@@ -401,6 +401,7 @@
             background-color: var(--sidebar-bg);
             border-left: 1px solid var(--border-color);
             height: 100vh;
+            height: 100dvh;
             position: fixed;
             top: 0; right: 0;
             transform: translateX(100%);
@@ -533,6 +534,12 @@
             color: white;
             align-self: flex-end;
             border-bottom-right-radius: 2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .chat-message.user:hover {
+            filter: brightness(1.15);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
         /* Override light-colored syntax highlights in dark bubbles */
         .chat-message.user code {
@@ -577,6 +584,7 @@
             display: flex;
             gap: 8px;
             background-color: var(--sidebar-bg);
+            flex-shrink: 0;
         }
         .chat-input-area textarea {
             flex-grow: 1;
@@ -676,6 +684,8 @@
                 width: 100% !important;
                 right: 0;
                 transform: translateX(100%);
+                height: 100vh;
+                height: 100dvh;
             }
             body.chat-sidebar-open #chat-sidebar {
                 transform: translateX(0);
@@ -3256,11 +3266,25 @@
             }
         }
 
+        // Adjusts sidebar height dynamically to match mobile visual viewport when virtual keyboard is launched
+        function adjustSidebarHeightForKeyboard() {
+            if (window.visualViewport) {
+                const chatSidebar = document.getElementById('chat-sidebar');
+                const isMobile = window.innerWidth <= 900;
+                if (isMobile && document.body.classList.contains('chat-sidebar-open')) {
+                    chatSidebar.style.height = window.visualViewport.height + 'px';
+                } else {
+                    chatSidebar.style.height = ''; // Fallback to CSS rules
+                }
+            }
+        }
+
         // Right AI Sidebar Toggles
         function toggleChatSidebar() {
             const body = document.body;
             if (body.classList.contains('chat-sidebar-open')) {
                 body.classList.remove('chat-sidebar-open');
+                adjustSidebarHeightForKeyboard();
             } else {
                 body.classList.add('chat-sidebar-open');
                 // Close Left Sidebar on Mobile
@@ -3269,7 +3293,10 @@
                     document.getElementById('mobile-overlay').classList.remove('open');
                 }
                 // Focus text area
-                setTimeout(() => document.getElementById('chat-input').focus(), 100);
+                setTimeout(() => {
+                    document.getElementById('chat-input').focus();
+                    adjustSidebarHeightForKeyboard();
+                }, 100);
             }
         }
 
@@ -3294,15 +3321,27 @@
                 customUrlGroup.style.display = 'none';
             }
 
-            // Suggest model placeholders based on provider selection
+            // Suggest model placeholders and default values based on provider selection
             if (p === 'openai') {
                 modelInput.placeholder = 'gpt-4o-mini';
+                if (modelInput.value === 'gemini-flash-latest' || modelInput.value === '' || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gemini')) {
+                    modelInput.value = 'gpt-4o-mini';
+                }
             } else if (p === 'anthropic') {
                 modelInput.placeholder = 'claude-3-5-sonnet-20241022';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('gemini') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'claude-3-5-sonnet-20241022';
+                }
             } else if (p === 'gemini') {
-                modelInput.placeholder = 'gemini-1.5-flash';
+                modelInput.placeholder = 'gemini-flash-latest';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'gemini-flash-latest';
+                }
             } else if (p === 'openrouter') {
                 modelInput.placeholder = 'meta-llama/llama-3-8b-instruct:free';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('gemini') || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'meta-llama/llama-3-8b-instruct:free';
+                }
             } else if (p === 'custom') {
                 modelInput.placeholder = 'model-name';
             }
@@ -3401,13 +3440,36 @@
                 currentSelection = text;
                 currentContext = context;
 
-                // Position floating popup relative to viewport
-                const range = selection.getRangeAt(0);
-                const rect = range.getBoundingClientRect();
+                const isMobile = window.innerWidth <= 900;
+                
+                if (isMobile) {
+                    // Position fixed at the bottom on mobile to avoid native Android contextual menu overlap
+                    popup.style.display = 'flex';
+                    popup.style.position = 'fixed';
+                    popup.style.bottom = '24px';
+                    popup.style.left = '50%';
+                    popup.style.transform = 'translateX(-50%)';
+                    popup.style.top = 'auto';
+                    popup.style.width = 'calc(100% - 40px)';
+                    popup.style.maxWidth = '340px';
+                    popup.style.justifyContent = 'center';
+                    popup.style.boxShadow = '0 8px 24px rgba(0,0,0,0.3)';
+                } else {
+                    // Position relative to selection on desktop
+                    const range = selection.getRangeAt(0);
+                    const rect = range.getBoundingClientRect();
 
-                popup.style.display = 'flex';
-                popup.style.left = Math.max(10, Math.min(window.innerWidth - popup.offsetWidth - 10, rect.left + (rect.width / 2) - 50)) + "px";
-                popup.style.top = (rect.top - 45) + "px";
+                    popup.style.display = 'flex';
+                    popup.style.position = 'fixed';
+                    popup.style.bottom = 'auto';
+                    popup.style.transform = 'none';
+                    popup.style.width = 'auto';
+                    popup.style.maxWidth = 'none';
+                    popup.style.left = Math.max(10, Math.min(window.innerWidth - popup.offsetWidth - 10, rect.left + (rect.width / 2) - 50)) + "px";
+                    popup.style.top = (rect.top - 45) + "px";
+                    popup.style.justifyContent = 'flex-start';
+                    popup.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+                }
             }, 10);
         }
 
@@ -3424,7 +3486,10 @@
 
             // Open sidebar
             document.body.classList.add('chat-sidebar-open');
-            document.getElementById('chat-input').focus();
+            setTimeout(() => {
+                document.getElementById('chat-input').focus();
+                adjustSidebarHeightForKeyboard();
+            }, 100);
         }
 
         function clearChat() {
@@ -3444,7 +3509,7 @@
             }
         }
 
-        function appendMessage(sender, text, isError = false) {
+        function appendMessage(sender, text, isError = false, historyIndex = null) {
             const msgsContainer = document.getElementById('chat-messages');
             const msgDiv = document.createElement('div');
             
@@ -3453,10 +3518,55 @@
             } else {
                 msgDiv.className = 'chat-message ' + sender;
             }
+
+            // If it is a user message and linked to history, attach interactive attributes
+            if (sender === 'user' && historyIndex !== null) {
+                msgDiv.setAttribute('data-history-index', historyIndex);
+                msgDiv.setAttribute('title', 'Κλικ για εκ νέου εκτέλεση από αυτό το σημείο');
+                msgDiv.addEventListener('click', () => handleHistoryClick(historyIndex));
+            }
             
             msgDiv.innerHTML = formatMarkdown(text);
             msgsContainer.appendChild(msgDiv);
             msgsContainer.scrollTop = msgsContainer.scrollHeight;
+        }
+
+        // Truncate history and re-run on user dialog click
+        async function handleHistoryClick(historyIndex) {
+            // Prevent duplicate triggers if query is running
+            const inputEl = document.getElementById('chat-input');
+            if (inputEl.disabled) return;
+
+            // Slice history array up to and including the selected user query
+            chatHistory = chatHistory.slice(0, historyIndex + 1);
+
+            // Redraw UI container to match truncated array
+            rebuildChatUI();
+
+            // Re-fire query
+            await runQuery();
+        }
+
+        // Clean redraw of current stack
+        function rebuildChatUI() {
+            const msgsContainer = document.getElementById('chat-messages');
+            const contextCard = document.getElementById('chat-context-card');
+            
+            msgsContainer.innerHTML = '';
+            msgsContainer.appendChild(contextCard);
+            
+            chatHistory.forEach((msg, idx) => {
+                if (msg.role === 'user') {
+                    let displayContent = msg.content;
+                    // Extract original question portion from first structured input turn for a clean UI
+                    if (idx === 0 && msg.content.includes("Ερώτηση:\n")) {
+                        displayContent = msg.content.split("Ερώτηση:\n").slice(1).join("Ερώτηση:\n");
+                    }
+                    appendMessage('user', displayContent, false, idx);
+                } else if (msg.role === 'assistant') {
+                    appendMessage('assistant', msg.content);
+                }
+            });
         }
 
         // Native Markdown parser leveraging standard Marked.js library
@@ -3475,11 +3585,18 @@
             }
         }
 
-        async function sendChatMessage() {
+        // Modular core query runner
+        async function runQuery() {
             const inputEl = document.getElementById('chat-input');
             const sendBtn = document.getElementById('chat-send-btn');
-            const prompt = inputEl.value.trim();
-            if (!prompt) return;
+            
+            // Disable inputs during network transaction
+            inputEl.disabled = true;
+            sendBtn.disabled = true;
+            
+            // Append loading container
+            appendMessage('assistant', 'Thinking...');
+            const lastMsgDiv = document.getElementById('chat-messages').lastChild;
 
             // Load credentials
             const provider = localStorage.getItem('ai-prov') || 'openai';
@@ -3488,42 +3605,28 @@
             const customUrl = localStorage.getItem('ai-url') || '';
 
             if (!apiKey && provider !== 'custom') {
-                appendMessage('assistant', '⚠️ Παρακαλούμε ρυθμίστε το API Key στις ρυθμίσεις AI Config πρώτα.', true);
+                lastMsgDiv.className = 'chat-message system-error';
+                lastMsgDiv.innerText = '⚠️ Παρακαλούμε ρυθμίστε το API Key στις ρυθμίσεις AI Config πρώτα.';
                 openAiSettings();
+                inputEl.disabled = false;
+                sendBtn.disabled = false;
                 return;
             }
 
-            appendMessage('user', prompt);
-            inputEl.value = '';
-            
-            // Disable inputs while query processed
-            inputEl.disabled = true;
-            sendBtn.disabled = true;
+            // Build the System Prompt Context dynamically on EVERY call
+            const isOriginal = currentContext.selectedColType === 'original';
+            const contextText = isOriginal ? currentContext.originalText : currentContext.translationText;
+            const contextLabel = isOriginal ? "Αρχαίο Κείμενο" : "Σύγχρονη Μετάφραση";
 
-            // Append context system parameters if starting the chat session
-            let payloadMessages = [];
-            if (chatHistory.length === 0) {
-                const isOriginal = currentContext.selectedColType === 'original';
-                const contextText = isOriginal ? currentContext.originalText : currentContext.translationText;
-                const contextLabel = isOriginal ? "Αρχαίο Κείμενο" : "Σύγχρονη Μετάφραση";
-                
-                let systemInstruction = "Είσαι διακεκριμένος φιλόσοφος και γνώστης της φιλοσοφίας του Αριστοτέλη και Πλάτωνα.\n" +
-                    "Ο χρήστης θέλει να κάνει κάποιες ερωτήσεις σε σχέση με το ακόλουθο βιβλίο/κεφάλαιο (Σελίδα " + currentContext.pageNum + ", " + currentContext.dividerText + "):\n" +
-                    "--- " + contextLabel + ":\n" + contextText + "\n\n" +
-                    "Ο χρήστης επισήμανε το ακόλουθο κείμενο απο το σχετικό πλαίσιο\n" +
-                    "--- Κείμενο Που Επισήμανε ο Χρήστης:\n\"" + currentSelection + "\"\n\n" +
-                    "Κάνε ανάλυση του επισημασμένου κειμένου σε σχέση με το πλαίσιο του βιβλίου/σελίδας στο οποίο υπάρχει και απάντησε στις ερωτήσεις του χρήστη" +
-                    "Δώσε τις απαντήσεις σου στα νέα ελληνικά.";
-                
-                payloadMessages.push({ role: "system", content: systemInstruction });
-            }
+            let systemInstruction = "Είσαι διακεκριμένος φιλόσοφος και γνώστης της φιλοσοφίας του Αριστοτέλη και Πλάτωνα.\n" +
+                "Ο χρήστης διαβάζει μια δίγλωσση έκδοση. Ακολουθεί το ευρύτειο πλαίσιο της σελίδας/κεφαλαίου (Σελίδα " + currentContext.pageNum + ", " + currentContext.dividerText + ") για αναφορά:\n" +
+                "--- " + contextLabel + ":\n" + contextText + "\n\n" +
+                "Απάντησε στις ερωτήσεις του χρήστη σε σχέση με το πλαίσιο του κειμένου που παρέχεται. " +
+                "Δώσε τις απαντήσεις σου στα νέα ελληνικά χρησιμοποιώντας markdown μορφοποίηση.";
 
-            // Append active dialogue to conversation tree
-            chatHistory.push({ role: "user", content: prompt });
+            // Construct Payload Messages (Always prepending system prompt at index 0)
+            let payloadMessages = [{ role: "system", content: systemInstruction }];
             payloadMessages = payloadMessages.concat(chatHistory);
-
-            appendMessage('assistant', 'Thinking...');
-            const lastMsgDiv = document.getElementById('chat-messages').lastChild;
 
             try {
                 const answer = await requestAPI(provider, apiKey, savedMod, payloadMessages, customUrl);
@@ -3532,12 +3635,47 @@
             } catch (error) {
                 lastMsgDiv.className = 'chat-message system-error';
                 lastMsgDiv.innerText = "Error: " + error.message;
+                // If API failed, keep the user question on screen so they can click to retry it,
+                // do not silently clear the UI anymore.
             } finally {
                 inputEl.disabled = false;
                 sendBtn.disabled = false;
                 document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
                 inputEl.focus();
+                adjustSidebarHeightForKeyboard();
             }
+        }
+
+        async function sendChatMessage() {
+            const inputEl = document.getElementById('chat-input');
+            const prompt = inputEl.value.trim();
+            if (!prompt) return;
+
+            // If the last message in history is a 'user' query (due to a previous failed turn),
+            // pop it before sending so that our conversational stack maintains alternating roles.
+            if (chatHistory.length > 0 && chatHistory[chatHistory.length - 1].role === 'user') {
+                chatHistory.pop();
+            }
+
+            // 1. Manage Chat History & Highlight Context
+            let histIdx;
+            if (chatHistory.length === 0) {
+                // Incorporate highlighted text directly into the first user turn, NOT the system prompt
+                const firstUserContent = "Επισημασμένο κείμενο:\n\"" + currentSelection + "\"\n\nΕρώτηση:\n" + prompt;
+                chatHistory.push({ role: "user", content: firstUserContent });
+                histIdx = 0;
+            } else {
+                // Subsequent turns: push the raw user follow-up prompt
+                chatHistory.push({ role: "user", content: prompt });
+                histIdx = chatHistory.length - 1;
+            }
+
+            // 2. Display user message in UI with history index
+            appendMessage('user', prompt, false, histIdx);
+            inputEl.value = '';
+
+            // 3. Trigger query execution
+            await runQuery();
         }
 
         async function requestAPI(provider, apiKey, model, messages, customUrl) {
@@ -3550,7 +3688,7 @@
             if (!activeModel) {
                 if (provider === 'openai') activeModel = 'gpt-4o-mini';
                 else if (provider === 'anthropic') activeModel = 'claude-3-5-sonnet-20241022';
-                else if (provider === 'gemini') activeModel = 'gemini-1.5-flash';
+                else if (provider === 'gemini') activeModel = 'gemini-flash-latest';
                 else if (provider === 'openrouter') activeModel = 'meta-llama/llama-3-8b-instruct:free';
                 else activeModel = 'local-model';
             }
@@ -3688,22 +3826,43 @@
                 }
             });
             
-            // Listen for selection events on layout columns
+            // Listen for selection events on layout columns (supports mouse and touch handles)
             document.addEventListener('mouseup', handleTextSelection);
             document.addEventListener('keyup', handleTextSelection);
+            document.addEventListener('selectionchange', handleTextSelection);
 
-            // Bind selection popup using mousedown with preventDefault.
-            // This guarantees the floating button registers clicks before selection is lost.
+            // Bind selection popup using both mousedown and touchstart with preventDefault.
+            // This guarantees instant tap execution on touch devices before selection focus is lost.
             const popup = document.getElementById('ai-selection-popup');
-            popup.addEventListener('mousedown', (e) => {
+            const handleTriggerTap = (e) => {
                 e.preventDefault();
                 openChatWithSelection();
-            });
+            };
+            popup.addEventListener('mousedown', handleTriggerTap);
+            popup.addEventListener('touchstart', handleTriggerTap);
 
-            // Hide the popup trigger during scroll shifts
+            // Hide the popup trigger during scroll shifts (desktop only to prevent mobile touch glitches)
             window.addEventListener('scroll', () => {
-                document.getElementById('ai-selection-popup').style.display = 'none';
+                if (window.innerWidth > 900) {
+                    document.getElementById('ai-selection-popup').style.display = 'none';
+                }
             }, { passive: true });
+
+            // VisualViewport resizing adjustments (Handles Android virtual keyboard overlap natively)
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', adjustSidebarHeightForKeyboard);
+                window.visualViewport.addEventListener('scroll', adjustSidebarHeightForKeyboard);
+            }
+
+            const chatInput = document.getElementById('chat-input');
+            if (chatInput) {
+                chatInput.addEventListener('focus', () => {
+                    setTimeout(adjustSidebarHeightForKeyboard, 150);
+                });
+                chatInput.addEventListener('blur', () => {
+                    setTimeout(adjustSidebarHeightForKeyboard, 150);
+                });
+            }
             
             let lastScrollTop = 0;
             const header = document.querySelector('header');
