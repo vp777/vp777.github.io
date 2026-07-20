@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ΠΛΑΤΩΝ Ἀπολογία Σωκράτους</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #faf8f5;
+            --text-color: #2c2520;
+            --accent-color: #8b263e;
+            --sidebar-bg: #f3efe9;
+            --border-color: #e3ded5;
+            --muted-text: #706357;
+            --font-serif: "Cardo", "Georgia", "Palatino", serif;
+        }
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --accent-color: #ff8a80;
+            --sidebar-bg: #2d2d2d;
+            --border-color: #404040;
+            --muted-text: #999999;
+        }
+        [data-theme="sepia"] {
+            --bg-color: #f4ecd8;
+            --text-color: #5b4636;
+            --accent-color: #a04000;
+            --sidebar-bg: #ebdcb9;
+            --border-color: #d7c59d;
+            --muted-text: #7c6857;
+        }
+        
+        body {
+            margin: 0;
+            font-family: var(--font-serif);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            transition: background-color 0.2s, color 0.2s;
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        #mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 90;
+        }
+        #mobile-overlay.open {
+            display: block;
+        }
+        
+        #expand-bar {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 24px;
+            height: 100vh;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            cursor: pointer;
+            z-index: 95;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+        #expand-bar:hover {
+            background-color: var(--border-color);
+        }
+        #expand-bar::after {
+            content: "›";
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        
+        #sidebar {
+            width: 340px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            height: 100vh;
+            position: fixed;
+            top: 0; left: 0;
+            overflow-y: auto;
+            padding: 24px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transform: translateX(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+        #sidebar h2 {
+            font-size: 1.25rem;
+            margin: 0;
+            color: var(--text-color);
+        }
+        .sidebar-close-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--accent-color);
+            font-size: 1.4rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            line-height: 1;
+        }
+        .sidebar-close-btn:hover {
+            background-color: var(--border-color);
+        }
+        
+        .toc-list-container { overflow-y: auto; flex-grow: 1; }
+        
+        details.book-group {
+            margin-bottom: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            background-color: var(--sidebar-bg);
+        }
+        details.book-group[open] { border-color: var(--accent-color); }
+        details.book-group summary {
+            font-weight: bold; font-size: 1.05rem; cursor: pointer; padding: 10px 14px;
+            background-color: var(--sidebar-bg); list-style: none; display: flex;
+            justify-content: space-between; align-items: center; user-select: none;
+        }
+        details.book-group summary::-webkit-details-marker { display: none; }
+        details.book-group summary::after { content: "▾"; font-size: 0.9rem; color: var(--accent-color); }
+        details.book-group[open] summary::after { transform: rotate(180deg); }
+        
+        .toc-sublist-container {
+            background-color: var(--bg-color);
+            border-top: 1px solid var(--border-color);
+        }
+        .toc-group-title {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            padding: 8px 14px 4px 14px;
+            line-height: 1.3;
+        }
+        .toc-sublist { list-style: none; padding: 4px 14px 8px 14px; margin: 0; }
+        .toc-sublist li { margin-bottom: 8px; font-size: 0.88rem; }
+        
+        /* Flex alignment keeps chapter names on left, page numbers perfectly aligned on right */
+        .toc-sublist a { 
+            color: var(--text-color); 
+            text-decoration: none; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding: 4px; 
+        }
+        .toc-sublist a:hover { color: var(--accent-color); }
+        .toc-page {
+            color: var(--muted-text);
+            font-size: 0.8rem;
+            font-family: var(--font-serif);
+        }
+        
+        #main {
+            margin-left: 340px;
+            flex-grow: 1;
+            padding: 180px 40px 40px 40px;
+            box-sizing: border-box;
+            width: calc(100% - 340px);
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        padding-top 0.3s ease;
+        }
+        
+        header {
+            position: fixed;
+            top: 0;
+            left: 340px;
+            right: 0;
+            background-color: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px 40px;
+            z-index: 50;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transform: translateY(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        left 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        background-color 0.2s, 
+                        box-shadow 0.2s;
+        }
+        header.header-hidden {
+            transform: translateY(-100%);
+            box-shadow: none !important;
+        }
+        body.scrolled header {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        [data-theme="dark"] body.scrolled header {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .header-top { display: flex; align-items: center; gap: 20px; }
+        header h1 { margin: 0; font-size: 1.8rem; color: var(--accent-color); line-height: 1.2; }
+        
+        .controls-group {
+            display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+        }
+        .btn {
+            background-color: var(--sidebar-bg); color: var(--text-color);
+            border: 1px solid var(--border-color); padding: 8px 14px;
+            font-family: inherit; cursor: pointer; border-radius: 6px;
+            font-size: 0.9rem; font-weight: bold; transition: all 0.2s; white-space: nowrap;
+        }
+        .btn:hover { background-color: var(--border-color); }
+        .btn.active { background-color: var(--accent-color); color: white; border-color: var(--accent-color); }
+        .btn-layout { background-color: var(--bg-color); border: 2px solid var(--accent-color); color: var(--accent-color); }
+        
+        .menu-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+            white-space: nowrap;
+        }
+        .menu-toggle:hover {
+            background-color: var(--text-color);
+        }
+        
+        .options-toggle {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 6px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            width: 38px;
+            height: 38px;
+            transition: all 0.2s;
+        }
+        .options-toggle:hover {
+            background-color: var(--sidebar-bg);
+        }
+
+        #book-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            column-gap: 48px;
+            row-gap: 0;
+            margin: 0 auto;
+            max-width: 140ch;
+            width: 100%;
+        }
+        
+        body.sidebar-closed #expand-bar {
+            display: flex;
+        }
+        body.sidebar-closed #sidebar {
+            transform: translateX(-340px);
+        }
+        body.sidebar-closed #main {
+            margin-left: 24px;
+            width: calc(100% - 24px);
+        }
+        body.sidebar-closed header {
+            left: 24px;
+        }
+        
+        body.hide-original #book-content { 
+            grid-template-columns: 1fr; 
+            max-width: 140ch;
+        }
+        body.hide-original .original-col { display: none; }
+        body.hide-original .bilingual-header { grid-template-columns: 1fr; }
+        body.hide-original .bilingual-header .original-title { display: none; }
+        body.hide-original .translation-col {
+            max-width: 100% !important;
+            justify-self: stretch !important;
+        }
+
+        .bilingual-header {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px; position: sticky; top: 0;
+            background-color: var(--bg-color); padding: 16px 0;
+            border-bottom: 2px solid var(--accent-color); z-index: 10;
+            font-weight: bold; text-transform: uppercase; font-size: 0.85rem;
+            letter-spacing: 0.05em; color: var(--muted-text);
+        }
+        
+        .chapter-anchor {
+            display: block;
+            scroll-margin-top: 180px;
+        }
+        
+        .page-divider {
+            grid-column: 1 / -1;
+            border-bottom: 1px solid var(--border-color);
+            padding-top: 48px; padding-bottom: 12px; margin-bottom: 24px;
+            font-size: 0.95rem; color: var(--accent-color); text-transform: uppercase;
+            letter-spacing: 0.05em; font-weight: bold; 
+            scroll-margin-top: 180px;
+        }
+        
+        .page-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--accent-color);
+            transition: color 0.2s, border-bottom-color 0.2s;
+        }
+        .page-link:hover {
+            color: var(--text-color);
+            border-bottom-color: var(--text-color);
+        }
+        
+        .column { 
+            box-sizing: border-box; 
+            padding-bottom: 24px; 
+            display: flex; 
+            flex-direction: column; 
+            max-width: 65ch;
+            width: 100%;
+        }
+        
+        .original-col {
+            justify-self: end;
+        }
+        .translation-col {
+            justify-self: start;
+        }
+        
+        .passage { margin: 0 0 1.2em 0; font-size: 1.15rem; text-align: justify; }
+        .passage.indent { text-indent: 2em; }
+        .marker { color: var(--accent-color); font-weight: bold; margin-right: 4px; }
+        i { font-style: italic; }
+
+        @media (max-width: 900px) {
+            #sidebar { transform: translateX(-100%); width: 320px; }
+            body.sidebar-open #sidebar { transform: translateX(0); }
+            body.sidebar-closed #sidebar { transform: translateX(-100%); }
+            
+            #main { 
+                margin-left: 0 !important; 
+                width: 100% !important; 
+                padding: 100px 20px 20px 20px !important;
+            }
+            body.mobile-options-open #main {
+                padding-top: 150px !important;
+            }
+            
+            header {
+                padding-bottom: 12px;
+                margin-bottom: 16px;
+                gap: 8px;
+            }
+            header h1 { 
+                font-size: 0.95rem !important;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                text-align: center;
+                flex-grow: 1;
+                margin: 0;
+            }
+            
+            header {
+                left: 0 !important;
+                padding: 12px 16px;
+            }
+            
+            .header-top { 
+                display: flex;
+                flex-direction: row !important;
+                align-items: center; 
+                justify-content: space-between; 
+                width: 100%;
+                gap: 12px; 
+            }
+            
+            .menu-toggle { 
+                width: auto !important; 
+                padding: 6px 12px;
+                font-size: 0.85rem;
+            }
+            
+            .options-toggle {
+                display: inline-flex;
+            }
+            
+            .controls-group {
+                display: none;
+                width: 100%;
+                justify-content: center;
+                padding-top: 12px;
+                border-top: 1px dashed var(--border-color);
+            }
+            header.options-open .controls-group {
+                display: flex;
+            }
+            
+            #book-content { grid-template-columns: 1fr; column-gap: 0; max-width: 100%; }
+            .column { max-width: 100% !important; }
+            .bilingual-header { display: none; }
+            .page-divider { padding-top: 32px; scroll-margin-top: 110px; }
+            .chapter-anchor { scroll-margin-top: 110px; }
+            .passage { font-size: 1.05rem; }
+        }
+        
+        @media (min-width: 901px) {
+            .menu-toggle {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="mobile-overlay" onclick="toggleSidebar()"></div>
+
+    <div id="expand-bar" onclick="toggleSidebar()" title="Ανάπτυξη Περιεχομένων"></div>
+
+    <aside id="sidebar">
+        <div class="sidebar-header">
+            <h2>Πίνακας Περιεχομένων</h2>
+            <button class="sidebar-close-btn" onclick="toggleSidebar()" title="Σύμπτυξη">‹</button>
+        </div>
+        <div class="toc-list-container">
+            <details class="book-group">
+    <summary>Προοίμιο</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-1-chapter-1" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1</span> <span class="toc-page">#1</span></a></li>
+        </ul>
+    </div>
+</details>
+<details class="book-group">
+    <summary>Ο Σωκράτης αντικρούει παλιότερες κατηγορίες εναντίον του</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-2-chapter-1" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1</span> <span class="toc-page">#2</span></a></li>
+            <li><a href="#book-2-chapter-1-2" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.2</span> <span class="toc-page">#3</span></a></li>
+            <li><a href="#book-2-chapter-1-3" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.3</span> <span class="toc-page">#4</span></a></li>
+            <li><a href="#book-2-chapter-1-4" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.4</span> <span class="toc-page">#5</span></a></li>
+        </ul>
+    </div>
+</details>
+<details class="book-group">
+    <summary>Ο Σωκράτης αντικρούει την κατηγορία του Μέλητου</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-3-chapter-1" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1</span> <span class="toc-page">#6</span></a></li>
+            <li><a href="#book-3-chapter-1-2" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.2</span> <span class="toc-page">#7</span></a></li>
+        </ul>
+    </div>
+</details>
+<details class="book-group">
+    <summary>Ο τρόπος ζωής και η δράση του Σωκράτη</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-4-chapter-1" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1</span> <span class="toc-page">#8</span></a></li>
+            <li><a href="#book-4-chapter-1-2" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.2</span> <span class="toc-page">#9</span></a></li>
+            <li><a href="#book-4-chapter-1-3" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.3</span> <span class="toc-page">#10</span></a></li>
+            <li><a href="#book-4-chapter-1-4" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.4</span> <span class="toc-page">#11</span></a></li>
+            <li><a href="#book-4-chapter-1-5" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.5</span> <span class="toc-page">#12</span></a></li>
+        </ul>
+    </div>
+</details>
+<details class="book-group">
+    <summary>Επίλογος</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-5-chapter-1" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1</span> <span class="toc-page">#13</span></a></li>
+        </ul>
+    </div>
+</details>
+<details class="book-group">
+    <summary>Αφού κρίθηκε ένοχος ο Σωκράτης προτείνει την ποινή που πιστεύει ότι του αξίζει</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-6-chapter-1" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1</span> <span class="toc-page">#14</span></a></li>
+            <li><a href="#book-6-chapter-1-2" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.2</span> <span class="toc-page">#15</span></a></li>
+        </ul>
+    </div>
+</details>
+<details class="book-group">
+    <summary>Μετά τον ορισμό της ποινής του θανάτου ο Σωκράτης απευθύνεται στους δικαστές</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-7-chapter-1" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1</span> <span class="toc-page">#16</span></a></li>
+            <li><a href="#book-7-chapter-1-2" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.2</span> <span class="toc-page">#17</span></a></li>
+            <li><a href="#book-7-chapter-1-3" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.3</span> <span class="toc-page">#18</span></a></li>
+        </ul>
+    </div>
+</details>
+        </div>
+    </aside>
+
+    <main id="main">
+        <header>
+            <div class="header-top">
+                <button class="btn menu-toggle" onclick="toggleSidebar()">☰ Περιεχόμενα</button>
+                <h1>ΠΛΑΤΩΝ Ἀπολογία Σωκράτους</h1>
+                <button class="btn options-toggle" onclick="toggleMobileOptions()" title="Ρυθμίσεις">⚙️</button>
+            </div>
+            
+            <div class="controls-group">
+                <button id="toggle-layout-btn" class="btn btn-layout" onclick="toggleLayout()">Hide Original</button>
+                <button class="btn active theme-btn" id="theme-light" onclick="setTheme('light', this)">Light</button>
+                <button class="btn theme-btn" id="theme-sepia" onclick="setTheme('sepia', this)">Sepia</button>
+                <button class="btn theme-btn" id="theme-dark" onclick="setTheme('dark', this)">Dark</button>
+            </div>
+        </header>
+
+        <section id="book-content">
+            <div class="bilingual-header">
+                <div class="original-title">Αρχαία Ελληνικά (Original)</div>
+                <div class="translation-title">Νέα Ελληνικά (Translation)</div>
+            </div>
+
+            
+        <div id="book-1-chapter-1" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-1" data-hash="book-1-chapter-1">
+            Προοίμιο • Κεφάλαιο 1 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=104&page=1" target="_blank" class="page-link">Page 1</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="marker">[17a]</span> Ὅτι μὲν ὑμεῖς, ὦ ἄνδρες Ἀθηναῖοι, πεπόνθατε ὑπὸ τῶν ἐμῶν κατηγόρων, οὐκ οἶδα· ἐγὼ δ᾽ οὖν καὶ αὐτὸς ὑπ᾽ αὐτῶν ὀλίγου ἐμαυτοῦ ἐπελαθόμην, οὕτω πιθανῶς ἔλεγον. καίτοι ἀληθές γε ὡς ἔπος εἰπεῖν οὐδὲν εἰρήκασιν. μάλιστα δὲ αὐτῶν ἓν ἐθαύμασα τῶν πολλῶν ὧν ἐψεύσαντο, τοῦτο ἐν ᾧ ἔλεγον ὡς χρῆν ὑμᾶς εὐλαβεῖσθαι μὴ ὑπ᾽ ἐμοῦ ἐξαπατηθῆτε <span class="marker">[17b]</span> ὡς δεινοῦ ὄντος λέγειν. τὸ γὰρ μὴ αἰσχυνθῆναι ὅτι αὐτίκα ὑπ᾽ ἐμοῦ ἐξελεγχθήσονται ἔργῳ, ἐπειδὰν μηδ᾽ ὁπωστιοῦν φαίνωμαι δεινὸς λέγειν, τοῦτό μοι ἔδοξεν αὐτῶν ἀναισχυντότατον εἶναι, εἰ μὴ ἄρα δεινὸν καλοῦσιν οὗτοι λέγειν τὸν τἀληθῆ λέγοντα· εἰ μὲν γὰρ τοῦτο λέγουσιν, ὁμολογοίην ἂν ἔγωγε οὐ κατὰ τούτους εἶναι ῥήτωρ. οὗτοι μὲν οὖν, ὥσπερ ἐγὼ λέγω, ἤ τι ἢ οὐδὲν ἀληθὲς εἰρήκασιν, ὑμεῖς δέ μου ἀκούσεσθε πᾶσαν τὴν ἀλήθειαν — οὐ μέντοι μὰ Δία, ὦ ἄνδρες Ἀθηναῖοι, κεκαλλιεπημένους γε λόγους, ὥσπερ οἱ τούτων, <span class="marker">[17c]</span> ῥήμασί τε καὶ ὀνόμασιν οὐδὲ κεκοσμημένους, ἀλλ᾽ ἀκούσεσθε εἰκῇ λεγόμενα τοῖς ἐπιτυχοῦσιν ὀνόμασιν —πιστεύω γὰρ δίκαια εἶναι ἃ λέγω— καὶ μηδεὶς ὑμῶν προσδοκησάτω ἄλλως· οὐδὲ γὰρ ἂν δήπου πρέποι, ὦ ἄνδρες, τῇδε τῇ ἡλικίᾳ ὥσπερ μειρακίῳ πλάττοντι λόγους εἰς ὑμᾶς εἰσιέναι. καὶ μέντοι καὶ πάνυ, ὦ ἄνδρες Ἀθηναῖοι, τοῦτο ὑμῶν δέομαι καὶ παρίεμαι· ἐὰν διὰ τῶν αὐτῶν λόγων ἀκούητέ μου ἀπολογουμένου δι᾽ ὧνπερ εἴωθα λέγειν καὶ ἐν ἀγορᾷ ἐπὶ τῶν τραπεζῶν, ἵνα ὑμῶν πολλοὶ ἀκηκόασι, καὶ ἄλλοθι, μήτε <span class="marker">[17d]</span> θαυμάζειν μήτε θορυβεῖν τούτου ἕνεκα. ἔχει γὰρ οὑτωσί. νῦν ἐγὼ πρῶτον ἐπὶ δικαστήριον ἀναβέβηκα, ἔτη γεγονὼς ἑβδομήκοντα· ἀτεχνῶς οὖν ξένως ἔχω τῆς ἐνθάδε λέξεως. ὥσπερ οὖν ἄν, εἰ τῷ ὄντι ξένος ἐτύγχανον ὤν, συνεγιγνώσκετε δήπου ἄν μοι εἰ ἐν ἐκείνῃ τῇ φωνῇ τε καὶ τῷ τρόπῳ <span class="marker">[18a]</span> ἔλεγον ἐν οἷσπερ ἐτεθράμμην, καὶ δὴ καὶ νῦν τοῦτο ὑμῶν δέομαι δίκαιον, ὥς γέ μοι δοκῶ, τὸν μὲν τρόπον τῆς λέξεως ἐᾶν —ἴσως μὲν γὰρ χείρων, ἴσως δὲ βελτίων ἂν εἴη— αὐτὸ δὲ τοῦτο σκοπεῖν καὶ τούτῳ τὸν νοῦν προσέχειν, εἰ δίκαια λέγω ἢ μή· δικαστοῦ μὲν γὰρ αὕτη ἀρετή, ῥήτορος δὲ τἀληθῆ λέγειν.</p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="marker">[17a]</span> Ποιά εντύπωση σας έκαναν, εσάς, ω άνδρες Αθηναίοι, τα λόγια των κατηγόρων μου δεν το ξέρω· εγώ λίγο έλειψε να ξεχάσω κι ο ίδιος ποιός είμαι. Τόσο πειστικά μιλούσανε. Μολονότι, έτσι να πούμε, δεν είπαν τίποτε αληθινό. Ένα όμως θαύμασα προπάντων από τα πολλά ψέματά τους: τούτο που σας είπαν, να φυλαχθείτε μήπως σας γελάσω <span class="marker">[17b]</span> με τη ρητορική μου. Γιατί το να μην ντραπούν πως αμέσως τώρα, ο ίδιος εγώ, με τα πράγματα θα τους βγάλω ψεύτες, όταν φανώ πως καθόλου δεν είμαι τρομερός στα λόγια, αυτό μου φάνηκε η μεγαλύτερή τους αναισχυντία· εκτός αν ίσως αυτοί ονομάζουν τρομερό στα λόγια εκείνον που λέει την αλήθεια. Γιατί αν αυτό λένε, τότε κι εγώ ίσως τ᾽ ομολογήσω πως είμαι ρήτορας, όχι όμως με τον δικό τους τον τρόπο. Αυτοί λοιπόν, όπως είπα, τίποτε σχεδόν αληθινό δεν είπαν· εσείς όμως θ᾽ ακούσετε από μένα όλη την αλήθεια, μά τον Δία, ω άνδρες Αθηναίοι· όχι δηλαδή ομιλίες καλοειπωμένες σαν τις δικές τους, <span class="marker">[17c]</span> με φράσεις και λέξεις όμορφες, ούτε καλοστολισμένες, μόνο θ᾽ ακούσετε λόγια απλά, με όποια λέξη μού τύχει· γιατί πιστεύω πως όσα λέω είναι δίκαια και κανείς σας ας μην τα περιμένει αλλιώτικα. Γιατί δεν ταιριάζει, βέβαια, ω άνδρες Αθηναίοι, σε τέτοιαν ηλικία να παρουσιάζομαι μπροστά σας σαν κανένα παιδάριο, που τορνεύει τα λόγια του. Και γι᾽ αυτό πολύ σας παρακαλώ και σας το ζητώ για χάρη, ω άνδρες Αθηναίοι, αν μ᾽ ακούσετε ν᾽ απολογούμαι με τα ίδια τα λόγια που συνηθίζω να μιλώ στην αγορά, μπροστά στα τραπέζια των κολλυβιστών, κι αλλού, όπου πολλοί από σας μ᾽ έχετε ακουσμένον, να μην <span class="marker">[17d]</span> ξαφνισθείτε και να μη θορυβήσετε. Ο λόγος είν᾽ αυτός. Πρώτη φορά τώρα, που είμαι εβδομήντα χρόνων, παρουσιάζομαι μπροστά σε δικαστήριο· αληθινά λοιπόν δε γνωρίζω καθόλου τη γλώσσα που μιλούν εδώ μέσα. Όπως λοιπόν, αν ήμουν στ᾽ αλήθεια ξένος και μιλούσα με τη γλώσσα και τον τρόπο <span class="marker">[18a]</span> που είχα ανατραφεί, θα με συχωρούσατε, έτσι και τώρα σας ζητώ ένα πράγμα, δίκαιο κατά τη γνώμη μου, να μην κοιτάξετε τον τρόπο που μιλώ, καλόν ή κακό, αλλά μόνο να προσέξετε αν αυτά που λέω είναι δίκαια ή όχι· γιατί έτσι πρέπει στον δικαστή, όπως πρέπει στον ρήτορα, να λέει την αλήθεια.</p>
+        </div>
+        
+
+        <div id="book-2-chapter-1" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-2" data-hash="book-2-chapter-1">
+            Ο Σωκράτης αντικρούει παλιότερες κατηγορίες εναντίον του • Κεφάλαιο 1 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=104&page=2" target="_blank" class="page-link">Page 2</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent">Πρῶτον μὲν οὖν δίκαιός εἰμι ἀπολογήσασθαι, ὦ ἄνδρες Ἀθηναῖοι, πρὸς τὰ πρῶτά μου ψευδῆ κατηγορημένα καὶ τοὺς πρώτους κατηγόρους, ἔπειτα δὲ πρὸς τὰ ὕστερον καὶ τοὺς <span class="marker">[18b]</span> ὑστέρους. ἐμοῦ γὰρ πολλοὶ κατήγοροι γεγόνασι πρὸς ὑμᾶς καὶ πάλαι πολλὰ ἤδη ἔτη καὶ οὐδὲν ἀληθὲς λέγοντες, οὓς ἐγὼ μᾶλλον φοβοῦμαι ἢ τοὺς ἀμφὶ Ἄνυτον, καίπερ ὄντας καὶ τούτους δεινούς· ἀλλ᾽ ἐκεῖνοι δεινότεροι, ὦ ἄνδρες, οἳ ὑμῶν τοὺς πολλοὺς ἐκ παίδων παραλαμβάνοντες ἔπειθόν τε καὶ κατηγόρουν ἐμοῦ μᾶλλον οὐδὲν ἀληθές, ὡς ἔστιν τις Σωκράτης σοφὸς ἀνήρ, τά τε μετέωρα φροντιστὴς καὶ τὰ ὑπὸ γῆς πάντα ἀνεζητηκὼς καὶ τὸν ἥττω λόγον κρείττω <span class="marker">[18c]</span> ποιῶν. οὗτοι, ὦ ἄνδρες Ἀθηναῖοι, ‹οἱ› ταύτην τὴν φήμην κατασκεδάσαντες, οἱ δεινοί εἰσίν μου κατήγοροι· οἱ γὰρ ἀκούοντες ἡγοῦνται τοὺς ταῦτα ζητοῦντας οὐδὲ θεοὺς νομίζειν. ἔπειτά εἰσιν οὗτοι οἱ κατήγοροι πολλοὶ καὶ πολὺν χρόνον ἤδη κατηγορηκότες, ἔτι δὲ καὶ ἐν ταύτῃ τῇ ἡλικίᾳ λέγοντες πρὸς ὑμᾶς ἐν ᾗ ἂν μάλιστα ἐπιστεύσατε, παῖδες ὄντες ἔνιοι ὑμῶν καὶ μειράκια, ἀτεχνῶς ἐρήμην κατηγοροῦντες ἀπολογουμένου οὐδενός. ὃ δὲ πάντων ἀλογώτατον, ὅτι οὐδὲ τὰ <span class="marker">[18d]</span> ὀνόματα οἷόν τε αὐτῶν εἰδέναι καὶ εἰπεῖν, πλὴν εἴ τις κωμῳδοποιὸς τυγχάνει ὤν. ὅσοι δὲ φθόνῳ καὶ διαβολῇ χρώμενοι ὑμᾶς ἀνέπειθον —οἱ δὲ καὶ αὐτοὶ πεπεισμένοι ἄλλους πείθοντες— οὗτοι πάντες ἀπορώτατοί εἰσιν· οὐδὲ γὰρ ἀναβιβάσασθαι οἷόν τ᾽ ἐστὶν αὐτῶν ἐνταυθοῖ οὐδ᾽ ἐλέγξαι οὐδένα, ἀλλ᾽ ἀνάγκη ἀτεχνῶς ὥσπερ σκιαμαχεῖν ἀπολογούμενόν τε καὶ ἐλέγχειν μηδενὸς ἀποκρινομένου. ἀξιώσατε οὖν καὶ ὑμεῖς, ὥσπερ ἐγὼ λέγω, διττούς μου τοὺς κατηγόρους γεγονέναι, ἑτέρους μὲν τοὺς ἄρτι κατηγορήσαντας, ἑτέρους δὲ <span class="marker">[18e]</span> τοὺς πάλαι οὓς ἐγὼ λέγω, καὶ οἰήθητε δεῖν πρὸς ἐκείνους πρῶτόν με ἀπολογήσασθαι· καὶ γὰρ ὑμεῖς ἐκείνων πρότερον ἠκούσατε κατηγορούντων καὶ πολὺ μᾶλλον ἢ τῶνδε τῶν ὕστερον.</p>
+<p class="passage indent">Εἶεν· ἀπολογητέον δή, ὦ ἄνδρες Ἀθηναῖοι, καὶ <span class="marker">[19a]</span> ἐπιχειρητέον ὑμῶν ἐξελέσθαι τὴν διαβολὴν ἣν ὑμεῖς ἐν πολλῷ χρόνῳ ἔσχετε ταύτην ἐν οὕτως ὀλίγῳ χρόνῳ. βουλοίμην μὲν οὖν ἂν τοῦτο οὕτως γενέσθαι, εἴ τι ἄμεινον καὶ ὑμῖν καὶ ἐμοί, καὶ πλέον τί με ποιῆσαι ἀπολογούμενον· οἶμαι δὲ αὐτὸ χαλεπὸν εἶναι, καὶ οὐ πάνυ με λανθάνει οἷόν ἐστιν. ὅμως τοῦτο μὲν ἴτω ὅπῃ τῷ θεῷ φίλον, τῷ δὲ νόμῳ πειστέον καὶ ἀπολογητέον.</p>
+<p class="passage indent">Ἀναλάβωμεν οὖν ἐξ ἀρχῆς τίς ἡ κατηγορία ἐστὶν ἐξ ἧς <span class="marker">[19b]</span> ἡ ἐμὴ διαβολὴ γέγονεν, ᾗ δὴ καὶ πιστεύων Μέλητός με ἐγράψατο τὴν γραφὴν ταύτην. εἶεν· τί δὴ λέγοντες διέβαλλον οἱ διαβάλλοντες; ὥσπερ οὖν κατηγόρων τὴν ἀντωμοσίαν δεῖ ἀναγνῶναι αὐτῶν· «Σωκράτης ἀδικεῖ καὶ περιεργάζεται ζητῶν τά τε ὑπὸ γῆς καὶ οὐράνια καὶ τὸν ἥττω λόγον κρείττω <span class="marker">[19c]</span> ποιῶν καὶ ἄλλους ταὐτὰ ταῦτα διδάσκων.» τοιαύτη τίς ἐστιν· ταῦτα γὰρ ἑωρᾶτε καὶ αὐτοὶ ἐν τῇ Ἀριστοφάνους κωμῳδίᾳ, Σωκράτη τινὰ ἐκεῖ περιφερόμενον, φάσκοντά τε ἀεροβατεῖν καὶ ἄλλην πολλὴν φλυαρίαν φλυαροῦντα, ὧν ἐγὼ οὐδὲν οὔτε μέγα οὔτε μικρὸν πέρι ἐπαΐω. καὶ οὐχ ὡς ἀτιμάζων λέγω τὴν τοιαύτην ἐπιστήμην, εἴ τις περὶ τῶν τοιούτων σοφός ἐστιν —μή πως ἐγὼ ὑπὸ Μελήτου τοσαύτας δίκας φεύγοιμι— ἀλλὰ γὰρ ἐμοὶ τούτων, ὦ ἄνδρες Ἀθηναῖοι, οὐδὲν μέτεστιν. <span class="marker">[19d]</span> μάρτυρας δὲ αὖ ὑμῶν τοὺς πολλοὺς παρέχομαι, καὶ ἀξιῶ ὑμᾶς ἀλλήλους διδάσκειν τε καὶ φράζειν, ὅσοι ἐμοῦ πώποτε ἀκηκόατε διαλεγομένου —πολλοὶ δὲ ὑμῶν οἱ τοιοῦτοί εἰσιν— φράζετε οὖν ἀλλήλοις εἰ πώποτε ἢ μικρὸν ἢ μέγα ἤκουσέ τις ὑμῶν ἐμοῦ περὶ τῶν τοιούτων διαλεγομένου, καὶ ἐκ τούτου γνώσεσθε ὅτι τοιαῦτ᾽ ἐστὶ καὶ τἆλλα περὶ ἐμοῦ ἃ οἱ πολλοὶ λέγουσιν.</p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent">Πρώτα λοιπόν, ω άνδρες Αθηναίοι, είναι δίκαιο ν᾽ απολογηθώ στις πρώτες ψεύτικες κατηγορίες που μου κάμανε, και στους πρώτους κατηγόρους και ύστερα στις υστερινές και τους <span class="marker">[18b]</span> υστερινούς. Γιατί πολλοί μ᾽ έχουν κατηγορήσει σε σας, και άλλοτε, εδώ και πολλά χρόνια, χωρίς να πούνε ούτε μιαν αλήθεια· εκείνους εγώ φοβούμαι περισσότερο, παρά αυτουνούς που τριγυρίζουν τον Άνυτο, αν και είναι και τούτοι φοβεροί. Εκείνοι όμως ήσαν φοβερότεροι, ω άνδρες Αθηναίοι, εκείνοι που σας παίρνανε από μικρά παιδιά και σας πείθανε με ψεύτικες κατηγορίες για μένα, πως τάχα είναι ένας Σωκράτης, σοφός άνθρωπος, που εξετάζει τα επουράνια και γυρεύει όσα κρύβει η γη και τον άδικο λόγο τον <span class="marker">[18c]</span> κάμνει δίκαιο. Αυτοί, ω άνδρες Αθηναίοι, που μου βγάλανε αυτό το όνομα είναι οι φοβεροί κατήγοροί μου· γιατί όσοι τους ακούνε νομίζουν πως αυτοί που γυρεύουν τέτοια πράγματα ούτε τους θεούς πιστεύουν. Ύστερα οι κατήγοροι αυτοί είναι πολλοί και πολλά χρόνια με κατηγορούνε και, το χειρότερο, σας μιλήσανε για μένα σε μια ηλικία που τους πιστέψατε περισσότερο, σαν παιδιά που είσαστε, και μερικοί από σας νέοι, και με κατηγορούσανε, χωρίς να είμαι μπροστά. Και το πιο παράξενο απ᾽ όλα είναι πως ούτε τα <span class="marker">[18d]</span> ονόματά τους μπορώ να τα ξέρω και να τα ειπώ, παρά ενός που έγραφε κωμωδίες. Εκείνοι όμως που με τα μέσα του φθόνου και της διαβολής σάς έπειθαν, και όσοι, αφού είχαν πεισθεί οι ίδιοι, έπειθαν άλλους, αυτοί είναι οι πιο δύσκολοι απ᾽ όλους, γιατί ούτε να παρουσιάσω κανέναν απ᾽ αυτούς μπορώ ούτε να τον βγάλω ψεύτη. Αλλά είναι ανάγκη καθαυτό να πολεμώ με σκιές και να ελέγχω, χωρίς κανένας να μου αποκρίνεται. Παραδεχθείτε λοιπόν και σεις ότι οι κατήγοροί μου είναι δύο ειδών, εκείνοι που με κατηγόρησαν τώρα τελευταία κι εκείνοι <span class="marker">[18e]</span> που με κατηγορούν από πολύν καιρό, όπως σας έλεγα. Και συλλογισθείτε ότι πρώτα πρώτα πρέπει ν᾽ απολογηθώ σ᾽ αυτούς, γιατί κι εσείς πρωτύτερα και περισσότερο καιρόν ακούσατε τις δικές τους κατηγορίες παρά τις τελευταίες.</p>
+<p class="passage indent">Ας είναι. Ας απολογηθώ, λοιπόν, ω άνδρες Αθηναίοι, και <span class="marker">[19a]</span> ας προσπαθήσω να βγάλω από το μυαλό σας, σε τόσο λίγη ώρα, τη διαβολή που τόσον καιρό ρίζωσε μέσα σας. Και θα επιθυμούσα να το καταφέρω, όσα μπορέσω με την απολογία μου, αν ήτανε δυνατό να βγει τίποτε καλό για σας και για μένα· αλλά νομίζω πως αυτό είναι δύσκολο και το καταλαβαίνω και μοναχός μου τί σπουδαίο είναι. Ας γίνει όμως όπως θέλει ο θεός· εγώ πρέπει να υπακούσω στον νόμο και ν απολογηθώ.</p>
+<p class="passage indent">Ας ξαναπιάσουμε λοιπόν από την αρχή ποιά είν᾽ εκείνη η κατηγορία που <span class="marker">[19b]</span> έχει γεννήσει όλες τις διαβολές εναντίον μου και που έπεισε και τον Μέλητο να με φέρει στο δικαστήριο. Καλά! Με ποιά λόγια λοιπόν με διαβάλανε αυτοί που με διαβάλανε; Πρέπει να σας ξαναπώ λέξη με λέξη την κατηγορία, όπως γίνεται στο δικαστήριο. ΕΙΝΑΙ ΕΝΟΧΟΣ Ο ΣΩΚΡΑΤΗΣ ΚΑΙ ΤΟ ΠΑΡΑΚΑΝΕΙ, ΓΙΑΤΙ ΓΥΡΕΥΕΙ ΟΣΑ ΚΡΥΒΕΙ Η ΓΗ ΚΑΙ ΤΑ ΟΥΡΑΝΙΑ ΚΑΙ ΤΟΝ ΑΔΙΚΟ ΛΟΓΟ ΤΟΝ ΚΑΝΕΙ <span class="marker">[19c]</span> ΔΙΚΑΙΟ ΚΑΙ ΤΑ ΔΙΔΑΣΚΕΙ ΑΥΤΑ ΤΑ ΙΔΙΑ ΚΑΙ ΣΤΟΥΣ ΑΛΛΟΥΣ. Τέτοια είναι η κατηγορία. Αυτά τα πράγματα τα είδατε κι εσείς στην κωμωδία του Αριστοφάνη, είδατε κάποιο Σωκράτη να φέρνεται απάνω στη σκηνή, να λέει πως περιπατεί απάνω στον αέρα και να φλυαρεί ένα σωρό φλυαρίες, που ποτέ δεν μου πέρασαν, ούτε λίγο ούτε πολύ, από τον νου μου. Και δεν τα λέω αυτά για να εξευτελίσω τάχα ο ίδιος αυτά τα πράγματα, αν βρίσκεται κανένας που τα γνωρίζει κι αυτά, και να ξεφύγω έτσι από τις τόσες κατηγορίες του Μέλητου. Στ᾽ αλήθεια όμως, ω άνδρες Αθηναίοι, δε γνωρίζω τίποτε από τέτοια πράγματα. <span class="marker">[19d]</span> Σας βάζω δε μάρτυρες τους περισσότερους από σας και σας παρακαλώ να τα πείτε και να τα εξηγήσετε ο ένας με τον άλλον, όσοι μ᾽ έχετε ακούσει ποτέ να μιλώ, έστω και το παραμικρό, και είναι πολλοί από σας τέτοιοι· λέτε λοιπόν ο ένας με τον άλλον αν καμιά φορά άκουσε κανείς από σας εμένα να λέω για τέτοια πράγματα, και απ᾽ αυτά θα καταλάβετε ότι τέτοια είναι και τ᾽ άλλα που λέει για μένα ο κόσμος.</p>
+        </div>
+        
+
+        <div id="book-2-chapter-1-2" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-3" data-hash="book-2-chapter-1-2">
+            Ο Σωκράτης αντικρούει παλιότερες κατηγορίες εναντίον του • Κεφάλαιο 1.2 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=104&page=3" target="_blank" class="page-link">Page 3</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent">Ἀλλὰ γὰρ οὔτε τούτων οὐδέν ἐστιν, οὐδέ γ᾽ εἴ τινος ἀκηκόατε ὡς ἐγὼ παιδεύειν ἐπιχειρῶ ἀνθρώπους καὶ χρήματα <span class="marker">[19e]</span> πράττομαι, οὐδὲ τοῦτο ἀληθές. ἐπεὶ καὶ τοῦτό γέ μοι δοκεῖ καλὸν εἶναι, εἴ τις οἷός τ᾽ εἴη παιδεύειν ἀνθρώπους ὥσπερ Γοργίας τε ὁ Λεοντῖνος καὶ Πρόδικος ὁ Κεῖος καὶ Ἱππίας ὁ Ἠλεῖος. τούτων γὰρ ἕκαστος, ὦ ἄνδρες, οἷός τ᾽ ἐστὶν ἰὼν εἰς ἑκάστην τῶν πόλεων τοὺς νέους —οἷς ἔξεστι τῶν ἑαυτῶν πολιτῶν προῖκα συνεῖναι ᾧ ἂν βούλωνται— τούτους πείθουσι <span class="marker">[20a]</span> τὰς ἐκείνων συνουσίας ἀπολιπόντας σφίσιν συνεῖναι χρήματα διδόντας καὶ χάριν προσειδέναι. ἐπεὶ καὶ ἄλλος ἀνήρ ἐστι Πάριος ἐνθάδε σοφὸς ὃν ἐγὼ ᾐσθόμην ἐπιδημοῦντα· ἔτυχον γὰρ προσελθὼν ἀνδρὶ ὃς τετέλεκε χρήματα σοφισταῖς πλείω ἢ σύμπαντες οἱ ἄλλοι, Καλλίᾳ τῷ Ἱππονίκου· τοῦτον οὖν ἀνηρόμην —ἐστὸν γὰρ αὐτῷ δύο ὑεῖ— «Ὦ Καλλία,» ἦν δ᾽ ἐγώ, «εἰ μέν σου τὼ ὑεῖ πώλω ἢ μόσχω ἐγενέσθην, εἴχομεν ἂν αὐτοῖν ἐπιστάτην λαβεῖν καὶ μισθώσασθαι ὃς <span class="marker">[20b]</span> ἔμελλεν αὐτὼ καλώ τε κἀγαθὼ ποιήσειν τὴν προσήκουσαν ἀρετήν, ἦν δ᾽ ἂν οὗτος ἢ τῶν ἱππικῶν τις ἢ τῶν γεωργικῶν· νῦν δ᾽ ἐπειδὴ ἀνθρώπω ἐστόν, τίνα αὐτοῖν ἐν νῷ ἔχεις ἐπιστάτην λαβεῖν; τίς τῆς τοιαύτης ἀρετῆς, τῆς ἀνθρωπίνης τε καὶ πολιτικῆς, ἐπιστήμων ἐστίν; οἶμαι γάρ σε ἐσκέφθαι διὰ τὴν τῶν ὑέων κτῆσιν. ἔστιν τις,» ἔφην ἐγώ, «ἢ οὔ;» «Πάνυ γε,» ἦ δ᾽ ὅς. «Τίς,» ἦν δ᾽ ἐγώ, «καὶ ποδαπός, καὶ πόσου διδάσκει;» «Εὔηνος,» ἔφη, «ὦ Σώκρατες, Πάριος, πέντε μνῶν.» καὶ ἐγὼ τὸν Εὔηνον ἐμακάρισα εἰ ὡς ἀληθῶς <span class="marker">[20c]</span> ἔχοι ταύτην τὴν τέχνην καὶ οὕτως ἐμμελῶς διδάσκει. ἐγὼ γοῦν καὶ αὐτὸς ἐκαλλυνόμην τε καὶ ἡβρυνόμην ἂν εἰ ἠπιστάμην ταῦτα· ἀλλ᾽ οὐ γὰρ ἐπίσταμαι, ὦ ἄνδρες Ἀθηναῖοι.</p>
+<p class="passage indent">Ὑπολάβοι ἂν οὖν τις ὑμῶν ἴσως· «Ἀλλ᾽, ὦ Σώκρατες, τὸ σὸν τί ἐστι πρᾶγμα; πόθεν αἱ διαβολαί σοι αὗται γεγόνασιν; οὐ γὰρ δήπου σοῦ γε οὐδὲν τῶν ἄλλων περιττότερον πραγματευομένου ἔπειτα τοσαύτη φήμη τε καὶ λόγος γέγονεν, εἰ μή τι ἔπραττες ἀλλοῖον ἢ οἱ πολλοί. λέγε οὖν ἡμῖν τί <span class="marker">[20d]</span> ἐστιν, ἵνα μὴ ἡμεῖς περὶ σοῦ αὐτοσχεδιάζωμεν.» ταυτί μοι δοκεῖ δίκαια λέγειν ὁ λέγων, κἀγὼ ὑμῖν πειράσομαι ἀποδεῖξαι τί ποτ᾽ ἐστὶν τοῦτο ὃ ἐμοὶ πεποίηκεν τό τε ὄνομα καὶ τὴν διαβολήν. ἀκούετε δή. καὶ ἴσως μὲν δόξω τισὶν ὑμῶν παίζειν· εὖ μέντοι ἴστε, πᾶσαν ὑμῖν τὴν ἀλήθειαν ἐρῶ. ἐγὼ γάρ, ὦ ἄνδρες Ἀθηναῖοι, δι᾽ οὐδὲν ἀλλ᾽ ἢ διὰ σοφίαν τινὰ τοῦτο τὸ ὄνομα ἔσχηκα. ποίαν δὴ σοφίαν ταύτην; ἥπερ ἐστὶν ἴσως ἀνθρωπίνη σοφία· τῷ ὄντι γὰρ κινδυνεύω ταύτην εἶναι σοφός. οὗτοι δὲ τάχ᾽ ἄν, οὓς ἄρτι <span class="marker">[20e]</span> ἔλεγον, μείζω τινὰ ἢ κατ᾽ ἄνθρωπον σοφίαν σοφοὶ εἶεν, ἢ οὐκ ἔχω τί λέγω· οὐ γὰρ δὴ ἔγωγε αὐτὴν ἐπίσταμαι, ἀλλ᾽ ὅστις φησὶ ψεύδεταί τε καὶ ἐπὶ διαβολῇ τῇ ἐμῇ λέγει. καί μοι, ὦ ἄνδρες Ἀθηναῖοι, μὴ θορυβήσητε, μηδ᾽ ἐὰν δόξω τι ὑμῖν μέγα λέγειν· οὐ γὰρ ἐμὸν ἐρῶ τὸν λόγον ὃν ἂν λέγω, ἀλλ᾽ εἰς ἀξιόχρεων ὑμῖν τὸν λέγοντα ἀνοίσω. τῆς γὰρ ἐμῆς, εἰ δή τίς ἐστιν σοφία καὶ οἵα, μάρτυρα ὑμῖν παρέξομαι τὸν θεὸν τὸν ἐν Δελφοῖς. Χαιρεφῶντα γὰρ ἴστε που. οὗτος <span class="marker">[21a]</span> ἐμός τε ἑταῖρος ἦν ἐκ νέου καὶ ὑμῶν τῷ πλήθει ἑταῖρός τε καὶ συνέφυγε τὴν φυγὴν ταύτην καὶ μεθ᾽ ὑμῶν κατῆλθε. καὶ ἴστε δὴ οἷος ἦν Χαιρεφῶν, ὡς σφοδρὸς ἐφ᾽ ὅτι ὁρμήσειεν. καὶ δή ποτε καὶ εἰς Δελφοὺς ἐλθὼν ἐτόλμησε τοῦτο μαντεύσασθαι —καί, ὅπερ λέγω, μὴ θορυβεῖτε, ὦ ἄνδρες— ἤρετο γὰρ δὴ εἴ τις ἐμοῦ εἴη σοφώτερος. ἀνεῖλεν οὖν ἡ Πυθία μηδένα σοφώτερον εἶναι. καὶ τούτων πέρι ὁ ἀδελφὸς ὑμῖν αὐτοῦ οὑτοσὶ μαρτυρήσει, ἐπειδὴ ἐκεῖνος τετελεύτηκεν.</p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent">Αλλά ούτε απ᾽ αυτά είναι τίποτε σωστό, και αν ίσως ακούσατε να λένε πως εγώ καταπιάνομαι να κάμω τον δάσκαλο <span class="marker">[19e]</span> με πληρωμή, ουδέ τούτο είν᾽ αλήθεια. Επειδή κι αυτό δεν μου φαίνεται άσχημο, αν είναι κανένας ικανός να κάνει τον δάσκαλο, όπως ο Γοργίας ο Λεοντίνος και ο Πρόδικος ο Κείος και ο Ιππίας ο Ηλείος. Γιατί καθένας απ᾽ αυτούς, ω άνδρες Αθηναίοι, είναι ικανός να γυρίζει από πολιτεία σε πολιτεία και να πείθει τους νέους, εκείνους που είν᾽ ελεύθεροι ν᾽ ακολουθούν όποιον θέλουν, <span class="marker">[20a]</span> ν᾽ αφήνουν τις παλιές τους συντροφιές και να πηγαίνουν μαζί τους και όχι μόνο να τους πληρώνουν μα και να τους το χρωστούν για χάρη. Και είναι και κάποιος άλλος εδώ σοφός από την Πάρο, που έμαθα πως ήλθε στον τόπο μας. Γιατί έτυχε να συνομιλήσω μ᾽ έναν, τον Καλλία, τον γιο του Ιππονίκου που έχει πληρώσει στους σοφιστές περισσότερα χρήματα από όλους τους άλλους μαζί. Τον ερώτησα λοιπόν αυτόν (γιατί έχει δύο γιους): Καλλία, του είπα, αν τα δυο σου παιδιά ήτανε πουλάρια ή μοσχαράκια, θα είχαμε να τους πάρουμε, με πληρωμή, κάποιον για να <span class="marker">[20b]</span> τα μεγαλώσει όμορφα και καλά, όπως τους πρέπει· κι αυτός θα ήτανε βέβαια ή ιπποκόμος ή γεωργός· τώρα που είναι άνθρωποι, σαν ποιόν παιδαγωγό έχεις στον νου σου να τους πάρεις; Ποιός είναι που κατέχει την επιστήμη να τους αναθρέψει, σαν ανθρώπους και σαν πολίτες· γιατί νομίζω πως, αφού απόκτησες τα παιδιά σου, θα τα έχεις συλλογισθεί όλα αυτά. Υπάρχει λοιπόν κανένας, είπα εγώ, ή όχι; Βέβαια, μου είπε εκείνος. Και ποιός είν᾽ αυτός, είπα εγώ, και από πού; Και πόσα παίρνει για τη διδαχή; — Ο Εύηνος, Σωκράτη, μου είπε, από την Πάρο και παίρνει πέντε μνες. Κι εγώ μακάρισα τον Εύηνο, αν ξέρει στ᾽ αλήθεια <span class="marker">[20c]</span> τέτοια τέχνη και διδάσκει τόσο κατάλληλα. Γιατί κι εγώ ο ίδιος θα καμάρωνα και θα περηφανευόμουν, αν τα ήξερα αυτά. Μα δεν τα ξέρω, ω άνδρες Αθηναίοι.</p>
+<p class="passage indent">Ίσως όμως κάποιος από σας θα μου ᾽λεγε: Μα λοιπόν ποιά είναι η δική σου δουλειά, Σωκράτη; και γιατί σου έχουνε βγάλει αυτές τις διαβολές; Γιατί αν δεν καταγινόσουν σε τίποτε σπουδαιότερο από τους άλλους, δε θα έβγαζες τέτοια φήμη και δε θα γινότανε λόγος για σένα, αν δεν έκανες τίποτε αλλιώτικο απ᾽ τον άλλο κόσμο. Πες μας λοιπόν εσύ τί <span class="marker">[20d]</span> είναι αυτό, για να μη λέμε κι εμείς για σένα ό,τι μας κατέβει στο κεφάλι. Όποιος τα πει αυτά θα ᾽χει δίκαιο μου φαίνεται και γι᾽ αυτό θα προσπαθήσω να σας αποδείξω τί είν᾽ εκείνο που και το όνομα μου έχει βγάλει αυτό και τις διαβολές. Ακούστε λοιπόν.</p>
+<p class="passage indent">Ίσως θα φανώ σε μερικούς πως χωρατεύω, να ξέρετε όμως καλά πως θα σας πω όλη την αλήθεια. Γιατί εγώ έχω βγάλει αυτό το όνομα, ω άνδρες Αθηναίοι, για κάποια σοφία που έχω. Τί είδος λοιπόν σοφία είναι αυτή; Είναι ίσως ανθρώπινη σοφία, και τωόντι κοντεύω να έχω αυτή την σοφία· αυτοί όμως που <span class="marker">[20e]</span> σας έλεγα τώρα φαίνεται να ᾽χουν κάποια σοφία ανώτερη από την ανθρώπινη ή δεν έχω τί να πω· γιατί εγώ τουλάχιστον δεν την ξέρω και όποιος το λέει λέει ψέματα και τα λέει για να με διαβάλει. Και σας παρακαλώ, ω άνδρες Αθηναίοι, μην ταραχθείτε, ακόμα κι αν σας φανεί πως λέω κατιτί υπερβολικό, γιατί τα λόγια που θα σας πω δεν είναι δικά μου. Είναι λόγια κάποιου που του έχετε μεγάλη εμπιστοσύνη. Γιατί για τη δική μου σοφία, αν έχω κάποια κι αν αξίζει τίποτε, θα σας φέρω μάρτυρα τον θεό των Δελφών. Τον Χαιρεφώντα τον γνωρίζετε βέβαια. Ήτανε <span class="marker">[21a]</span> φίλος μου από νέος και φίλος των δημοκρατικών και μαζί σας εξορίσθηκε και μαζί σας ξαναγύρισε. Και ξέρετε δα τί άνθρωπος ήτανε ο Χαιρεφών, πόσο ήτανε ακράτητος σ᾽ ό,τι κι αν επιχειρούσε. Και λοιπόν κάποτε πήγε και στους Δελφούς και τόλμησε να ρωτήσει το μαντείο γι᾽ αυτό το ζήτημα· και μην ξαφνισθείτε γι᾽ αυτό που θα σας πω, ω άνδρες Αθηναίοι. Ρώτησε δηλαδή αν είναι κανένας σοφότερος από μένα. Η Πυθία λοιπόν αποκρίθηκε πως κανένας δεν είναι σοφότερος. Και γι᾽ αυτό το πράγμα σάς φέρνω μάρτυρα τον αδελφό του, αυτόν εδώ, γιατί εκείνος είναι πεθαμένος.</p>
+        </div>
+        
+
+        <div id="book-2-chapter-1-3" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-4" data-hash="book-2-chapter-1-3">
+            Ο Σωκράτης αντικρούει παλιότερες κατηγορίες εναντίον του • Κεφάλαιο 1.3 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=104&page=4" target="_blank" class="page-link">Page 4</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="marker">[21b]</span> Σκέψασθε δὴ ὧν ἕνεκα ταῦτα λέγω· μέλλω γὰρ ὑμᾶς διδάξειν ὅθεν μοι ἡ διαβολὴ γέγονεν. ταῦτα γὰρ ἐγὼ ἀκούσας ἐνεθυμούμην οὑτωσί· «Τί ποτε λέγει ὁ θεός, καὶ τί ποτε αἰνίττεται; ἐγὼ γὰρ δὴ οὔτε μέγα οὔτε σμικρὸν σύνοιδα ἐμαυτῷ σοφὸς ὤν· τί οὖν ποτε λέγει φάσκων ἐμὲ σοφώτατον εἶναι; οὐ γὰρ δήπου ψεύδεταί γε· οὐ γὰρ θέμις αὐτῷ.» καὶ πολὺν μὲν χρόνον ἠπόρουν τί ποτε λέγει· ἔπειτα μόγις πάνυ ἐπὶ ζήτησιν αὐτοῦ τοιαύτην τινὰ ἐτραπόμην. ἦλθον ἐπί τινα τῶν δοκούντων σοφῶν εἶναι, ὡς <span class="marker">[21c]</span> ἐνταῦθα εἴπερ που ἐλέγξων τὸ μαντεῖον καὶ ἀποφανῶν τῷ χρησμῷ ὅτι «Οὑτοσὶ ἐμοῦ σοφώτερός ἐστι, σὺ δ᾽ ἐμὲ ἔφησθα.» διασκοπῶν οὖν τοῦτον —ὀνόματι γὰρ οὐδὲν δέομαι λέγειν, ἦν δέ τις τῶν πολιτικῶν πρὸς ὃν ἐγὼ σκοπῶν τοιοῦτόν τι ἔπαθον, ὦ ἄνδρες Ἀθηναῖοι, καὶ διαλεγόμενος αὐτῷ— ἔδοξέ μοι οὗτος ὁ ἀνὴρ δοκεῖν μὲν εἶναι σοφὸς ἄλλοις τε πολλοῖς ἀνθρώποις καὶ μάλιστα ἑαυτῷ, εἶναι δ᾽ οὔ· κἄπειτα ἐπειρώμην αὐτῷ δεικνύναι ὅτι οἴοιτο μὲν εἶναι σοφός, εἴη δ᾽ οὔ. <span class="marker">[21d]</span> ἐντεῦθεν οὖν τούτῳ τε ἀπηχθόμην καὶ πολλοῖς τῶν παρόντων· πρὸς ἐμαυτὸν δ᾽ οὖν ἀπιὼν ἐλογιζόμην ὅτι τούτου μὲν τοῦ ἀνθρώπου ἐγὼ σοφώτερός εἰμι· κινδυνεύει μὲν γὰρ ἡμῶν οὐδέτερος οὐδὲν καλὸν κἀγαθὸν εἰδέναι, ἀλλ᾽ οὗτος μὲν οἴεταί τι εἰδέναι οὐκ εἰδώς, ἐγὼ δέ, ὥσπερ οὖν οὐκ οἶδα, οὐδὲ οἴομαι· ἔοικα γοῦν τούτου γε σμικρῷ τινι αὐτῷ τούτῳ σοφώτερος εἶναι, ὅτι ἃ μὴ οἶδα οὐδὲ οἴομαι εἰδέναι. ἐντεῦθεν ἐπ᾽ ἄλλον ᾖα τῶν ἐκείνου δοκούντων σοφωτέρων εἶναι καί <span class="marker">[21e]</span> μοι ταὐτὰ ταῦτα ἔδοξε, καὶ ἐνταῦθα κἀκείνῳ καὶ ἄλλοις πολλοῖς ἀπηχθόμην.</p>
+<p class="passage indent">Μετὰ ταῦτ᾽ οὖν ἤδη ἐφεξῆς ᾖα, αἰσθανόμενος μὲν [καὶ] λυπούμενος καὶ δεδιὼς ὅτι ἀπηχθανόμην, ὅμως δὲ ἀναγκαῖον ἐδόκει εἶναι τὸ τοῦ θεοῦ περὶ πλείστου ποιεῖσθαι· ἰτέον οὖν, σκοποῦντι τὸν χρησμὸν τί λέγει, ἐπὶ ἅπαντας τούς τι <span class="marker">[22a]</span> δοκοῦντας εἰδέναι. καὶ νὴ τὸν κύνα, ὦ ἄνδρες Ἀθηναῖοι —δεῖ γὰρ πρὸς ὑμᾶς τἀληθῆ λέγειν— ἦ μὴν ἐγὼ ἔπαθόν τι τοιοῦτον· οἱ μὲν μάλιστα εὐδοκιμοῦντες ἔδοξάν μοι ὀλίγου δεῖν τοῦ πλείστου ἐνδεεῖς εἶναι ζητοῦντι κατὰ τὸν θεόν, ἄλλοι δὲ δοκοῦντες φαυλότεροι ἐπιεικέστεροι εἶναι ἄνδρες πρὸς τὸ φρονίμως ἔχειν. δεῖ δὴ ὑμῖν τὴν ἐμὴν πλάνην ἐπιδεῖξαι ὥσπερ πόνους τινὰς πονοῦντος ἵνα μοι καὶ ἀνέλεγκτος ἡ μαντεία γένοιτο. μετὰ γὰρ τοὺς πολιτικοὺς ᾖα ἐπὶ τοὺς ποιητὰς τούς τε τῶν τραγῳδιῶν καὶ τοὺς τῶν <span class="marker">[22b]</span> διθυράμβων καὶ τοὺς ἄλλους, ὡς ἐνταῦθα ἐπ᾽ αὐτοφώρῳ καταληψόμενος ἐμαυτὸν ἀμαθέστερον ἐκείνων ὄντα. ἀναλαμβάνων οὖν αὐτῶν τὰ ποιήματα ἅ μοι ἐδόκει μάλιστα πεπραγματεῦσθαι αὐτοῖς, διηρώτων ἂν αὐτοὺς τί λέγοιεν, ἵν᾽ ἅμα τι καὶ μανθάνοιμι παρ᾽ αὐτῶν. αἰσχύνομαι οὖν ὑμῖν εἰπεῖν, ὦ ἄνδρες, τἀληθῆ· ὅμως δὲ ῥητέον. ὡς ἔπος γὰρ εἰπεῖν ὀλίγου αὐτῶν ἅπαντες οἱ παρόντες ἂν βέλτιον ἔλεγον περὶ ὧν αὐτοὶ ἐπεποιήκεσαν. ἔγνων οὖν αὖ καὶ περὶ τῶν ποιητῶν ἐν ὀλίγῳ τοῦτο, ὅτι οὐ σοφίᾳ ποιοῖεν <span class="marker">[22c]</span> ἃ ποιοῖεν, ἀλλὰ φύσει τινὶ καὶ ἐνθουσιάζοντες ὥσπερ οἱ θεομάντεις καὶ οἱ χρησμῳδοί· καὶ γὰρ οὗτοι λέγουσι μὲν πολλὰ καὶ καλά, ἴσασιν δὲ οὐδὲν ὧν λέγουσι. τοιοῦτόν τί μοι ἐφάνησαν πάθος καὶ οἱ ποιηταὶ πεπονθότες, καὶ ἅμα ᾐσθόμην αὐτῶν διὰ τὴν ποίησιν οἰομένων καὶ τἆλλα σοφωτάτων εἶναι ἀνθρώπων ἃ οὐκ ἦσαν. ἀπῇα οὖν καὶ ἐντεῦθεν τῷ αὐτῷ οἰόμενος περιγεγονέναι ᾧπερ καὶ τῶν πολιτικῶν.</p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="marker">[21b]</span> Καθώς θα ιδείτε έχω τον λόγο μου που σας τα λέω αυτά· γιατί θέλω να σας εξηγήσω από πού έχει βγει η κατηγορία που μου κάνουν. Όταν άκουσα εγώ τα λόγια αυτά, είπα με τον νου μου: Τί είν᾽ αυτά τάχα που λέει ο θεός και τί εννοεί, γιατί εγώ δεν καταλαβαίνω να είμαι σοφός, ούτε λίγο ούτε πολύ. Τί θέλει να πει λοιπόν, όταν λέει πως εγώ είμαι ο πιο σοφός απ᾽ όλους; γιατί βέβαια δε λέει ψέματα· δεν είναι δυνατό να πει ψέματα. Και για πολύν καιρόν απορούσα τί τάχα ήθελε να πει το μαντείο· πολύ πιο ύστερα άρχισα να καλοεξετάζω το πράγμα, όπως θα σας πω. Πήγα σε κάποιον απ᾽ αυτούς που περνούνε για σοφοί, για να <span class="marker">[21c]</span> μπορέσω εκεί, αν ήτανε δυνατόν, να βρω λάθος στο μαντείο και να του πω: «Νά, αυτός είναι πιο σοφός από μένα κι εσύ είπες πως είμαι εγώ». Καθώς τον εξέταζα λοιπόν (καμιά ανάγκη δεν είναι να σας τον πω με το όνομά του· ήταν ένας από τους πολιτειολόγους, και, εξετάζοντάς τον, μου έκαμε την εντύπωση που θα σας πω, ω άνδρες Αθηναίοι) και καθώς μιλούσα μ᾽ αυτόν μου φάνηκε πως ο άνθρωπος αυτός περνάει για σοφός στους άλλους και μάλιστα στον εαυτό του, μα στ᾽ αλήθεια δεν είναι. Και ύστερα προσπάθησα να του αποδείξω ότι ενόμιζε πως είναι σοφός, δεν ήταν όμως. <span class="marker">[21d]</span> Από τότε κι αυτός μ᾽ εχθρεύθηκε και άλλοι πολλοί που ήταν μπροστά. Εγώ λοιπόν, καθώς έφευγα, έλεγα με τον εαυτό μου πως απ᾽ αυτόν τον άνθρωπο είμαι σοφότερος· γιατί κανένας από τους δυο μας σχεδόν δεν ξέρει τίποτε ωραίο ή καλό· αυτός όμως νόμιζε πως κάτι ξέρει χωρίς να ξέρει, ενώ εγώ, καθώς δεν ξέρω, έτσι ουδέ νομίζω πως ξέρω. Μου φαίνεται λοιπόν πως απ᾽ αυτόν είμαι λιγάκι σοφότερος δηλαδή τούτο μόνο, πως τουλάχιστο δεν νομίζω πως ξέρω εκείνα που δεν ξέρω. Ύστερα απ᾽ αυτόν επήγα σε άλλον από κείνους που περνούν για σοφότεροι κι απ᾽ αυτόν και <span class="marker">[21e]</span> τα ίδια πάλι κι απαράλλακτα βρήκα. Και εδώ έγινα πάλι μισητός και σε τούτον και σε άλλους.</p>
+<p class="passage indent">Ύστερα απ᾽ αυτά, εξακολούθησα να πηγαίνω σ᾽ άλλους. Το αισθανόμουν πως γινόμουν μισητός κι είχα λύπη γι᾽ αυτό και κάποιο φόβο, ενόμιζα όμως πως έπρεπε πρώτα απ᾽ όλα να τιμήσω τον χρησμό του θεού. Ας πάω λοιπόν, έλεγα, σε όλους όσοι <span class="marker">[22a]</span> νομίζουν πως ξέρουν κατιτί, για να ξεδιαλύσω τί λέει ο χρησμός. Και, μά τον Κύνα, ω άνδρες Αθηναίοι, (γιατί σ᾽ εσάς πρέπει να πω την αλήθεια) νά! ποιά εντύπωση μου κάμανε: οι πιο διάσημοι απ᾽ αυτούς μου φάνηκαν πως απάνω κάτω δεν ήξεραν να μου πουν τίποτε σωστό, όταν εγώ γύρευα το νόημα του θεού, κι οι άλλοι που περνούνε για χειρότεροι μου φάνηκαν πως βρίσκονται πιο σιμά στη φρόνηση. Πρέπει λοιπόν να σας περιγράψω όλες μου τις περιπλανήσεις, γιατί είναι κόποι που έκαμα, για να γίνει ακλόνητη μέσα μου η μαντεία. Ύστερ᾽ απ᾽ τους πολιτειολόγους πήγα στους ποιητές, και των τραγωδιών και των <span class="marker">[22b]</span> διθυράμβων και στους άλλους όλους, με την ιδέα πως εδώ πια, φως φανερά, θα πιάσω τον εαυτό μου αμαθέστερο από κείνους. Αφού πήρα λοιπόν τα πιο καλοκαμωμένα ποιήματά τους, τους ρώτησα το νόημά τους για να μάθω κιόλα κάτι απ᾽ αυτούς. Ντρέπομαι, ω άνδρες Αθηναίοι, να σας πω την αλήθεια και όμως πρέπει να σας την πω. Μπορεί να πει κανένας πως οι άλλοι που ήσαν μπροστά μπορούσαν να μιλήσουν καλύτερα γι᾽ αυτά παρά εκείνοι που τα είχαν κάνει. Κατάλαβα λοιπόν πάλι, πολύ σύντομα, και για τους ποιητές, ότι τα ποιήματά τους δεν τα κάνουν <span class="marker">[22c]</span> ξέροντας οι ίδιοι τί κάνουν, αλλ᾽ έτσι φυσικά, από θεία έμπνευση, σαν τους μάγους δηλαδή και τους προφήτες· λένε πολλά και ωραία πράγματα, μα κι οι ίδιοι δεν ξέρουν τί λένε. Αυτά μου φάνηκε πως παθαίνουν και οι ποιητές. Και κοντά στ᾽ άλλα κατάλαβα πως αυτοί νομίζουν ότι με την ποίηση είναι σοφότατοι άνθρωποι και στ᾽ άλλα πράγματα που δεν ήσαν. Έφυγα λοιπόν κι από εδώ, με την ιδέα πως κι απ᾽ αυτούς είμαι ανώτερος, κατά το ίδιο πράγμα που είμαι κι από τους πολιτειολόγους.</p>
+        </div>
+        
+
+        <div id="book-2-chapter-1-4" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-5" data-hash="book-2-chapter-1-4">
+            Ο Σωκράτης αντικρούει παλιότερες κατηγορίες εναντίον του • Κεφάλαιο 1.4 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=104&page=5" target="_blank" class="page-link">Page 5</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent">Τελευτῶν οὖν ἐπὶ τοὺς χειροτέχνας ᾖα· ἐμαυτῷ γὰρ <span class="marker">[22d]</span> συνῄδη οὐδὲν ἐπισταμένῳ ὡς ἔπος εἰπεῖν, τούτους δέ γ᾽ ᾔδη ὅτι εὑρήσοιμι πολλὰ καὶ καλὰ ἐπισταμένους. καὶ τούτου μὲν οὐκ ἐψεύσθην, ἀλλ᾽ ἠπίσταντο ἃ ἐγὼ οὐκ ἠπιστάμην καί μου ταύτῃ σοφώτεροι ἦσαν. ἀλλ᾽, ὦ ἄνδρες Ἀθηναῖοι, ταὐτόν μοι ἔδοξαν ἔχειν ἁμάρτημα ὅπερ καὶ οἱ ποιηταὶ καὶ οἱ ἀγαθοὶ δημιουργοί —διὰ τὸ τὴν τέχνην καλῶς ἐξεργάζεσθαι ἕκαστος ἠξίου καὶ τἆλλα τὰ μέγιστα σοφώτατος εἶναι— καὶ αὐτῶν αὕτη ἡ πλημμέλεια ἐκείνην τὴν σοφίαν <span class="marker">[22e]</span> ἀποκρύπτειν· ὥστε με ἐμαυτὸν ἀνερωτᾶν ὑπὲρ τοῦ χρησμοῦ πότερα δεξαίμην ἂν οὕτως ὥσπερ ἔχω ἔχειν, μήτε τι σοφὸς ὢν τὴν ἐκείνων σοφίαν μήτε ἀμαθὴς τὴν ἀμαθίαν, ἢ ἀμφότερα ἃ ἐκεῖνοι ἔχουσιν ἔχειν. ἀπεκρινάμην οὖν ἐμαυτῷ καὶ τῷ χρησμῷ ὅτι μοι λυσιτελοῖ ὥσπερ ἔχω ἔχειν.</p>
+<p class="passage indent">Ἐκ ταυτησὶ δὴ τῆς ἐξετάσεως, ὦ ἄνδρες Ἀθηναῖοι, <span class="marker">[23a]</span> πολλαὶ μὲν ἀπέχθειαί μοι γεγόνασι καὶ οἷαι χαλεπώταται καὶ βαρύταται, ὥστε πολλὰς διαβολὰς ἀπ᾽ αὐτῶν γεγονέναι, ὄνομα δὲ τοῦτο λέγεσθαι, σοφὸς εἶναι· οἴονται γάρ με ἑκάστοτε οἱ παρόντες ταῦτα αὐτὸν εἶναι σοφὸν ἃ ἂν ἄλλον ἐξελέγξω. τὸ δὲ κινδυνεύει, ὦ ἄνδρες, τῷ ὄντι ὁ θεὸς σοφὸς εἶναι, καὶ ἐν τῷ χρησμῷ τούτῳ τοῦτο λέγειν, ὅτι ἡ ἀνθρωπίνη σοφία ὀλίγου τινὸς ἀξία ἐστὶν καὶ οὐδενός. καὶ φαίνεται †τοῦτον λέγειν τὸν Σωκράτη, προσκεχρῆσθαι δὲ <span class="marker">[23b]</span> τῷ ἐμῷ ὀνόματι, ἐμὲ παράδειγμα ποιούμενος, ὥσπερ ἂν ‹εἰ› εἴποι ὅτι «Οὗτος ὑμῶν, ὦ ἄνθρωποι, σοφώτατός ἐστιν, ὅστις ὥσπερ Σωκράτης ἔγνωκεν ὅτι οὐδενὸς ἄξιός ἐστι τῇ ἀληθείᾳ πρὸς σοφίαν.» ταῦτ᾽ οὖν ἐγὼ μὲν ἔτι καὶ νῦν περιιὼν ζητῶ καὶ ἐρευνῶ κατὰ τὸν θεὸν καὶ τῶν ἀστῶν καὶ ξένων ἄν τινα οἴωμαι σοφὸν εἶναι· καὶ ἐπειδάν μοι μὴ δοκῇ, τῷ θεῷ βοηθῶν ἐνδείκνυμαι ὅτι οὐκ ἔστι σοφός. καὶ ὑπὸ ταύτης τῆς ἀσχολίας οὔτε τι τῶν τῆς πόλεως πρᾶξαί μοι σχολὴ γέγονεν ἄξιον λόγου οὔτε τῶν οἰκείων, ἀλλ᾽ ἐν <span class="marker">[23c]</span> πενίᾳ μυρίᾳ εἰμὶ διὰ τὴν τοῦ θεοῦ λατρείαν.</p>
+<p class="passage indent">Πρὸς δὲ τούτοις οἱ νέοι μοι ἐπακολουθοῦντες —οἷς μάλιστα σχολή ἐστιν, οἱ τῶν πλουσιωτάτων— αὐτόματοι, χαίρουσιν ἀκούοντες ἐξεταζομένων τῶν ἀνθρώπων, καὶ αὐτοὶ πολλάκις ἐμὲ μιμοῦνται, εἶτα ἐπιχειροῦσιν ἄλλους ἐξετάζειν· κἄπειτα οἶμαι εὑρίσκουσι πολλὴν ἀφθονίαν οἰομένων μὲν εἰδέναι τι ἀνθρώπων, εἰδότων δὲ ὀλίγα ἢ οὐδέν. ἐντεῦθεν οὖν οἱ ὑπ᾽ αὐτῶν ἐξεταζόμενοι ἐμοὶ ὀργίζονται, οὐχ αὑτοῖς, <span class="marker">[23d]</span> καὶ λέγουσιν ὡς Σωκράτης τίς ἐστι μιαρώτατος καὶ διαφθείρει τοὺς νέους· καὶ ἐπειδάν τις αὐτοὺς ἐρωτᾷ ὅτι ποιῶν καὶ ὅτι διδάσκων, ἔχουσι μὲν οὐδὲν εἰπεῖν ἀλλ᾽ ἀγνοοῦσιν, ἵνα δὲ μὴ δοκῶσιν ἀπορεῖν, τὰ κατὰ πάντων τῶν φιλοσοφούντων πρόχειρα ταῦτα λέγουσιν, ὅτι «τὰ μετέωρα καὶ τὰ ὑπὸ γῆς» καὶ «θεοὺς μὴ νομίζειν» καὶ «τὸν ἥττω λόγον κρείττω ποιεῖν.» τὰ γὰρ ἀληθῆ οἴομαι οὐκ ἂν ἐθέλοιεν λέγειν, ὅτι κατάδηλοι γίγνονται προσποιούμενοι μὲν εἰδέναι, εἰδότες δὲ οὐδέν. ἅτε οὖν οἶμαι φιλότιμοι <span class="marker">[23e]</span> ὄντες καὶ σφοδροὶ καὶ πολλοί, καὶ συντεταμένως καὶ πιθανῶς λέγοντες περὶ ἐμοῦ, ἐμπεπλήκασιν ὑμῶν τὰ ὦτα καὶ πάλαι καὶ σφοδρῶς διαβάλλοντες. ἐκ τούτων καὶ Μέλητός μοι ἐπέθετο καὶ Ἄνυτος καὶ Λύκων, Μέλητος μὲν ὑπὲρ τῶν ποιητῶν ἀχθόμενος, Ἄνυτος δὲ ὑπὲρ τῶν δημιουργῶν καὶ <span class="marker">[24a]</span> τῶν πολιτικῶν, Λύκων δὲ ὑπὲρ τῶν ῥητόρων· ὥστε, ὅπερ ἀρχόμενος ἐγὼ ἔλεγον, θαυμάζοιμ᾽ ἂν εἰ οἷός τ᾽ εἴην ἐγὼ ὑμῶν ταύτην τὴν διαβολὴν ἐξελέσθαι ἐν οὕτως ὀλίγῳ χρόνῳ οὕτω πολλὴν γεγονυῖαν. ταῦτ᾽ ἔστιν ὑμῖν, ὦ ἄνδρες Ἀθηναῖοι, τἀληθῆ, καὶ ὑμᾶς οὔτε μέγα οὔτε μικρὸν ἀποκρυψάμενος ἐγὼ λέγω οὐδ᾽ ὑποστειλάμενος. καίτοι οἶδα σχεδὸν ὅτι αὐτοῖς τούτοις ἀπεχθάνομαι, ὃ καὶ τεκμήριον ὅτι ἀληθῆ λέγω καὶ ὅτι αὕτη ἐστὶν ἡ διαβολὴ ἡ ἐμὴ καὶ τὰ αἴτια <span class="marker">[24b]</span> ταῦτά ἐστιν. καὶ ἐάντε νῦν ἐάντε αὖθις ζητήσητε ταῦτα, οὕτως εὑρήσετε.</p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent">Στο τέλος πήγα στους τεχνίτες· καταλάβαινα <span class="marker">[22d]</span> και μόνος μου πως από τέτοια δουλειά δεν εγνώριζα τίποτε και ήξερα πως αυτούς θα τους βρω να γνωρίζουν πολλά και ωραία πράγματα. Και όσο για αυτό δε γελάσθηκα, αλλά κι αυτοί γνωρίζανε εκείνα που δεν εγνώριζα εγώ και σ᾽ αυτά ήσαν σοφότεροι από μένα. Μου φάνηκε όμως, ω άνδρες Αθηναίοι, πως κι αυτοί, οι καλοί τεχνίτες, είχανε το ίδιο ελάττωμα με τους ποιητές· δηλαδή με το να δουλεύουν καλά στην τέχνη τους, καθένας απ᾽ αυτούς είχε την αξίωση πως ξέρει κι όλα τ᾽ άλλα, και τα πιο μεγάλα ακόμα, και το ελάττωμά τους αυτό τους χαλούσε <span class="marker">[22e]</span> κι εκείνα που ήξεραν ακόμα. Ώστε με κάνανε να συλλογίζομαι τον χρησμό και να λέω με τον εαυτό μου τί τάχα να προτιμήσω: να μείνω όπως είμαι, χωρίς να ξέρω όσα ξέρουν εκείνοι, ούτε πάλι να μην ξέρω όσα εκείνοι δεν ξέρουν, ή να τα ᾽χω και τα δυο σαν κι εκείνους. Είπα λοιπόν στον εαυτό μου, λογαριάζοντας και τον χρησμό, πως καλύτερα είναι να μείνω όπως είμαι.</p>
+<p class="passage indent">Απ᾽ αυτήν εδώ λοιπόν την εξέταση που έκαμα, ω άνδρες Αθηναίοι, <span class="marker">[23a]</span> μου έχουν γεννηθεί εναντίον μου πολλές έχθρες, τόσο δυσάρεστες και βαριές, που μου γέννησαν ένα σωρό διαβολές και μου βγάλανε και τ᾽ όνομα πως είμαι σοφός. Γιατί οι περισσότεροι που βρέθηκαν μπροστά μου κάθε φορά νομίζουν πως είμαι σοφός σ᾽ εκείνα που βγάζω ανήξερους τους άλλους· κι η αλήθεια όμως είναι πως, όπως φαίνεται, ο θεός μονάχα είναι σοφός, κι αυτό είπε και στον χρησμό, πως η ανθρώπινη σοφία πολύ λίγο αξίζει και ίσως ίσως και τίποτε. Και φαίνεται πως αυτό δεν το είπε για τον Σωκράτη εμένα, αλλά πήρε <span class="marker">[23b]</span> τ᾽ όνομά μου στο στόμα του, σαν να ᾽θελε να πει πως: «Εκείνος, ω άνθρωποι, είναι ο σοφότερος από όλους σας, όποιος, σαν τον Σωκράτη, έχει καταλάβει πως αληθινά η σοφία του δεν αξίζει τίποτε». Αυτά λοιπόν κι εγώ ακόμη και τώρα τριγυρνώ και ζητώ κι εξετάζω, σύμφωνα με το θέλημα του θεού, σε δικούς μας και ξένους, όποιους νομίζω απ᾽ αυτούς πως είναι σοφοί· κι όταν καταλάβω πως δεν είναι, κάνοντας το θέλημα του θεού, του αποδείχνω καθενός πως σοφός δεν είναι. Και μ᾽ αυτές τις φροντίδες, ούτε για τον τόπο μου ᾽μεινε καιρός να κάμω τίποτε σημαντικό ούτε για την οικογένειά μου, μόνο <span class="marker">[23c]</span> βρίσκομαι πάντα σε μεγάλη φτώχεια, για την αγάπη του θεού.</p>
+<p class="passage indent">Εκτός όμως απ᾽ αυτά, οι νέοι που μονάχοι τους μ᾽ ακολουθούνε, όσοι έχουν όλον τον καιρό, τα παιδιά των πιο πλουσίων δηλαδή, ευχαριστούνται ν᾽ ακούνε την εξέταση αυτή που κάνω στους ανθρώπους και πολλές φορές με μιμούνται κι αυτοί και ύστερα καταπιάνονται κι αυτοί να εξετάζουν τους άλλους· και μ᾽ αυτόν τον τρόπο, νομίζω πως βρίσκουν πολλούς απ᾽ αυτούς που φαντάζονται πως ξέρουν κάτι, δεν ξέρουν όμως τίποτε ή πολύ λίγα. Αυτοί λοιπόν που εξετάζονται από τους μαθητές μου τα βάζουν μ᾽ εμένα, όχι μ᾽ αυτούς, <span class="marker">[23d]</span> και λένε πως είναι κάποιος Σωκράτης, βρωμερός άνθρωπος, και διαφθείρει τους νέους. Και όταν τους ρωτήσει κανένας τί κάνει και τί διδάσκει που τους διαφθείρει, δεν έχουν τίποτε να πουν, γιατί τίποτε δεν ξέρουν· και για να μη φαίνονται πως δεν έχουν τί να πουν, ξαναλένε εκείνα που έχουν πρόχειρα για όλους τους φιλοσόφους, ότι τάχα εξετάζει τα επουράνια και τ᾽ απόκρυφα της γης και δεν πιστεύει τους θεούς και κάνει τον άδικον λόγον δίκαιον. Γιατί, όπως νομίζω, δεν θέλουν να πούνε την αλήθεια, για να μη φανερωθούν πως χωρίς να ξέρουν τίποτε προσποιούνται πως ξέρουν κάτι. Έτσι λοιπόν νομίζω πως οι άνθρωποι αυτοί, καθώς είναι φιλόδοξοι <span class="marker">[23e]</span> και ορμητικοί και πολλοί και μιλούν όλοι μαζί για μένα με τον πιο πειστικό τρόπο, σας γέμισαν τ᾽ αυτιά από καιρό με τις πιο άγριες διαβολές. Απ᾽ αυτούς είναι και ο Μέλητος και ο Άνυτος και ο Λύκων που μου επιτέθηκαν. Ο Μέλητος θυμωμένος για το μέρος των ποιητών, ο Άνυτος για το μέρος των τεχνιτών και <span class="marker">[24a]</span> των πολιτειολόγων και ο Λύκων για το μέρος των ρητόρων. Ώστε, όπως σας έλεγα στην αρχή, θα το θαύμαζα κι εγώ ο ίδιος, αν μπορούσα να πετάξω από πάνω μου αυτή τη διαβολή, σε τόσο λίγην ώρα, τώρα που γέμισε τον κόσμο. Αυτή είναι η αλήθεια, ω άνδρες Αθηναίοι, και ούτε σας κρύβω το παραμικρό σ᾽ αυτά που λέω ούτε σας αλλάζω τίποτε, μολονότι ξέρω πως γι᾽ αυτά ίσα ίσα τα πράγματα έγινα μισητός. Κι αυτό είναι απόδειξη πως λέω την αλήθεια και πως η διαβολή που μου κάνουν και η αιτία της <span class="marker">[24b]</span> είναι όπως σας τα είπα. Και είτε τώρα είτε άλλοτε τα καλοεξετάσετε, έτσι θα τα βρείτε.</p>
+        </div>
+        
+
+        <div id="book-3-chapter-1" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-6" data-hash="book-3-chapter-1">
+            Ο Σωκράτης αντικρούει την κατηγορία του Μέλητου • Κεφάλαιο 1 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=104&page=6" target="_blank" class="page-link">Page 6</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent">Περὶ μὲν οὖν ὧν οἱ πρῶτοί μου κατήγοροι κατηγόρουν αὕτη ἔστω ἱκανὴ ἀπολογία πρὸς ὑμᾶς· πρὸς δὲ Μέλητον τὸν ἀγαθὸν καὶ φιλόπολιν, ὥς φησι, καὶ τοὺς ὑστέρους μετὰ ταῦτα πειράσομαι ἀπολογήσασθαι. αὖθις γὰρ δή, ὥσπερ ἑτέρων τούτων ὄντων κατηγόρων, λάβωμεν αὖ τὴν τούτων ἀντωμοσίαν. ἔχει δέ πως ὧδε· Σωκράτη φησὶν ἀδικεῖν τούς τε νέους διαφθείροντα καὶ θεοὺς οὓς ἡ πόλις <span class="marker">[24c]</span> νομίζει οὐ νομίζοντα, ἕτερα δὲ δαιμόνια καινά. τὸ μὲν δὴ ἔγκλημα τοιοῦτόν ἐστιν· τούτου δὲ τοῦ ἐγκλήματος ἓν ἕκαστον ἐξετάσωμεν.</p>
+<p class="passage indent">Φησὶ γὰρ δὴ τοὺς νέους ἀδικεῖν με διαφθείροντα. ἐγὼ δέ γε, ὦ ἄνδρες Ἀθηναῖοι, ἀδικεῖν φημι Μέλητον, ὅτι σπουδῇ χαριεντίζεται, ῥᾳδίως εἰς ἀγῶνα καθιστὰς ἀνθρώπους, περὶ πραγμάτων προσποιούμενος σπουδάζειν καὶ κήδεσθαι ὧν οὐδὲν τούτῳ πώποτε ἐμέλησεν· ὡς δὲ τοῦτο οὕτως ἔχει, πειράσομαι καὶ ὑμῖν ἐπιδεῖξαι. καί μοι δεῦρο, ὦ Μέλητε, εἰπέ· ἄλλο τι ἢ <span class="marker">[24d]</span> περὶ πλείστου ποιῇ ὅπως ὡς βέλτιστοι οἱ νεώτεροι ἔσονται;</p>
+<p class="passage indent">Ἔγωγε.</p>
+<p class="passage indent">Ἴθι δή νυν εἰπὲ τούτοις, τίς αὐτοὺς βελτίους ποιεῖ; δῆλον γὰρ ὅτι οἶσθα, μέλον γέ σοι. τὸν μὲν γὰρ διαφθείροντα ἐξευρών, ὡς φῄς, ἐμέ, εἰσάγεις τουτοισὶ καὶ κατηγορεῖς· τὸν δὲ δὴ βελτίους ποιοῦντα ἴθι εἰπὲ καὶ μήνυσον αὐτοῖς τίς ἐστιν. — Ὁρᾷς, ὦ Μέλητε, ὅτι σιγᾷς καὶ οὐκ ἔχεις εἰπεῖν; καίτοι οὐκ αἰσχρόν σοι δοκεῖ εἶναι καὶ ἱκανὸν τεκμήριον οὗ δὴ ἐγὼ λέγω, ὅτι σοι οὐδὲν μεμέληκεν; ἀλλ᾽ εἰπέ, ὠγαθέ, τίς αὐτοὺς ἀμείνους ποιεῖ;</p>
+<p class="passage indent">Οἱ νόμοι.</p>
+<p class="passage indent"><span class="marker">[24e]</span> Ἀλλ᾽ οὐ τοῦτο ἐρωτῶ, ὦ βέλτιστε, ἀλλὰ τίς ἄνθρωπος, ὅστις πρῶτον καὶ αὐτὸ τοῦτο οἶδε, τοὺς νόμους;</p>
+<p class="passage indent">Οὗτοι, ὦ Σώκρατες, οἱ δικασταί.</p>
+<p class="passage indent">Πῶς λέγεις, ὦ Μέλητε; οἵδε τοὺς νέους παιδεύειν οἷοί τέ εἰσι καὶ βελτίους ποιοῦσιν;</p>
+<p class="passage indent">Μάλιστα.</p>
+<p class="passage indent">Πότερον ἅπαντες, ἢ οἱ μὲν αὐτῶν, οἱ δ᾽ οὔ;</p>
+<p class="passage indent">Ἅπαντες.</p>
+<p class="passage indent">Εὖ γε νὴ τὴν Ἥραν λέγεις καὶ πολλὴν ἀφθονίαν τῶν ὠφελούντων. τί δὲ δή; οἱ δὲ ἀκροαταὶ βελτίους ποιοῦσιν <span class="marker">[25a]</span> ἢ οὔ;</p>
+<p class="passage indent">Καὶ οὗτοι.</p>
+<p class="passage indent">Τί δέ, οἱ βουλευταί;</p>
+<p class="passage indent">Καὶ οἱ βουλευταί.</p>
+<p class="passage indent">Ἀλλ᾽ ἄρα, ὦ Μέλητε, μὴ οἱ ἐν τῇ ἐκκλησίᾳ, οἱ ἐκκλησιασταί, διαφθείρουσι τοὺς νεωτέρους; ἢ κἀκεῖνοι βελτίους ποιοῦσιν ἅπαντες;</p>
+<p class="passage indent">Κἀκεῖνοι.</p>
+<p class="passage indent">Πάντες ἄρα, ὡς ἔοικεν, Ἀθηναῖοι καλοὺς κἀγαθοὺς ποιοῦσι πλὴν ἐμοῦ, ἐγὼ δὲ μόνος διαφθείρω. οὕτω λέγεις;</p>
+<p class="passage indent">Πάνυ σφόδρα ταῦτα λέγω.</p>
+<p class="passage indent">Πολλήν γέ μου κατέγνωκας δυστυχίαν. καί μοι ἀπόκριναι· ἦ καὶ περὶ ἵππους οὕτω σοι δοκεῖ ἔχειν; οἱ μὲν <span class="marker">[25b]</span> βελτίους ποιοῦντες αὐτοὺς πάντες ἄνθρωποι εἶναι, εἷς δέ τις ὁ διαφθείρων; ἢ τοὐναντίον τούτου πᾶν εἷς μέν τις ὁ βελτίους οἷός τ᾽ ὢν ποιεῖν ἢ πάνυ ὀλίγοι, οἱ ἱππικοί, οἱ δὲ πολλοὶ ἐάνπερ συνῶσι καὶ χρῶνται ἵπποις, διαφθείρουσιν; οὐχ οὕτως ἔχει, ὦ Μέλητε, καὶ περὶ ἵππων καὶ τῶν ἄλλων ἁπάντων ζῴων; πάντως δήπου, ἐάντε σὺ καὶ Ἄνυτος οὐ φῆτε ἐάντε φῆτε· πολλὴ γὰρ ἄν τις εὐδαιμονία εἴη περὶ τοὺς νέους εἰ εἷς μὲν μόνος αὐτοὺς διαφθείρει, οἱ δ᾽ ἄλλοι <span class="marker">[25c]</span> ὠφελοῦσιν. ἀλλὰ γάρ, ὦ Μέλητε, ἱκανῶς ἐπιδείκνυσαι ὅτι οὐδεπώποτε ἐφρόντισας τῶν νέων, καὶ σαφῶς ἀποφαίνεις τὴν σαυτοῦ ἀμέλειαν, ὅτι οὐδέν σοι μεμέληκεν περὶ ὧν ἐμὲ εἰσάγεις.</p>
+<p class="passage indent">Ἔτι δὲ ἡμῖν εἰπέ, ὦ πρὸς Διὸς Μέλητε, πότερόν ἐστιν οἰκεῖν ἄμεινον ἐν πολίταις χρηστοῖς ἢ πονηροῖς; ὦ τάν, ἀπόκριναι· οὐδὲν γάρ τοι χαλεπὸν ἐρωτῶ. οὐχ οἱ μὲν πονηροὶ κακόν τι ἐργάζονται τοὺς ἀεὶ ἐγγυτάτω αὑτῶν ὄντας, οἱ δ᾽ ἀγαθοὶ ἀγαθόν τι;</p>
+<p class="passage indent">Πάνυ γε.</p>
+<p class="passage indent"><span class="marker">[25d]</span> Ἔστιν οὖν ὅστις βούλεται ὑπὸ τῶν συνόντων βλάπτεσθαι μᾶλλον ἢ ὠφελεῖσθαι; ἀποκρίνου, ὦ ἀγαθέ· καὶ γὰρ ὁ νόμος κελεύει ἀποκρίνεσθαι. ἔσθ᾽ ὅστις βούλεται βλάπτεσθαι;</p>
+<p class="passage indent">Οὐ δῆτα.</p>
+<p class="passage indent">Φέρε δή, πότερον ἐμὲ εἰσάγεις δεῦρο ὡς διαφθείροντα τοὺς νέους καὶ πονηροτέρους ποιοῦντα ἑκόντα ἢ ἄκοντα;</p>
+<p class="passage indent">Ἑκόντα ἔγωγε.</p>
+<p class="passage indent">Τί δῆτα, ὦ Μέλητε; τοσοῦτον σὺ ἐμοῦ σοφώτερος εἶ τηλικούτου ὄντος τηλικόσδε ὤν, ὥστε σὺ μὲν ἔγνωκας ὅτι οἱ μὲν κακοὶ κακόν τι ἐργάζονται ἀεὶ τοὺς μάλιστα πλησίον <span class="marker">[25e]</span> ἑαυτῶν, οἱ δὲ ἀγαθοὶ ἀγαθόν, ἐγὼ δὲ δὴ εἰς τοσοῦτον ἀμαθίας ἥκω ὥστε καὶ τοῦτ᾽ ἀγνοῶ, ὅτι ἐάν τινα μοχθηρὸν ποιήσω τῶν συνόντων, κινδυνεύσω κακόν τι λαβεῖν ὑπ᾽ αὐτοῦ, ὥστε τοῦτο ‹τὸ› τοσοῦτον κακὸν ἑκὼν ποιῶ, ὡς φῂς σύ; ταῦτα ἐγώ σοι οὐ πείθομαι, ὦ Μέλητε, οἶμαι δὲ οὐδὲ ἄλλον ἀνθρώπων οὐδένα· ἀλλ᾽ ἢ οὐ διαφθείρω, ἢ εἰ διαφθείρω, <span class="marker">[26a]</span> ἄκων, ὥστε σύ γε κατ᾽ ἀμφότερα ψεύδῃ. εἰ δὲ ἄκων διαφθείρω, τῶν τοιούτων [καὶ ἀκουσίων] ἁμαρτημάτων οὐ δεῦρο νόμος εἰσάγειν ἐστίν, ἀλλὰ ἰδίᾳ λαβόντα διδάσκειν καὶ νουθετεῖν· δῆλον γὰρ ὅτι ἐὰν μάθω, παύσομαι ὅ γε ἄκων ποιῶ. σὺ δὲ συγγενέσθαι μέν μοι καὶ διδάξαι ἔφυγες καὶ οὐκ ἠθέλησας, δεῦρο δὲ εἰσάγεις, οἷ νόμος ἐστὶν εἰσάγειν τοὺς κολάσεως δεομένους ἀλλ᾽ οὐ μαθήσεως.</p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent">Και όσο για τις κατηγορίες των πρώτων μου κατηγόρων, αρκετά είναι αυτά που σας απολογήθηκα. Όσο για τον Μέλητο, τον καλό και πατριώτη, όπως τον λένε, και τους υστερινούς, θα δοκιμάσω τώρα ν᾽ απολογηθώ και σ᾽ αυτούς. Και επειδή αυτοί είναι άλλοι κατήγοροι, ας ξαναπάρουμε πάλι το κατηγορητήριό τους. Αυτό είναι: Λέει πως Ο ΣΩΚΡΑΤΗΣ ΕΙΝΑΙ ΕΝΟΧΟΣ ΚΑΙ ΓΙΑΤΙ ΔΙΑΦΘΕΙΡΕΙ ΤΟΥΣ ΝΕΟΥΣ ΚΑΙ ΓΙΑΤΙ ΔΕΝ ΠΙΣΤΕΥΕΙ ΤΟΥΣ ΘΕΟΥΣ <span class="marker">[24c]</span> ΠΟΥ ΠΙΣΤΕΥΕΙ Ο ΤΟΠΟΣ ΑΛΛΑ ΝΕΕΣ ΘΕΟΤΗΤΕΣ, ΑΛΛΕΣ. Τέτοια λοιπόν είναι η κατηγορία μου και τώρα ας την εξετάσουμε στο καθετί. Λένε δηλαδή πως είμαι ένοχος, γιατί διαφθείρω τους νέους. Κι εγώ, ω άνδρες Αθηναίοι, λέω πως ένοχος είναι ο Μέλητος, γιατί αστειεύεται στα σοβαρά και βάζει σε αγώνες δικαστικούς τους ανθρώπους για το τίποτε, με την πρόφαση πως φροντίζει και χάνεται για πράγματα που ποτέ του γι᾽ αυτά δεν τον έμελε. Και ότι τούτο έτσι είναι θα δοκιμάσω να το αποδείξω και σ᾽ εσάς.</p>
+<p class="passage indent">Κι έλα μου εδώ τώρα, Μέλητε, και πες μου. Η μόνη σου <span class="marker">[24d]</span> φροντίδα δεν είναι πώς να γίνουν καλύτεροι οι νέοι; — Βέβαια. — Έλα λοιπόν, πες σε τούτους τώρα ποιός είναι αυτός που τους κάνει καλύτερους. Γιατί φανερό είναι πως θα τον ξέρεις, αφού τόσο σε μέλει. Εκείνον που τους διαφθείρει, καθώς λες, τον βρήκες και είμ᾽ εγώ, που με φέρνεις στο δικαστήριο μπροστά σ᾽ αυτούς εδώ και με κατηγορείς· πες μου τώρα και ποιός είν᾽ αυτός που τους κάνει καλύτερους και δείξε τούς τον. Βλέπεις, Μέλητε, πώς σωπαίνεις και δεν έχεις τί να πεις; και δεν ντρέπεσαι, που σου δείχνω τώρα με το παραπάνω πως δε σε μέλει καθόλου γι᾽ αυτό το πράγμα; Πες μας λοιπόν, καλέ μου, ποιός τους κάνει καλύτερους; — Οι νόμοι. <span class="marker">[24e]</span> — Μα δεν σε ρωτώ αυτό, λαμπρέ άνθρωπε, σε ρωτώ ποιός άνθρωπος, αφού πρώτα έμαθε κι αυτό που λες, τους νόμους. — Αυτοί εδώ, Σωκράτη, οι δικαστές. — Πώς είπες, Μέλητε; Αυτοί είναι ικανοί να εκπαιδεύσουν τους νέους και να τους κάνουν καλύτερους; — Μάλιστα. — Και ποιό απ᾽ τα δύο; Όλοι, ή μερικοί απ᾽ αυτούς ναι και άλλοι όχι; — Όλοι. — Πολύ καλά τα είπες, μά την Ήρα, και μας βρήκες ένα σωρό ωφέλιμους ανθρώπους. Γιά πες μας ακόμα. Αυτοί εδώ οι ακροατές τούς κάνουν καλύτερους <span class="marker">[25a]</span> ή όχι; — Κι αυτοί. — Και οι βουλευτές; — Και οι βουλευτές. — Το λοιπόν, Μέλητε, μήπως οι άνθρωποι των συνελεύσεων, οι «εκκλησιαστές», διαφθείρουν τους νέους, ή κι εκείνοι τους κάνουν καλύτερους; — Κι εκείνοι. — Όλοι λοιπόν, καθώς φαίνεται, οι Αθηναίοι τούς κάνουν καλούς και άξιους, εκτός από μένα και μόνος εγώ τους διαφθείρω. Έτσι λες; — Έτσι λέω βέβαια. — Μεγάλη δυστυχία μού φόρτωσες αλήθεια. Και τώρα αποκρίσου μου πάλι. Το ίδιο δε σου φαίνεται πως γίνεται και με τ᾽ άλογα: εκείνοι <span class="marker">[25b]</span> που τα καλυτερεύουν είναι όλοι οι άνθρωποι και ένας μονάχα είναι που τα καταστρέφει, ή το εναντίο ένας ή πολύ λίγοι είναι που μπορούν να τα κάνουν καλύτερα, δηλαδή οι ιπποκόμοι, ενώ ο πολύς κόσμος, αν ανακατεύεται με τ᾽ άλογα και τα μεταχειρίζεται, τα καταστρέφει; Δεν είναι έτσι, ω Μέλητε, και για τ᾽ άλογα και για όλα τ᾽ άλλα ζώα; Έτσι είναι βέβαια, είτε το παραδεχθείτε και συ και ο Άνυτος είτε όχι· θέλω να πω πως πολλή ευτυχία θα ήτανε για τους νέους αν ένας μονάχα είναι που τους διαφθείρει και οι άλλοι όλοι <span class="marker">[25c]</span> τούς ωφελούν. Φανερώθηκε όμως αρκετά τώρα, Μέλητε, πως ποτέ δεν φρόντισες για τους νέους και καθαρά δείχνεις την αφροντισιά σου, πως τίποτε δε σε μέλει γι᾽ αυτά που με καταγγέλλεις.</p>
+<p class="passage indent">Πες μας ακόμα, Μέλητε, για όνομα του θεού, τί είναι καλύτερο, να ζει κανένας με πολίτες καλούς ή με κακούς; Αποκρίσου, φίλε μου, γιατί δε σε ρωτώ τίποτε δύσκολο. Δεν είν᾽ αλήθεια πως οι κακοί κακό πάντα κάνουν σε όσους έχουνε κοντά τους, και οι καλοί καλό; — Βέβαια. <span class="marker">[25d]</span> — Είναι λοιπόν κανένας που να θέλει καλύτερα να τον βλάφτουν οι δικοί του, παρά να τον ωφελούν; Αποκρίσου καλέ μου· γιατί ο νόμος προστάζει ν᾽ αποκριθείς. Είναι κανείς που να ζητεί να τον βλάφτουν; — Όχι βέβαια. — Έλα λοιπόν, πες μου, ποιό από τα δύο έφερες εδώ: πως τάχα διαφθείρω τους νέους και τους κάνω χειρότερους γιατί το θέλω, ή χωρίς να το θέλω κι ο ίδιος; — Εγώ λέω πως το θέλεις. — Τί λοιπόν, Μέλητε; Τόσο σοφότερος είσ᾽ εσύ, με τα χρόνια που έχεις, από μένα, με τα χρόνια τα δικά μου, ώστε εσύ το κατάλαβες πως οι κακοί πάντα κακό κάνουν σ᾽ αυτούς που είναι <span class="marker">[25e]</span> γύρω τους και οι καλοί καλό; Κι εγώ σε τέτοια αμάθεια κατάντησα, που κι αυτό ακόμα να μην το καταλαβαίνω, πως αν κάνω σε κανένα κακόν απ᾽ αυτούς που συναναστρέφομαι, ο ίδιος θα κινδυνέψω να πάθω κακό απ᾽ αυτόν, και το μεγάλο αυτό κακό να το κάνω ο ίδιος με το θέλημά μου, όπως λες εσύ; Αυτό ποτέ δεν το πιστεύω για σένα, Μέλητε, και θαρρώ πως ούτε άλλος άνθρωπος κανένας το πιστεύει. Λοιπόν, είτε δεν διαφθείρω, είτε κι αν διαφθείρω, <span class="marker">[26a]</span> το κάνω χωρίς να το θέλω· ώστε όπως και να το πάρουμε, πάντα εσύ λες ψέματα. Κι αν διαφθείρω χωρίς να το θέλω, γι᾽ αυτά τα ακούσια σφάλματα ο νόμος δε λέει να με φέρεις στο δικαστήριο, μα να με πάρεις κατά μέρος και να με συμβουλέψεις. Γιατί είναι φανερό πως αν μάθω θα πάψω να κάνω ό,τι κάνω χωρίς να θέλω. Εσύ όμως απόφυγες να μ᾽ ανταμώσεις και να με διδάξεις και δεν το θέλησες· αλλά με φέρνεις εδώ, όπου ο νόμος λέει να φέρνουν όσους χρειάζονται τιμωρία κι όχι όσους χρειάζονται μάθηση.</p>
+        </div>
+        
+
+        <div id="book-3-chapter-1-2" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-7" data-hash="book-3-chapter-1-2">
+            Ο Σωκράτης αντικρούει την κατηγορία του Μέλητου • Κεφάλαιο 1.2 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=104&page=7" target="_blank" class="page-link">Page 7</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent">Ἀλλὰ γάρ, ὦ ἄνδρες Ἀθηναῖοι, τοῦτο μὲν ἤδη δῆλον <span class="marker">[26b]</span> οὑγὼ ἔλεγον, ὅτι Μελήτῳ τούτων οὔτε μέγα οὔτε μικρὸν πώποτε ἐμέλησεν. ὅμως δὲ δὴ λέγε ἡμῖν, πῶς με φῂς διαφθείρειν, ὦ Μέλητε, τοὺς νεωτέρους; ἢ δῆλον δὴ ὅτι κατὰ τὴν γραφὴν ἣν ἐγράψω θεοὺς διδάσκοντα μὴ νομίζειν οὓς ἡ πόλις νομίζει, ἕτερα δὲ δαιμόνια καινά; οὐ ταῦτα λέγεις ὅτι διδάσκων διαφθείρω;</p>
+<p class="passage indent">Πάνυ μὲν οὖν σφόδρα ταῦτα λέγω.</p>
+<p class="passage indent">Πρὸς αὐτῶν τοίνυν, ὦ Μέλητε, τούτων τῶν θεῶν ὧν νῦν ὁ λόγος ἐστίν, εἰπὲ ἔτι σαφέστερον καὶ ἐμοὶ καὶ τοῖς <span class="marker">[26c]</span> ἀνδράσιν τουτοισί. ἐγὼ γὰρ οὐ δύναμαι μαθεῖν πότερον λέγεις διδάσκειν με νομίζειν εἶναί τινας θεούς —καὶ αὐτὸς ἄρα νομίζω εἶναι θεοὺς καὶ οὐκ εἰμὶ τὸ παράπαν ἄθεος οὐδὲ ταύτῃ ἀδικῶ— οὐ μέντοι οὕσπερ γε ἡ πόλις ἀλλὰ ἑτέρους, καὶ τοῦτ᾽ ἔστιν ὅ μοι ἐγκαλεῖς, ὅτι ἑτέρους, ἢ παντάπασί με φῂς οὔτε αὐτὸν νομίζειν θεοὺς τούς τε ἄλλους ταῦτα διδάσκειν.</p>
+<p class="passage indent">Ταῦτα λέγω, ὡς τὸ παράπαν οὐ νομίζεις θεούς.</p>
+<p class="passage indent"><span class="marker">[26d]</span> Ὦ θαυμάσιε Μέλητε, ἵνα τί ταῦτα λέγεις; οὐδὲ ἥλιον οὐδὲ σελήνην ἄρα νομίζω θεοὺς εἶναι, ὥσπερ οἱ ἄλλοι ἄνθρωποι;</p>
+<p class="passage indent">Μὰ Δί᾽, ὦ ἄνδρες δικασταί, ἐπεὶ τὸν μὲν ἥλιον λίθον φησὶν εἶναι, τὴν δὲ σελήνην γῆν.</p>
+<p class="passage indent">Ἀναξαγόρου οἴει κατηγορεῖν, ὦ φίλε Μέλητε; καὶ οὕτω καταφρονεῖς τῶνδε καὶ οἴει αὐτοὺς ἀπείρους γραμμάτων εἶναι ὥστε οὐκ εἰδέναι ὅτι τὰ Ἀναξαγόρου βιβλία τοῦ Κλαζομενίου γέμει τούτων τῶν λόγων; καὶ δὴ καὶ οἱ νέοι ταῦτα παρ᾽ ἐμοῦ μανθάνουσιν, ἃ ἔξεστιν ἐνίοτε εἰ πάνυ πολλοῦ δραχμῆς <span class="marker">[26e]</span> ἐκ τῆς ὀρχήστρας πριαμένοις Σωκράτους καταγελᾶν, ἐὰν προσποιῆται ἑαυτοῦ εἶναι, ἄλλως τε καὶ οὕτως ἄτοπα ὄντα; ἀλλ᾽, ὦ πρὸς Διός, οὑτωσί σοι δοκῶ; οὐδένα νομίζω θεὸν εἶναι;</p>
+<p class="passage indent">Οὐ μέντοι μὰ Δία οὐδ᾽ ὁπωστιοῦν.</p>
+<p class="passage indent">Ἄπιστός γ᾽ εἶ, ὦ Μέλητε, καὶ ταῦτα μέντοι, ὡς ἐμοὶ δοκεῖς, σαυτῷ. ἐμοὶ γὰρ δοκεῖ οὑτοσί, ὦ ἄνδρες Ἀθηναῖοι, πάνυ εἶναι ὑβριστὴς καὶ ἀκόλαστος, καὶ ἀτεχνῶς τὴν γραφὴν ταύτην ὕβρει τινὶ καὶ ἀκολασίᾳ καὶ νεότητι γράψασθαι. <span class="marker">[27a]</span> ἔοικεν γὰρ ὥσπερ αἴνιγμα συντιθέντι διαπειρωμένῳ «Ἆρα γνώσεται Σωκράτης ὁ σοφὸς δὴ ἐμοῦ χαριεντιζομένου καὶ ἐναντί᾽ ἐμαυτῷ λέγοντος, ἢ ἐξαπατήσω αὐτὸν καὶ τοὺς ἄλλους τοὺς ἀκούοντας;» οὗτος γὰρ ἐμοὶ φαίνεται τὰ ἐναντία λέγειν αὐτὸς ἑαυτῷ ἐν τῇ γραφῇ ὥσπερ ἂν εἰ εἴποι· «Ἀδικεῖ Σωκράτης θεοὺς οὐ νομίζων, ἀλλὰ θεοὺς νομίζων.» καίτοι τοῦτό ἐστι παίζοντος.</p>
+<p class="passage indent">Συνεπισκέψασθε δή, ὦ ἄνδρες, ᾗ μοι φαίνεται ταῦτα λέγειν· σὺ δὲ ἡμῖν ἀπόκριναι, ὦ Μέλητε. ὑμεῖς δέ, ὅπερ <span class="marker">[27b]</span> κατ᾽ ἀρχὰς ὑμᾶς παρῃτησάμην, μέμνησθέ μοι μὴ θορυβεῖν ἐὰν ἐν τῷ εἰωθότι τρόπῳ τοὺς λόγους ποιῶμαι.</p>
+<p class="passage indent">Ἔστιν ὅστις ἀνθρώπων, ὦ Μέλητε, ἀνθρώπεια μὲν νομίζει πράγματ᾽ εἶναι, ἀνθρώπους δὲ οὐ νομίζει; ἀποκρινέσθω, ὦ ἄνδρες, καὶ μὴ ἄλλα καὶ ἄλλα θορυβείτω· ἔσθ᾽ ὅστις ἵππους μὲν οὐ νομίζει, ἱππικὰ δὲ πράγματα; ἢ αὐλητὰς μὲν οὐ νομίζει εἶναι, αὐλητικὰ δὲ πράγματα; οὐκ ἔστιν, ὦ ἄριστε ἀνδρῶν· εἰ μὴ σὺ βούλει ἀποκρίνεσθαι, ἐγὼ σοὶ λέγω καὶ τοῖς ἄλλοις τουτοισί. ἀλλὰ τὸ ἐπὶ τούτῳ γε ἀπόκριναι· <span class="marker">[27c]</span> ἔσθ᾽ ὅστις δαιμόνια μὲν νομίζει πράγματ᾽ εἶναι, δαίμονας δὲ οὐ νομίζει;</p>
+<p class="passage indent">Οὐκ ἔστιν.</p>
+<p class="passage indent">Ὡς ὤνησας ὅτι μόγις ἀπεκρίνω ὑπὸ τουτωνὶ ἀναγκαζόμενος. οὐκοῦν δαιμόνια μὲν φῄς με καὶ νομίζειν καὶ διδάσκειν, εἴτ᾽ οὖν καινὰ εἴτε παλαιά, ἀλλ᾽ οὖν δαιμόνιά γε νομίζω κατὰ τὸν σὸν λόγον, καὶ ταῦτα καὶ διωμόσω ἐν τῇ ἀντιγραφῇ. εἰ δὲ δαιμόνια νομίζω, καὶ δαίμονας δήπου πολλὴ ἀνάγκη νομίζειν μέ ἐστιν· οὐχ οὕτως ἔχει; ἔχει δή· τίθημι γάρ σε ὁμολογοῦντα, ἐπειδὴ οὐκ ἀποκρίνῃ. τοὺς δὲ <span class="marker">[27d]</span> δαίμονας οὐχὶ ἤτοι θεούς γε ἡγούμεθα ἢ θεῶν παῖδας; φῂς ἢ οὔ;</p>
+<p class="passage indent">Πάνυ γε.</p>
+<p class="passage indent">Οὐκοῦν εἴπερ δαίμονας ἡγοῦμαι, ὡς σὺ φῄς, εἰ μὲν θεοί τινές εἰσιν οἱ δαίμονες, τοῦτ᾽ ἂν εἴη ὃ ἐγώ φημί σε αἰνίττεσθαι καὶ χαριεντίζεσθαι, θεοὺς οὐχ ἡγούμενον φάναι με θεοὺς αὖ ἡγεῖσθαι πάλιν, ἐπειδήπερ γε δαίμονας ἡγοῦμαι· εἰ δ᾽ αὖ οἱ δαίμονες θεῶν παῖδές εἰσιν νόθοι τινὲς ἢ ἐκ νυμφῶν ἢ ἔκ τινων ἄλλων ὧν δὴ καὶ λέγονται, τίς ἂν ἀνθρώπων θεῶν μὲν παῖδας ἡγοῖτο εἶναι, θεοὺς δὲ μή; ὁμοίως γὰρ <span class="marker">[27e]</span> ἂν ἄτοπον εἴη ὥσπερ ἂν εἴ τις ἵππων μὲν παῖδας ἡγοῖτο ἢ καὶ ὄνων, τοὺς ἡμιόνους, ἵππους δὲ καὶ ὄνους μὴ ἡγοῖτο εἶναι. ἀλλ᾽, ὦ Μέλητε, οὐκ ἔστιν ὅπως σὺ ταῦτα οὐχὶ ἀποπειρώμενος ἡμῶν ἐγράψω τὴν γραφὴν ταύτην ἢ ἀπορῶν ὅτι ἐγκαλοῖς ἐμοὶ ἀληθὲς ἀδίκημα· ὅπως δὲ σύ τινα πείθοις ἂν καὶ σμικρὸν νοῦν ἔχοντα ἀνθρώπων, ὡς οὐ τοῦ αὐτοῦ ἔστιν καὶ δαιμόνια καὶ θεῖα ἡγεῖσθαι, καὶ αὖ τοῦ αὐτοῦ μήτε <span class="marker">[28a]</span> δαίμονας μήτε θεοὺς μήτε ἥρωας, οὐδεμία μηχανή ἐστιν.</p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent">Μα είναι φανερόν, ω άνδρες Αθηναίοι, <span class="marker">[26b]</span> όπως σας έλεγα, πως γι᾽ αυτά τα πράγματα ποτέ του δεν τον έμελε τον Μέλητο, ούτε πολύ ούτε λίγο. Πες μου όμως τώρα, Μέλητε, με τί τρόπο λες πως διαφθείρω τους νέους; Όπως δηλαδή έγραφες στην καταγγελία σου, ότι διδάσκω να μην πιστεύουν τους θεούς που πιστεύει ο τόπος, μόνο άλλες θεότητες καινούργιες; Δεν λες πως τους διαφθείρω με τέτοιες διδασκαλίες; — Βεβαιότατα αυτά λέω. — Λοιπόν, Μέλητε, σ᾽ ορκίζω στ᾽ όνομα αυτών των ίδιων των θεών για τους οποίους μιλείς, μίλησέ μας καθαρότερα και σ᾽ εμένα και στους <span class="marker">[26c]</span> άλλους ανθρώπους εδώ. Γιατί εγώ δεν μπορώ να καταλάβω ποιό απ᾽ τα δύο θέλεις να πεις: πως εγώ διδάσκω να πιστεύουν πως υπάρχουν θεοί (κι εγώ δηλαδή τότε πιστεύω πως υπάρχουν θεοί και δεν είμαι ολότελα άθεος, ούτε ενοχοποιούμαι γι᾽ αυτό), όχι όμως εκείνους που πιστεύει ο τόπος μα άλλους, και γι᾽ αυτό με καταγγέλλεις, πως άλλους πιστεύω· ή θέλεις να πεις ότι κι εγώ δεν πιστεύω ολότελα σε θεούς, και τους άλλους διδάσκω να μην πιστεύουν; — Αυτά λέω, πως δεν πιστεύεις καθόλου σε θεούς. <span class="marker">[26d]</span> — Θαυμάσιε Μέλητε, για ποιό λόγο τάχα τα λες αυτά; Λοιπόν δεν πιστεύω πως ούτε ο ήλιος ούτε η σελήνη είναι θεοί, όπως πιστεύουν οι άνθρωποι. — Όχι, μά τον Δία, δικαστές, αφού αυτός λέει πως ο ήλιος είναι πέτρα και η σελήνη χώμα. — Μήπως νομίζεις πως καταγγέλλεις τον Αναξαγόρα, φίλε μου Μέλητε, αντί για μένα; Μ᾽ αυτόν τον τρόπο όμως προσβάλλεις αυτούς όλους εδώ και τους παίρνεις γι᾽ αγράμματους, σαν να μην ξέρουν πως τα βιβλία του Αναξαγόρα του Κλαζομένιου είναι γεμάτα από τέτοια λόγια. Και οι νέοι λοιπόν τα μαθαίνουν αυτά κάποτε από μένα, ενώ μπορούν με μία δραχμή ν᾽ αγοράσουν <span class="marker">[26e]</span> από την ορχήστρα το πολύ πολύ και να με γελούνε αν τους πουλούσα για δικές μου τέτοιες παράλογες μάλιστα ιδέες. Μα για τ᾽ όνομα του Διός, έτσι σου φαίνομαι; πως εγώ δεν πιστεύω σε κανέναν θεό; — Μά τον Δία, δεν πιστεύεις, όχι, δεν πιστεύεις καθόλου. — Κανένας, βέβαια, δεν σε πιστεύει, Μέλητε, και μου φαίνεται πως ούτε συ ο ίδιος έχεις πίστη σ᾽ αυτά που λες. Ναι, ω άνδρες Αθηναίοι, αυτός ο άνθρωπος μου φαίνεται πολύ υβριστής και αδιάντροπος και ολοφάνερα την καταγγελία που μου ᾽κανε την έκαμε με τρόπο υβριστικό και αδιάντροπο και παιδιακίστικο. <span class="marker">[27a]</span> Γιατί μοιάζει μ᾽ εκείνον που δίνει στους άλλους ένα αίνιγμα και τους ρωτά: «Τάχα θα καταλάβει ο Σωκράτης ο σοφός πως εγώ κοροϊδεύω και λέω πράματα που δεν τα πιστεύω ο ίδιος ή θα τον γελάσω κι αυτόν και τους άλλους που μ᾽ ακούνε;» Γιατί αυτός κατά τη γνώμη μου λέει πράματα αντίθετα απ᾽ αυτά που ᾽βαλε στην καταγγελία, σαν να ᾽λεγε: «Ο Σωκράτης είναι ένοχος γιατί δεν πιστεύει στους θεούς και πιστεύει στους θεούς». Τέτοια πράγματα μόνο στ᾽ αστεία λέγονται.</p>
+<p class="passage indent">Ελάτε να σκεφθούμε μαζί τώρα, ω άνδρες Αθηναίοι, με τί τρόπο μού φαίνεται πως αυτή είναι η σημασία των λόγων του. Και συ, Μέλητε, αποκρίσου μας ύστερα. Κι εσείς οι άλλοι θυμηθείτε εκείνο <span class="marker">[27b]</span> που σας ζήτησα απ᾽ την αρχή, να μην κάνετε θόρυβο, αν μιλήσω με τον συνηθισμένο τρόπο.</p>
+<p class="passage indent">Είναι κανένας άνθρωπος, Μέλητε, που να πιστεύει πως υπάρχουν πράγματα ανθρώπινα και ύστερα να μην πιστεύει πως υπάρχουν άνθρωποι; Ας μας αποκριθεί, ω άνδρες Αθηναίοι, και ας μη φωνάζει άλλα και άλλα. Είναι κανένας που να μην πιστεύει πως υπάρχουν άλογα και να πιστεύει πως υπάρχουν ιππικά πράγματα; ή αυλητές δεν νομίζει πως υπάρχουν, υπάρχουν όμως αυλητικά πράγματα; Κανένας δεν είναι, λαμπρέ άνθρωπε, κι αν εσύ δεν θέλεις να το πεις, σου το λέω εγώ και σένα και στους άλλους. Τουλάχιστον αποκρίσου σ᾽ αυτό που θα σου πω τώρα. <span class="marker">[27c]</span> Είναι κανένας που να πιστεύει πως υπάρχουν θεία πράγματα και θεούς να μην πιστεύει; — Δεν είναι. Μόλις και με τη βία μού αποκρίθηκες, γιατί σ᾽ αναγκάσανε αυτοί εδώ. Λοιπόν λες πως εγώ πιστεύω σε θεότητες και τις διδάσκω και στους άλλους, παλαιές ή καινούργιες· κατά τα λόγια σου λοιπόν πιστεύω σε θεότητες και το βεβαίωσες μάλιστα με όρκο στην καταγγελία. Κι αν πιστεύω σε θεότητες δεν μπορώ παρά να πιστεύω και σε θεούς. Δεν είν᾽ έτσι; Έτσι είναι· γιατί, αφού δεν αποκρίνεσαι, υποθέτω πως το παραδέχεσαι. Και <span class="marker">[27d]</span> οι άλλες θεότητες δεν πιστεύουμε πως είναι θεοί ή παιδιά θεών; Το παραδέχεσαι ή όχι; — Βέβαια. — Λοιπόν αφού πιστεύω σε θεότητες, όπως λες εσύ ο ίδιος, κι αν οι θεότητες αυτές είναι θεοί, τότε λοιπόν συμβαίνει ό,τι λέω εγώ, πως μας παρουσιάζεις αινίγματα και αστειεύεσαι με το να λες μια φορά πως δεν πιστεύω θεούς και πάλι πως πιστεύω, αφού πιστεύω θεότητες. Κι αν πάλι οι θεότητες είναι νόθα παιδιά θεών είτε από νύμφες ή από άλλες θνητές όπως λένε, ποιός άνθρωπος είν᾽ εκείνος που πιστεύει σε παιδιά θεών και σε θεούς δεν πιστεύει; Έτσι <span class="marker">[27e]</span> παράλογο θα ήταν αν κανένας πίστευε πως υπάρχουν παιδιά αλόγων ή παιδιά γαϊδουριών, τα μουλάρια, και δεν πιστεύει πως υπάρχουνε άλογα και γαϊδούρια. Δεν είναι όμως δυνατό, Μέλητε, παρά να ᾽καμες την καταγγελία αυτή για να μας δοκιμάσεις ή γιατί δεν έβρισκες άλλο αληθινό αδίκημα να μου κολλήσεις. Και με τί τρόπο θα πείσεις και τον πιο μικρόμυαλο πώς μπορεί ο ίδιος άνθρωπος να πιστεύει και θεότητες και θεία πράγματα και πάλι ο ίδιος να μην πιστεύει μήτε <span class="marker">[28a]</span> θεότητες, μήτε θεούς, μήτε ήρωες; Αυτά δεν γίνονται με κανέναν τρόπο.</p>
+        </div>
+        
+
+        <div id="book-4-chapter-1" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-8" data-hash="book-4-chapter-1">
+            Ο τρόπος ζωής και η δράση του Σωκράτη • Κεφάλαιο 1 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=104&page=8" target="_blank" class="page-link">Page 8</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent">Ἀλλὰ γάρ, ὦ ἄνδρες Ἀθηναῖοι, ὡς μὲν ἐγὼ οὐκ ἀδικῶ κατὰ τὴν Μελήτου γραφήν, οὐ πολλῆς μοι δοκεῖ εἶναι ἀπολογίας, ἀλλὰ ἱκανὰ καὶ ταῦτα· ὃ δὲ καὶ ἐν τοῖς ἔμπροσθεν ἔλεγον, ὅτι πολλή μοι ἀπέχθεια γέγονεν καὶ πρὸς πολλούς, εὖ ἴστε ὅτι ἀληθές ἐστιν. καὶ τοῦτ᾽ ἔστιν ὃ ἐμὲ αἱρεῖ, ἐάνπερ αἱρῇ, οὐ Μέλητος οὐδὲ Ἄνυτος ἀλλ᾽ ἡ τῶν πολλῶν διαβολή τε καὶ φθόνος. ἃ δὴ πολλοὺς καὶ ἄλλους καὶ ἀγαθοὺς <span class="marker">[28b]</span> ἄνδρας ᾕρηκεν, οἶμαι δὲ καὶ αἱρήσει· οὐδὲν δὲ δεινὸν μὴ ἐν ἐμοὶ στῇ.</p>
+<p class="passage indent">Ἴσως ἂν οὖν εἴποι τις· «Εἶτ᾽ οὐκ αἰσχύνῃ, ὦ Σώκρατες, τοιοῦτον ἐπιτήδευμα ἐπιτηδεύσας ἐξ οὗ κινδυνεύεις νυνὶ ἀποθανεῖν;» ἐγὼ δὲ τούτῳ ἂν δίκαιον λόγον ἀντείποιμι, ὅτι «Οὐ καλῶς λέγεις, ὦ ἄνθρωπε, εἰ οἴει δεῖν κίνδυνον ὑπολογίζεσθαι τοῦ ζῆν ἢ τεθνάναι ἄνδρα ὅτου τι καὶ σμικρὸν ὄφελός ἐστιν, ἀλλ᾽ οὐκ ἐκεῖνο μόνον σκοπεῖν ὅταν πράττῃ, πότερον δίκαια ἢ ἄδικα πράττει, καὶ ἀνδρὸς ἀγαθοῦ ἔργα ἢ κακοῦ. φαῦλοι <span class="marker">[28c]</span> γὰρ ἂν τῷ γε σῷ λόγῳ εἶεν τῶν ἡμιθέων ὅσοι ἐν Τροίᾳ τετελευτήκασιν οἵ τε ἄλλοι καὶ ὁ τῆς Θέτιδος ὑός, ὃς τοσοῦτον τοῦ κινδύνου κατεφρόνησεν παρὰ τὸ αἰσχρόν τι ὑπομεῖναι ὥστε, ἐπειδὴ εἶπεν ἡ μήτηρ αὐτῷ προθυμουμένῳ Ἕκτορα ἀποκτεῖναι, θεὸς οὖσα, οὑτωσί πως, ὡς ἐγὼ οἶμαι· “Ὦ παῖ, εἰ τιμωρήσεις Πατρόκλῳ τῷ ἑταίρῳ τὸν φόνον καὶ Ἕκτορα ἀποκτενεῖς, αὐτὸς ἀποθανῇ —αὐτίκα γάρ τοι,” φησί, “μεθ᾽ Ἕκτορα πότμος ἑτοῖμος”— ὁ δὲ τοῦτο ἀκούσας τοῦ μὲν θανάτου καὶ τοῦ κινδύνου ὠλιγώρησε, πολὺ δὲ <span class="marker">[28d]</span> μᾶλλον δείσας τὸ ζῆν κακὸς ὢν καὶ τοῖς φίλοις μὴ τιμωρεῖν, “Αὐτίκα,” φησί, “τεθναίην, δίκην ἐπιθεὶς τῷ ἀδικοῦντι, ἵνα μὴ ἐνθάδε μένω καταγέλαστος παρὰ νηυσὶ κορωνίσιν ἄχθος ἀρούρης.” μὴ αὐτὸν οἴει φροντίσαι θανάτου καὶ κινδύνου;»</p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent">Μα ότι εγώ δεν είμαι ένοχος, ω άνδρες Αθηναίοι, όπως λέει ο Μέλητος, μου φαίνεται πως δεν χρειάζεται και μεγάλη απολογία να σας το αποδείξω. Φθάνουν αυτά που σας είπα. Εκείνο όμως που σας έλεγα πρωτύτερα, πως πολλοί μ᾽ εχθρευθήκανε, ξέρετε καλά πως είναι αλήθεια. Και αν θα με φάει κατιτί αυτό θα με φάει, όχι ο Μέλητος και ο Άνυτος, μα η διαβολή και ο φθόνος του κόσμου. Αυτά και άλλους πολλούς και καλούς ανθρώπους <span class="marker">[28b]</span> φάγανε, και νομίζω πως θα φαν ακόμη, ούτε είναι φόβος να σταματήσει σ᾽ εμένα το κακό.</p>
+<p class="passage indent">Ίσως θα μου ᾽λεγε όμως κανένας: «Δεν ντρέπεσαι λοιπόν, Σωκράτη, να πιάσεις ένα τέτοιο επάγγελμα που κινδυνεύεις τώρα να πεθάνεις;» Εδώ θ᾽ αποκρινόμουν σ᾽ αυτόν, με όλο μου το δίκαιο: Δεν τα λες καλά, άνθρωπέ μου, αν νομίζεις πως ένας άνθρωπος που κάνει έστω και την παραμικρή ωφέλεια στους άλλους πρέπει να λογαριάζει αν θα ζήσει ή θα πεθάνει, αλλά να έχει μόνο του σκοπό, όταν κάνει κατιτί, αν αυτό που κάνει είναι δίκαιο ή άδικο κι αν ταιριάζει σε καλόν ή κακόν άνθρωπο. Γιατί τότε θα ήσαν φαύλοι, <span class="marker">[28c]</span> κατά τα λόγια τα δικά σου, και οι ημίθεοι που σκοτώθηκαν στην Τροία και όλοι οι άλλοι και ο γιος της Θέτιδας που τόσο περιφρόνησε τον κίνδυνο, παρά να πάθει καμιά ντροπή, ώστε όταν η μητέρα του, που ήτανε θεά, στην ώρα που αυτός έβραζε να σκοτώσει τον Έκτορα, του είπε αυτά τα λόγια, όπως ξέρουμε: «Αν εκδικηθείς τον φόνο του φίλου σου του Πατρόκλου και σκοτώσεις τον Έκτορα και συ ο ίδιος θα πεθάνεις, γιατί αμέσως ύστερ᾽ από τον θάνατο του Έκτορα, έτοιμη είναι κι η δική σου η μοίρα», εκείνος σαν τ᾽ άκουσε αυτά, δεν έδωκε προσοχή καθόλου στον θάνατο και στον κίνδυνο, του φάνηκε <span class="marker">[28d]</span> μάλιστα φοβερότερο να ζήσει ντροπιασμένος, χωρίς να εκδικηθεί τον φίλο του. «Καλύτερα να πεθάνω αυτή τη στιγμή, είπε, και να εκδικηθώ τον ένοχο, παρά να μείνω εδώ καταγέλαστος κοντά στα καμαρωτά καράβια, βάρος της γης. Νομίζεις λοιπόν πως κι αυτός φρόντιζε καθόλου για τον θάνατο και τον κίνδυνο;» Έτσι είναι η αλήθεια, ω άνδρες Αθηναίοι. Στη θέση που διαλέξει κανένας, γιατί μόνος του τη νόμισε καλύτερη, ή που τοποθετηθεί από τον αρχηγό του, πρέπει να μένει σταθερός, κατά τη γνώμη μου, με κάθε κίνδυνο, χωρίς να λογαριάζει καθόλου ούτε τον θάνατο ούτε άλλο τίποτε, μπροστά στην ατιμία.</p>
+        </div>
+        
+
+        <div id="book-4-chapter-1-2" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-9" data-hash="book-4-chapter-1-2">
+            Ο τρόπος ζωής και η δράση του Σωκράτη • Κεφάλαιο 1.2 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=104&page=9" target="_blank" class="page-link">Page 9</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent">Οὕτω γὰρ ἔχει, ὦ ἄνδρες Ἀθηναῖοι, τῇ ἀληθείᾳ· οὗ ἄν τις ἑαυτὸν τάξῃ ἡγησάμενος βέλτιστον εἶναι ἢ ὑπ᾽ ἄρχοντος ταχθῇ, ἐνταῦθα δεῖ, ὡς ἐμοὶ δοκεῖ, μένοντα κινδυνεύειν, μηδὲν ὑπολογιζόμενον μήτε θάνατον μήτε ἄλλο μηδὲν πρὸ τοῦ αἰσχροῦ. ἐγὼ οὖν δεινὰ ἂν εἴην εἰργασμένος, ὦ ἄνδρες <span class="marker">[28e]</span> Ἀθηναῖοι, εἰ ὅτε μέν με οἱ ἄρχοντες ἔταττον, οὓς ὑμεῖς εἵλεσθε ἄρχειν μου, καὶ ἐν Ποτειδαίᾳ καὶ ἐν Ἀμφιπόλει καὶ ἐπὶ Δηλίῳ, τότε μὲν οὗ ἐκεῖνοι ἔταττον ἔμενον ὥσπερ καὶ ἄλλος τις καὶ ἐκινδύνευον ἀποθανεῖν, τοῦ δὲ θεοῦ τάττοντος, ὡς ἐγὼ ᾠήθην τε καὶ ὑπέλαβον, φιλοσοφοῦντά με δεῖν ζῆν καὶ ἐξετάζοντα ἐμαυτὸν καὶ τοὺς ἄλλους, ἐνταῦθα δὲ φοβηθεὶς ἢ θάνατον <span class="marker">[29a]</span> ἢ ἄλλ᾽ ὁτιοῦν πρᾶγμα λίποιμι τὴν τάξιν. δεινόν τἂν εἴη, καὶ ὡς ἀληθῶς τότ᾽ ἄν με δικαίως εἰσάγοι τις εἰς δικαστήριον, ὅτι οὐ νομίζω θεοὺς εἶναι ἀπειθῶν τῇ μαντείᾳ καὶ δεδιὼς θάνατον καὶ οἰόμενος σοφὸς εἶναι οὐκ ὤν. τὸ γάρ τοι θάνατον δεδιέναι, ὦ ἄνδρες, οὐδὲν ἄλλο ἐστὶν ἢ δοκεῖν σοφὸν εἶναι μὴ ὄντα· δοκεῖν γὰρ εἰδέναι ἐστὶν ἃ οὐκ οἶδεν. οἶδε μὲν γὰρ οὐδεὶς τὸν θάνατον οὐδ᾽ εἰ τυγχάνει τῷ ἀνθρώπῳ πάντων μέγιστον ὂν τῶν ἀγαθῶν, δεδίασι δ᾽ ὡς εὖ εἰδότες <span class="marker">[29b]</span> ὅτι μέγιστον τῶν κακῶν ἐστι. καίτοι πῶς οὐκ ἀμαθία ἐστὶν αὕτη ἡ ἐπονείδιστος, ἡ τοῦ οἴεσθαι εἰδέναι ἃ οὐκ οἶδεν; ἐγὼ δ᾽, ὦ ἄνδρες, τούτῳ καὶ ἐνταῦθα ἴσως διαφέρω τῶν πολλῶν ἀνθρώπων, καὶ εἰ δή τῳ σοφώτερός του φαίην εἶναι, τούτῳ ἄν, ὅτι οὐκ εἰδὼς ἱκανῶς περὶ τῶν ἐν Ἅιδου οὕτω καὶ οἴομαι οὐκ εἰδέναι· τὸ δὲ ἀδικεῖν καὶ ἀπειθεῖν τῷ βελτίονι καὶ θεῷ καὶ ἀνθρώπῳ, ὅτι κακὸν καὶ αἰσχρόν ἐστιν οἶδα. πρὸ οὖν τῶν κακῶν ὧν οἶδα ὅτι κακά ἐστιν, ἃ μὴ οἶδα εἰ καὶ ἀγαθὰ ὄντα τυγχάνει οὐδέποτε φοβήσομαι οὐδὲ φεύξομαι· ὥστε οὐδ᾽ εἴ <span class="marker">[29c]</span> με νῦν ὑμεῖς ἀφίετε Ἀνύτῳ ἀπιστήσαντες, ὃς ἔφη ἢ τὴν ἀρχὴν οὐ δεῖν ἐμὲ δεῦρο εἰσελθεῖν ἤ, ἐπειδὴ εἰσῆλθον, οὐχ οἷόν τ᾽ εἶναι τὸ μὴ ἀποκτεῖναί με, λέγων πρὸς ὑμᾶς ὡς εἰ διαφευξοίμην ἤδη [ἂν] ὑμῶν οἱ ὑεῖς ἐπιτηδεύοντες ἃ Σωκράτης διδάσκει πάντες παντάπασι διαφθαρήσονται, —εἴ μοι πρὸς ταῦτα εἴποιτε· «Ὦ Σώκρατες, νῦν μὲν Ἀνύτῳ οὐ πεισόμεθα ἀλλ᾽ ἀφίεμέν σε, ἐπὶ τούτῳ μέντοι, ἐφ᾽ ᾧτε μηκέτι ἐν ταύτῃ τῇ ζητήσει διατρίβειν μηδὲ φιλοσοφεῖν· ἐὰν δὲ <span class="marker">[29d]</span> ἁλῷς ἔτι τοῦτο πράττων, ἀποθανῇ»— εἰ οὖν με, ὅπερ εἶπον, ἐπὶ τούτοις ἀφίοιτε, εἴποιμ᾽ ἂν ὑμῖν ὅτι «Ἐγὼ ὑμᾶς, ὦ ἄνδρες Ἀθηναῖοι, ἀσπάζομαι μὲν καὶ φιλῶ, πείσομαι δὲ μᾶλλον τῷ θεῷ ἢ ὑμῖν, καὶ ἕωσπερ ἂν ἐμπνέω καὶ οἷός τε ὦ, οὐ μὴ παύσωμαι φιλοσοφῶν καὶ ὑμῖν παρακελευόμενός τε καὶ ἐνδεικνύμενος ὅτῳ ἂν ἀεὶ ἐντυγχάνω ὑμῶν, λέγων οἷάπερ εἴωθα, ὅτι “Ὦ ἄριστε ἀνδρῶν, Ἀθηναῖος ὤν, πόλεως τῆς μεγίστης καὶ εὐδοκιμωτάτης εἰς σοφίαν καὶ ἰσχύν, χρημάτων μὲν οὐκ αἰσχύνῃ ἐπιμελούμενος ὅπως σοι ἔσται ὡς πλεῖστα, <span class="marker">[29e]</span> καὶ δόξης καὶ τιμῆς, φρονήσεως δὲ καὶ ἀληθείας καὶ τῆς ψυχῆς ὅπως ὡς βελτίστη ἔσται οὐκ ἐπιμελῇ οὐδὲ φροντίζεις;” καὶ ἐάν τις ὑμῶν ἀμφισβητήσῃ καὶ φῇ ἐπιμελεῖσθαι, οὐκ εὐθὺς ἀφήσω αὐτὸν οὐδ᾽ ἄπειμι, ἀλλ᾽ ἐρήσομαι αὐτὸν καὶ ἐξετάσω καὶ ἐλέγξω, καὶ ἐάν μοι μὴ δοκῇ κεκτῆσθαι ἀρετήν, <span class="marker">[30a]</span> φάναι δέ, ὀνειδιῶ ὅτι τὰ πλείστου ἄξια περὶ ἐλαχίστου ποιεῖται, τὰ δὲ φαυλότερα περὶ πλείονος. ταῦτα καὶ νεωτέρῳ καὶ πρεσβυτέρῳ ὅτῳ ἂν ἐντυγχάνω ποιήσω, καὶ ξένῳ καὶ ἀστῷ, μᾶλλον δὲ τοῖς ἀστοῖς, ὅσῳ μου ἐγγυτέρω ἐστὲ γένει. ταῦτα γὰρ κελεύει ὁ θεός, εὖ ἴστε, καὶ ἐγὼ οἴομαι οὐδέν πω ὑμῖν μεῖζον ἀγαθὸν γενέσθαι ἐν τῇ πόλει ἢ τὴν ἐμὴν τῷ θεῷ ὑπηρεσίαν. οὐδὲν γὰρ ἄλλο πράττων ἐγὼ περιέρχομαι ἢ πείθων ὑμῶν καὶ νεωτέρους καὶ πρεσβυτέρους μήτε σωμάτων <span class="marker">[30b]</span> ἐπιμελεῖσθαι μήτε χρημάτων πρότερον μηδὲ οὕτω σφόδρα ὡς τῆς ψυχῆς ὅπως ὡς ἀρίστη ἔσται, λέγων ὅτι “Οὐκ ἐκ χρημάτων ἀρετὴ γίγνεται, ἀλλ᾽ ἐξ ἀρετῆς χρήματα καὶ τὰ ἄλλα ἀγαθὰ τοῖς ἀνθρώποις ἅπαντα καὶ ἰδίᾳ καὶ δημοσίᾳ.” εἰ μὲν οὖν ταῦτα λέγων διαφθείρω τοὺς νέους, ταῦτ᾽ ἂν εἴη βλαβερά· εἰ δέ τίς μέ φησιν ἄλλα λέγειν ἢ ταῦτα, οὐδὲν λέγει. πρὸς ταῦτα,» φαίην ἄν, «ὦ ἄνδρες Ἀθηναῖοι, ἢ πείθεσθε Ἀνύτῳ ἢ μή, καὶ ἢ ἀφίετέ με ἢ μή, ὡς ἐμοῦ οὐκ <span class="marker">[30c]</span> ἂν ποιήσαντος ἄλλα, οὐδ᾽ εἰ μέλλω πολλάκις τεθνάναι».</p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent">Παράξενο πράγμα θα είχα κάνει, ω άνδρες <span class="marker">[28e]</span> Αθηναίοι, αν, όταν οι άρχοντες που εσείς εκλέξατε να με κυβερνούν με τοποθέτησαν στην Ποτίδαια και στην Αμφίπολη και στο Δήλιο, έμενα τότε σαν όλους τους άλλους στη θέση μου και κινδύνευα να σκοτωθώ, όταν όμως μ᾽ έβαλε ο θεός σε μια θέση, όπως εγώ ενόμισα και είχα την ιδέα να περάσω τη ζωή μου, δηλαδή με τη φιλοσοφία και την εξέταση του εαυτού μου και των άλλων, να φοβηθώ τον θάνατο <span class="marker">[29a]</span> ή ό,τι άλλο και ν᾽ αφήσω τη θέση μου. Βέβαια αυτό θα ήτανε το παράξενο και τότε ίσα ίσα έπρεπε να με στείλουν στο δικαστήριο, πως δεν πιστεύω στην ύπαρξη των θεών, αφού παρακούω τη μαντεία και φοβούμαι τον θάνατο και νομίζω πως είμαι σοφός χωρίς να είμαι. Γιατί το να φοβάται κανένας τον θάνατο, ω άνδρες Αθηναίοι, δεν είναι άλλο τίποτε παρά να νομίζει πως είναι σοφός χωρίς να είναι· γιατί θα πει ότι υποθέτει πως γνωρίζει εκείνα που δεν ξέρει. Γιατί κανένας δεν ξέρει τί είναι ο θάνατος, ούτε αν είναι το μεγαλύτερο καλό για τους ανθρώπους· και το φοβούνται όλοι σαν να γνωρίζουν καλά <span class="marker">[29b]</span> πως είναι το μεγαλύτερο κακό. Και πώς; Δεν είναι αυτό η πιο ντροπιασμένη αμάθεια να νομίζει κανένας πως γνωρίζει εκείνα που δεν ξέρει; Εγώ όμως, ω άνδρες Αθηναίοι, και σε τούτο εδώ διαφέρω από τους περισσότερους ανθρώπους και, αν λέω πως είμαι σοφότερος από έναν άλλον σε κάτι, είναι σ᾽ αυτό: ότι αφού δεν ξέρω αρκετά για τα πράγματα του Άδη, έτσι και το νομίζω πως δεν ξέρω. Αλλά να είμαι άδικος και να παρακούω τον καλύτερό μου, είτε θεόν είτε άνθρωπο, ξέρω πως είναι κακό και ντροπιασμένο. Μπροστά στα κακά λοιπόν, που τα ξέρω πως είναι κακά, εκείνα που δεν ξέρω αν είναι καλά δεν θα τα φοβηθώ καθόλου ποτέ, ούτε θα τ᾽ αποφύγω· ώστε και αν <span class="marker">[29c]</span> τώρα εσείς με αθωώσετε και δεν πεισθείτε στον Άνυτο, που είπε πως ή δεν έπρεπε εξαρχής να σταλώ στο δικαστήριο ή, αφού ήλθα εδώ, δεν είναι δυνατό πια να μην καταδικασθώ σε θάνατο και πως, αν ξεφύγω, τα παιδιά σας, καταγινόμενα με τη διδασκαλία του Σωκράτη, θα διαφθαρούν όλα πέρα πέρα, αν μου πείτε τώρα, λέγω, ύστερ᾽ απ᾽ αυτά: «Σωκράτη, εμείς δεν θα πιστεύσουμε τον Άνυτο, αλλά σε αθωώνουμε, με τη συμφωνία όμως να μην καταγίνεσαι πια σ᾽ αυτά τα ζητήματα, μήτε να φιλοσοφείς· κι αν <span class="marker">[29d]</span> σε πιάσουμε να ξανακάνεις τα ίδια, θα καταδικασθείς σε θάνατο», αν λοιπόν, όπως είπα, με τέτοια συμφωνία με αθωώσετε, θα σας πω ότι εγώ, ω άνδρες Αθηναίοι, σας εκτιμώ και σας αγαπώ, θ᾽ ακούσω όμως περισσότερο τον θεό από σας, και, όσο έχω πνοή και είμαι δυνατός, δεν θα παύσω να φιλοσοφώ και να σας συμβουλεύω, με όποιον κι αν βρεθώ, και να σας λέω εκείνα που συνήθισα, δηλαδή: Ω άνθρωπε, καλύτερε απ᾽ όλους, που είσαι Αθηναίος, από την πόλη τη μεγαλύτερη και πιο ξακουσμένη και στη σοφία και στη δύναμη, δεν ντρέπεσαι να φροντίζεις για χρήματα, με τί τρόπο ν᾽ αποκτήσεις περισσότερα, <span class="marker">[29e]</span> και για την υπόληψη και την τιμή, για την φρόνηση και την αλήθεια και για την ψυχή σου, πώς να την καλυτερεύσεις, δεν καταγίνεσαι και δεν φροντίζεις καθόλου; Και αν κανένας από σας αμφισβητήσει και πει πως φροντίζει, δεν θα τον αφήσω και δεν θα φύγω, αλλά θα τον ρωτήσω και θα τον εξετάσω και θα τον εξελέγξω και, αν μου φανεί πως δεν έχει στ᾽ αλήθεια αυτή την αρετή, <span class="marker">[30a]</span> παρά μόνο με τα λόγια, θα τον περιγελάσω, γιατί τόσο λίγο φροντίζει για κείνα που αξίζουν πολύ και τόσο πολύ για τα πιο τιποτένια. Αυτό θα κάνω σε όποιον συντύχω, είτε νεότερον είτε γεροντότερο, και ξένο και ντόπιο, και περισσότερο στους ντόπιους, γιατί περισσότερο συγγενεύετε μαζί μου. Γιατί αυτά προστάζει ο θεός, ξέρετέ το καλά. Κι εγώ φαντάζομαι πως δεν έγινε ακόμη μεγαλύτερο καλό σε σας και στην πολιτεία, από την υπηρεσία μου αυτή προς τον θεό. Γιατί εγώ τίποτε άλλο δεν κάνω, καθώς τριγυρίζω παντού, παρά να σας πείθω, νέους και γέρους, μήτε για τα σώματά σας <span class="marker">[30b]</span> να φροντίζετε, μήτε για χρήματα πρώτα πρώτα και με τόσο ζήλο, όσο για την ψυχή σας, πώς να την κάμετε καλύτερη, λέγοντάς σας πως τα χρήματα δεν κάνουν την αρετή αλλά η αρετή τα χρήματα και όλα τα άλλα καλά των ανθρώπων και στην ιδιωτική ζωή και στη δημόσια. Αν λοιπόν, λέγοντας αυτά, διαφθείρω τους νέους, τότε αυτά που λέω θα ήσαν βλαβερά· και αν μου πει κανένας πως δεν λέω αυτά μα άλλα, δεν λέει τίποτε. Σε τέτοια λόγια θα έλεγα, ω άνδρες Αθηναίοι: Ή ακούσετε τον Άνυτο ή δεν τον ακούσετε, ή με αθωώσετε ή δεν με αθωώσετε, εγώ δεν <span class="marker">[30c]</span> θα κάμω άλλο πράγμα απ᾽ αυτό που κάνω, και αν μου μέλλεται να πεθάνω, όχι μία φορά μα και πολλές.</p>
+        </div>
+        
+
+        <div id="book-4-chapter-1-3" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-10" data-hash="book-4-chapter-1-3">
+            Ο τρόπος ζωής και η δράση του Σωκράτη • Κεφάλαιο 1.3 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=104&page=10" target="_blank" class="page-link">Page 10</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent">Μὴ θορυβεῖτε, ὦ ἄνδρες Ἀθηναῖοι, ἀλλ᾽ ἐμμείνατέ μοι οἷς ἐδεήθην ὑμῶν, μὴ θορυβεῖν ἐφ᾽ οἷς ἂν λέγω ἀλλ᾽ ἀκούειν· καὶ γάρ, ὡς ἐγὼ οἶμαι, ὀνήσεσθε ἀκούοντες. μέλλω γὰρ οὖν ἄττα ὑμῖν ἐρεῖν καὶ ἄλλα ἐφ᾽ οἷς ἴσως βοήσεσθε· ἀλλὰ μηδαμῶς ποιεῖτε τοῦτο. εὖ γὰρ ἴστε, ἐάν με ἀποκτείνητε τοιοῦτον ὄντα οἷον ἐγὼ λέγω, οὐκ ἐμὲ μείζω βλάψετε ἢ ὑμᾶς αὐτούς· ἐμὲ μὲν γὰρ οὐδὲν ἂν βλάψειεν οὔτε Μέλητος οὔτε Ἄνυτος —οὐδὲ γὰρ ἂν δύναιτο— οὐ γὰρ οἴομαι θεμιτὸν <span class="marker">[30d]</span> εἶναι ἀμείνονι ἀνδρὶ ὑπὸ χείρονος βλάπτεσθαι. ἀποκτείνειε μεντἂν ἴσως ἢ ἐξελάσειεν ἢ ἀτιμώσειεν· ἀλλὰ ταῦτα οὗτος μὲν ἴσως οἴεται καὶ ἄλλος τίς που μεγάλα κακά, ἐγὼ δ᾽ οὐκ οἴομαι, ἀλλὰ πολὺ μᾶλλον ποιεῖν ἃ οὑτοσὶ νῦν ποιεῖ, ἄνδρα ἀδίκως ἐπιχειρεῖν ἀποκτεινύναι. νῦν οὖν, ὦ ἄνδρες Ἀθηναῖοι, πολλοῦ δέω ἐγὼ ὑπὲρ ἐμαυτοῦ ἀπολογεῖσθαι, ὥς τις ἂν οἴοιτο, ἀλλὰ ὑπὲρ ὑμῶν, μή τι ἐξαμάρτητε περὶ τὴν τοῦ <span class="marker">[30e]</span> θεοῦ δόσιν ὑμῖν ἐμοῦ καταψηφισάμενοι. ἐὰν γάρ με ἀποκτείνητε, οὐ ῥᾳδίως ἄλλον τοιοῦτον εὑρήσετε, ἀτεχνῶς —εἰ καὶ γελοιότερον εἰπεῖν— προσκείμενον τῇ πόλει ὑπὸ τοῦ θεοῦ ὥσπερ ἵππῳ μεγάλῳ μὲν καὶ γενναίῳ, ὑπὸ μεγέθους δὲ νωθεστέρῳ καὶ δεομένῳ ἐγείρεσθαι ὑπὸ μύωπός τινος, οἷον δή μοι δοκεῖ ὁ θεὸς ἐμὲ τῇ πόλει προστεθηκέναι τοιοῦτόν τινα, ὃς ὑμᾶς ἐγείρων καὶ πείθων καὶ ὀνειδίζων ἕνα ἕκαστον <span class="marker">[31a]</span> οὐδὲν παύομαι τὴν ἡμέραν ὅλην πανταχοῦ προσκαθίζων. τοιοῦτος οὖν ἄλλος οὐ ῥᾳδίως ὑμῖν γενήσεται, ὦ ἄνδρες, ἀλλ᾽ ἐὰν ἐμοὶ πείθησθε, φείσεσθέ μου· ὑμεῖς δ᾽ ἴσως τάχ᾽ ἂν ἀχθόμενοι, ὥσπερ οἱ νυστάζοντες ἐγειρόμενοι, κρούσαντες ἄν με, πειθόμενοι Ἀνύτῳ, ῥᾳδίως ἂν ἀποκτείναιτε, εἶτα τὸν λοιπὸν βίον καθεύδοντες διατελοῖτε ἄν, εἰ μή τινα ἄλλον ὁ θεὸς ὑμῖν ἐπιπέμψειεν κηδόμενος ὑμῶν. ὅτι δ᾽ ἐγὼ τυγχάνω ὢν τοιοῦτος οἷος ὑπὸ τοῦ θεοῦ τῇ πόλει δεδόσθαι, ἐνθένδε <span class="marker">[31b]</span> ἂν κατανοήσαιτε· οὐ γὰρ ἀνθρωπίνῳ ἔοικε τὸ ἐμὲ τῶν μὲν ἐμαυτοῦ πάντων ἠμεληκέναι καὶ ἀνέχεσθαι τῶν οἰκείων ἀμελουμένων τοσαῦτα ἤδη ἔτη, τὸ δὲ ὑμέτερον πράττειν ἀεί, ἰδίᾳ ἑκάστῳ προσιόντα ὥσπερ πατέρα ἢ ἀδελφὸν πρεσβύτερον πείθοντα ἐπιμελεῖσθαι ἀρετῆς. καὶ εἰ μέν τι ἀπὸ τούτων ἀπέλαυον καὶ μισθὸν λαμβάνων ταῦτα παρεκελευόμην, εἶχον ἄν τινα λόγον· νῦν δὲ ὁρᾶτε δὴ καὶ αὐτοὶ ὅτι οἱ κατήγοροι τἆλλα πάντα ἀναισχύντως οὕτω κατηγοροῦντες τοῦτό γε οὐχ οἷοί τε ἐγένοντο ἀπαναισχυντῆσαι <span class="marker">[31c]</span> παρασχόμενοι μάρτυρα, ὡς ἐγώ ποτέ τινα ἢ ἐπραξάμην μισθὸν ἢ ᾔτησα. ἱκανὸν γάρ, οἶμαι, ἐγὼ παρέχομαι τὸν μάρτυρα ὡς ἀληθῆ λέγω, τὴν πενίαν.</p>
+<p class="passage indent">Ἴσως ἂν οὖν δόξειεν ἄτοπον εἶναι, ὅτι δὴ ἐγὼ ἰδίᾳ μὲν ταῦτα συμβουλεύω περιιὼν καὶ πολυπραγμονῶ, δημοσίᾳ δὲ οὐ τολμῶ ἀναβαίνων εἰς τὸ πλῆθος τὸ ὑμέτερον συμβουλεύειν τῇ πόλει. τούτου δὲ αἴτιόν ἐστιν ὃ ὑμεῖς ἐμοῦ πολλάκις ἀκηκόατε πολλαχοῦ λέγοντος, ὅτι μοι θεῖόν τι καὶ <span class="marker">[31d]</span> δαιμόνιον γίγνεται [φωνή], ὃ δὴ καὶ ἐν τῇ γραφῇ ἐπικωμῳδῶν Μέλητος ἐγράψατο. ἐμοὶ δὲ τοῦτ᾽ ἔστιν ἐκ παιδὸς ἀρξάμενον, φωνή τις γιγνομένη, ἣ ὅταν γένηται, ἀεὶ ἀποτρέπει με τοῦτο ὃ ἂν μέλλω πράττειν, προτρέπει δὲ οὔποτε. τοῦτ᾽ ἔστιν ὅ μοι ἐναντιοῦται τὰ πολιτικὰ πράττειν, καὶ παγκάλως γέ μοι δοκεῖ ἐναντιοῦσθαι· εὖ γὰρ ἴστε, ὦ ἄνδρες Ἀθηναῖοι, εἰ ἐγὼ πάλαι ἐπεχείρησα πράττειν τὰ πολιτικὰ πράγματα, πάλαι ἂν ἀπολώλη καὶ οὔτ᾽ ἂν ὑμᾶς ὠφελήκη <span class="marker">[31e]</span> οὐδὲν οὔτ᾽ ἂν ἐμαυτόν. καί μοι μὴ ἄχθεσθε λέγοντι τἀληθῆ· οὐ γὰρ ἔστιν ὅστις ἀνθρώπων σωθήσεται οὔτε ὑμῖν οὔτε ἄλλῳ πλήθει οὐδενὶ γνησίως ἐναντιούμενος καὶ διακωλύων πολλὰ ἄδικα καὶ παράνομα ἐν τῇ πόλει γίγνεσθαι, ἀλλ᾽ <span class="marker">[32a]</span> ἀναγκαῖόν ἐστι τὸν τῷ ὄντι μαχούμενον ὑπὲρ τοῦ δικαίου, καὶ εἰ μέλλει ὀλίγον χρόνον σωθήσεσθαι, ἰδιωτεύειν ἀλλὰ μὴ δημοσιεύειν.</p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent">Μη θορυβείτε, ω άνδρες Αθηναίοι, μόνο κάνετέ μου τη χάρη που σας ζήτησα, να μη θορυβείτε σε όσα και αν ειπώ, αλλά να μ᾽ ακούσετε· γιατί φαντάζομαι πως θα ωφεληθείτε απ᾽ αυτά που θ᾽ ακούσετε. Εγώ θα σας πω και άλλα ακόμα, που θα σας κάνουν να φωνάξετε· μην το κάνετε όμως. Γιατί πρέπει να ξέρετε καλά, αν με καταδικάσετε εμένα σε θάνατο, έναν τέτοιον άνθρωπο, όπως ο ίδιος σας είπα τον εαυτό μου, περισσότερο θα βλάψετε τον εαυτό σας παρά εμένα. Εμένα σε τίποτε δεν θα μ᾽ έβλαπτε ούτε ο Άνυτος ούτε ο Μέλητος. Γιατί ούτε θα μπορούσαν να το κάμουν· δεν είναι δυνατό <span class="marker">[30d]</span> νομίζω τον καλύτερον άνθρωπο να τον βλάψει ο χειρότερος. Ίσως μπορεί να τον θανατώσει ή να τον εξορίσει ή να τον ατιμάσει. Αυτά όμως ίσως αυτός και κανένας άλλος τα νομίζουν για μεγάλα κακά· εγώ δεν τα νομίζω, εξεναντίας νομίζω πολύ περισσότερο κακό να κάνει κανένας αυτά που κάνει αυτός, δηλαδή να θέλει να θανατώσει άδικα έναν άνθρωπο. Τώρα λοιπόν, ω άνδρες Αθηναίοι, εγώ κάθε άλλο κάνω παρά ν᾽ απολογούμαι για τον εαυτό μου, όπως θα νομίζετε ίσως, μ᾽ απολογούμαι για σας, μήπως αμαρτήσετε στον θεό <span class="marker">[30e]</span> για το χάρισμα που σας έκανε, με την καταδικαστική σας ψήφο. Γιατί αν με θανατώσετε δεν θα βρείτε εύκολα άλλον σαν κι εμένα, κολλημένον από το θεό στην πόλη, αν και είναι αστείο να το πούμε έτσι, σα σε μεγάλο και δυνατό άλογο, μα νωθρό απ᾽ το πάχος του, που για να ξυπνήσει έχει ανάγκη από μιαν αλογόμυγα. Σαν τέτοια μού φαίνεται πως με κόλλησε κι εμένα ο θεός στην πολιτεία, να σας ξυπνώ και να σας πείθω και να σας πειράζω καθέναν από σας, κι έτσι <span class="marker">[31a]</span> δεν παύω όλη την ημέρα να σας κολλάω εδώ κι εκεί. Τέτοιος λοιπόν άλλος δεν θα βρεθεί για σας εύκολα, ω άνδρες Αθηναίοι, κι αν με πιστεύετε δεν θα με καταδικάσετε. Εσείς όμως δυσαρεστημένοι ίσως, σαν κι εκείνους που σηκώνονται νυσταγμένοι ακόμα, θα πιστεύσετε τον Άνυτο και θα με κτυπήσετε και με όλη την ευκολία ίσως θα με θανατώσετε· και ύστερα όλη σας τη ζωή θα μείνετε κοιμισμένοι, αν δεν σας λυπηθεί ο θεός και σας στείλει κανέναν άλλον. Και ότι εγώ είμαι ο άνθρωπος που έπρεπε ο θεός να χαρίσει στην πολιτεία, θα το καταλάβετε <span class="marker">[31b]</span> απ᾽ αυτά που θα σας πω· γιατί δεν μου φαίνεται ανθρώπινο πράγμα να παραμελήσω εγώ τα δικά μου πράγματα και ν᾽ ανέχομαι να βλέπω τους ανθρώπους μου αμελημένους τόσον καιρό και να κοιτάζω πάντα τα δικά σας συμφέροντα και να πηγαίνω χωριστά σε καθέναν από σας, σαν πατέρας ή μεγαλύτερος αδελφός, να σας παρακινώ να επιμελείσθε την αρετή. Και αν τουλάχιστον απόλαυα τίποτε απ᾽ αυτά κι έπαιρνα κανέναν μισθό για να σας συμβουλεύω, θα είχα κάποιο λόγο· τώρα όμως, το βλέπετε δα και σεις οι ίδιοι, οι κατήγοροί μου, ενώ για όλα τ᾽ άλλα αδιάντροπα με κατηγόρησαν, όσο γι᾽ αυτό δεν μπόρεσαν πια να χάσουν κάθε ντροπή <span class="marker">[31c]</span> και να φέρουν μάρτυρα πως εγώ πήρα ποτέ πληρωμή από κανέναν ή ζήτησα. Γιατί εγώ ο ίδιος σας παρουσιάζω, νομίζω, αρκετόν μάρτυρα πως λέω την αλήθεια τη φτώχεια μου.</p>
+<p class="passage indent">Ίσως όμως θα φανεί άτοπο ότι εγώ ιδιαιτέρως συμβουλεύω όλ᾽ αυτά και τριγυρίζω και σκοτίζομαι για τόσα πράγματα, αλλά δημοσία δεν τολμώ να φανερωθώ μπροστά στον δήμο και να συμβουλεύσω όσα πρέπει στον τόπο. Η αιτία είναι εκείνο που πολλές φορές και σε πολλά μέρη μ᾽ ακούσατε να λέω, ότι μου ᾽ρχεται δηλαδή κάτι θείο πράγμα και <span class="marker">[31d]</span> υπεράνθρωπο [μια φωνή] που και ο Μέλητος στ᾽ αστεία το ανάφερε μέσα στην κατηγορία. Αυτό το πράγμα μού άρχισε από τα παιδικά μου χρόνια και γίνεται μια φωνή μέσα μου, που, όταν γίνει, μ᾽ εμποδίζει πάντα από κείνο που πάω να κάμω και ποτέ δεν με προτρέπει. Αυτό είναι που μου εναντιώνεται και να πολιτευθώ. Και παρά πολύ καλά μού φαίνεται πως εναντιώνεται. Γιατί πολύ καλά ξέρετε, ω άνδρες Αθηναίοι, πως αν εγώ από καιρό επιχειρούσα να πολιτευθώ θα ήμουν χαμένος και ούτ᾽ εσάς θα σας είχα ωφελήσει <span class="marker">[31e]</span> τίποτε ούτε τον εαυτό μου. Και μη θυμώνετε μαζί μου που σας λέω την αλήθεια· γιατί δεν υπάρχει άνθρωπος που μπορεί να σωθεί όταν εναντιώνεται με ειλικρίνεια, είτε σε σας είτε σε άλλον λαό, κι εμποδίζει να γίνονται πολλά άδικα και παράνομα στον τόπο. Γι᾽ αυτό <span class="marker">[32a]</span> είναι ανάγκη όποιος με τα σωστά του μάχεται για τη δικαιοσύνη, κι αν θέλει να σωθεί για λίγον καιρό, να μένει ιδιώτης και να μην ανακατεύεται στα πολιτικά.</p>
+        </div>
+        
+
+        <div id="book-4-chapter-1-4" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-11" data-hash="book-4-chapter-1-4">
+            Ο τρόπος ζωής και η δράση του Σωκράτη • Κεφάλαιο 1.4 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=104&page=11" target="_blank" class="page-link">Page 11</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent">Μεγάλα δ᾽ ἔγωγε ὑμῖν τεκμήρια παρέξομαι τούτων, οὐ λόγους ἀλλ᾽ ὃ ὑμεῖς τιμᾶτε, ἔργα. ἀκούσατε δή μοι τὰ συμβεβηκότα, ἵνα εἰδῆτε ὅτι οὐδ᾽ ἂν ἑνὶ ὑπεικάθοιμι παρὰ τὸ δίκαιον δείσας θάνατον, μὴ ὑπείκων δὲ ἀλλὰ κἂν ἀπολοίμην. ἐρῶ δὲ ὑμῖν φορτικὰ μὲν καὶ δικανικά, ἀληθῆ δέ. ἐγὼ γάρ, ὦ ἄνδρες Ἀθηναῖοι, ἄλλην μὲν ἀρχὴν οὐδεμίαν <span class="marker">[32b]</span> πώποτε ἦρξα ἐν τῇ πόλει, ἐβούλευσα δέ· καὶ ἔτυχεν ἡμῶν ἡ φυλὴ Ἀντιοχὶς πρυτανεύουσα ὅτε ὑμεῖς τοὺς δέκα στρατηγοὺς τοὺς οὐκ ἀνελομένους τοὺς ἐκ τῆς ναυμαχίας ἐβουλεύσασθε ἁθρόους κρίνειν, παρανόμως, ὡς ἐν τῷ ὑστέρῳ χρόνῳ πᾶσιν ὑμῖν ἔδοξεν. τότ᾽ ἐγὼ μόνος τῶν πρυτάνεων ἠναντιώθην ὑμῖν μηδὲν ποιεῖν παρὰ τοὺς νόμους καὶ ἐναντία ἐψηφισάμην· καὶ ἑτοίμων ὄντων ἐνδεικνύναι με καὶ ἀπάγειν τῶν ῥητόρων, καὶ ὑμῶν κελευόντων καὶ βοώντων, μετὰ τοῦ <span class="marker">[32c]</span> νόμου καὶ τοῦ δικαίου ᾤμην μᾶλλόν με δεῖν διακινδυνεύειν ἢ μεθ᾽ ὑμῶν γενέσθαι μὴ δίκαια βουλευομένων, φοβηθέντα δεσμὸν ἢ θάνατον. καὶ ταῦτα μὲν ἦν ἔτι δημοκρατουμένης τῆς πόλεως· ἐπειδὴ δὲ ὀλιγαρχία ἐγένετο, οἱ τριάκοντα αὖ μεταπεμψάμενοί με πέμπτον αὐτὸν εἰς τὴν θόλον προσέταξαν ἀγαγεῖν ἐκ Σαλαμῖνος Λέοντα τὸν Σαλαμίνιον ἵνα ἀποθάνοι, οἷα δὴ καὶ ἄλλοις ἐκεῖνοι πολλοῖς πολλὰ προσέταττον, βουλόμενοι ὡς πλείστους ἀναπλῆσαι αἰτιῶν. τότε μέντοι ἐγὼ <span class="marker">[32d]</span> οὐ λόγῳ ἀλλ᾽ ἔργῳ αὖ ἐνεδειξάμην ὅτι ἐμοὶ θανάτου μὲν μέλει, εἰ μὴ ἀγροικότερον ἦν εἰπεῖν, οὐδ᾽ ὁτιοῦν, τοῦ δὲ μηδὲν ἄδικον μηδ᾽ ἀνόσιον ἐργάζεσθαι, τούτου δὲ τὸ πᾶν μέλει. ἐμὲ γὰρ ἐκείνη ἡ ἀρχὴ οὐκ ἐξέπληξεν, οὕτως ἰσχυρὰ οὖσα, ὥστε ἄδικόν τι ἐργάσασθαι, ἀλλ᾽ ἐπειδὴ ἐκ τῆς θόλου ἐξήλθομεν, οἱ μὲν τέτταρες ᾤχοντο εἰς Σαλαμῖνα καὶ ἤγαγον Λέοντα, ἐγὼ δὲ ᾠχόμην ἀπιὼν οἴκαδε. καὶ ἴσως ἂν διὰ ταῦτα ἀπέθανον, εἰ μὴ ἡ ἀρχὴ διὰ ταχέων κατελύθη. καὶ <span class="marker">[32e]</span> τούτων ὑμῖν ἔσονται πολλοὶ μάρτυρες.</p>
+<p class="passage indent">Ἆρ᾽ οὖν ἄν με οἴεσθε τοσάδε ἔτη διαγενέσθαι εἰ ἔπραττον τὰ δημόσια, καὶ πράττων ἀξίως ἀνδρὸς ἀγαθοῦ ἐβοήθουν τοῖς δικαίοις καὶ ὥσπερ χρὴ τοῦτο περὶ πλείστου ἐποιούμην; πολλοῦ γε δεῖ, ὦ ἄνδρες Ἀθηναῖοι· οὐδὲ γὰρ ἂν ἄλλος <span class="marker">[33a]</span> ἀνθρώπων οὐδείς. ἀλλ᾽ ἐγὼ διὰ παντὸς τοῦ βίου δημοσίᾳ τε εἴ πού τι ἔπραξα τοιοῦτος φανοῦμαι, καὶ ἰδίᾳ ὁ αὐτὸς οὗτος, οὐδενὶ πώποτε συγχωρήσας οὐδὲν παρὰ τὸ δίκαιον οὔτε ἄλλῳ οὔτε τούτων οὐδενὶ οὓς δὴ διαβάλλοντες ἐμέ φασιν ἐμοὺς μαθητὰς εἶναι. ἐγὼ δὲ διδάσκαλος μὲν οὐδενὸς πώποτ᾽ ἐγενόμην· εἰ δέ τίς μου λέγοντος καὶ τὰ ἐμαυτοῦ πράττοντος ἐπιθυμοῖ ἀκούειν, εἴτε νεώτερος εἴτε πρεσβύτερος, οὐδενὶ πώποτε ἐφθόνησα, οὐδὲ χρήματα μὲν λαμβάνων <span class="marker">[33b]</span> διαλέγομαι μὴ λαμβάνων δὲ οὔ, ἀλλ᾽ ὁμοίως καὶ πλουσίῳ καὶ πένητι παρέχω ἐμαυτὸν ἐρωτᾶν, καὶ ἐάν τις βούληται ἀποκρινόμενος ἀκούειν ὧν ἂν λέγω. καὶ τούτων ἐγὼ εἴτε τις χρηστὸς γίγνεται εἴτε μή, οὐκ ἂν δικαίως τὴν αἰτίαν ὑπέχοιμι, ὧν μήτε ὑπεσχόμην μηδενὶ μηδὲν πώποτε μάθημα μήτε ἐδίδαξα· εἰ δέ τίς φησι παρ᾽ ἐμοῦ πώποτέ τι μαθεῖν ἢ ἀκοῦσαι ἰδίᾳ ὅτι μὴ καὶ οἱ ἄλλοι πάντες, εὖ ἴστε ὅτι οὐκ ἀληθῆ λέγει.</p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent">Εγώ λοιπόν θα σας φέρω μεγάλες αποδείξεις, όχι λόγια αλλά εκείνο που εκτιμάτε εσείς, έργα. Ακούστε αυτά που μου συνέβηκαν, για να μάθετε πως σε κανέναν δεν υποχώρησα μπροστά στο δίκαιο, από τον φόβο του θανάτου, αν και ήξερα πως, αν δεν υποχωρούσα, θα χανόμουν. Και θα σας πω πράγματα φορτικά και δικανικά, μ᾽ αληθινά. Γιατί εγώ, ω άνδρες Αθηναίοι, άλλο υπούργημα κανένα <span class="marker">[32b]</span> δεν έλαβα στην πολιτεία, παρά μόνο στη βουλή των πεντακοσίων. Έτυχε να πρυτανεύει τότε η Αντιοχίς φυλή η δική μας, την εποχή που εσείς αποφασίσατε να δικάσετε τους δέκα στρατηγούς, που δεν είχανε σηκώσει τους νεκρούς της ναυμαχίας, όλους μαζί, παράνομα, όπως το είδατε και μόνοι σας ύστερα. Τότε μονάχος εγώ από τους πρυτάνεις εναντιώθηκα να μην κάνουνε τίποτε εναντίο στους νόμους και έδωκα αντίθετη ψήφο· και, ενώ οι ρήτορες ήσαν έτοιμοι να με καταγγείλουν και να με στείλουν στο δικαστήριο, και σεις τους παρακινούσατε με φωνές, <span class="marker">[32c]</span> εγώ νόμισα πως έπρεπε μάλλον να διακινδυνεύσω μαζί με τους νόμους και το δίκαιο, παρά από φόβο φυλακής ή θανάτου να ᾽ρθω με το μέρος το δικό σας, που δεν σκεπτόσαστε δίκαια πράγματα. Και αυτά όταν ο τόπος είχε ακόμα δημοκρατία. Μα όταν έγινε ολιγαρχία, οι τριάκοντα με προσκάλεσαν με τέσσερες άλλους στον Θόλο κι επρόσταξαν να φέρουμε από τη Σαλαμίνα τον Λέοντα τον Σαλαμίνιο, για να τον θανατώσουν, κι έδωκαν κι άλλες πολλές παρόμοιες προσταγές γι᾽ άλλους, θέλοντας να ενοχοποιήσουν όσους μπορούσαν περισσότερους. Τότε λοιπόν εγώ, <span class="marker">[32d]</span> όχι με λόγια αλλά με έργα απόδειξα πως εμένα δεν με μέλει για τον θάνατο, να το πούμε έτσι χονδρά χονδρά, ουδέ τόσο δα, αλλά με μέλει προπάντων να μην κάνω τίποτε άδικο· όταν όμως βγήκαμε από τον Θόλο, οι άλλοι τέσσερες έφυγαν για τη Σαλαμίνα και φέρανε τον Λέοντα, μα εγώ έφυγα και πήγα στο σπίτι μου. Και γι᾽ αυτό το πράγμα ίσως θα θανατωνόμουν, αν γρήγορα δεν έπεφταν από την εξουσία. Κι <span class="marker">[32e]</span> αυτά είναι πολλοί που μπορούνε να σας τα μαρτυρήσουν.</p>
+<p class="passage indent">Νομίζετε λοιπόν πως θα μπορούσα εγώ να ζήσω τόσα χρόνια, αν επολιτευόμουν, και, όπως οφείλει να κάνει κάθε καλός άνθρωπος, βοηθούσα πάντα τους δίκαιους και είχα, όπως πρέπει, μόνη μου φροντίδα αυτή; Κάθε άλλο, ω άνδρες Αθηναίοι, ούτε άλλος <span class="marker">[33a]</span> κανένας σαν κι εμένα. Εγώ όμως σε όλη μου τη ζωή, αν πολιτεύθηκα ποτέ καμιά φορά, και σαν ιδιώτης, τέτοιος κι ο ίδιος πάντα θα φανώ, πως δηλαδή σε κανέναν δεν συχώρεσα τίποτε εναντίο στη δικαιοσύνη, ούτε σε άλλον, ούτε σε κανέναν απ᾽ αυτούς, που, για να με διαβάλουν, τους λένε μαθητές μου. Εγώ δάσκαλος ποτέ μου σε κανέναν δεν έγινα· κι αν κανένας θέλει να μ᾽ ακούσει όταν μιλώ και κάνω το έργο μου, είτε νεότερος είτε γεροντότερος, σε κανέναν δεν αρνήθηκα ποτέ μου. Ούτε πάλι όταν παίρνω χρήματα <span class="marker">[33b]</span> μιλώ και όταν δεν παίρνω όχι, αλλά και σε πλούσιους και σε φτωχούς πρόθυμος είμαι πάντα να με ρωτούν και αν θέλει κανένας ν᾽ ακούσει αυτά που λέω και να μου αποκρίνεται. Και είτε γίνει κανένας καλός είτε όχι, δεν είναι δίκαιο να έχω την ευθύνη εγώ, που μήτε υποσχέθηκα ποτέ μου σε κανέναν να διδάξω τίποτε, μήτε δίδαξα. Και αν λέει κανένας πως έμαθε ποτέ τίποτε από μένα ή άκουσε ιδιαιτέρως, που δεν το ᾽χουν ακούσει και όλοι οι άλλοι, μάθετε καλά πως δεν λέει αλήθεια.</p>
+        </div>
+        
+
+        <div id="book-4-chapter-1-5" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-12" data-hash="book-4-chapter-1-5">
+            Ο τρόπος ζωής και η δράση του Σωκράτη • Κεφάλαιο 1.5 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=104&page=12" target="_blank" class="page-link">Page 12</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent">Ἀλλὰ διὰ τί δή ποτε μετ᾽ ἐμοῦ χαίρουσί τινες πολὺν <span class="marker">[33c]</span> χρόνον διατρίβοντες; ἀκηκόατε, ὦ ἄνδρες Ἀθηναῖοι, πᾶσαν ὑμῖν τὴν ἀλήθειαν ἐγὼ εἶπον· ὅτι ἀκούοντες χαίρουσιν ἐξεταζομένοις τοῖς οἰομένοις μὲν εἶναι σοφοῖς, οὖσι δ᾽ οὔ. ἔστι γὰρ οὐκ ἀηδές. ἐμοὶ δὲ τοῦτο, ὡς ἐγώ φημι, προστέτακται ὑπὸ τοῦ θεοῦ πράττειν καὶ ἐκ μαντείων καὶ ἐξ ἐνυπνίων καὶ παντὶ τρόπῳ ᾧπέρ τίς ποτε καὶ ἄλλη θεία μοῖρα ἀνθρώπῳ καὶ ὁτιοῦν προσέταξε πράττειν. ταῦτα, ὦ ἄνδρες Ἀθηναῖοι, καὶ ἀληθῆ ἐστιν καὶ εὐέλεγκτα. εἰ γὰρ δὴ ἔγωγε τῶν νέων <span class="marker">[33d]</span> τοὺς μὲν διαφθείρω τοὺς δὲ διέφθαρκα, χρῆν δήπου, εἴτε τινὲς αὐτῶν πρεσβύτεροι γενόμενοι ἔγνωσαν ὅτι νέοις οὖσιν αὐτοῖς ἐγὼ κακὸν πώποτέ τι συνεβούλευσα, νυνὶ αὐτοὺς ἀναβαίνοντας ἐμοῦ κατηγορεῖν καὶ τιμωρεῖσθαι· εἰ δὲ μὴ αὐτοὶ ἤθελον, τῶν οἰκείων τινὰς τῶν ἐκείνων, πατέρας καὶ ἀδελφοὺς καὶ ἄλλους τοὺς προσήκοντας, εἴπερ ὑπ᾽ ἐμοῦ τι κακὸν ἐπεπόνθεσαν αὐτῶν οἱ οἰκεῖοι, νῦν μεμνῆσθαι καὶ τιμωρεῖσθαι. πάντως δὲ πάρεισιν αὐτῶν πολλοὶ ἐνταυθοῖ οὓς ἐγὼ ὁρῶ, πρῶτον μὲν Κρίτων οὑτοσί, ἐμὸς ἡλικιώτης <span class="marker">[33e]</span> καὶ δημότης, Κριτοβούλου τοῦδε πατήρ, ἔπειτα Λυσανίας ὁ Σφήττιος, Αἰσχίνου τοῦδε πατήρ, ἔτι δ᾽ Ἀντιφῶν ὁ Κηφισιεὺς οὑτοσί, Ἐπιγένους πατήρ, ἄλλοι τοίνυν οὗτοι ὧν οἱ ἀδελφοὶ ἐν ταύτῃ τῇ διατριβῇ γεγόνασιν, Νικόστρατος Θεοζοτίδου, ἀδελφὸς Θεοδότου —καὶ ὁ μὲν Θεόδοτος τετελεύτηκεν, ὥστε οὐκ ἂν ἐκεῖνός γε αὐτοῦ καταδεηθείη— καὶ Παράλιος ὅδε, ὁ Δημοδόκου, οὗ ἦν Θεάγης ἀδελφός· ὅδε δὲ <span class="marker">[34a]</span> Ἀδείμαντος, ὁ Ἀρίστωνος, οὗ ἀδελφὸς οὑτοσὶ Πλάτων, καὶ Αἰαντόδωρος, οὗ Ἀπολλόδωρος ὅδε ἀδελφός. καὶ ἄλλους πολλοὺς ἐγὼ ἔχω ὑμῖν εἰπεῖν, ὧν τινα ἐχρῆν μάλιστα μὲν ἐν τῷ ἑαυτοῦ λόγῳ παρασχέσθαι Μέλητον μάρτυρα· εἰ δὲ τότε ἐπελάθετο, νῦν παρασχέσθω —ἐγὼ παραχωρῶ— καὶ λεγέτω εἴ τι ἔχει τοιοῦτον. ἀλλὰ τούτου πᾶν τοὐναντίον εὑρήσετε, ὦ ἄνδρες, πάντας ἐμοὶ βοηθεῖν ἑτοίμους τῷ διαφθείροντι, τῷ κακὰ ἐργαζομένῳ τοὺς οἰκείους αὐτῶν, ὥς φασι Μέλητος καὶ <span class="marker">[34b]</span> Ἄνυτος. αὐτοὶ μὲν γὰρ οἱ διεφθαρμένοι τάχ᾽ ἂν λόγον ἔχοιεν βοηθοῦντες· οἱ δὲ ἀδιάφθαρτοι, πρεσβύτεροι ἤδη ἄνδρες, οἱ τούτων προσήκοντες, τίνα ἄλλον ἔχουσι λόγον βοηθοῦντες ἐμοὶ ἀλλ᾽ ἢ τὸν ὀρθόν τε καὶ δίκαιον, ὅτι συνίσασι Μελήτῳ μὲν ψευδομένῳ, ἐμοὶ δὲ ἀληθεύοντι;</p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent">Αλλά γιατί τάχα λοιπόν μερικοί χαίρονται να συναναστρέφονται πολύν <span class="marker">[33c]</span> καιρό μαζί μου; Το ᾽χετε ακούσει, ω άνδρες Αθηναίοι· εγώ σας είπα όλη την αλήθεια, ότι δηλαδή χαίρουνται ν᾽ ακούνε σαν εξετάζω εκείνους που φαντάζονται πως είναι σοφοί και δεν είναι, γιατί δεν είναι δυσάρεστο πράγμα. Κι εμένα μου το ᾽χει προστάξει ο θεός, όπως είπα, να κάνω έτσι και με μαντείες και μ᾽ ενύπνια και με κάθε τρόπο που το θέλημα του θεού προστάζει τον άνθρωπο να κάνει οτιδήποτε. Αυτά, ω άνδρες Αθηναίοι, και αληθινά είναι και ευκολοαπόδεικτα. Γιατί αν εγώ άλλους από τους νέους <span class="marker">[33d]</span> διαφθείρω τώρα και άλλους έχω διαφθείρει, έπρεπε τωόντι μερικοί απ᾽ αυτούς, τώρα που μεγάλωσαν, αν καταλαβαίνουν ότι εγώ όταν ήσαν νέοι τους συμβούλευσα ποτέ τίποτε κακό, τώρα δα να παρουσιασθούν μπροστά και να μου κάνουν το κατηγορητήριό μου και να ζητήσουν την τιμωρία μου. Και αν δεν ήθελαν οι ίδιοι, έπρεπε μερικοί δικοί των εκεινών, πατέρες και αδελφοί και άλλοι συγγενείς των, αν είχαν πάθει τίποτε κακό οι δικοί των, τώρα να το θυμηθούν. Και χωρίς άλλο απ᾽ αυτούς βρίσκονται πολλοί εδώ, που τους βλέπω τώρα, πρώτα ο Κρίτων αυτός εδώ, συνομήλικος <span class="marker">[33e]</span> και συνδημότης μου, πατέρας του Κριτοβούλου αυτού εδώ· έπειτα ο Λυσανίας ο Σφήττιος, πατέρας αυτού εδώ του Αισχίνη· ακόμα και τούτος ο Αντιφών ο Κηφισιεύς, πατέρας του Επιγένη. Και αυτοί ακόμα οι άλλοι, που οι αδελφοί τους είχαν σχέσεις μαζί μου, ο Νικόστρατος, ο γιος του Θεοδοτίδη, αδελφός του Θεοδότου (ο Θεόδοτος είναι πεθαμένος, ώστε βέβαια δεν θα τον παρακαλέσει) και ο Πάραλος αυτός, ο γιος του Δημοδόκη, που είχε αδελφό τον Θεάγη· και αυτός ακόμα <span class="marker">[34a]</span> ο Αδείμαντος, γιος του Αρίστωνος, που έχει αδελφόν αυτόν εδώ, τον Πλάτωνα, και ο Αιαντόδωρος που έχει αδελφόν αυτόν εδώ τον Απολλόδωρο. Και άλλους πολλούς έχω να σας ονομάσω, από τους οποίους κάποιον ο Μέλητος έπρεπε, στην κατηγορία του μάλιστα, να φέρει για μάρτυρα· κι αν ξέχασε να το κάνει τότε, εγώ του δίνω την άδεια και ας πει τώρα αν έχει τίποτε τέτοιο. Θα βρείτε όμως, ως άνδρες Αθηναίοι, ολωσδιόλου το εναντίο, πως όλοι δηλαδή είναι έτοιμοι να υπερασπισθούν εμένα που διάφθειρα και έβλαπτα τους συγγενείς τους, όπως λένε ο Μέλητος και <span class="marker">[34b]</span> ο Άνυτος. Και εκείνοι τουλάχιστον που διαφθαρήκανε από μένα θα είχανε κάποιον λόγο να με υπερασπισθούν· οι αδιάφθαρτοι όμως, που είναι τώρα άνδρες ηλικιωμένοι, οι συγγενείς αυτωνών, ποιόν άλλον λόγο έχουν να με υπερασπισθούν, παρά το σωστό και το δίκαιο, ότι δηλαδή ξέρουν καλά πως ο Μέλητος λέει ψέματα κι εγώ λέω την αλήθεια;</p>
+        </div>
+        
+
+        <div id="book-5-chapter-1" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-13" data-hash="book-5-chapter-1">
+            Επίλογος • Κεφάλαιο 1 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=104&page=13" target="_blank" class="page-link">Page 13</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent">Εἶεν δή, ὦ ἄνδρες· ἃ μὲν ἐγὼ ἔχοιμ᾽ ἂν ἀπολογεῖσθαι, σχεδόν ἐστι ταῦτα καὶ ἄλλα ἴσως τοιαῦτα. τάχα δ᾽ ἄν τις <span class="marker">[34c]</span> ὑμῶν ἀγανακτήσειεν ἀναμνησθεὶς ἑαυτοῦ, εἰ ὁ μὲν καὶ ἐλάττω τουτουῒ τοῦ ἀγῶνος ἀγῶνα ἀγωνιζόμενος ἐδεήθη τε καὶ ἱκέτευσε τοὺς δικαστὰς μετὰ πολλῶν δακρύων, παιδία τε αὑτοῦ ἀναβιβασάμενος ἵνα ὅτι μάλιστα ἐλεηθείη, καὶ ἄλλους τῶν οἰκείων καὶ φίλων πολλούς, ἐγὼ δὲ οὐδὲν ἄρα τούτων ποιήσω, καὶ ταῦτα κινδυνεύων, ὡς ἂν δόξαιμι, τὸν ἔσχατον κίνδυνον. τάχ᾽ ἂν οὖν τις ταῦτα ἐννοήσας αὐθαδέστερον ἂν πρός με σχοίη καὶ ὀργισθεὶς αὐτοῖς τούτοις θεῖτο ἂν μετ᾽ <span class="marker">[34d]</span> ὀργῆς τὴν ψῆφον. εἰ δή τις ὑμῶν οὕτως ἔχει —οὐκ ἀξιῶ μὲν γὰρ ἔγωγε, εἰ δ᾽ οὖν— ἐπιεικῆ ἄν μοι δοκῶ πρὸς τοῦτον λέγειν λέγων ὅτι «Ἐμοί, ὦ ἄριστε, εἰσὶν μέν πού τινες καὶ οἰκεῖοι· καὶ γὰρ τοῦτο αὐτὸ τὸ τοῦ Ὁμήρου, οὐδ᾽ ἐγὼ “ἀπὸ δρυὸς οὐδ᾽ ἀπὸ πέτρης” πέφυκα ἀλλ᾽ ἐξ ἀνθρώπων, ὥστε καὶ οἰκεῖοί μοί εἰσι καὶ ὑεῖς γε, ὦ ἄνδρες Ἀθηναῖοι, τρεῖς, εἷς μὲν μειράκιον ἤδη, δύο δὲ παιδία· ἀλλ᾽ ὅμως οὐδένα αὐτῶν δεῦρο ἀναβιβασάμενος δεήσομαι ὑμῶν ἀποψηφίσασθαι.» τί δὴ οὖν οὐδὲν τούτων ποιήσω; οὐκ αὐθαδιζόμενος, ὦ ἄνδρες <span class="marker">[34e]</span> Ἀθηναῖοι, οὐδ᾽ ὑμᾶς ἀτιμάζων, ἀλλ᾽ εἰ μὲν θαρραλέως ἐγὼ ἔχω πρὸς θάνατον ἢ μή, ἄλλος λόγος, πρὸς δ᾽ οὖν δόξαν καὶ ἐμοὶ καὶ ὑμῖν καὶ ὅλῃ τῇ πόλει οὔ μοι δοκεῖ καλὸν εἶναι ἐμὲ τούτων οὐδὲν ποιεῖν καὶ τηλικόνδε ὄντα καὶ τοῦτο τοὔνομα ἔχοντα, εἴτ᾽ οὖν ἀληθὲς εἴτ᾽ οὖν ψεῦδος, ἀλλ᾽ οὖν δεδογμένον <span class="marker">[35a]</span> γέ ἐστί τῳ Σωκράτη διαφέρειν τῶν πολλῶν ἀνθρώπων. εἰ οὖν ὑμῶν οἱ δοκοῦντες διαφέρειν εἴτε σοφίᾳ εἴτε ἀνδρείᾳ εἴτε ἄλλῃ ᾑτινιοῦν ἀρετῇ τοιοῦτοι ἔσονται, αἰσχρὸν ἂν εἴη· οἵουσπερ ἐγὼ πολλάκις ἑώρακά τινας ὅταν κρίνωνται, δοκοῦντας μέν τι εἶναι, θαυμάσια δὲ ἐργαζομένους, ὡς δεινόν τι οἰομένους πείσεσθαι εἰ ἀποθανοῦνται, ὥσπερ ἀθανάτων ἐσομένων ἂν ὑμεῖς αὐτοὺς μὴ ἀποκτείνητε· οἳ ἐμοὶ δοκοῦσιν αἰσχύνην τῇ πόλει περιάπτειν, ὥστ᾽ ἄν τινα καὶ τῶν ξένων <span class="marker">[35b]</span> ὑπολαβεῖν ὅτι οἱ διαφέροντες Ἀθηναίων εἰς ἀρετήν, οὓς αὐτοὶ ἑαυτῶν ἔν τε ταῖς ἀρχαῖς καὶ ταῖς ἄλλαις τιμαῖς προκρίνουσιν, οὗτοι γυναικῶν οὐδὲν διαφέρουσιν. ταῦτα γάρ, ὦ ἄνδρες Ἀθηναῖοι, οὔτε ὑμᾶς χρὴ ποιεῖν τοὺς δοκοῦντας καὶ ὁπῃοῦν τι εἶναι, οὔτ᾽, ἂν ἡμεῖς ποιῶμεν, ὑμᾶς ἐπιτρέπειν, ἀλλὰ τοῦτο αὐτὸ ἐνδείκνυσθαι, ὅτι πολὺ μᾶλλον καταψηφιεῖσθε τοῦ τὰ ἐλεινὰ ταῦτα δράματα εἰσάγοντος καὶ καταγέλαστον τὴν πόλιν ποιοῦντος ἢ τοῦ ἡσυχίαν ἄγοντος.</p>
+<p class="passage indent">Χωρὶς δὲ τῆς δόξης, ὦ ἄνδρες, οὐδὲ δίκαιόν μοι δοκεῖ <span class="marker">[35c]</span> εἶναι δεῖσθαι τοῦ δικαστοῦ οὐδὲ δεόμενον ἀποφεύγειν, ἀλλὰ διδάσκειν καὶ πείθειν. οὐ γὰρ ἐπὶ τούτῳ κάθηται ὁ δικαστής, ἐπὶ τῷ καταχαρίζεσθαι τὰ δίκαια, ἀλλ᾽ ἐπὶ τῷ κρίνειν ταῦτα· καὶ ὀμώμοκεν οὐ χαριεῖσθαι οἷς ἂν δοκῇ αὐτῷ, ἀλλὰ δικάσειν κατὰ τοὺς νόμους. οὔκουν χρὴ οὔτε ἡμᾶς ἐθίζειν ὑμᾶς ἐπιορκεῖν οὔθ᾽ ὑμᾶς ἐθίζεσθαι· οὐδέτεροι γὰρ ἂν ἡμῶν εὐσεβοῖεν. μὴ οὖν ἀξιοῦτέ με, ὦ ἄνδρες Ἀθηναῖοι, τοιαῦτα δεῖν πρὸς ὑμᾶς πράττειν ἃ μήτε ἡγοῦμαι καλὰ εἶναι μήτε <span class="marker">[35d]</span> δίκαια μήτε ὅσια, ἄλλως τε μέντοι νὴ Δία πάντως καὶ ἀσεβείας φεύγοντα ὑπὸ Μελήτου τουτουΐ. σαφῶς γὰρ ἄν, εἰ πείθοιμι ὑμᾶς καὶ τῷ δεῖσθαι βιαζοίμην ὀμωμοκότας, θεοὺς ἂν διδάσκοιμι μὴ ἡγεῖσθαι ὑμᾶς εἶναι, καὶ ἀτεχνῶς ἀπολογούμενος κατηγοροίην ἂν ἐμαυτοῦ ὡς θεοὺς οὐ νομίζω. ἀλλὰ πολλοῦ δεῖ οὕτως ἔχειν· νομίζω τε γάρ, ὦ ἄνδρες Ἀθηναῖοι, ὡς οὐδεὶς τῶν ἐμῶν κατηγόρων, καὶ ὑμῖν ἐπιτρέπω καὶ τῷ θεῷ κρῖναι περὶ ἐμοῦ ὅπῃ μέλλει ἐμοί τε ἄριστα εἶναι καὶ ὑμῖν.</p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent">Ας είναι λοιπόν, ω άνδρες Αθηναίοι· αυτά που είχα ν᾽ απολογηθώ εγώ είναι αυτά που σας είπα και άλλα ίσως παρόμοια. Ίσως όμως κανένας <span class="marker">[34c]</span> από σας θ᾽ αγανακτήσει, όταν θυμηθεί πως ο ίδιος ίσως σε περίσταση που είχε ν᾽ αγωνισθεί αγώνα μικρότερον απ᾽ αυτόν εδώ, παρακάλεσε και ικέτευσε τους δικαστές, με δάκρυα πολλά, και παρουσίασε στο δικαστήριο και τα παιδιά του για να τον λυπηθούν όσο το δυνατό περισσότερο, και άλλους συγγενείς του και από τους φίλους του πολλούς, κι εγώ δεν κάνω τίποτε απ᾽ αυτά, και μάλιστα αφού κινδυνεύω, όπως μου φαίνεται, τον έσχατο κίνδυνο. Ίσως όταν το προσέξει κανένας, ερεθισθεί εναντίον μου και γι᾽ αυτό ίσα ίσα θυμώσει και με <span class="marker">[34d]</span> θυμό δώσει την ψήφο του για μένα. Αν κανένας λοιπόν έχει τέτοια διάθεση (εγώ τουλάχιστον δεν το περιμένω), αν λοιπόν είναι κανένας, νομίζω πως θα μπορούσα να του πω πολύ σωστά: Κι εγώ, καλέ μου, έχω τους δικούς μου τους ανθρώπους. Γιατί, όπως λέει και ο Όμηρος, δεν φύτρωσα από δρυ ή από πέτρα αλλ᾽ από ανθρώπους, ώστε και συγγενείς έχω και παιδιά, ω άνδρες Αθηναίοι, το ένα παλληκάρι πια, τα άλλα δυο παιδιά. Και όμως κανένα απ᾽ αυτά δεν παρουσιάζω εδώ για να σας παρακαλέσω να δώσετε αρνητική ψήφο. Γιατί λοιπόν δεν κάνω τίποτε απ᾽ αυτά; Όχι από υπερηφάνεια, <span class="marker">[34e]</span> ούτε για να σας περιφρονήσω. Αν εγώ βλέπω με θάρρος τον θάνατο ή όχι, αυτό είναι άλλο ζήτημα· για τη δόξα όμως και τη δική μου και τη δική σας και όλης της πόλης, δεν μου φαίνεται πως είναι όμορφο πράγμα να κάνω τίποτε απ᾽ αυτά και στα χρόνια που έφθασα και με το όνομα που έχω, είτε αληθινό είτε ψεύτικο· αν και το παραδέχονται <span class="marker">[35a]</span> όλοι πως ο Σωκράτης κάτι ξεχωρίζει από τους άλλους ανθρώπους. Αν λοιπόν μερικοί από σας νομίζουν πως ξεχωρίζουν είτε στη σοφία, είτε στην ανδρεία, είτε σ᾽ άλλην αρετή, όποια κι αν είναι, θα ήταν αισχρό να μοιάσουν με μερικούς που έτυχε να ιδώ πολλές φορές, και που όταν δικάζονται, ενώ φαίνονται πως είναι κατιτί, κάνουν ύστερα πράγματα που δεν τα περιμένει κανείς, γιατί νομίζουν πως θα πάθουν τίποτε φοβερό, αν πεθάνουν, σαν να μπορούσαν να μείνουν αθάνατοι, αν δεν τους θανατώνατε εσείς· αυτοί μου φαίνεται πως κάνουν ντροπή στην πόλη, γιατί και οι ξένοι <span class="marker">[35b]</span> μπορούν να νομίσουν ότι οι πρώτοι απ᾽ όλους στην αρετή από τους Αθηναίους, αυτοί που τους διαλέγουν μεταξύ τους και τους δίνουν τις αρχές και όλες τις άλλες τιμές, δεν διαφέρουν καθόλου από τις γυναίκες. Αυτά λοιπόν, ω άνδρες Αθηναίοι, ούτε σεις πρέπει να τα κάνετε, όσοι νομίζετε πως είσθε κατιτί, ούτ᾽ εμάς να μας επιτρέπετε να τα κάνουμε, αλλά να μας δίνετε να καταλαβαίνουμε πως πολύ περισσότερο θα καταψηφίσετε εκείνον που παριστάνει εδώ μέσα τις ελεεινές αυτές σκηνές και κάνει καταγέλαστο τον τόπο, παρά εκείνον που κάθεται ήσυχος.</p>
+<p class="passage indent">Εκτός όμως από την κακήν ή καλή φήμη, ω άνδρες Αθηναίοι, μου φαίνεται πως δεν είναι δίκαιο <span class="marker">[35c]</span> να παρακαλεί κανένας τον δικαστή, ούτε να θέλει να ξεφύγει με τις παρακλήσεις, αλλά να τον διαφωτίζει και να τον πείθει. Γιατί ο δικαστής δεν κάθεται εκεί επάνω γι᾽ αυτό, για να χαρίζεται δηλαδή, παραβλέποντας τη δικαιοσύνη, μα να κρίνει τί είναι και τί δεν είναι δίκαιο· και είναι ορκισμένος όχι να χαρίζεται σε όποιον του δόξει, αλλά να δικάζει σύμφωνα με τους νόμους. Δεν πρέπει λοιπόν ούτ᾽ εμείς να σας συνηθίζουμε να επιορκείτε, ούτε σεις μόνοι σας να συνηθίζετε· γιατί κι εμείς και σεις δεν κάνουμε τότε θεάρεστο πράγμα. Μην έχετε λοιπόν την αξίωση, ω άνδρες Αθηναίοι, πως πρέπει εγώ να κάνω τέτοια πράγματα μπροστά σας, που ούτε μου αρέσουν, ούτε <span class="marker">[35d]</span> δίκαια τα νομίζω, ούτε θεάρεστα, και σε κάθε περίσταση, μά τον Δία, και μάλιστα τώρα που θέλω ν᾽ αποκρούσω την κατηγορία του Μέλητου, τούτου εδώ, πως τάχα είμαι ασεβής. Γιατί αν σας έπειθα και με τις παρακλήσεις μου σας εβίαζα να πατήσετε τον όρκο που δώσατε, καθαρά θα σας δίδασκα να μην πιστεύετε στην ύπαρξη των θεών και ο ίδιος θα κατάγγελλα τον εαυτό μου πως δεν πιστεύω στους θεούς. Κάθε άλλο όμως· γιατί εγώ πιστεύω, ω άνδρες Αθηναίοι, όπως κανένας από τους κατηγόρους μου, και σας αφήνω εσάς και τον θεό να με κρίνετε, όπως θα νομίσετε καλύτερα και για μένα και για τον εαυτό σας.</p>
+        </div>
+        
+
+        <div id="book-6-chapter-1" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-14" data-hash="book-6-chapter-1">
+            Αφού κρίθηκε ένοχος ο Σωκράτης προτείνει την ποινή που πιστεύει ότι του αξίζει • Κεφάλαιο 1 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=104&page=14" target="_blank" class="page-link">Page 14</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="marker">[35e]</span> Τὸ μὲν μὴ ἀγανακτεῖν, ὦ ἄνδρες Ἀθηναῖοι, ἐπὶ τούτῳ <span class="marker">[36a]</span> τῷ γεγονότι, ὅτι μου κατεψηφίσασθε, ἄλλα τέ μοι πολλὰ συμβάλλεται, καὶ οὐκ ἀνέλπιστόν μοι γέγονεν τὸ γεγονὸς τοῦτο, ἀλλὰ πολὺ μᾶλλον θαυμάζω ἑκατέρων τῶν ψήφων τὸν γεγονότα ἀριθμόν. οὐ γὰρ ᾠόμην ἔγωγε οὕτω παρ᾽ ὀλίγον ἔσεσθαι ἀλλὰ παρὰ πολύ· νῦν δέ, ὡς ἔοικεν, εἰ τριάκοντα μόναι μετέπεσον τῶν ψήφων, ἀπεπεφεύγη ἄν. Μέλητον μὲν οὖν, ὡς ἐμοὶ δοκῶ, καὶ νῦν ἀποπέφευγα, καὶ οὐ μόνον ἀποπέφευγα, ἀλλὰ παντὶ δῆλον τοῦτό γε, ὅτι εἰ μὴ ἀνέβη Ἄνυτος καὶ Λύκων κατηγορήσοντες ἐμοῦ, κἂν ὦφλε <span class="marker">[36b]</span> χιλίας δραχμάς, οὐ μεταλαβὼν τὸ πέμπτον μέρος τῶν ψήφων.</p>
+<p class="passage indent">Τιμᾶται δ᾽ οὖν μοι ὁ ἀνὴρ θανάτου. εἶεν· ἐγὼ δὲ δὴ τίνος ὑμῖν ἀντιτιμήσομαι, ὦ ἄνδρες Ἀθηναῖοι; ἢ δῆλον ὅτι τῆς ἀξίας; τί οὖν; τί ἄξιός εἰμι παθεῖν ἢ ἀποτεῖσαι, ὅτι μαθὼν ἐν τῷ βίῳ οὐχ ἡσυχίαν ἦγον, ἀλλ᾽ ἀμελήσας ὧνπερ οἱ πολλοί, χρηματισμοῦ τε καὶ οἰκονομίας καὶ στρατηγιῶν καὶ δημηγοριῶν καὶ τῶν ἄλλων ἀρχῶν καὶ συνωμοσιῶν καὶ στάσεων τῶν ἐν τῇ πόλει γιγνομένων, ἡγησάμενος ἐμαυτὸν <span class="marker">[36c]</span> τῷ ὄντι ἐπιεικέστερον εἶναι ἢ ὥστε εἰς ταῦτ᾽ ἰόντα σῴζεσθαι, ἐνταῦθα μὲν οὐκ ᾖα οἷ ἐλθὼν μήτε ὑμῖν μήτε ἐμαυτῷ ἔμελλον μηδὲν ὄφελος εἶναι, ἐπὶ δὲ τὸ ἰδίᾳ ἕκαστον ἰὼν εὐεργετεῖν τὴν μεγίστην εὐεργεσίαν, ὡς ἐγώ φημι, ἐνταῦθα ᾖα, ἐπιχειρῶν ἕκαστον ὑμῶν πείθειν μὴ πρότερον μήτε τῶν ἑαυτοῦ μηδενὸς ἐπιμελεῖσθαι πρὶν ἑαυτοῦ ἐπιμεληθείη ὅπως ὡς βέλτιστος καὶ φρονιμώτατος ἔσοιτο, μήτε τῶν τῆς πόλεως, πρὶν αὐτῆς τῆς πόλεως, τῶν τε ἄλλων οὕτω κατὰ τὸν <span class="marker">[36d]</span> αὐτὸν τρόπον ἐπιμελεῖσθαι — τί οὖν εἰμι ἄξιος παθεῖν τοιοῦτος ὤν; ἀγαθόν τι, ὦ ἄνδρες Ἀθηναῖοι, εἰ δεῖ γε κατὰ τὴν ἀξίαν τῇ ἀληθείᾳ τιμᾶσθαι· καὶ ταῦτά γε ἀγαθὸν τοιοῦτον ὅτι ἂν πρέποι ἐμοί. τί οὖν πρέπει ἀνδρὶ πένητι εὐεργέτῃ δεομένῳ ἄγειν σχολὴν ἐπὶ τῇ ὑμετέρᾳ παρακελεύσει; οὐκ ἔσθ᾽ ὅτι μᾶλλον, ὦ ἄνδρες Ἀθηναῖοι, πρέπει οὕτως ὡς τὸν τοιοῦτον ἄνδρα ἐν πρυτανείῳ σιτεῖσθαι, πολύ γε μᾶλλον ἢ εἴ τις ὑμῶν ἵππῳ ἢ συνωρίδι ἢ ζεύγει νενίκηκεν Ὀλυμπίασιν· ὁ μὲν γὰρ ὑμᾶς ποιεῖ εὐδαίμονας δοκεῖν εἶναι, ἐγὼ δὲ <span class="marker">[36e]</span> εἶναι, καὶ ὁ μὲν τροφῆς οὐδὲν δεῖται, ἐγὼ δὲ δέομαι. εἰ οὖν δεῖ με κατὰ τὸ δίκαιον τῆς ἀξίας τιμᾶσθαι, τούτου <span class="marker">[37a]</span> τιμῶμαι, ἐν πρυτανείῳ σιτήσεως.</p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="marker">[35e]</span> Να μην αγανακτώ, ω άνδρες Αθηναίοι, γι᾽ αυτό <span class="marker">[36a]</span> που έγινε και με καταψηφίσατε, και πολλά άλλα συντελούν και τούτο, πως το γεγονός αυτό δεν μου ήτανε ανέλπιστο· πολύ περισσότερο όμως θαυμάζω τον αριθμό των ψήφων από τα δύο μέρη. Γιατί εγώ τουλάχιστον δεν πίστευα να είναι τόσο λίγη η διαφορά των ψήφων αλλά πιο μεγάλη· και τώρα, όπως φαίνεται, αν τρεις μονάχα ψήφοι έπεφταν απ᾽ το άλλο μέρος, θα την εγλίτωνα. Τον Μέλητο λοιπόν, καθώς μου φαίνεται, τώρα τον ξέφυγα και όχι μόνο τον ξέφυγα, αλλά και φανερό σε όλους είναι πως, αν ο Άνυτος και ο Λύκων δεν εσηκώνοντο να με κατηγορήσουν μαζί του, θα πλήρωνε <span class="marker">[36b]</span> και χίλιες δραχμές πρόστιμο, για τον λόγο πως δεν πήρε με το μέρος του το ένα πέμπτο των ψήφων.</p>
+<p class="passage indent">Προτείνει λοιπόν ο άνθρωπος για μένα την ποινή του θανάτου. Ας είναι. Κι εγώ ποιά ποινή θα σας ζητήσω, ω άνδρες Αθηναίοι; Ποιάν άλλη παρ᾽ αυτήν που μου αξίζει; Τί λοιπόν; Τί είμαι άξιος να πάθω ή να πληρώσω, αφού, κι εγώ δεν ξέρω γιατί, δεν κοίταξα την ησυχία μου στη ζωή μου, μόνο αμέλησα εκείνα που οι περισσότεροι γυρεύουν, και χρήματα και σπίτι και στρατηγίες και δημηγορίες και άλλες εξουσίες και συνωμοσίες και επαναστάσεις, που εγίνοντο στην πόλη, γιατί νόμισα <span class="marker">[36c]</span> πως έπρεπε να είμαι πιο μετριοπαθής και να μην ανακατεύομαι σε τέτοια πράγματα ζητώντας τη σωτηρία μου, και δεν ανακατεύθηκα, που αν ανακατευόμουν ούτε σας ούτε τον εαυτό μου θα ωφελούσα, αλλά κοίταζα να κάνω καλό σε καθέναν χωριστά, το μεγαλύτερο απ᾽ τα καλά, να προσπαθώ δηλαδή να πείθω τον καθένα σας να μην επιμελείται πρώτα τα συμφέροντά του σε τίποτε, πριν επιμεληθεί τον εαυτό του, πώς δηλαδή να γίνει ο καλύτερος και ο φρονιμότερος, μήτε πρώτα πάλι τα άλλα συμφέροντα της πόλης, πριν απ᾽ αυτή την ίδια την πόλη, και να επιμελείται και όλα τ᾽ άλλα <span class="marker">[36d]</span> με τον ίδιον τον τρόπο. Τί αξίζω να πάθω λοιπόν, τέτοιος που είμαι; Κάτι καλό, ω άνδρες Αθηναίοι, αν πρέπει να μου δοθεί ό,τι μου αξίζει· και τέτοιο καλό που να μου πρέπει. Τί πρέπει λοιπόν σε φτωχό ευεργέτη, που έχει ανάγκη να ησυχάσει για να σας συμβουλεύει; Και είναι τίποτε, ω άνδρες Αθηναίοι, που να πρέπει τόσο σε τέτοιον άνθρωπο, από το να τρέφεται στο πρυτανείο πολύ περισσότερο από κάθε άλλον από σας που νίκησε στους Ολυμπιακούς αγώνες, στην ιππασία ή σε άρμα με δύο άλογα ή και με περισσότερα; Γιατί εκείνος σας κάνει να φαίνεσθε πως είσαστε ευτυχισμένοι κι εγώ <span class="marker">[36e]</span> σας κάνω αληθινά ευτυχισμένους, εκείνος δεν έχει ανάγκη από τροφή κι εγώ έχω. Αν πρέπει λοιπόν κατά την αξία μου να κριθώ άξιος για κατιτί, <span class="marker">[37a]</span> εγώ κρίνω άξιο τον εαυτό μου να τρέφομαι στο πρυτανείο.</p>
+        </div>
+        
+
+        <div id="book-6-chapter-1-2" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-15" data-hash="book-6-chapter-1-2">
+            Αφού κρίθηκε ένοχος ο Σωκράτης προτείνει την ποινή που πιστεύει ότι του αξίζει • Κεφάλαιο 1.2 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=104&page=15" target="_blank" class="page-link">Page 15</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent">Ἴσως οὖν ὑμῖν καὶ ταυτὶ λέγων παραπλησίως δοκῶ λέγειν ὥσπερ περὶ τοῦ οἴκτου καὶ τῆς ἀντιβολήσεως, ἀπαυθαδιζόμενος· τὸ δὲ οὐκ ἔστιν, ὦ ἄνδρες Ἀθηναῖοι, τοιοῦτον ἀλλὰ τοιόνδε μᾶλλον. πέπεισμαι ἐγὼ ἑκὼν εἶναι μηδένα ἀδικεῖν ἀνθρώπων, ἀλλὰ ὑμᾶς τοῦτο οὐ πείθω· ὀλίγον γὰρ χρόνον ἀλλήλοις διειλέγμεθα. ἐπεί, ὡς ἐγᾦμαι, εἰ ἦν ὑμῖν νόμος, ὥσπερ καὶ ἄλλοις ἀνθρώποις, περὶ θανάτου μὴ μίαν ἡμέραν <span class="marker">[37b]</span> μόνον κρίνειν ἀλλὰ πολλάς, ἐπείσθητε ἄν· νῦν δ᾽ οὐ ῥᾴδιον ἐν χρόνῳ ὀλίγῳ μεγάλας διαβολὰς ἀπολύεσθαι. πεπεισμένος δὴ ἐγὼ μηδένα ἀδικεῖν πολλοῦ δέω ἐμαυτόν γε ἀδικήσειν καὶ κατ᾽ ἐμαυτοῦ ἐρεῖν αὐτὸς ὡς ἄξιός εἰμί του κακοῦ καὶ τιμήσεσθαι τοιούτου τινὸς ἐμαυτῷ. τί δείσας; ἦ μὴ πάθω τοῦτο οὗ Μέλητός μοι τιμᾶται, ὅ φημι οὐκ εἰδέναι οὔτ᾽ εἰ ἀγαθὸν οὔτ᾽ εἰ κακόν ἐστιν; ἀντὶ τούτου δὴ ἕλωμαι ὧν εὖ οἶδά τι κακῶν ὄντων τούτου τιμησάμενος; πότερον δεσμοῦ; <span class="marker">[37c]</span> καὶ τί με δεῖ ζῆν ἐν δεσμωτηρίῳ, δουλεύοντα τῇ ἀεὶ καθισταμένῃ ἀρχῇ, τοῖς ἕνδεκα; ἀλλὰ χρημάτων καὶ δεδέσθαι ἕως ἂν ἐκτείσω; ἀλλὰ ταὐτόν μοί ἐστιν ὅπερ νυνδὴ ἔλεγον· οὐ γὰρ ἔστι μοι χρήματα ὁπόθεν ἐκτείσω. ἀλλὰ δὴ φυγῆς τιμήσωμαι; ἴσως γὰρ ἄν μοι τούτου τιμήσαιτε. πολλὴ μεντἄν με φιλοψυχία ἔχοι, ὦ ἄνδρες Ἀθηναῖοι, εἰ οὕτως ἀλόγιστός εἰμι ὥστε μὴ δύνασθαι λογίζεσθαι ὅτι ὑμεῖς μὲν ὄντες πολῖταί μου οὐχ οἷοί τε ἐγένεσθε ἐνεγκεῖν τὰς ἐμὰς <span class="marker">[37d]</span> διατριβὰς καὶ τοὺς λόγους, ἀλλ᾽ ὑμῖν βαρύτεραι γεγόνασιν καὶ ἐπιφθονώτεραι, ὥστε ζητεῖτε αὐτῶν νυνὶ ἀπαλλαγῆναι· ἄλλοι δὲ ἄρα αὐτὰς οἴσουσι ῥᾳδίως; πολλοῦ γε δεῖ, ὦ ἄνδρες Ἀθηναῖοι. καλὸς οὖν ἄν μοι ὁ βίος εἴη ἐξελθόντι τηλικῷδε ἀνθρώπῳ ἄλλην ἐξ ἄλλης πόλεως ἀμειβομένῳ καὶ ἐξελαυνομένῳ ζῆν. εὖ γὰρ οἶδ᾽ ὅτι ὅποι ἂν ἔλθω, λέγοντος ἐμοῦ ἀκροάσονται οἱ νέοι ὥσπερ ἐνθάδε· κἂν μὲν τούτους ἀπελαύνω, οὗτοί με αὐτοὶ ἐξελῶσι πείθοντες τοὺς πρεσβυτέρους· <span class="marker">[37e]</span> ἐὰν δὲ μὴ ἀπελαύνω, οἱ τούτων πατέρες δὲ καὶ οἰκεῖοι δι᾽ αὐτοὺς τούτους.</p>
+<p class="passage indent">Ἴσως οὖν ἄν τις εἴποι· «Σιγῶν δὲ καὶ ἡσυχίαν ἄγων, ὦ Σώκρατες, οὐχ οἷός τ᾽ ἔσῃ ἡμῖν ἐξελθὼν ζῆν;» τουτὶ δή ἐστι πάντων χαλεπώτατον πεῖσαί τινας ὑμῶν. ἐάντε γὰρ λέγω ὅτι τῷ θεῷ ἀπειθεῖν τοῦτ᾽ ἐστὶν καὶ διὰ τοῦτ᾽ <span class="marker">[38a]</span> ἀδύνατον ἡσυχίαν ἄγειν, οὐ πείσεσθέ μοι ὡς εἰρωνευομένῳ· ἐάντ᾽ αὖ λέγω ὅτι καὶ τυγχάνει μέγιστον ἀγαθὸν ὂν ἀνθρώπῳ τοῦτο, ἑκάστης ἡμέρας περὶ ἀρετῆς τοὺς λόγους ποιεῖσθαι καὶ τῶν ἄλλων περὶ ὧν ὑμεῖς ἐμοῦ ἀκούετε διαλεγομένου καὶ ἐμαυτὸν καὶ ἄλλους ἐξετάζοντος, ὁ δὲ ἀνεξέταστος βίος οὐ βιωτὸς ἀνθρώπῳ, ταῦτα δ᾽ ἔτι ἧττον πείσεσθέ μοι λέγοντι. τὰ δὲ ἔχει μὲν οὕτως, ὡς ἐγώ φημι, ὦ ἄνδρες, πείθειν δὲ οὐ ῥᾴδιον. καὶ ἐγὼ ἅμα οὐκ εἴθισμαι ἐμαυτὸν ἀξιοῦν κακοῦ <span class="marker">[38b]</span> οὐδενός. εἰ μὲν γὰρ ἦν μοι χρήματα, ἐτιμησάμην ἂν χρημάτων ὅσα ἔμελλον ἐκτείσειν, οὐδὲν γὰρ ἂν ἐβλάβην· νῦν δὲ οὐ γὰρ ἔστιν, εἰ μὴ ἄρα ὅσον ἂν ἐγὼ δυναίμην ἐκτεῖσαι, τοσούτου βούλεσθέ μοι τιμῆσαι. ἴσως δ᾽ ἂν δυναίμην ἐκτεῖσαι ὑμῖν που μνᾶν ἀργυρίου· τοσούτου οὖν τιμῶμαι.</p>
+<p class="passage indent">Πλάτων δὲ ὅδε, ὦ ἄνδρες Ἀθηναῖοι, καὶ Κρίτων καὶ Κριτόβουλος καὶ Ἀπολλόδωρος κελεύουσί με τριάκοντα μνῶν τιμήσασθαι, αὐτοὶ δ᾽ ἐγγυᾶσθαι· τιμῶμαι οὖν τοσούτου, ἐγγυηταὶ δὲ ὑμῖν ἔσονται τοῦ ἀργυρίου οὗτοι ἀξιόχρεῳ.</p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent">Ίσως, καθώς σας λέω αυτά, σας φαίνομαι, όπως και πριν που μίλησα για τον οίκτο και τις ικεσίες, πως μιλώ με περηφάνια. Δεν είναι έτσι όμως, ω άνδρες Αθηναίοι, αλλά όπως θα σας πω τώρα. Εγώ έχω την πεποίθηση πως θεληματικώς κανέναν άνθρωπο δεν αδίκησα, δεν μπορώ όμως να σας πείσω, γιατί πολύ λίγον καιρό μιλήσαμε μεταξύ μας, ενώ αν ήτανε και σε σας νόμος, όπως και σε άλλους λαούς, να μην αποφασίζετε για την ποινή του θανάτου σε μια ημέρα <span class="marker">[37b]</span> μονάχα αλλά σε πολλές, θα μπορούσατε να πεισθείτε· τώρα όμως δεν είναι εύκολο σε λίγο καιρό να πέσουν μεγάλες διαβολές. Ενώ λοιπόν εγώ έχω την πεποίθηση πως δεν αδικώ κανέναν, πολύ περισσότερο θ᾽ αδικήσω τον εαυτόν μου, πως είμαι άξιος να πάθω κάτι κακό, και μόνος μου να επιβάλω τέτοια ποινή στον εαυτό μου. Και από τί φόβο τάχα; Ή μήπως πάθω αυτό που ο Μέλητος με κρίνει άξιο να πάθω, και που εγώ λέω πως δεν ξέρω ούτε αν είναι καλό ούτε αν είναι κακό; και αντίς από τούτο, εγώ θα πάω να διαλέξω κάτι που ξέρω πως είναι κακό και να καταδικάσω τον εαυτό μου; <span class="marker">[37c]</span> Και τί ανάγκη να ζήσω στο δεσμωτήριο, σκλάβος στον καθένα που έρχεται στην εξουσία (των Ένδεκα); Ή να διαλέξω πρόστιμο και να είμαι δέσμιος ώσπου να το πληρώσω; Αλλ᾽ αυτό είναι το ίδιο σαν το πρώτο που σας έλεγα· γιατί χρήματα δεν έχω για να πληρώσω. Αλλά τί ποινή να διαλέξω; Εξορία; Γιατί ίσως τέτοια ποινή μπορούσατε να μου επιβάλετε. Θα ήμουν πολύ φιλόζωος, ω άνδρες Αθηναίοι, αν είχα την απερισκεψία να μην μπορώ να συλλογισθώ πως εσείς που είσαστε συμπολίτες μου δεν μπορέσατε να υποφέρετε <span class="marker">[37d]</span> τη συναναστροφή μου και τα λόγια μου και σας φάνηκαν τόσο βαριά και ανυπόφορα πράγματα, ώστε να θέλετε να γλιτώσετε απ᾽ αυτά, και άλλοι θα τα υποφέρουν τόσο εύκολα. Κάθε άλλο, ω άνδρες Αθηναίοι. Ωραία θα ήτανε αλήθεια η ζωή μου να γυρίζω, τέτοιας ηλικίας άνθρωπος, από πολιτεία σε πολιτεία και να ζω διωγμένος από τόπο σε τόπο. Γιατί πολύ καλά το ξέρω πως, όπου κι αν πάω, οι νέοι θα τρέχουν να μ᾽ ακούνε όταν μιλώ, όπως κι εδώ πέρα. Και αν τους διώξω, τότε αυτοί οι ίδιοι θα μ᾽ εξορίσουν, πείθοντας τους γεροντότερους· <span class="marker">[37e]</span> κι αν δεν τους διώξω αυτούς, τότε για χάρη τους θα μ᾽ εξορίσουν οι πατέρες τους και οι δικοί τους.</p>
+<p class="passage indent">Ίσως λοιπόν θα πει κανένας: Δεν μπορείς λοιπόν, Σωκράτη, αφού φύγεις από δω, να ζήσεις μια ήσυχη ζωή; Αυτό δα είναι το δυσκολότερο να δώσω σε μερικούς από σας να το καταλάβουν. Γιατί αν πω πως αυτό το πράγμα είναι απείθεια στον θεό, και γι᾽ αυτό <span class="marker">[38a]</span> δεν μπορώ να ησυχάσω, δεν θα με πιστεύσετε, νομίζοντας πως αστειεύομαι· και αν πάλι σας πω πως αυτό είναι για τον άνθρωπο το μεγαλύτερο καλό, να μιλώ δηλαδή κάθε μέρα για την αρετή και για όλα τ᾽ άλλα που μ᾽ ακούτε συχνά να λέω και να εξετάζω τον εαυτό μου και τους άλλους, γιατί μια παραμελημένη ζωή δεν είναι ζωή για τον άνθρωπο, πολύ λιγότερο θα πιστεύσετε και τα λόγια μου αυτά. Και αυτά είναι έτσι όπως σας τα λέω εγώ, ω άνδρες Αθηναίοι, δεν είναι όμως κι εύκολο να σας δώσω να τα καταλάβετε. Έπειτα εγώ δεν είμαι συνηθισμένος να νομίζω πως μου αξίζει να πάθω <span class="marker">[38b]</span> κανένα κακό. Αν είχα χρήματα, θα καταδίκαζα τον εαυτό μου σε χρηματικό πρόστιμο, σε όσα δηλαδή θα μπορούσα να πληρώσω, περίπου μια μναν ασημένια· σε τόσα κανονίζω εγώ το πρόστιμό μου. Ο Πλάτων όμως, αυτός εδώ, ω άνδρες Αθηναίοι, και ο Κρίτων και ο Κριτόβουλος και ο Απολλόδωρος μου παραγγέλλουν να δεχθώ τριάντα μνες με την εγγύησή τους· λοιπόν κανονίζω τώρα το πρόστιμό μου σε τόσα· και θα σας είναι εγγυητές για τα χρήματα αξιόχρεοι αυτοί εδώ.</p>
+        </div>
+        
+
+        <div id="book-7-chapter-1" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-16" data-hash="book-7-chapter-1">
+            Μετά τον ορισμό της ποινής του θανάτου ο Σωκράτης απευθύνεται στους δικαστές • Κεφάλαιο 1 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=104&page=16" target="_blank" class="page-link">Page 16</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="marker">[38c]</span> Οὐ πολλοῦ γ᾽ ἕνεκα χρόνου, ὦ ἄνδρες Ἀθηναῖοι, ὄνομα ἕξετε καὶ αἰτίαν ὑπὸ τῶν βουλομένων τὴν πόλιν λοιδορεῖν ὡς Σωκράτη ἀπεκτόνατε, ἄνδρα σοφόν —φήσουσι γὰρ δὴ σοφὸν εἶναι, εἰ καὶ μή εἰμι, οἱ βουλόμενοι ὑμῖν ὀνειδίζειν— εἰ γοῦν περιεμείνατε ὀλίγον χρόνον, ἀπὸ τοῦ αὐτομάτου ἂν ὑμῖν τοῦτο ἐγένετο· ὁρᾶτε γὰρ δὴ τὴν ἡλικίαν ὅτι πόρρω ἤδη ἐστὶ τοῦ βίου θανάτου δὲ ἐγγύς. λέγω δὲ τοῦτο οὐ <span class="marker">[38d]</span> πρὸς πάντας ὑμᾶς, ἀλλὰ πρὸς τοὺς ἐμοῦ καταψηφισαμένους θάνατον. λέγω δὲ καὶ τόδε πρὸς τοὺς αὐτοὺς τούτους. ἴσως με οἴεσθε, ὦ ἄνδρες Ἀθηναῖοι, ἀπορίᾳ λόγων ἑαλωκέναι τοιούτων οἷς ἂν ὑμᾶς ἔπεισα, εἰ ᾤμην δεῖν ἅπαντα ποιεῖν καὶ λέγειν ὥστε ἀποφυγεῖν τὴν δίκην. πολλοῦ γε δεῖ. ἀλλ᾽ ἀπορίᾳ μὲν ἑάλωκα, οὐ μέντοι λόγων, ἀλλὰ τόλμης καὶ ἀναισχυντίας καὶ τοῦ μὴ ἐθέλειν λέγειν πρὸς ὑμᾶς τοιαῦτα οἷ᾽ ἂν ὑμῖν μὲν ἥδιστα ἦν ἀκούειν — θρηνοῦντός τέ μου καὶ ὀδυρομένου καὶ ἄλλα ποιοῦντος καὶ <span class="marker">[38e]</span> λέγοντος πολλὰ καὶ ἀνάξια ἐμοῦ, ὡς ἐγώ φημι, οἷα δὴ καὶ εἴθισθε ὑμεῖς τῶν ἄλλων ἀκούειν. ἀλλ᾽ οὔτε τότε ᾠήθην δεῖν ἕνεκα τοῦ κινδύνου πρᾶξαι οὐδὲν ἀνελεύθερον, οὔτε νῦν μοι μεταμέλει οὕτως ἀπολογησαμένῳ, ἀλλὰ πολὺ μᾶλλον αἱροῦμαι ὧδε ἀπολογησάμενος τεθνάναι ἢ ἐκείνως ζῆν. οὔτε γὰρ ἐν δίκῃ οὔτ᾽ ἐν πολέμῳ οὔτ᾽ ἐμὲ οὔτ᾽ ἄλλον οὐδένα δεῖ <span class="marker">[39a]</span> τοῦτο μηχανᾶσθαι, ὅπως ἀποφεύξεται πᾶν ποιῶν θάνατον. καὶ γὰρ ἐν ταῖς μάχαις πολλάκις δῆλον γίγνεται ὅτι τό γε ἀποθανεῖν ἄν τις ἐκφύγοι καὶ ὅπλα ἀφεὶς καὶ ἐφ᾽ ἱκετείαν τραπόμενος τῶν διωκόντων· καὶ ἄλλαι μηχαναὶ πολλαί εἰσιν ἐν ἑκάστοις τοῖς κινδύνοις ὥστε διαφεύγειν θάνατον, ἐάν τις τολμᾷ πᾶν ποιεῖν καὶ λέγειν. ἀλλὰ μὴ οὐ τοῦτ᾽ ᾖ χαλεπόν, ὦ ἄνδρες, θάνατον ἐκφυγεῖν, ἀλλὰ πολὺ χαλεπώτερον <span class="marker">[39b]</span> πονηρίαν· θᾶττον γὰρ θανάτου θεῖ. καὶ νῦν ἐγὼ μὲν ἅτε βραδὺς ὢν καὶ πρεσβύτης ὑπὸ τοῦ βραδυτέρου ἑάλων, οἱ δ᾽ ἐμοὶ κατήγοροι ἅτε δεινοὶ καὶ ὀξεῖς ὄντες ὑπὸ τοῦ θάττονος, τῆς κακίας. καὶ νῦν ἐγὼ μὲν ἄπειμι ὑφ᾽ ὑμῶν θανάτου δίκην ὀφλών, οὗτοι δ᾽ ὑπὸ τῆς ἀληθείας ὠφληκότες μοχθηρίαν καὶ ἀδικίαν. καὶ ἐγώ τε τῷ τιμήματι ἐμμένω καὶ οὗτοι. ταῦτα μέν που ἴσως οὕτως καὶ ἔδει σχεῖν, καὶ οἶμαι αὐτὰ μετρίως ἔχειν.</p>
+<p class="passage indent"><span class="marker">[39c]</span> Τὸ δὲ δὴ μετὰ τοῦτο ἐπιθυμῶ ὑμῖν χρησμῳδῆσαι, ὦ καταψηφισάμενοί μου· καὶ γάρ εἰμι ἤδη ἐνταῦθα ἐν ᾧ μάλιστα ἄνθρωποι χρησμῳδοῦσιν, ὅταν μέλλωσιν ἀποθανεῖσθαι. φημὶ γάρ, ὦ ἄνδρες οἳ ἐμὲ ἀπεκτόνατε, τιμωρίαν ὑμῖν ἥξειν εὐθὺς μετὰ τὸν ἐμὸν θάνατον πολὺ χαλεπωτέραν νὴ Δία ἢ οἵαν ἐμὲ ἀπεκτόνατε· νῦν γὰρ τοῦτο εἴργασθε οἰόμενοι μὲν ἀπαλλάξεσθαι τοῦ διδόναι ἔλεγχον τοῦ βίου, τὸ δὲ ὑμῖν πολὺ ἐναντίον ἀποβήσεται, ὡς ἐγώ φημι. πλείους ἔσονται ὑμᾶς <span class="marker">[39d]</span> οἱ ἐλέγχοντες, οὓς νῦν ἐγὼ κατεῖχον, ὑμεῖς δὲ οὐκ ᾐσθάνεσθε· καὶ χαλεπώτεροι ἔσονται ὅσῳ νεώτεροί εἰσιν, καὶ ὑμεῖς μᾶλλον ἀγανακτήσετε. εἰ γὰρ οἴεσθε ἀποκτείνοντες ἀνθρώπους ἐπισχήσειν τοῦ ὀνειδίζειν τινὰ ὑμῖν ὅτι οὐκ ὀρθῶς ζῆτε, οὐ καλῶς διανοεῖσθε· οὐ γάρ ἐσθ᾽ αὕτη ἡ ἀπαλλαγὴ οὔτε πάνυ δυνατὴ οὔτε καλή, ἀλλ᾽ ἐκείνη καὶ καλλίστη καὶ ῥᾴστη, μὴ τοὺς ἄλλους κολούειν ἀλλ᾽ ἑαυτὸν παρασκευάζειν ὅπως ἔσται ὡς βέλτιστος. ταῦτα μὲν οὖν ὑμῖν τοῖς <span class="marker">[39e]</span> καταψηφισαμένοις μαντευσάμενος ἀπαλλάττομαι.</p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="marker">[38c]</span> Για να μην περιμένετε λίγον καιρόν, ω άνδρες Αθηναίοι, εκείνοι που θέλουν και καλά να κατηγορούν την πόλη θα σας βγάλουν το όνομα και την κατηγορία πως θανατώσατε τον Σωκράτη, έναν σοφόν άνθρωπο· γιατί θα με πουν σοφό, και ας μην είμαι, όσοι θέλουν να σας κακολογήσουν. Αν περιμένατε όμως λίγο ακόμα, μόνο του θα σας ερχότανε το πράγμα· γιατί βλέπετε δα την ηλικία μου, πως είναι πια μακριά από τη ζωή και κοντά στον θάνατο. Και τα λέω, όχι <span class="marker">[38d]</span> σε όλους εσάς, αλλά σ᾽ εκείνους που με καταδίκασαν σε θάνατο. Και λέω και αυτά ακόμα στους ίδιους τούτους. Ίσως θα φαντάζεσθε, ω άνθρωποι, πως εγώ την έπαθα, γιατί μου λείπανε τα λόγια με τα οποία θα σας έπειθα, αν νόμιζα πως έπρεπε να πω και να κάνω το καθετί, για να ξεφύγω την καταδίκη. Κάθε άλλο. Την έπαθα γιατί μου λείψανε όχι τα λόγια αλλά η τόλμη και η αναισχυντία, και γιατί δεν θέλησα να σας πω τέτοια πράγματα που θα σας ευχαριστούσαν να τ᾽ ακούσετε, και να θρηνώ και να δέρνομαι και <span class="marker">[38e]</span> άλλα τέτοια να λέω και να κάνω πολλά και ανάξια για μένα, όπως σας είπα· πράγματα δηλαδή που είσθε συνηθισμένοι ν᾽ ακούτε από τους άλλους. Ούτε τότε όμως νόμισα πως για τον κίνδυνο του θανάτου έπρεπε να κάνω τίποτε ανελεύθερο, ούτε τώρα μεταμελούμαι, που έτσι απολογήθηκα, αλλά πολύ περισσότερο προτιμώ να πεθάνω με τέτοια απολογία, παρά να ζήσω με τον άλλο τρόπο· γιατί ούτε σε δίκη, ούτε σε πόλεμο, ούτ᾽ εγώ, ούτε κανείς άλλος πρέπει <span class="marker">[39a]</span> τούτο να μηχανάται, πώς ν᾽ αποφύγει με κάθε τρόπο τον θάνατο· γιατί και στις μάχες πολλές φορές είναι φανερό πως μπορεί να ξεφύγει κανένας τον θάνατο πετώντας κάτω τα όπλα του και πέφτοντας στα γόνατα εκεινών που τον κυνηγούν· και άλλοι τρόποι είναι σε κάθε κίνδυνο να ξεφύγει κανένας τον θάνατο, αν έχει αποφασίσει να κάνει και να λέει το καθετί. Αλλά προσέξατε μήπως δεν είναι τούτο το δύσκολο, ω άνδρες Αθηναίοι, να ξεφύγει δηλαδή κανένας τον θάνατο· το δυσκολότερο είναι να ξεφύγει <span class="marker">[39b]</span> την κακή πράξη· γιατί αυτή τρέχει πιο γρήγορα από τον θάνατο. Κι εγώ τώρα, σαν αργοκίνητος και γέρος που είμαι, πιάσθηκα από το πιο αργοκίνητο· οι κατήγοροί μου όμως, σαν πιο δυνατοί κι ευκολοκίνητοι, θα πιασθούν από το πιο γρήγορο, από την κακία. Και τώρα εγώ φεύγω για να ξεπληρώσω την ποινή του θανάτου που μου βάλατε, κι αυτοί εδώ για να ξεπληρώσουν την ποινή της μοχθηρίας και της αδικίας που τους έβαλε η αλήθεια. Κι εγώ μένω σταθερός στην ποινή μου και αυτοί. Ίσως έτσι έπρεπε να γίνουν τα πράγματα και φαντάζομαι πως σωστά έγιναν.</p>
+<p class="passage indent"><span class="marker">[39c]</span> Έχω όμως επιθυμία να σας προφητεύσω τί θα γίνει ύστερ᾽ απ᾽ αυτά, ω σεις που με καταψηφίσατε· γιατί βρίσκομαι τώρα εδώ, στη στιγμή που οι άνθρωποι καλύτερα προφητεύουν, στη στιγμή που τους μέλλεται να πεθάνουν. Σας λέω λοιπόν, ω άνθρωποι που με θανατώσατε εμένα, πως ευθύς ύστερ᾽ από τον θάνατό μου, θα σας βρει τιμωρία, πολύ φοβερότερη, μά τον Δία, από εκείνη που μου δώσατε με τον θάνατό μου. Γιατί τώρα κάνετε αυτό που κάνετε, με την ιδέα πως θα γλιτώσετε να δίνετε λόγο για τη ζωή σας· σας λέω όμως πως αυτό θα σας βγει πολύ ενάντιο. Περισσότεροι τώρα θα βγουν να σας <span class="marker">[39d]</span> τα ψάλουν, αυτοί που εγώ τους κρατούσα κι εσείς δεν το καταλαβαίνατε· και θα είναι φοβερότεροι, σαν πιο νέοι που είναι, και σεις τότε ακόμα περισσότερο θ᾽ αγανακτήσετε. Γιατί, αν νομίζετε πως με το να θανατώσετε ανθρώπους θα εμποδίσετε κανέναν να σας κακολογεί πως δεν ζείτε όπως πρέπει, δεν το συλλογίζεσθε καλά· γιατί αυτό το γλίτωμα ούτε πολύ δυνατό ούτε όμορφο είναι, αλλά ευκολότατο και ομορφότατο είναι όχι να εμποδίζει κανένας τους άλλους, μα ο ίδιος να κοιτάξει πώς να γίνει καλύτερος. Αφού σας προφήτευσα λοιπόν αυτά, εσάς που <span class="marker">[39e]</span> με καταψηφίσατε, σας αφήνω.</p>
+        </div>
+        
+
+        <div id="book-7-chapter-1-2" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-17" data-hash="book-7-chapter-1-2">
+            Μετά τον ορισμό της ποινής του θανάτου ο Σωκράτης απευθύνεται στους δικαστές • Κεφάλαιο 1.2 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=104&page=17" target="_blank" class="page-link">Page 17</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent">Τοῖς δὲ ἀποψηφισαμένοις ἡδέως ἂν διαλεχθείην ὑπὲρ τοῦ γεγονότος τουτουῒ πράγματος, ἐν ᾧ οἱ ἄρχοντες ἀσχολίαν ἄγουσι καὶ οὔπω ἔρχομαι οἷ ἐλθόντα με δεῖ τεθνάναι. ἀλλά μοι, ὦ ἄνδρες, παραμείνατε τοσοῦτον χρόνον· οὐδὲν γὰρ κωλύει διαμυθολογῆσαι πρὸς ἀλλήλους ἕως ἔξεστιν. ὑμῖν <span class="marker">[40a]</span> γὰρ ὡς φίλοις οὖσιν ἐπιδεῖξαι ἐθέλω τὸ νυνί μοι συμβεβηκὸς τί ποτε νοεῖ. ἐμοὶ γάρ, ὦ ἄνδρες δικασταί —ὑμᾶς γὰρ δικαστὰς καλῶν ὀρθῶς ἂν καλοίην— θαυμάσιόν τι γέγονεν. ἡ γὰρ εἰωθυῖά μοι μαντικὴ ἡ τοῦ δαιμονίου ἐν μὲν τῷ πρόσθεν χρόνῳ παντὶ πάνυ πυκνὴ ἀεὶ ἦν καὶ πάνυ ἐπὶ σμικροῖς ἐναντιουμένη, εἴ τι μέλλοιμι μὴ ὀρθῶς πράξειν. νυνὶ δὲ συμβέβηκέ μοι ἅπερ ὁρᾶτε καὶ αὐτοί, ταυτὶ ἅ γε δὴ οἰηθείη ἄν τις καὶ νομίζεται ἔσχατα κακῶν εἶναι· ἐμοὶ δὲ <span class="marker">[40b]</span> οὔτε ἐξιόντι ἕωθεν οἴκοθεν ἠναντιώθη τὸ τοῦ θεοῦ σημεῖον, οὔτε ἡνίκα ἀνέβαινον ἐνταυθοῖ ἐπὶ τὸ δικαστήριον, οὔτε ἐν τῷ λόγῳ οὐδαμοῦ μέλλοντί τι ἐρεῖν. καίτοι ἐν ἄλλοις λόγοις πολλαχοῦ δή με ἐπέσχε λέγοντα μεταξύ· νῦν δὲ οὐδαμοῦ περὶ ταύτην τὴν πρᾶξιν οὔτ᾽ ἐν ἔργῳ οὐδενὶ οὔτ᾽ ἐν λόγῳ ἠναντίωταί μοι. τί οὖν αἴτιον εἶναι ὑπολαμβάνω; ἐγὼ ὑμῖν ἐρῶ· κινδυνεύει γάρ μοι τὸ συμβεβηκὸς τοῦτο ἀγαθὸν γεγονέναι, καὶ οὐκ ἔσθ᾽ ὅπως ἡμεῖς ὀρθῶς ὑπολαμβάνομεν, <span class="marker">[40c]</span> ὅσοι οἰόμεθα κακὸν εἶναι τὸ τεθνάναι. μέγα μοι τεκμήριον τούτου γέγονεν· οὐ γὰρ ἔσθ᾽ ὅπως οὐκ ἠναντιώθη ἄν μοι τὸ εἰωθὸς σημεῖον, εἰ μή τι ἔμελλον ἐγὼ ἀγαθὸν πράξειν.</p>
+<p class="passage indent">Ἐννοήσωμεν δὲ καὶ τῇδε ὡς πολλὴ ἐλπίς ἐστιν ἀγαθὸν αὐτὸ εἶναι. δυοῖν γὰρ θάτερόν ἐστιν τὸ τεθνάναι· ἢ γὰρ οἷον μηδὲν εἶναι μηδὲ αἴσθησιν μηδεμίαν μηδενὸς ἔχειν τὸν τεθνεῶτα, ἢ κατὰ τὰ λεγόμενα μεταβολή τις τυγχάνει οὖσα καὶ μετοίκησις τῇ ψυχῇ τοῦ τόπου τοῦ ἐνθένδε εἰς ἄλλον τόπον. καὶ εἴτε δὴ μηδεμία αἴσθησίς ἐστιν ἀλλ᾽ <span class="marker">[40d]</span> οἷον ὕπνος ἐπειδάν τις καθεύδων μηδ᾽ ὄναρ μηδὲν ὁρᾷ, θαυμάσιον κέρδος ἂν εἴη ὁ θάνατος —ἐγὼ γὰρ ἂν οἶμαι, εἴ τινα ἐκλεξάμενον δέοι ταύτην τὴν νύκτα ἐν ᾗ οὕτω κατέδαρθεν ὥστε μηδὲ ὄναρ ἰδεῖν, καὶ τὰς ἄλλας νύκτας τε καὶ ἡμέρας τὰς τοῦ βίου τοῦ ἑαυτοῦ ἀντιπαραθέντα ταύτῃ τῇ νυκτὶ δέοι σκεψάμενον εἰπεῖν πόσας ἄμεινον καὶ ἥδιον ἡμέρας καὶ νύκτας ταύτης τῆς νυκτὸς βεβίωκεν ἐν τῷ ἑαυτοῦ βίῳ, οἶμαι <span class="marker">[40e]</span> ἂν μὴ ὅτι ἰδιώτην τινά, ἀλλὰ τὸν μέγαν βασιλέα εὐαριθμήτους ἂν εὑρεῖν αὐτὸν ταύτας πρὸς τὰς ἄλλας ἡμέρας καὶ νύκτας— εἰ οὖν τοιοῦτον ὁ θάνατός ἐστιν, κέρδος ἔγωγε λέγω· καὶ γὰρ οὐδὲν πλείων ὁ πᾶς χρόνος φαίνεται οὕτω δὴ εἶναι ἢ μία νύξ. εἰ δ᾽ αὖ οἷον ἀποδημῆσαί ἐστιν ὁ θάνατος ἐνθένδε εἰς ἄλλον τόπον, καὶ ἀληθῆ ἐστιν τὰ λεγόμενα, ὡς ἄρα ἐκεῖ εἰσι πάντες οἱ τεθνεῶτες, τί μεῖζον ἀγαθὸν τούτου εἴη ἄν, ὦ ἄνδρες δικασταί; εἰ γάρ τις <span class="marker">[41a]</span> ἀφικόμενος εἰς Ἅιδου, ἀπαλλαγεὶς τουτωνὶ τῶν φασκόντων δικαστῶν εἶναι, εὑρήσει τοὺς ὡς ἀληθῶς δικαστάς, οἵπερ καὶ λέγονται ἐκεῖ δικάζειν, Μίνως τε καὶ Ῥαδάμανθυς καὶ Αἰακὸς καὶ Τριπτόλεμος καὶ ἄλλοι ὅσοι τῶν ἡμιθέων δίκαιοι ἐγένοντο ἐν τῷ ἑαυτῶν βίῳ, ἆρα φαύλη ἂν εἴη ἡ ἀποδημία; ἢ αὖ Ὀρφεῖ συγγενέσθαι καὶ Μουσαίῳ καὶ Ἡσιόδῳ καὶ Ὁμήρῳ ἐπὶ πόσῳ ἄν τις δέξαιτ᾽ ἂν ὑμῶν; ἐγὼ μὲν γὰρ πολλάκις ἐθέλω τεθνάναι εἰ ταῦτ᾽ ἔστιν ἀληθῆ. ἐπεὶ <span class="marker">[41b]</span> ἔμοιγε καὶ αὐτῷ θαυμαστὴ ἂν εἴη ἡ διατριβὴ αὐτόθι, ὁπότε ἐντύχοιμι Παλαμήδει καὶ Αἴαντι τῷ Τελαμῶνος καὶ εἴ τις ἄλλος τῶν παλαιῶν διὰ κρίσιν ἄδικον τέθνηκεν, ἀντιπαραβάλλοντι τὰ ἐμαυτοῦ πάθη πρὸς τὰ ἐκείνων —ὡς ἐγὼ οἶμαι, οὐκ ἂν ἀηδὲς εἴη— καὶ δὴ τὸ μέγιστον, τοὺς ἐκεῖ ἐξετάζοντα καὶ ἐρευνῶντα ὥσπερ τοὺς ἐνταῦθα διάγειν, τίς αὐτῶν σοφός ἐστιν καὶ τίς οἴεται μέν, ἔστιν δ᾽ οὔ. ἐπὶ πόσῳ δ᾽ ἄν τις, ὦ ἄνδρες δικασταί, δέξαιτο ἐξετάσαι τὸν ἐπὶ Τροίαν ἀγαγόντα <span class="marker">[41c]</span> τὴν πολλὴν στρατιὰν ἢ Ὀδυσσέα ἢ Σίσυφον ἢ ἄλλους μυρίους ἄν τις εἴποι καὶ ἄνδρας καὶ γυναῖκας, οἷς ἐκεῖ διαλέγεσθαι καὶ συνεῖναι καὶ ἐξετάζειν ἀμήχανον ἂν εἴη εὐδαιμονίας; πάντως οὐ δήπου τούτου γε ἕνεκα οἱ ἐκεῖ ἀποκτείνουσι· τά τε γὰρ ἄλλα εὐδαιμονέστεροί εἰσιν οἱ ἐκεῖ τῶν ἐνθάδε, καὶ ἤδη τὸν λοιπὸν χρόνον ἀθάνατοί εἰσιν, εἴπερ γε τὰ λεγόμενα ἀληθῆ.</p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent">Μ᾽ εκείνους όμως που μου δώκανε αθωωτική ψήφο θα μιλούσα ευχαρίστως γι᾽ αυτό που έγινε, ενόσω οι ένδεκα βρίσκονται ακόμη σε δουλειά και εγώ δεν πηγαίνω ακόμα εκεί που πρέπει να πάω, για να θανατωθώ. Μείνετε λοιπόν μαζί μου, ω άνδρες, αυτή την ώρα· γιατί τίποτε δεν μας εμποδίζει να τα πούμε μεταξύ μας, όσο μας αφήνουν. Γιατί σε σας, <span class="marker">[40a]</span> σα φίλοι που είσθε, θέλω να σας δείξω τί σημαίνει αυτό που μου συνέβηκε. Γιατί εμένα, ω δικαστές (και όταν εσάς σας ονομάζω δικαστές, σωστά νομίζω πως σας ονομάζω) μου ᾽τυχε κάτι σαν θαύμα. Γιατί η μαντική δύναμη που έχω πάντα, από την θεότητα που ξέρετε, πρωτύτερα ήτανε πολύ συχνή πάντα και μου εναντιωνότανε και στα μικρότερα πράγματα, όταν πήγαινα να κάνω τίποτε που δεν ήτανε σωστό· και τώρα μου συνέβηκαν αυτά εδώ που και μόνοι σας τα βλέπετε και που θα φαντάζετο κανένας, όπως όλοι το πιστεύουν, πως είναι τα μεγαλύτερα κακά. Εμένα λοιπόν <span class="marker">[40b]</span> ούτε όταν βγήκα το πρωί από το σπίτι μου μού εναντιώθηκε το σημάδι αυτό του θεού, ούτε όταν παρουσιάσθηκα εδώ στο δικαστήριο, ούτε στον λόγο μου απάνω, όταν πήγαινα να πω κάτι, μολονότι σε άλλους λόγους, σε πολλά μέρη, μ᾽ εμπόδισε απάνω στην ώρα που μιλούσα. Τώρα όμως πουθενά σε όλη αυτή την ιστορία, ούτε σε πράξη καμιά ούτε σε λόγο μού έχει εναντιωθεί. Ποιά λοιπόν είναι η αιτία, κατά τη γνώμη μου; Εγώ θα σας το πω· γιατί αυτό που μου συνέβηκε πάει να μου βγει σε καλό, και δεν είναι σωστό, όπως το παίρνουμε εμείς, <span class="marker">[40c]</span> όσοι νομίζουμε πως είναι κακό να πεθάνει κανένας. Εμένα μου δόθηκε μια μεγάλη απόδειξη γι᾽ αυτό το πράγμα· γιατί δεν ήτανε ποτέ δυνατόν να μη μου εναντιωθεί το συνηθισμένο σημάδι του θεού, αν δεν έμελλα να κάμω κάτι καλό.</p>
+<p class="passage indent">Έπειτα ας το συλλογισθούμε και έτσι, πόσες δηλαδή ελπίδες μας δίνει με το να είναι καλό πράγμα. Γιατί ένα από τα δύο είναι το να πεθάνει κανένας· ή είναι δηλαδή σαν να μην είναι, ούτ᾽ έχει αίσθηση από τίποτε ο πεθαμένος, ή όπως λένε κάποια αλλαγή είναι ο θάνατος και η ψυχή αλλάζει κατοικία από τον τόπο αυτό σε άλλο τόπο. Και αν καμιά αίσθηση δεν υπάρχει πια αλλά <span class="marker">[40d]</span> είναι σαν ύπνος, όπως όταν κοιμάται κανείς και ούτε όνειρο βλέπει κανένα, θα ήτανε θαυμάσιο κέρδος ο θάνατος. Γιατί εγώ φαντάζομαι πως αν διαλέξει κανένας αυτή τη νύχτα, που έτσι βαριοκοιμήθηκε, ώστε ούτε όνειρο είδε, και ύστερα συγκρίνει με τις άλλες νύχτες και τις ημέρες της ζωής του τη νύχτα αυτή, και συλλογισθεί και πει πόσες ημέρες και νύχτες έζησε καλύτερα και γλυκύτερα στη ζωή του, πιστεύω πως, <span class="marker">[40e]</span> όχι ένας ιδιώτης, μα και ο μέγας βασιλεύς ευκολομέτρητες θα τις βρει αυτές μπροστά στις άλλες ημέρες και τις νύχτες. Αν είναι λοιπόν τέτοιο πράγμα ο θάνατος, εγώ λέω πως είναι κέρδος. Γιατί τίποτε περισσότερο δεν φαίνεται να είναι έτσι όλος ο καιρός παρά μια νύχτα. Κι αν είναι πάλι ο θάνατος σαν ταξίδι από δω σε άλλο τόπο, και είναι αληθινά αυτά που λένε, πως εκεί πέρα βρίσκονται όλοι οι πεθαμένοι, τί μεγαλύτερο καλό θα ήτανε απ᾽ αυτό, ω δικαστές; Γιατί όταν <span class="marker">[41a]</span> φθάσει κανένας στον Άδη, αφού γλιτώσει απ᾽ αυτούς που λένε πως είναι δικαστές, και βρει τους αληθινούς δικαστές, αυτούς που λένε πως δικάζουν εκεί, τον Μίνω και τον Ραδάμανθυ και τον Αιακό και τον Τριπτόλεμο και τους άλλους, όσοι από τους ημίθεους ζήσανε δίκαια στη ζωή τους, άσχημο τάχα θα ήτανε τέτοιο ταξίδι; Ή για να βρεθείτε πάλι με τον Ορφέα και τον Μουσαίο και τον Ησίοδο και τον Όμηρο, πόσα δεν θα ᾽δινε ο καθένας από σας; Εγώ τουλάχιστον χίλιες φορές θα ήθελα να πεθάνω, αν είναι αληθινά αυτά· γιατί <span class="marker">[41b]</span> και για μένα θαυμαστό θα ήτανε να μείνω εκεί πέρα, αν έβρισκα τον Παλαμήδη και τον Αίαντα, τον γιο του Τελαμώνος, και όποιον άλλον από τους παλαιούς που θανατώθηκε από άδικη κρίση· να συγκρίνω τα πάθη μου με τα δικά τους δεν είναι δυσάρεστο πράγμα, κατά τη γνώμη μου. Και το καλύτερο από όλα να περνώ τη ζωή μου με το να ρωτάω και να ερευνώ κι εκείνους εκεί, όπως τους εδώ, ποιός τάχα είναι σοφός απ᾽ αυτούς και ποιός νομίζει πως είναι και δεν είναι. Και πόσα δεν θα ᾽δινε κανένας, ω δικαστές, να ρωτήσει εκείνον που οδήγησε <span class="marker">[41c]</span> το μεγάλο στράτευμα στην Τροία ή τον Οδυσσέα ή τον Σίσυφο και χίλιους άλλους να πούμε, και άνδρες και γυναίκες, που να τους μιλεί κανένας και να τους συναναστρέφεται και να τους ρωτάει θα ήτανε μια θαυμαστή ευτυχία. Και γι᾽ αυτό εκείνοι εκεί βέβαια δεν θανατώνουν κανέναν. Γιατί και στα άλλα είναι πιο ευτυχισμένοι αυτοί εκεί από τους εδώ και όλον τον καιρό είναι αθάνατοι, αν είναι αληθινά τα λεγόμενα.</p>
+        </div>
+        
+
+        <div id="book-7-chapter-1-3" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-18" data-hash="book-7-chapter-1-3">
+            Μετά τον ορισμό της ποινής του θανάτου ο Σωκράτης απευθύνεται στους δικαστές • Κεφάλαιο 1.3 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=104&page=18" target="_blank" class="page-link">Page 18</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent">Ἀλλὰ καὶ ὑμᾶς χρή, ὦ ἄνδρες δικασταί, εὐέλπιδας εἶναι πρὸς τὸν θάνατον, καὶ ἕν τι τοῦτο διανοεῖσθαι ἀληθές, ὅτι <span class="marker">[41d]</span> οὐκ ἔστιν ἀνδρὶ ἀγαθῷ κακὸν οὐδὲν οὔτε ζῶντι οὔτε τελευτήσαντι, οὐδὲ ἀμελεῖται ὑπὸ θεῶν τὰ τούτου πράγματα· οὐδὲ τὰ ἐμὰ νῦν ἀπὸ τοῦ αὐτομάτου γέγονεν, ἀλλά μοι δῆλόν ἐστι τοῦτο, ὅτι ἤδη τεθνάναι καὶ ἀπηλλάχθαι πραγμάτων βέλτιον ἦν μοι. διὰ τοῦτο καὶ ἐμὲ οὐδαμοῦ ἀπέτρεψεν τὸ σημεῖον, καὶ ἔγωγε τοῖς καταψηφισαμένοις μου καὶ τοῖς κατηγόροις οὐ πάνυ χαλεπαίνω. καίτοι οὐ ταύτῃ τῇ διανοίᾳ κατεψηφίζοντό μου καὶ κατηγόρουν, ἀλλ᾽ οἰόμενοι βλάπτειν· <span class="marker">[41e]</span> τοῦτο αὐτοῖς ἄξιον μέμφεσθαι. τοσόνδε μέντοι αὐτῶν δέομαι· τοὺς ὑεῖς μου, ἐπειδὰν ἡβήσωσι, τιμωρήσασθε, ὦ ἄνδρες, ταὐτὰ ταῦτα λυποῦντες ἅπερ ἐγὼ ὑμᾶς ἐλύπουν, ἐὰν ὑμῖν δοκῶσιν ἢ χρημάτων ἢ ἄλλου του πρότερον ἐπιμελεῖσθαι ἢ ἀρετῆς, καὶ ἐὰν δοκῶσί τι εἶναι μηδὲν ὄντες, ὀνειδίζετε αὐτοῖς ὥσπερ ἐγὼ ὑμῖν, ὅτι οὐκ ἐπιμελοῦνται ὧν δεῖ, καὶ οἴονταί τι εἶναι ὄντες οὐδενὸς ἄξιοι. καὶ ἐὰν <span class="marker">[42a]</span> ταῦτα ποιῆτε, δίκαια πεπονθὼς ἐγὼ ἔσομαι ὑφ᾽ ὑμῶν αὐτός τε καὶ οἱ ὑεῖς. ἀλλὰ γὰρ ἤδη ὥρα ἀπιέναι, ἐμοὶ μὲν ἀποθανουμένῳ, ὑμῖν δὲ βιωσομένοις· ὁπότεροι δὲ ἡμῶν ἔρχονται ἐπὶ ἄμεινον πρᾶγμα, ἄδηλον παντὶ πλὴν ἢ τῷ θεῷ.</p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent">Αλλά και σεις πρέπει, ω δικαστές, να έχετε τις καλύτερες ελπίδες σας στον θάνατο, κι ένα πράγμα να συλλογίζεσθε, που είναι αληθινό, ότι <span class="marker">[41d]</span> για τον καλόν άνθρωπο τίποτε δεν είναι κακό ούτε στη ζωή ούτε στον θάνατό του, ούτε οι θεοί τον ξεχνούνε ποτέ· ούτε τα δικά μου γινήκανε τώρα έτσι από την τύχη, αλλά τώρα το βλέπω φανερά πως το να πεθάνω και να γλιτώσω από τις φροντίδες είναι το καλύτερο για μένα. Γι᾽ αυτό και πουθενά δεν μ᾽ εμπόδισε το σημάδι του θεού και ούτε έχω και πολύ παράπονο μ᾽ αυτούς που με καταψήφισαν και τους κατηγόρους μου. Μολονότι αυτοί δεν με καταψηφίσανε και δεν με κατηγορήσανε μ᾽ αυτή την ιδέα, μα φαντάζονται πως με βλάπτουν· <span class="marker">[41e]</span> και γι᾽ αυτό και μόνο αξίζει να τους κατακρίνω.</p>
+<p class="passage indent">Ωστόσο τους παρακαλώ ένα πράγμα: Τα παιδιά μου, όταν γίνουν έφηβοι, να τα τιμωρήσετε, ω άνδρες Αθηναίοι, και να τα τυραννήσετε με τον ίδιο τρόπο που σας τυράννησα εγώ, αν σας φανούν πως φροντίζουν για χρήματα ή γι᾽ άλλο τίποτε περισσότερο από την αρετή, και, αν νομίζουν πως είναι κάτι χωρίς να είναι, να τα περιγελάσετε όπως σας περιγέλασα εγώ, πως δεν επιμελούνται εκείνα που πρέπει και νομίζουν πως είναι κάτι χωρίς να είναι άξιοι για τίποτε. Και αν <span class="marker">[42a]</span> τα κάμετε αυτά, δίκαια θα τα κάμετε και για μένα και για τα παιδιά μου.</p>
+<p class="passage indent">Τώρα όμως ώρα είναι να πηγαίνω εγώ για να πεθάνω και σεις για να ζήσετε. Ποιός από μας πηγαίνει στο καλύτερο, κανένας δεν το ξέρει παρά μόνος ο θεός.</p>
+        </div>
+        
+        </section>
+    </main>
+
+    <script>
+        function toggleLayout() {
+            const body = document.body;
+            const btn = document.getElementById('toggle-layout-btn');
+            
+            if (body.classList.contains('hide-original')) {
+                body.classList.remove('hide-original');
+                btn.innerText = 'Hide Original';
+                localStorage.setItem('ebook-hide-original', 'false');
+            } else {
+                body.classList.add('hide-original');
+                btn.innerText = 'Show Original';
+                localStorage.setItem('ebook-hide-original', 'true');
+            }
+        }
+
+        function setTheme(theme, buttonElement) {
+            if (theme === 'light') {
+                document.documentElement.removeAttribute('data-theme');
+            } else {
+                document.documentElement.setAttribute('data-theme', theme);
+            }
+            
+            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+            buttonElement.classList.add('active');
+            
+            localStorage.setItem('ebook-theme', theme);
+        }
+
+        function toggleSidebar() {
+            const body = document.body;
+            const overlay = document.getElementById('mobile-overlay');
+            const isMobile = window.innerWidth <= 900;
+            
+            if (isMobile) {
+                if (body.classList.contains('sidebar-open')) {
+                    body.classList.remove('sidebar-open');
+                    overlay.classList.remove('open');
+                } else {
+                    body.classList.add('sidebar-open');
+                    overlay.classList.add('open');
+                }
+            } else {
+                if (body.classList.contains('sidebar-closed')) {
+                    body.classList.remove('sidebar-closed');
+                    localStorage.setItem('ebook-sidebar-closed', 'false');
+                } else {
+                    body.classList.add('sidebar-closed');
+                    localStorage.setItem('ebook-sidebar-closed', 'true');
+                }
+            }
+        }
+        
+        function closeSidebarOnMobile() {
+            if (window.innerWidth <= 900) {
+                document.body.classList.remove('sidebar-open');
+                document.getElementById('mobile-overlay').classList.remove('open');
+            }
+        }
+        
+        function toggleMobileOptions() {
+            const header = document.querySelector('header');
+            const btn = document.querySelector('.options-toggle');
+            
+            if (header.classList.contains('options-open')) {
+                header.classList.remove('options-open');
+                document.body.classList.remove('mobile-options-open');
+                btn.classList.remove('active');
+            } else {
+                header.classList.add('options-open');
+                document.body.classList.add('mobile-options-open');
+                btn.classList.add('active');
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('ebook-theme');
+            if (savedTheme) {
+                const targetBtn = document.getElementById('theme-' + savedTheme);
+                if (targetBtn) setTheme(savedTheme, targetBtn);
+            }
+
+            const hideOriginal = localStorage.getItem('ebook-hide-original');
+            if (hideOriginal === 'true') {
+                document.body.classList.add('hide-original');
+                document.getElementById('toggle-layout-btn').innerText = 'Show Original';
+            }
+            
+            if (window.innerWidth > 900) {
+                const sidebarClosed = localStorage.getItem('ebook-sidebar-closed');
+                if (sidebarClosed === 'true') {
+                    document.body.classList.add('sidebar-closed');
+                }
+            }
+            
+            let lastScrollTop = 0;
+            const header = document.querySelector('header');
+            const optBtn = document.querySelector('.options-toggle');
+            
+            window.addEventListener('scroll', () => {
+                let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                
+                if (scrollTop < 0) scrollTop = 0;
+                
+                if (scrollTop > 10) {
+                    document.body.classList.add('scrolled');
+                } else {
+                    document.body.classList.remove('scrolled');
+                }
+                
+                if (scrollTop > lastScrollTop && scrollTop > 120) {
+                    header.classList.add('header-hidden');
+                    header.classList.remove('options-open');
+                    document.body.classList.remove('mobile-options-open');
+                    optBtn.classList.remove('active');
+                } else {
+                    header.classList.remove('header-hidden');
+                }
+                
+                lastScrollTop = scrollTop;
+            }, { passive: true });
+            
+            const observerOptions = {
+                root: null,
+                rootMargin: "-100px 0px -60% 0px", 
+                threshold: 0
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const hash = entry.target.getAttribute('data-hash');
+                        if (hash && window.location.hash !== '#' + hash) {
+                            history.replaceState(null, null, '#' + hash);
+                        }
+                    }
+                });
+            }, observerOptions);
+            
+            document.querySelectorAll('.page-divider').forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>
