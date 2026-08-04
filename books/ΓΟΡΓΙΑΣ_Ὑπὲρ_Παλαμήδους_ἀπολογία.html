@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ΓΟΡΓΙΑΣ Ὑπὲρ Παλαμήδους ἀπολογία</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Marked.js Markdown rendering library -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #faf8f5;
+            --text-color: #2c2520;
+            --accent-color: #8b263e;
+            --sidebar-bg: #f3efe9;
+            --border-color: #e3ded5;
+            --muted-text: #706357;
+            --font-serif: "Cardo", "Georgia", "Palatino", serif;
+        }
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --accent-color: #ff8a80;
+            --sidebar-bg: #2d2d2d;
+            --border-color: #404040;
+            --muted-text: #999999;
+        }
+        [data-theme="sepia"] {
+            --bg-color: #f4ecd8;
+            --text-color: #5b4636;
+            --accent-color: #a04000;
+            --sidebar-bg: #ebdcb9;
+            --border-color: #d7c59d;
+            --muted-text: #7c6857;
+        }
+        
+        body {
+            margin: 0;
+            font-family: var(--font-serif);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            transition: background-color 0.2s, color 0.2s;
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        #mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 90;
+        }
+        #mobile-overlay.open {
+            display: block;
+        }
+        
+        #expand-bar {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 24px;
+            height: 100vh;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            cursor: pointer;
+            z-index: 95;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+        #expand-bar:hover {
+            background-color: var(--border-color);
+        }
+        #expand-bar::after {
+            content: "›";
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        
+        #sidebar {
+            width: 340px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            height: 100vh;
+            position: fixed;
+            top: 0; left: 0;
+            overflow-y: auto;
+            padding: 24px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transform: translateX(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+        #sidebar h2 {
+            font-size: 1.25rem;
+            margin: 0;
+            color: var(--text-color);
+        }
+        .sidebar-close-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--accent-color);
+            font-size: 1.4rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            line-height: 1;
+        }
+        .sidebar-close-btn:hover {
+            background-color: var(--border-color);
+        }
+        
+        .toc-list-container { overflow-y: auto; flex-grow: 1; }
+        
+        details.book-group {
+            margin-bottom: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            background-color: var(--sidebar-bg);
+        }
+        details.book-group[open] { border-color: var(--accent-color); }
+        details.book-group summary {
+            font-weight: bold; font-size: 1.05rem; cursor: pointer; padding: 10px 14px;
+            background-color: var(--sidebar-bg); list-style: none; display: flex;
+            justify-content: space-between; align-items: center; user-select: none;
+        }
+        details.book-group summary::-webkit-details-marker { display: none; }
+        details.book-group summary::after { content: "▾"; font-size: 0.9rem; color: var(--accent-color); }
+        details.book-group[open] summary::after { transform: rotate(180deg); }
+        
+        .toc-sublist-container {
+            background-color: var(--bg-color);
+            border-top: 1px solid var(--border-color);
+        }
+        .toc-group-title {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            padding: 8px 14px 4px 14px;
+            line-height: 1.3;
+        }
+        .toc-sublist { list-style: none; padding: 4px 14px 8px 14px; margin: 0; }
+        .toc-sublist li { margin-bottom: 8px; font-size: 0.88rem; }
+        
+        .toc-sublist a { 
+            color: var(--text-color); 
+            text-decoration: none; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding: 4px; 
+        }
+        .toc-sublist a:hover { color: var(--accent-color); }
+        .toc-page {
+            color: var(--muted-text);
+            font-size: 0.8rem;
+            font-family: var(--font-serif);
+        }
+        
+        #main {
+            margin-left: 340px;
+            flex-grow: 1;
+            padding: 180px 40px 40px 40px;
+            box-sizing: border-box;
+            width: calc(100% - 340px);
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        padding-top 0.3s ease;
+        }
+        
+        header {
+            position: fixed;
+            top: 0;
+            left: 340px;
+            right: 0;
+            background-color: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px 40px;
+            z-index: 50;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transform: translateY(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        left 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        background-color 0.2s, 
+                        box-shadow 0.2s;
+        }
+        header.header-hidden {
+            transform: translateY(-100%);
+            box-shadow: none !important;
+        }
+        body.scrolled header {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        [data-theme="dark"] body.scrolled header {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .header-top { display: flex; align-items: center; gap: 20px; }
+        header h1 { margin: 0; font-size: 1.8rem; color: var(--accent-color); line-height: 1.2; }
+        
+        .controls-group {
+            display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+        }
+        .btn {
+            background-color: var(--sidebar-bg); color: var(--text-color);
+            border: 1px solid var(--border-color); padding: 8px 14px;
+            font-family: inherit; cursor: pointer; border-radius: 6px;
+            font-size: 0.9rem; font-weight: bold; transition: all 0.2s; white-space: nowrap;
+        }
+        .btn:hover { background-color: var(--border-color); }
+        .btn.active { background-color: var(--accent-color); color: white; border-color: var(--accent-color); }
+        .btn-layout { background-color: var(--bg-color); border: 2px solid var(--accent-color); color: var(--accent-color); }
+        
+        .menu-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+            white-space: nowrap;
+        }
+        .menu-toggle:hover {
+            background-color: var(--text-color);
+        }
+        
+        .options-toggle {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 6px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            width: 38px;
+            height: 38px;
+            transition: all 0.2s;
+        }
+        .options-toggle:hover {
+            background-color: var(--sidebar-bg);
+        }
+
+        #book-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            column-gap: 48px;
+            row-gap: 0;
+            margin: 0 auto;
+            max-width: 140ch;
+            width: 100%;
+        }
+        
+        body.sidebar-closed #expand-bar {
+            display: flex;
+        }
+        body.sidebar-closed #sidebar {
+            transform: translateX(-340px);
+        }
+        body.sidebar-closed #main {
+            margin-left: 24px;
+            width: calc(100% - 24px);
+        }
+        body.sidebar-closed header {
+            left: 24px;
+        }
+        
+        body.hide-original #book-content { 
+            grid-template-columns: 1fr; 
+            max-width: 140ch;
+        }
+        body.hide-original .original-col { display: none; }
+        body.hide-original .bilingual-header { grid-template-columns: 1fr; }
+        body.hide-original .original-title { display: none; }
+        body.hide-original .translation-col {
+            max-width: 100% !important;
+            justify-self: stretch !important;
+        }
+
+        .bilingual-header {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px; position: sticky; top: 0;
+            background-color: var(--bg-color); padding: 16px 0;
+            border-bottom: 2px solid var(--accent-color); z-index: 10;
+            font-weight: bold; text-transform: uppercase; font-size: 0.85rem;
+            letter-spacing: 0.05em; color: var(--muted-text);
+        }
+        
+        .chapter-anchor {
+            display: block;
+            scroll-margin-top: 180px;
+        }
+        
+        .page-divider {
+            grid-column: 1 / -1;
+            border-bottom: 1px solid var(--border-color);
+            padding-top: 48px; padding-bottom: 12px; margin-bottom: 24px;
+            font-size: 0.95rem; color: var(--accent-color); text-transform: uppercase;
+            letter-spacing: 0.05em; font-weight: bold; 
+            scroll-margin-top: 180px;
+        }
+        
+        .page-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--accent-color);
+            transition: color 0.2s, border-bottom-color 0.2s;
+        }
+        .page-link:hover {
+            color: var(--text-color);
+            border-bottom-color: var(--text-color);
+        }
+        
+        .column { 
+            box-sizing: border-box; 
+            padding-bottom: 24px; 
+            display: flex; 
+            flex-direction: column; 
+            max-width: 65ch;
+            width: fit-content;
+            min-width: 0;
+        }
+        
+        .original-col {
+            justify-self: end;
+        }
+        .translation-col {
+            justify-self: start;
+        }
+        
+        .passage { 
+            margin: 0 0 1.2em 0; 
+            font-size: 1.15rem; 
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 1.5rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .passage-text {
+            flex: 1;
+            min-width: 0;
+            text-align: justify;
+        }
+        .passage.indent .passage-text { text-indent: 2em; }
+        .marker { color: var(--accent-color); font-weight: bold; margin-right: 4px; }
+        .line-number { 
+            color: var(--muted-text); 
+            font-size: 0.85em; 
+            font-weight: normal; 
+            user-select: none;
+            margin-left: auto;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+        i { font-style: italic; }
+
+        /* Floating popover trigger styling */
+        #ai-selection-popup {
+            position: fixed;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 14px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1005;
+            display: none;
+            font-family: var(--font-serif);
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.1s ease;
+        }
+        #ai-selection-popup:hover {
+            transform: scale(1.05);
+        }
+
+        /* Resizable sliding Right Chat Sidebar */
+        #chat-sidebar {
+            width: 380px;
+            min-width: 280px;
+            max-width: 85vw;
+            background-color: var(--sidebar-bg);
+            border-left: 1px solid var(--border-color);
+            height: 100vh;
+            height: 100dvh;
+            position: fixed;
+            top: 0; right: 0;
+            transform: translateX(100%);
+            overflow: visible;
+            display: flex;
+            flex-direction: column;
+            z-index: 110;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-sizing: border-box;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.05);
+        }
+        body.chat-sidebar-open #chat-sidebar {
+            transform: translateX(0);
+        }
+        
+        /* Draggable Resize Handle */
+        #chat-resize-handle {
+            width: 8px;
+            height: 100%;
+            position: absolute;
+            left: -4px;
+            top: 0;
+            cursor: ew-resize;
+            z-index: 120;
+            background-color: transparent;
+            transition: background-color 0.2s;
+        }
+        #chat-resize-handle:hover,
+        #chat-sidebar.resizing #chat-resize-handle {
+            background-color: var(--accent-color);
+            opacity: 0.5;
+        }
+        
+        .chat-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-header h3 { margin: 0; font-size: 1.1rem; color: var(--accent-color); }
+        
+        .chat-header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .chat-context-card {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+        .chat-context-card h4 { margin: 0 0 6px 0; color: var(--accent-color); }
+        .chat-context-card p { 
+            margin: 0; 
+            font-style: italic; 
+            display: -webkit-box; 
+            -webkit-line-clamp: 3; 
+            -webkit-box-orient: vertical; 
+            overflow: hidden; 
+            line-height: 1.4;
+        }
+        
+        .chat-message {
+            max-width: 85%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        
+        /* Render styles for AI Markdown elements in chat boxes */
+        .chat-message p { margin: 0 0 8px 0; line-height: 1.5; }
+        .chat-message p:last-child { margin-bottom: 0; }
+        .chat-message strong { font-weight: bold; }
+        .chat-message em { font-style: italic; }
+        .chat-message ul, .chat-message ol { margin: 4px 0 8px 16px; padding: 0; }
+        .chat-message li { margin-bottom: 4px; font-size: 0.92rem; }
+        .chat-message h1, .chat-message h2, .chat-message h3, .chat-message h4, .chat-message h5 {
+            color: var(--accent-color);
+            margin: 12px 0 6px 0;
+            line-height: 1.3;
+        }
+        .chat-message h3 { font-size: 1.15rem; }
+        .chat-message h4 { font-size: 1.05rem; }
+        .chat-message h5 { font-size: 0.95rem; }
+        .chat-message blockquote {
+            border-left: 3px solid var(--accent-color);
+            margin: 8px 0;
+            padding-left: 10px;
+            color: var(--muted-text);
+            font-style: italic;
+        }
+        .chat-message pre {
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.85rem;
+            margin: 8px 0;
+        }
+        .chat-message code {
+            font-family: monospace;
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: var(--accent-color);
+        }
+        
+        .chat-message.user {
+            background-color: var(--accent-color);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .chat-message.user:hover {
+            filter: brightness(1.15);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        /* Override light-colored syntax highlights in dark bubbles */
+        .chat-message.user code {
+            color: #ff8a80;
+            background-color: rgba(0,0,0,0.2);
+            border-color: rgba(0,0,0,0.1);
+        }
+        .chat-message.user pre {
+            background-color: rgba(0,0,0,0.2);
+            border-color: rgba(0,0,0,0.1);
+            color: white;
+        }
+        
+        .chat-message.assistant {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .chat-message.system-error {
+            background-color: #fce8e6;
+            color: #c5221f;
+            border: 1px solid #fad2cf;
+            align-self: center;
+            max-width: 95%;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+        
+        [data-theme="dark"] .chat-message.system-error {
+            background-color: #371d1d;
+            color: #f28b82;
+            border-color: #5c2424;
+        }
+
+        .chat-input-area {
+            padding: 16px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 8px;
+            background-color: var(--sidebar-bg);
+            flex-shrink: 0;
+        }
+        .chat-input-area textarea {
+            flex-grow: 1;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 10px;
+            border-radius: 6px;
+            resize: none;
+            height: 42px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+        }
+        .chat-input-area button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .chat-input-area button:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* Modal Config Dialog */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-content {
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            padding: 24px;
+            box-sizing: border-box;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 12px;
+        }
+        .modal-header h3 { margin: 0; font-size: 1.25rem; color: var(--accent-color); }
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group label {
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        .form-control {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 14px;
+        }
+
+        @media (max-width: 900px) {
+            #sidebar { transform: translateX(-100%); width: 320px; }
+            body.sidebar-open #sidebar { transform: translateX(0); }
+            body.sidebar-closed #sidebar { transform: translateX(-100%); }
+            
+            #chat-sidebar {
+                width: 100% !important;
+                right: 0;
+                transform: translateX(100%);
+                height: 100vh;
+                height: 100dvh;
+            }
+            body.chat-sidebar-open #chat-sidebar {
+                transform: translateX(0);
+            }
+            #chat-resize-handle {
+                display: none;
+            }
+            
+            #main { 
+                margin-left: 0 !important; 
+                width: 100% !important; 
+                padding: 100px 20px 20px 20px !important;
+            }
+            body.mobile-options-open #main {
+                padding-top: 150px !important;
+            }
+            
+            header {
+                padding-bottom: 12px;
+                margin-bottom: 16px;
+                gap: 8px;
+            }
+            header h1 { 
+                font-size: 0.95rem !important;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                text-align: center;
+                flex-grow: 1;
+                margin: 0;
+            }
+            
+            header {
+                left: 0 !important;
+                padding: 12px 16px;
+            }
+            
+            .header-top { 
+                display: flex;
+                flex-direction: row !important;
+                align-items: center; 
+                justify-content: space-between; 
+                width: 100%;
+                gap: 12px; 
+            }
+            
+            .menu-toggle { 
+                width: auto !important; 
+                padding: 6px 12px;
+                font-size: 0.85rem;
+            }
+            
+            .options-toggle {
+                display: inline-flex;
+            }
+            
+            .controls-group {
+                display: none;
+                width: 100%;
+                justify-content: center;
+                padding-top: 12px;
+                border-top: 1px dashed var(--border-color);
+            }
+            header.options-open .controls-group {
+                display: flex;
+            }
+            
+            #book-content { grid-template-columns: 1fr; column-gap: 0; max-width: 100%; }
+            .column { max-width: 100% !important; width: 100% !important; }
+            .bilingual-header { display: none; }
+            .page-divider { padding-top: 32px; scroll-margin-top: 110px; }
+            .chapter-anchor { scroll-margin-top: 110px; }
+            .passage { font-size: 1.05rem; }
+        }
+        
+        @media (min-width: 901px) {
+            .menu-toggle {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="mobile-overlay" onclick="toggleSidebar()"></div>
+
+    <div id="expand-bar" onclick="toggleSidebar()" title="Ανάπτυξη Περιεχομένων"></div>
+
+    <aside id="sidebar">
+        <div class="sidebar-header">
+            <h2>Πίνακας Περιεχομένων</h2>
+            <button class="sidebar-close-btn" onclick="toggleSidebar()" title="Σύμπτυξη">‹</button>
+        </div>
+        <div class="toc-list-container">
+            <details class="book-group">
+    <summary>ΒΙΒΛΙΟΝ Α</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-1-chapter-1" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1</span> <span class="toc-page">#1</span></a></li>
+            <li><a href="#book-1-chapter-1-2" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.2</span> <span class="toc-page">#2</span></a></li>
+            <li><a href="#book-1-chapter-1-3" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.3</span> <span class="toc-page">#3</span></a></li>
+            <li><a href="#book-1-chapter-1-4" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.4</span> <span class="toc-page">#4</span></a></li>
+            <li><a href="#book-1-chapter-1-5" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.5</span> <span class="toc-page">#5</span></a></li>
+        </ul>
+    </div>
+</details>
+        </div>
+    </aside>
+
+    <!-- AI Right Chat Sidebar -->
+    <aside id="chat-sidebar">
+        <div id="chat-resize-handle"></div>
+        <div class="chat-header">
+            <h3>AI Assistant</h3>
+            <div class="chat-header-actions">
+                <button class="btn" style="padding: 4px 8px; font-size: 0.8rem;" onclick="clearChat()">Clear</button>
+                <button class="sidebar-close-btn" style="width: 28px; height: 28px; font-size: 1.1rem;" onclick="toggleChatSidebar()" title="Κλείσιμο">›</button>
+            </div>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <!-- Active Context Card -->
+            <div class="chat-context-card" id="chat-context-card">
+                <h4>Επιλεγμένο Κείμενο</h4>
+                <p id="chat-context-text"></p>
+            </div>
+            <!-- Messages stream here -->
+        </div>
+        <div class="chat-input-area">
+            <textarea id="chat-input" placeholder="Ρωτήστε κάτι για το επιλεγμένο κείμενο..." onkeydown="handleChatKeyDown(event)"></textarea>
+            <button id="chat-send-btn" onclick="sendChatMessage()">Send</button>
+        </div>
+    </aside>
+
+    <!-- Floating Popover Trigger -->
+    <button id="ai-selection-popup"><span style="font-size: 1.1rem;">✨</span> Ask AI</button>
+
+    <!-- Settings Configuration Modal -->
+    <div id="ai-config-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Ρυθμίσεις LLM / AI</h3>
+                <button class="sidebar-close-btn" style="width: 28px; height: 28px; font-size: 1.1rem;" onclick="closeAiSettings()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="ai-provider">Πάροχος (Provider)</label>
+                    <select id="ai-provider" class="form-control" onchange="handleProviderChange()">
+                        <option value="openai">OpenAI (ChatGPT)</option>
+                        <option value="anthropic">Anthropic (Claude)</option>
+                        <option value="gemini">Google Gemini</option>
+                        <option value="openrouter">OpenRouter</option>
+                        <option value="custom">Custom Endpoint (Ollama / Local)</option>
+                    </select>
+                </div>
+                <div class="form-group" id="group-custom-url" style="display: none;">
+                    <label for="ai-custom-url">Base URL</label>
+                    <input type="text" id="ai-custom-url" class="form-control" placeholder="http://localhost:11434/v1/chat/completions">
+                </div>
+                <div class="form-group">
+                    <label for="ai-key">API Key</label>
+                    <input type="password" id="ai-key" class="form-control" placeholder="Εισάγετε το API Key">
+                </div>
+                <div class="form-group">
+                    <label for="ai-model">Μοντέλο (Model Name)</label>
+                    <input type="text" id="ai-model" class="form-control" placeholder="π.χ. gpt-4o-mini">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeAiSettings()">Άκυρο</button>
+                <button class="btn active" onclick="saveAiSettings()">Αποθήκευση</button>
+            </div>
+        </div>
+    </div>
+
+    <main id="main">
+        <header>
+            <div class="header-top">
+                <button class="btn menu-toggle" onclick="toggleSidebar()">☰ Περιεχόμενα</button>
+                <h1>ΓΟΡΓΙΑΣ Ὑπὲρ Παλαμήδους ἀπολογία</h1>
+                <button class="btn options-toggle" onclick="toggleMobileOptions()" title="Ρυθμίσεις">⚙️</button>
+            </div>
+            
+            <div class="controls-group">
+                <button id="toggle-layout-btn" class="btn btn-layout" onclick="toggleLayout()">Hide Original</button>
+                <button class="btn" style="border-color: var(--accent-color);" onclick="openAiSettings()">⚙️ AI Config</button>
+                <button class="btn active theme-btn" id="theme-light" onclick="setTheme('light', this)">Light</button>
+                <button class="btn theme-btn" id="theme-sepia" onclick="setTheme('sepia', this)">Sepia</button>
+                <button class="btn theme-btn" id="theme-dark" onclick="setTheme('dark', this)">Dark</button>
+            </div>
+        </header>
+
+        <section id="book-content">
+            <div class="bilingual-header">
+                <div class="original-title">Αρχαία Ελληνικά (Original)</div>
+                <div class="translation-title">Νέα Ελληνικά (Translation)</div>
+            </div>
+
+            
+        <div id="book-1-chapter-1" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-1" data-hash="book-1-chapter-1">
+            ΒΙΒΛΙΟΝ Α • Κεφάλαιο 1 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=36&page=1" target="_blank" class="page-link">Page 1</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[1]</span> Ἡ μὲν κατηγορία καὶ ἡ ἀπολογία ‹καὶ ἡ› κρίσις οὐ περὶ θανάτου γίγνεται· θάνατον μὲν γὰρ ἡ φύσις φανερᾷ τῇ ψήφῳ πάντων κατεψηφίσατο τῶν θνητῶν, ᾗπερ ἡμέρᾳ ἐγένετο· περὶ δὲ τῆς ἀτιμίας καὶ τῆς τιμῆς ὁ κίνδυνός ἐστι, πότερά με χρὴ δικαίως ἀποθανεῖν ἢ μετ᾽ ὀνειδῶν μεγίστων καὶ τῆς αἰσχίστης αἰτίας βιαίως ἀποθανεῖν. <span class="marker">[2]</span> δισσῶν δὲ τούτων ὄντων τοῦ μὲν ὅλου ὑμεῖς κρατεῖτε, τοῦ δ᾽ ἐγώ, τῆς μὲν δίκης ἐγώ, τῆς δὲ βίας ὑμεῖς. ἀποκτεῖναι γάρ με δυνήσεσθε βουλόμενοι ῥᾳδίως· κρατεῖτε γὰρ καὶ τούτων, ὧν οὐδὲν ἐγὼ τυγχάνω κρατῶν. <span class="marker">[3]</span> εἰ μὲν οὖν ὁ κατήγορος Ὀδυσσεὺς ἢ σαφῶς ἐπιστάμενος προδιδόντα με τὴν Ἑλλάδα τοῖς βαρβάροις ἢ δοξάζων γ᾽ ἁμῆ οὕτω ταῦτα ἔχειν ἐποιεῖτο τὴν κατηγορίαν δι᾽ εὔνοιαν τῆς Ἑλλάδος, ἄριστος ἂν ἦν ὁ ἀνήρ· πῶς γὰρ ‹οὔχ›, ὅς γε σῴζει πατρίδα, τοκέας, τὴν πᾶσαν Ἑλλάδα, ἔτι δὲ πρὸς τούτοις τὸν ἀδικοῦντα τιμωρούμενος; εἰ δὲ φθόνῳ ἢ κακοτεχνίᾳ ἢ πανουργίᾳ συνέθηκε ταύτην τὴν αἰτίαν, ὥσπερ δι᾽ ἐκεῖνα κράτιστος ἂν ἦν ἀνήρ, οὕτω διὰ ταῦτα κάκιστος ἂν εἴη.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[4]</span> περὶ τούτων λέγων δὲ πόθεν ἄρξωμαι; τί δὲ πρῶτον εἴπω; ποῖ δὲ τῆς ἀπολογίας τράπωμαι; αἰτία γὰρ ἀνεπίδεικτος ἔκπληξιν ἐμφανῆ ἐμποιεῖ, διὰ δὲ τὴν ἔκπληξιν ἀπορεῖν ἀνάγκη τῷ λόγῳ, ἂν μή τι παρ᾽ αὐτῆς τῆς ἀληθείας καὶ τῆς παρούσης ἀνάγκης μάθω, διδασκάλων ἐπικινδυνοτέρων ἢ ποριμωτέρων τυχών. <span class="marker">[5]</span> ὅτι μὲν οὖν οὐ σαφῶς ‹εἰδὼς› ὁ κατήγορος κατηγορεῖ μου, σαφῶς οἶδα· σύνοιδα γὰρ ἐμαυτῷ σαφῶς οὐδὲν τοιοῦτον πεποιηκὼς οὐδ᾽ ἔοιχ᾽ ὅπως ἂν εἰδείη τις ὂν τὸ μὴ γενόμενον. εἰ δὲ οἰόμενος οὕτω ταῦτα ἔχειν ἐποιεῖτο τὴν κατηγορίαν, οὐκ ἀληθῆ λέγειν διὰ δισσῶν ὑμῖν ἐπιδείξω τρόπων· οὔτε γὰρ βουληθεὶς ἐδυνάμην ἂν οὔτε δυνάμενος ἐβουλήθην ἔργοις ἐπιχειρεῖν τοιούτοις.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[6]</span> ἐπὶ τοῦτον δὲ τὸν λόγον εἶμι πρῶτον, ὡς ἀδύνατός εἰμι τοῦτο πράττειν. ἔδει γάρ τινα πρῶτον ἀρχὴν γενέσθαι τῆς προδοσίας, ἡ δὲ ἀρχὴ λόγος ἂν εἴη· πρὸ γὰρ τῶν μελλόντων ἔργων ἀνάγκη λόγους γίνεσθαι πρότερον. λόγοι δὲ πῶς ἂν γένοιντο μὴ συνουσίας τινὸς γενομένης; συνουσία δὲ τίνα τρόπον γένοιτ᾽ ἂν μήτ᾽ ἐκείνου πρὸς ἐμὲ πέμψαντος μήτε ἐμοῦ πρὸς ἐκεῖνον ἐλθόντος; οὐδὲ παραγγελία διὰ γραμμάτων ἀφῖκται ἄνευ τοῦ φέροντος. <span class="marker">[7]</span> ἀλλὰ δὴ τοῦτο τῷ λόγῳ δυνατὸν γενέσθαι. καὶ δὴ τοίνυν σύνειμι καὶ σύνεστι κἀκεῖνος ἐμοὶ κἀκείνῳ ἐγώ — τίνα τρόπον; τίνι τίς ὤν; Ἕλλην βαρβάρῳ. πῶς ἀκούων καὶ λέγων; πότερα μόνος μόνῳ; ἀλλ᾽ ἀγνοήσομεν τοὺς ἀλλήλων λόγους. ἀλλὰ μεθ᾽ ἑρμηνέως; τρίτος ἄρα μάρτυς γίνεται τῶν κρύπτεσθαι δεομένων. <span class="marker">[8]</span> ἀλλὰ δὴ καὶ τοῦτο γενέσθω, καίπερ οὐ γενόμενον. ἔδει δὲ μετὰ τούτους πίστιν δοῦναι καὶ δέξασθαι. τίς οὖν ἂν ἦν ἡ πίστις; πότερον ὅρκος; τίς οὖν ἐμοὶ τῷ προδότῃ πιστεύειν ἔμελλεν; ἀλλ᾽ ὅμηροι; τίνες; οἷον ἐγὼ τὸν ἀδελφὸν ἔδωκ᾽ ἄν (οὐ γὰρ εἶχον ἄλλον), ὁ δὲ βάρβαρος τῶν υἱέων τινά· πιστότατα γὰρ ἂν ἦν οὕτως ἐμοί τε παρ᾽ ἐκείνου ἐκείνῳ τε παρ᾽ ἐμοῦ. ταῦτα δὲ γινόμενα πᾶσιν ὑμῖν ἂν ἦν φανερά. <span class="marker">[9]</span> φήσει τις ὡς χρήμασι τὴν πίστιν ἐποιούμεθα, ἐκεῖνος μὲν διδούς, ἐγὼ δὲ λαμβάνων. πότερον οὖν ὀλίγοις; ἀλλ᾽ οὐκ εἰκὸς ἀντὶ μεγάλων ὑπουργημάτων ὀλίγα χρήματα λαμβάνειν. ἀλλὰ πολλοῖς; τίς οὖν ἦν ἡ κομιδή; πῶς δ᾽ ἂν ‹εἷς› ἐκόμισεν; ἢ πολλοί; πολλῶν γὰρ κομιζόντων πολλοὶ ἂν ἦσαν μάρτυρες τῆς ἐπιβουλῆς, ἑνὸς δὲ κομίζοντος οὐκ ἂν πολύ τι τὸ φερόμενον ἦν. <span class="marker">[10]</span> πότερα δὲ ἐκόμισαν ἡμέρας ἢ νυκτός; ἀλλὰ ‹νυκτὸς› πολλαὶ καὶ πυκναὶ φυλακαί, δι᾽ ὧν οὐκ ἔστι λαθεῖν. ἀλλ᾽ ἡμέρας; ἀλλά γε τὸ φῶς πολεμεῖ τοῖς τοιούτοις. εἶεν. ἐγὼ δ᾽ ἐξελθὼν ἐδεξάμην, ἢ ἐκεῖνος ὁ φέρων εἰσῆλθεν; ἀμφότερα γὰρ ἄπορα. λαβὼν δὲ δὴ πῶς ἂν ἔκρυψα καὶ τοὺς ἔνδον καὶ τοὺς ἔξω; ποῦ δ᾽ ἂν ἔθηκα; πῶς δ᾽ ἂν ἐφύλαξα; χρώμενος δ᾽ ἂν φανερὸς ἐγενόμην, μὴ χρώμενος δὲ τί ἂν ὠφελούμην ἀπ᾽ αὐτῶν;</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[1]</span> Η κατηγορία και η υπεράσπιση και η απόφαση δεν αφορούν εδώ μια καταδίκη σε θάνατο· γιατί η φύση έχει φανερά καταδικάσει σε θάνατο όλους τους θνητούς από την ημέρα που γεννήθηκαν· αλλά πρόκειται για ζήτημα ατίμωσης ή τιμής, αν πρέπει να πεθάνω ως άνθρωπος δίκαιος ή να πεθάνω βίαια μέσα στη μεγαλύτερη καταισχύνη και κάτω από την απεχθέστερη κατηγορία. <span class="marker">[2]</span> Από τα δύο λοιπόν αυτά, εσείς υπερισχύετε ολοκληρωτικά ως προς το ένα, ενώ εγώ ως προς το άλλο: εγώ ως προς το δίκιο, εσείς ως προς τη βία· γιατί εύκολα θα μπορέσετε να με σκοτώσετε, αν το θελήσετε· αφού εσείς εξουσιάζετε και εκείνα στα οποία δεν έχω καμιάν εξουσία. <span class="marker">[3]</span> Λοιπόν: αν ο κατήγορος μου Οδυσσέας με κατηγορούσε —από αγάπη για την Ελλάδα— είτε με σαφή γνώση ότι εγώ πρόδωσα την Ελλάδα στους βαρβάρους, είτε έχοντας κάπως σχηματίσει τη γνώμη ότι έτσι έχουν τα πράγματα, ο άνθρωπος θα ήταν έξοχος· τί άλλο να πει κανείς για κάποιον που σώζει την πατρίδα του, τους προγόνους και την Ελλάδα ολόκληρη, και επιπλέον τιμωρεί αυτόν που προξένησε κακό; Αν όμως κατασκεύασε την κατηγορία αυτή από φθόνο, δολιότητα ή πανουργία, τότε όπως στην πρώτη περίπτωση θα ήταν ο πιο σπουδαίος άνθρωπος, έτσι σε τούτη θα είναι ο χειρότερος.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[4]</span> Από πού να αρχίσω να μιλώ γι᾽ αυτά; Και τί να πω πρώτα; Ποιά κατεύθυνση να δώσω στην υπεράσπισή μου; Γιατί μια κατηγορία χωρίς αποδείξεις προκαλεί προφανή κατάπληξη, και η κατάπληξη το να μην ξέρει κανείς τί να πει· εκτός αν το μάθω από την ίδια την αλήθεια και την τωρινή ανάγκη, δασκάλους πιο επικίνδυνους παρά επινοητικούς. <span class="marker">[5]</span> Ότι ο κατήγορος με κατηγορεί χωρίς να έχει σαφή γνώση, το γνωρίζω σαφώς· γιατί έχω σαφή συνείδηση ότι δεν έχω κάνει τίποτα τέτοιο· ούτε καταλαβαίνω πώς μπορεί κανείς να γνωρίζει ως γεγονός κάτι που δεν έχει γίνει. Αν όμως διατύπωσε την κατηγορία νομίζοντας πως έτσι έχουν τα πράγματα, θα σας αποδείξω με δύο τρόπους ότι δεν λέει την αλήθεια· γιατί ούτε αν ήθελα θα μπορούσα, ούτε αν μπορούσα θα ήθελα να κάνω τέτοιες πράξεις.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[6]</span> Θα στραφώ πρώτα στο ακόλουθο επιχείρημα: ότι δεν ήταν για μένα δυνατόν να κάνω την πράξη αυτή. Γιατί έπρεπε πρώτα να υπάρξει μια αρχή της προδοσίας, και η αρχή αυτή θα ήταν λόγος, αφού πριν από τις μελλούμενες πράξεις πρέπει να προηγηθούν λόγοι. Πώς όμως θα μπορούσαν να υπάρξουν λόγοι αν δεν υπήρξε κάποια συνάντηση; Και με ποιόν τρόπο θα μπορούσε να υπάρξει συνάντηση αν ούτε εκείνος έστειλε αγγελιαφόρους σ᾽ εμένα ούτε εγώ πήγα σ᾽ εκείνον; Ούτε φτάνει παραγγελία με γράμμα χωρίς κάποιος να το μεταφέρει. <span class="marker">[7]</span> Αλλά θεωρητικά μπορεί τούτο να έγινε. Έστω λοιπόν ότι εκείνος συναντά εμένα και εγώ συναντώ εκείνον — με ποιόν τρόπο; Όντας τί ο καθένας για τον άλλον; Έλληνας ο ένας, βάρβαρος ο άλλος. Πώς θα ακούει ή θα μιλάει ο καθένας; Μόνοι μας μήπως; Μα τότε δεν θα ξέρει ο ένας τί λέει ο άλλος. Μήπως με διερμηνέα; Μα έτσι, τότε, θα υπάρχει ένας τρίτος, μάρτυρας γι᾽ αυτά που πρέπει να μένουν κρυφά. <span class="marker">[8]</span> Αλλά ας δεχτούμε ότι και αυτό συνέβη, παρόλο που δεν έχει συμβεί. Θα έπρεπε, κατόπιν, αυτοί οι δυο να δώσουν και να πάρουν εγγυήσεις. Ποιά λοιπόν θα ήταν η εγγύηση; Μήπως ο όρκος; Μα ποιός επρόκειτο να εμπιστευτεί εμένα τον προδότη; Μήπως όμηροι; Ποιοί; Εγώ λ.χ. θα μπορούσα να παραδώσω ως όμηρο τον αδερφό μου —αφού δεν είχα και άλλον— και ο βάρβαρος κάποιον από τους γιους του· γιατί με αυτόν τον τρόπο θα είχαμε ασφαλέστερες εγγυήσεις και εγώ από εκείνον και εκείνος από μένα. Μα αν είχαν συμβεί αυτά θα ήσαν φανερά σε όλους σας. <span class="marker">[9]</span> Θα πει ίσως κάποιος ότι η εγγύηση ήσαν χρήματα που εκείνος έδωσε και εγώ πήρα. Τί λοιπόν, λίγα; Μα δεν είναι εύλογο για μεγάλες υπηρεσίες να πάρει κανείς λίγα χρήματα. Μήπως πολλά; Πώς λοιπόν έγινε η μεταφορά τους; Πώς τα μετέφερε ένας άνθρωπος μόνος του; Ή μήπως ήσαν πολλοί; Μα αν ήσαν πολλοί που έκαναν τη μεταφορά, θα υπήρχαν πολλοί μάρτυρες της συνομωσίας, ενώ αν ήταν ένας, αυτό που μετέφερε δεν θα μπορούσε να είναι πολύ. <span class="marker">[10]</span> Άλλωστε πότε τα μετέφεραν, μέρα ή νύχτα; Μα τη νύχτα υπάρχουν πολλές και πυκνές φρουρές, από τις οποίες δεν μπορεί κανείς να ξεφύγει. Μήπως λοιπόν την ημέρα; Μα το φως αποτελεί βέβαια εχθρό για τέτοιες πράξεις. Ας είναι. Όμως τί, εγώ βγήκα και πήρα τα χρήματα ή ήρθε μέσα εκείνος που τα έφερε; Και τα δύο αυτά δεν στέκουν. Και αν τα πήρα, πώς θα τα έκρυβα και από τους μέσα και από τους έξω; Και πού τα έβαλα; Και πώς τα φύλαξα; Αν τα χρησιμοποιούσα θα φανερωνόμουν, αν όμως δεν τα χρησιμοποιούσα ποιό όφελος θα είχα απ᾽ αυτά;</span></p>
+        </div>
+        
+
+        <div id="book-1-chapter-1-2" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-2" data-hash="book-1-chapter-1-2">
+            ΒΙΒΛΙΟΝ Α • Κεφάλαιο 1.2 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=36&page=2" target="_blank" class="page-link">Page 2</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[11]</span> καὶ δὴ τοίνυν γενέσθω καὶ τὰ μὴ γενόμενα, συνήλθομεν, εἴπομεν, ἠκούσαμεν, χρήματα παρ᾽ αὐτῶν ἔλαβον, ἔλαθον λαβών, ἔκρυψα. ἔδει δήπου πράττειν ὧν ἕνεκα ταῦτα ἐγένετο. τοῦτο τοίνυν ἔτι τῶν εἰρημένων ἀπορώτερον. πράττων μὲν γὰρ αὐτὸς ἔπραττον ἢ μεθ᾽ ἑτέρων· ἀλλ᾽ οὐχ ἑνὸς ἡ πρᾶξις. ἀλλὰ μεθ᾽ ἑτέρων; τίνων; δηλονότι τῶν συνόντων. πότερον ἐλευθέρων ἢ δούλων; ἐλευθέροις μὲν γὰρ ὑμῖν σύνειμι. τίς οὖν ὑμῶν ξύνοιδε; λεγέτω. δούλοις δὲ πῶς οὐκ ἄπιστον; ἑκόντες ‹τε› γὰρ ἐπ᾽ ἐλευθερίᾳ χειμαζόμενοί τε δι᾽ ἀνάγκην κατηγοροῦσιν. <span class="marker">[12]</span> ἡ δὲ πρᾶξις πῶς ‹ἂν› ἐγένετο; δηλονότι τοὺς πολεμίους εἰσαγαγεῖν ἔδει κρείττονας ὑμῶν· ὅπερ ἀδύνατον. πῶς ἂν οὖν εἰσήγαγον; πότερα διὰ πυλῶν; ἀλλ᾽ οὐκ ἐμὸν ταύτας οὔτε κλῄειν οὔτε ἀνοίγειν, ἀλλ᾽ ἡγεμόνες κύριοι τούτων. ἀλλ᾽ ὑπὲρ τειχέων ‹διὰ› κλίμακος; οὔκουν ‹ἐφωράθην ἄν;› ἅπαντα γὰρ πλήρη φυλακῶν. ἀλλὰ διελὼν τοῦ τείχους; ἅπασιν ἄρα φανερὰ γένοιτο ἄν. ὑπαίθριος γὰρ ὁ βίος (στρατόπεδον γάρ) ἔστ᾽ ἐν ὅπλοις, ἐν οἷς ‹πάντες› πάντα ὁρῶσι καὶ πάντες ὑπὸ πάντων ὁρῶνται. πάντως ἄρα καὶ πάντῃ πάντα πράττειν ἀδύνατον ἦν μοι.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[13]</span> σκέψασθε κοινῇ καὶ τόδε. τίνος ἕνεκα προσῆκε βουληθῆναι ταῦτα πράττειν, εἰ μάλιστα πάντων ἐδυνάμην; οὐδεὶς γὰρ βούλεται προῖκα τοὺς μεγίστους κινδύνους κινδυνεύειν οὐδὲ τὴν μεγίστην κακότητα εἶναι κάκιστος. ἀλλ᾽ ἕνεκα τοῦ; (καὶ αὖθις πρὸς τόδ᾽ ἐπάνειμι.) πότερον ‹τοῦ› τυραννεῖν; ὑμῶν ἢ τῶν βαρβάρων; ἀλλ᾽ ὑμῶν [ἀλλ᾽] ἀδύνατον τοσούτων καὶ τοιούτων, οἷς ὑπάρχει ἅπαντα μέγιστα, προγόνων ἀρεταί, χρημάτων πλῆθος, ἀριστεῖαι, ἀλκὴ φρονημάτων, βασιλεία πόλεων. <span class="marker">[14]</span> ἀλλὰ τῶν ‹βαρβάρων›; ὁ δὲ παραδώσων τίς; ἐγὼ δὲ ποίᾳ δυνάμει παραλήψομαι Ἕλλην βαρβάρους, εἷς ὢν πολλούς; πείσας ἢ βιασάμενος; οὔτε γὰρ ἐκεῖνοι πεισθῆναι βούλοιντ᾽ ἄν, οὔτ᾽ ἐγὼ βιάσασθαι δυναίμην. ἀλλ᾽ ἴσως ἑκόντες ἑκόντι παραδώσουσιν, μισθὸν τῆς προδοσίας ἀντιδιδόντες; ἀλλά γε ταῦτα πολλῆς μωρίας καὶ πιστεῦσαι καὶ δέξασθαι· τίς γὰρ ἂν ἕλοιτο δουλείαν ἀντὶ βασιλείας, ἀντὶ τοῦ κρατίστου τὸ κάκιστον; <span class="marker">[15]</span> εἴποι τις ἂν ὅτι πλούτου καὶ χρημάτων ἐρασθεὶς ἐπεχείρησα τούτοις. ἀλλὰ χρήματα μὲν μέτρια κέκτημαι, πολλῶν δὲ οὐθὲν δέομαι· πολλῶν γὰρ δέονται χρημάτων οἱ πολλὰ δαπανῶντες, ἀλλ᾽ οὐχ οἱ κρείττονες τῶν τῆς φύσεως ἡδονῶν, ἀλλ᾽ οἱ δουλεύοντες ταῖς ἡδοναῖς καὶ ζητοῦντες ἀπὸ πλούτου καὶ μεγαλοπρεπείας τὰς τιμὰς κτᾶσθαι. τούτων δὲ ἐμοὶ πρόσεστιν οὐθέν. ὡς δ᾽ ἀληθῆ λέγω, μάρτυρα πιστὸν παρέξομαι τὸν παροιχόμενον βίον· τῷ δὲ μάρτυρι μάρτυρες ὑμεῖς ἦτε· σύνεστε γάρ μοι, διὸ σύνιστε ταῦτα. <span class="marker">[16]</span> καὶ μὴν οὐδ᾽ ἂν τιμῆς ἕνεκα τοιούτοις ἔργοις ἀνὴρ ἐπιχειρήσειε καὶ μέσως φρόνιμος. ἀπ᾽ ἀρετῆς γὰρ ἀλλ᾽ οὐκ ἀπὸ κακότητος αἱ τιμαί· προδότῃ δὲ τῆς Ἑλλάδος ἀνδρὶ πῶς ἂν γένοιτο τιμή; πρὸς δὲ τούτοις οὐδὲ τιμῆς ἐτύγχανον ἐνδεὴς ὤν· ἐτιμώμην γὰρ ἐπὶ τοῖς ἐντιμοτάτοις ὑπὸ τῶν ἐντιμοτάτων, ὑφ᾽ ὑμῶν ἐπὶ σοφίᾳ. <span class="marker">[17]</span> καὶ μὴν οὐδ᾽ ἀσφαλείας [ὧν] οὕνεκά τις ἂν ταῦτα πράξαι. πᾶσι γὰρ ὅ γε προδότης πολέμιος, τῷ νόμῳ, τῇ δίκῃ, τοῖς θεοῖς, τῷ πλήθει τῶν ἀνθρώπων· τὸν μὲν γὰρ νόμον παραβαίνει, τὴν δὲ δίκην καταλύει, τὸ δὲ πλῆθος διαφθείρει, τὸ δὲ θεῖον ἀτιμάζει. τῷ δὲ τοιούτῳ ‹ὁ› βίος περὶ κινδύνων τῶν μεγίστων οὐκ ἔχει ἀσφάλειαν. <span class="marker">[18]</span> ἀλλὰ δὴ φίλους ὠφελεῖν βουλόμενος ἢ πολεμίους βλάπτειν; καὶ γὰρ τούτων ἕνεκά τις ἂν ἀδικήσειεν. ἐμοὶ δὲ πᾶν τοὐναντίον ἐγίνετο· τοὺς μὲν φίλους κακῶς ἐποίουν, τοὺς δὲ ἐχθροὺς ὠφέλουν. ἀγαθῶν μὲν οὖν ἔγκτησιν οὐδεμίαν εἶχεν ἡ πρᾶξις· κακῶς δὲ παθεῖν οὐδὲ εἷς ἐπιθυμῶν πανουργεῖ. <span class="marker">[19]</span> τὸ δὲ λοιπόν ἐστιν, εἴ τινα φόβον ἢ πόνον ἢ κίνδυνον φεύγων ἔπραξα. ταῦτα δ᾽ οὐθεὶς ἂν εἰπεῖν ἔχοι τί μοι προσήκειν. δισσῶν γὰρ τούτων ἕνεκα πάντες πάντα πράττουσιν, ἢ κέρδος τι μετιόντες ἢ ζημίαν φεύγοντες· ὅσα δὲ τούτων ἔξω πανουργεῖται, ‹ὅτι› κακῶς ἐμαυτὸν ἐποίουν ταῦτα [γὰρ] πράττων, οὐκ ἄδηλον· προδιδοὺς γὰρ τὴν Ἑλλάδα προὐδίδουν ἐμαυτόν, τοκέας, φίλους, ἀξίωμα προγόνων, ἱερὰ πατρῷα, τάφους, πατρίδα τὴν μεγίστην τῆς Ἑλλάδος. ἃ δὲ πᾶσι περὶ παντός ἐστι, ταῦτα ἂν τοῖς ἀδικήσασιν ἐνεχείρισα. <span class="marker">[20]</span> σκέψασθε δὲ καὶ τόδε. πῶς οὐκ ἂν ἀβίωτος ἦν ὁ βίος μοι πράξαντι ταῦτα; ποῖ γὰρ τραπέσθαι με χρῆν; πότερον εἰς τὴν Ἑλλάδα; δίκην δώσοντα τοῖς ἠδικημένοις; τίς δ᾽ ἂν ἀπείχετό μου τῶν κακῶς πεπονθότων; ἀλλὰ μένειν ἐν τοῖς βαρβάροις; παραμελήσαντα πάντων τῶν μεγίστων, ἐστερημένον τῆς καλλίστης τιμῆς, ἐν αἰσχίστῃ δυσκλείᾳ διάγοντα, τοὺς ἐν τῷ παροιχομένῳ βίῳ πόνους ἐπ᾽ ἀρετῇ πεπονημένους ἀπορρίψαντα; καὶ ταῦτα δι᾽ ἐμαυτόν, ὅπερ αἴσχιστον ἀνδρί, δυστυχεῖν δι᾽ αὑτόν. <span class="marker">[21]</span> οὐ μὴν οὐδὲ παρὰ τοῖς βαρβάροις πιστῶς ἂν διεκείμην· πῶς γάρ, οἵτινες ἀπιστότατον ἔργον συνηπίσταντό μοι πεποιηκότι, τοὺς φίλους τοῖς ἐχθροῖς παραδεδωκότι; βίος δὲ οὐ βιωτὸς πίστεως ἐστερημένῳ. χρήματα μὲν γὰρ ἀποβαλὼν ‹ἢ› τυραννίδος ἐκπεσὼν ἢ τὴν πατρίδα φυγὼν ἀναλάβοι τις ἄν· ὁ δὲ πίστιν ἀποβαλὼν οὐκ ἂν ἔτι κτήσαιτο. ὅτι μὲν οὖν οὔτ᾽ ἂν ‹ἐδυνάμην βουλόμενος οὔτ᾽ ἂν δυνάμενος› ἐβουλόμην προδοῦναι τὴν Ἑλλάδα, διὰ τῶν προειρημένων δέδεικται.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[11]</span> Αλλά έστω ότι έγιναν αυτά που δεν έγιναν. Συναντηθήκαμε, μιλήσαμε, συνεννοηθήκαμε, πήρα απ᾽ αυτούς χρήματα, τα πήρα κρυφά και τα έκρυψα. Θα έπρεπε μετά να κάνω αυτά για τα οποία έγιναν όλα τούτα. Και αυτό είναι ακόμα πιο αδύνατον απ᾽ τα όσα ανέφερα προηγουμένως. Γιατί θα είχα ενεργήσει είτε μόνος μου είτε μαζί με άλλους· αλλά η πράξη αυτή χρειάζεται περισσότερους από έναν. Μαζί με άλλους λοιπόν; Με ποιούς; Με τους συντρόφους μου προφανώς. Και τί, με τους ελεύθερους ή με τους δούλους; Γιατί οι ελεύθεροι σύντροφοί μου είσαστε εσείς. Ποιός λοιπόν από σας το γνωρίζει; Ας το πει. Από την άλλη μεριά πώς να πιστέψει κανείς ότι χρησιμοποίησα δούλους; Γιατί αυτοί καταγγέλλουν και από μόνοι τους προκειμένου να κερδίσουν την ελευθερία τους, αλλά και όταν εξαναγκαστούν με βασανιστήρια. <span class="marker">[12]</span> Και η πράξη η ίδια με ποιόν τρόπο θα μπορούσε να γίνει; Προφανώς θα έπρεπε να φέρω μέσα στο στρατόπεδο δυνάμεις εχθρικές, ανώτερες από σας· πράγμα αδύνατον. Γιατί με ποιόν τρόπο θα τους έβαζα μέσα; Μήπως από τις πύλες; Μα δεν είναι στη δικαιοδοσία μου ούτε να τις κλείνω ούτε να τις ανοίγω, παρά υπάρχουν φρούραρχοι που έχουν αυτή την αρμοδιότητα. Μήπως όμως πάνω από τα τείχη με σκάλα; Μα δεν θα με έβλεπαν; Αφού παντού είναι γεμάτο φρουρές. Μήπως λοιπόν τρυπώντας το τείχος; Μα τότε θα το έβλεπαν οι πάντες. Γιατί σε καιρό πολέμου ζούμε στο ύπαιθρο —στρατόπεδο είναι— και όλοι τα βλέπουν όλα, και όλοι είναι κάτω από τα βλέμματα όλων. Επομένως μου ήταν εντελώς αδύνατον να κάνω με οποιονδήποτε τρόπο οτιδήποτε απ᾽ όλα αυτά.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[13]</span> Σκεφτείτε μαζί και τούτο: έστω και αν είχα, κατ᾽ εξαίρεση, τη δυνατότητα να τα κάνω όλα αυτά, με ποιό σκοπό θα ήθελα να τα κάνω; Γιατί κανείς δεν θέλει έτσι, χωρίς ανταμοιβή, να διατρέξει μέγιστους κινδύνους, ούτε να φορτωθεί το πιο μεγάλο από τα κρίματα. Αλλά τότε —ξαναγυρίζω τώρα σ᾽ αυτό το ζήτημα— για ποιό λόγο; Μήπως για χάρη της εξουσίας; Πάνω σε σας ή στους βαρβάρους; Μα πάνω σε σας είναι αδύνατον, αφού είσαστε τόσοι πολλοί και τόσο σπουδαίοι, αφού διαθέτετε τα πιο μεγάλα προσόντα, αρετή των προγόνων, πλήθος χρημάτων, ανδρεία, υψηλό φρόνημα, βασιλική εξουσία πάνω στις πολιτείες σας. <span class="marker">[14]</span> Μήπως πάνω στους βαρβάρους; Και ποιός θα μου την παρέδιδε; Και εγώ, ένας Έλληνας, με ποιά δύναμη θα έπαιρνα την εξουσία πάνω σε βαρβάρους, ένας εγώ από πολλούς; Με την πειθώ ή με τη βία; Γιατί ούτε εκείνοι θα ήθελαν να πεισθούν, ούτε εγώ θα μπορούσα να τους εξαναγκάσω με τη βία. Μήπως όμως επρόκειτο να την παραδώσουν πρόθυμα στη δική μου προθυμία, δίνοντας την ως αμοιβή της προδοσίας μου; Μα θα πρέπει κανείς να είναι πολύ ανόητος για να πιστέψει και να παραδεχτεί κάτι τέτοιο· ποιός θα διάλεγε τη σκλαβιά από τη βασιλεία, αντί για το μέγιστο αγαθό το χειρότερο κακό; <span class="marker">[15]</span> Μπορεί κανείς να πει ότι τα επιχείρησα αυτά από αγάπη για τον πλούτο και το χρήμα· Όμως χρήματα έχω αρκετά και δεν χρειάζομαι πολλά· πολλά χρήματα έχουν ανάγκη όσοι ξοδεύουν πολλά και όχι αυτοί που είναι υπεράνω των ηδονών της φύσης, αλλά αυτοί που είναι σκλάβοι των ηδονών και αποζητούν να αποκτήσουν δόξα από τα πλούτη και τα μεγαλεία. Τίποτε απ᾽ αυτά όμως δεν ισχύει για μένα. Και για να αποδείξω ότι λέω την αλήθεια, επικαλούμαι ως αδιάψευστο μάρτυρα τον πρότερο βίο μου· και του μάρτυρα αυτού μάρτυρες είσαστε εσείς· γιατί σύντροφοί μου είσαστε, και έτσι τα γνωρίζετε αυτά. <span class="marker">[16]</span> Αλλά ούτε για χάρη της δόξας θα επιχειρούσε κανείς τέτοιες πράξεις αν είχε λίγο μυαλό. Γιατί οι τιμές έρχονται από την αρετή, όχι από την κακία· και τί τιμή θα μπορούσε να έχει ένας προδότης της Ελλάδας; Άλλωστε δεν μου έλειπε η δόξα· γιατί με τιμούσαν οι πιο τιμημένοι για το πιο τιμημένο πράγμα: εσείς για τη σοφία μου. <span class="marker">[17]</span> Αλλά ούτε και για χάρη της ασφάλειας θα μπορούσε κανείς να τα κάνει αυτά. Γιατί ο προδότης είναι εχθρός για όλους: για το νόμο, για τη δικαιοσύνη, για τους θεούς, για τους περισσότερους ανθρώπους· αφού παραβαίνει το νόμο, καταλύει τη δικαιοσύνη, καταστρέφει πλήθος ανθρώπων και ατιμάζει το θείο. Και τούτου η ζωή είναι εκτεθειμένη στους πιο μεγάλους κινδύνους. <span class="marker">[18]</span> Μήπως όμως επιδίωκα να ωφελήσω τους φίλους μου ή να βλάψω τους εχθρούς μου; Γιατί μπορεί κανείς να κάνει άδικες πράξεις και γι᾽ αυτό. Με μένα όμως θα συνέβαινε ακριβώς το αντίθετο· θα έκανα κακό στους φίλους και θα ωφελούσα τους εχθρούς. Επομένως η πράξη μου δεν θα μου απέφερε κανένα όφελος· και κανένας δεν μηχανεύεται κάτι από επιθυμία να πάθει κακό. <span class="marker">[19]</span> Απομένει όμως να εξετάσουμε αν έκανα την πράξη για να αποφύγω κάτι φοβερό, οδυνηρό ή επικίνδυνο. Απ᾽ αυτά όμως κανείς δεν θα μπορούσε να πει ότι κάποιο ταιριάζει για την περίπτωσή μου. Όλοι κάνουν όλα όσα κάνουν για τούτα τα δύο: ή για να αποκτήσουν κάποιο κέρδος ή για να αποφύγουν κάποια ζημιά· και ό,τι μηχανεύεται κανείς έξω απ᾽ αυτά, αν το έκανα, είναι προφανές ότι θα έκανα κακό στον εαυτό μου· αφού προδίδοντας την Ελλάδα θα πρόδιδα τον εαυτό μου, τους γονείς μου, τους φίλους μου, την τιμή των προγόνων, τα πατροπαράδοτα ιερά, τους τάφους, την πιο μεγάλη πατρίδα, την Ελλάδα. Και αυτά που για όλους αποτελούν την ύψιστη αξία, αυτά θα τα είχα παραδώσει σ᾽ αυτούς που τα έβλαψαν. <span class="marker">[20]</span> Αλλά σκεφτείτε και το εξής: αν τα είχα κάνει αυτά δεν θα γινόταν αβίωτος ο βίος μου; Γιατί πού θα έπρεπε να στραφώ; Στην Ελλάδα; Να υποστώ την τιμωρία απ᾽ αυτούς που έβλαψα; Ποιός θα μου χαριζόταν απ᾽ όσους θα είχαν πάθει κακό εξαιτίας μου; Να μείνω με τους βαρβάρους; Να παραμελήσω έτσι όλα τα πιο σημαντικά πράγματα, στερημένος από τη πιο καλή δόξα, περνώντας τη ζωή μου μέσα στη χειρότερη ντροπή, πετώντας τους κόπους που κατέβαλα στην προηγούμενη ζωή μου για την αρετή; Και αυτά εξαιτίας εμού του ίδιου, πράγμα που είναι το χειρότερο για έναν άνθρωπο, να πέφτει σε δυστυχία εξαιτίας του ίδιου του εαυτού του. <span class="marker">[21]</span> Όμως ούτε και οι βάρβαροι θα μου είχαν εμπιστοσύνη· πώς, αφού θα γνώριζαν και εκείνοι ότι θα είχα διαπράξει τη μεγαλύτερη απιστία, παραδίδοντας τους φίλους μου στους εχθρούς; Και χωρίς εμπιστοσύνη, ο βίος είναι αβίωτος. Γιατί αν κανείς χάσει χρήματα ή εξουσία ή διωχτεί από τη πατρίδα του, μπορεί να τα ανακτήσει· όμως όποιος χάσει την εμπιστοσύνη των άλλων δεν μπορεί πια ξανά να την αποκτήσει. Αποδείχθηκε λοιπόν με όσα είπα ότι ούτε αν ήθελα θα μπορούσα, ούτε αν μπορούσα θα ήθελα να προδώσω την Ελλάδα.</span></p>
+        </div>
+        
+
+        <div id="book-1-chapter-1-3" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-3" data-hash="book-1-chapter-1-3">
+            ΒΙΒΛΙΟΝ Α • Κεφάλαιο 1.3 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=36&page=3" target="_blank" class="page-link">Page 3</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[22]</span> βούλομαι δὲ μετὰ ταῦτα πρὸς τὸν κατήγορον διαλεχθῆναι. τίνι ποτὲ πιστεύσας τοιοῦτος ὢν τοιούτου κατηγορεῖς; ἄξιον γὰρ καταμαθεῖν, οἷος ὢν λέγεις ὡς ἀνάξιος ἀνάξια. πότερα γάρ μου κατηγορεῖς εἰδὼς ἀκριβῶς ἢ δοξάζων; εἰ μὲν γὰρ εἰδώς, οἶσθα ἰδὼν ἢ μετέχων ἤ του ‹μετέχοντος› πυθόμενος. εἰ μὲν οὖν ἰδών, φράσον τούτοις ‹τὸν τρόπον›, τὸν τόπον, τὸν χρόνον, πότε, ποῦ, πῶς εἶδες· εἰ δὲ μετέχων, ἔνοχος εἷς ταῖς αὐταῖς αἰτίαις· εἰ δέ του μετέχοντος ἀκούσας, ὅστις ἐστίν, αὐτὸς ἐλθέτω, φανήτω, μαρτυρησάτω. πιστότερον γὰρ οὕτως ἔσται τὸ κατηγόρημα μαρτυρηθέν. ἐπεὶ νῦν γε οὐδέτερος ἡμῶν παρέχεται μάρτυρα. <span class="marker">[23]</span> φήσεις ἴσως ἴσον εἶναι τὸ σέ γε τῶν γενομένων, ὡς σὺ φῄς, μὴ παρέχεσθαι μάρτυρας, τῶν δὲ μὴ γενομένων ἐμέ. τὸ δὲ οὐκ ἴσον ἐστί· τὰ μὲν γὰρ ἀγένητα πῶς ἂν δύναιτο μαρτυρηθῆναι; περὶ δὲ τῶν γενομένων οὐ μόνον οὐκ ἀδύνατον, ἀλλὰ καὶ ῥᾴδιον, οὐδὲ μόνον ῥᾴδιον, ἀλλὰ ‹καὶ ἀναγκαῖον· ἀλλὰ› σοὶ μὲν οὐκ ἦν οἷόν ‹τε μὴ› μόνον μάρτυρας ἀλλὰ καὶ ψευδομάρτυρας εὑρεῖν, ἐμοὶ δὲ οὐδέτερον εὑρεῖν τούτων δυνατόν. <span class="marker">[24]</span> ὅτι μὲν οὖν οὐκ οἶσθα ἃ κατηγορεῖς, φανερόν· τὸ δὴ λοιπὸν ‹οὐκ› εἰδότα σε δοξάζειν. εἶτα, ὦ πάντων ἀνθρώπων τολμηρότατε, δόξῃ πιστεύσας, ἀπιστοτάτῳ πράγματι, τὴν ἀλήθειαν οὐκ εἰδώς, τολμᾷς ἄνδρα περὶ θανάτου διώκειν; ᾧ τί τοιοῦτον ἔργον εἰργασμένῳ σύνοισθα; ἀλλὰ μὴν τό γε δοξάσαι κοινὸν ἅπασι περὶ πάντων, καὶ οὐδὲν ἐν τούτῳ σὺ τῶν ἄλλων σοφώτερος. ἀλλ᾽ οὔτε τοῖς δοξάζουσι δεῖ πιστεύειν ἀλλὰ τοῖς εἰδόσιν, οὔτε τὴν δόξαν τῆς ἀληθείας πιστοτέραν νομίζειν, ἀλλὰ τἀναντία τὴν ἀλήθειαν τῆς δόξης.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[25]</span> κατηγόρησας δέ μου διὰ τῶν εἰρημένων λόγων δύο τὰ ἐναντιώτατα, σοφίαν καὶ μανίαν, ὥπερ οὐχ οἷόν τε τὸν αὐτὸν ἄνθρωπον ἔχειν. ὅπου μὲν γάρ με φῂς εἶναι τεχνήεντά τε καὶ δεινὸν καὶ πόριμον, σοφίαν μου κατηγορεῖς, ὅπου δὲ λέγεις ὡς προὐδίδουν τὴν Ἑλλάδα, μανίαν· μανία γάρ ἐστιν ἔργοις ἐπιχειρεῖν ἀδυνάτοις, ἀσυμφόροις, αἰσχροῖς, ἀφ᾽ ὧν τοὺς μὲν φίλους βλάψει, τοὺς δ᾽ ἐχθροὺς ὠφελήσει, τὸν δὲ αὑτοῦ βίον ἐπονείδιστον καὶ σφαλερὸν καταστήσει. καίτοι πῶς χρὴ ἀνδρὶ τοιούτῳ πιστεύειν, ὅστις τὸν αὐτὸν λόγον λέγων πρὸς τοὺς αὐτοὺς ἄνδρας περὶ τῶν αὐτῶν τὰ ἐναντιώτατα λέγει; <span class="marker">[26]</span> βουλοίμην δ᾽ ἂν παρὰ σοῦ πυθέσθαι, πότερον τοὺς σοφοὺς ἄνδρας νομίζεις ἀνοήτους ἢ φρονίμους. εἰ μὲν γὰρ ἀνοήτους, καινὸς ὁ λόγος, ἀλλ᾽ οὐκ ἀληθής· εἰ δὲ φρονίμους, οὐ δήπου προσήκει τούς γε φρονοῦντας ἐξαμαρτάνειν τὰς μεγίστας ἁμαρτίας καὶ μᾶλλον αἱρεῖσθαι κακὰ προχείρων ὄντων ἀγαθῶν. εἰ μὲν οὖν εἰμι σοφός, οὐχ ἥμαρτον· εἰ δ᾽ ἥμαρτον, οὐ σοφός εἰμι. οὐκοῦν δι᾽ ἀμφότερα ἂν εἴης ψευδής.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[22]</span> Μετά απ᾽ αυτά θέλω να απευθυνθώ στον κατήγορο. Σε τί δίνεις πίστη κα κατηγορείς εσύ, αυτός που είσαι, έναν άνθρωπο σαν εμένα; Γιατί αξίζει να μάθουμε ποιός είσαι εσύ που λες αυτά που λες, λόγια ανάξια από έναν ανάξιο. Τί, με κατηγορείς γνωρίζοντας με ακρίβεια ο ίδιος, ή πιστεύοντας ότι έτσι είναι; Γιατί αν γνωρίζεις, το γνωρίζεις είτε επειδή το είδες με τα μάτια σου, είτε επειδή συμμετείχες ο ίδιος, είτε από πληροφορίες κάποιου που συμμετείχε. Αν μεν το είδες με τα μάτια σου, πες σ᾽ αυτούς εδώ τον τρόπο, τον τόπο, το χρόνο, πότε, πού, πώς το είδες· αν πάλι συμμετείχες, είσαι και συ ένοχος για τις ίδιες κατηγορίες· και αν το άκουσες από κάποιον που συμμετείχε, ποιός είναι αυτός, ας έρθει ο ίδιος, ας παρουσιαστεί, ας καταθέσει ως μάρτυρας. Γιατί έτσι, με τη μαρτυρία του, η κατηγορία θα είναι πιο πειστική. Έως τώρα όμως κανείς από τους δυο μας δεν έχει παρουσιάσει κάποιον μάρτυρα. <span class="marker">[23]</span> Θα ισχυριστείς ίσως ότι το ίδιο είναι εσύ να μην προσκομίσεις μάρτυρες γι᾽ αυτά που, κατά τα λεγόμενά σου, συνέβησαν με το να μην προσκομίσω εγώ γι᾽ αυτά που δεν συνέβησαν. Όμως δεν είναι το ίδιο· γιατί γι᾽ αυτά που δεν έχουν γίνει πώς μπορούν να υπάρξουν μάρτυρες; Ενώ γι᾽ αυτά που έχουν γίνει, όχι μόνο δεν είναι αδύνατον, αλλά είναι και εύκολο, και όχι μόνο εύκολο, αλλά και απαραίτητο· αλλά εσύ δεν μπόρεσες όχι μόνο μάρτυρες αλλά ούτε ψευδομάρτυρες να βρεις, ενώ εγώ δεν ήταν δυνατόν να βρω ούτε το ένα ούτε το άλλο. <span class="marker">[24]</span> Είναι λοιπόν φανερό ότι δεν γνωρίζεις αυτά για τα οποία με κατηγορείς· απομένει λοιπόν ότι τα πιστεύεις χωρίς να τα γνωρίζεις. Όμως εσύ, θρασύτερε απ᾽ όλους τους ανθρώπους, εμπιστεύεσαι την πίστη, το πιο άπιστο πράγμα, όταν δεν γνωρίζεις την αλήθεια, και έχεις το θράσος να κατηγορείς έναν άνθρωπο για ζήτημα ζωής και θανάτου; Τί, ξέρεις ότι αυτός έκανε αυτή την πράξη; Μα ο καθένας μπορεί να έχει γνώμη για όλα τα πράγματα, και ως προς αυτό δεν είσαι εσύ πιο σοφός από τους άλλους. Δεν πρέπει όμως να εμπιστευόμαστε αυτούς που πιστεύουν, αλλά αυτούς που ξέρουν, ούτε να θεωρούμε την πίστη ως πιο αξιόπιστη από την αλήθεια, αλλά αντίθετα την αλήθεια πιο αξιόπιστη από την πίστη.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[25]</span> Εξάλλου, με τα λόγια σου με κατηγόρησες για δυο ολωσδιόλου αντίθετα πράγματα, τη σοφία και την τρέλα, τα οποία δεν είναι δυνατόν να τα έχει και τα δύο ο ίδιος άνθρωπος. Γιατί εκεί που λες ότι είμαι πολυμήχανος, επιδέξιος και επινοητικός, με κατηγορείς ότι είμαι σοφός, ενώ εκεί που λες ότι πρόδωσα την Ελλάδα, ότι είμαι τρελός· γιατί είναι τρέλα να επιχειρήσει κανείς έργα αδύνατα, ασύμφορα, αισχρά, με τα οποία θα βλάψει τους φίλους, θα ωφελήσει τους εχθρούς και θα καταστήσει την ίδια του τη ζωή επαίσχυντη και ανασφαλή. Και πώς να πιστέψει κανείς έναν άνθρωπο που στον ίδιο λόγο του, απευθυνόμενος προς τους ίδιους ανθρώπους, μιλώντας για τα ίδια πράγματα λέει τα ακριβώς αντίθετα; <span class="marker">[26]</span> Και θα ήθελα να σε ρωτήσω αν θεωρείς τους σοφούς άντρες ανόητους ή συνετούς. Γιατί αν τους θεωρείς ανόητους, αυτό που λες είναι πρωτότυπο αλλά όχι αληθινό· αν όμως συνετούς, δεν ταιριάζει βέβαια οι συνετοί να διαπράττουν τα μεγαλύτερα σφάλματα και να προτιμούν τα κακά από τα αγαθά που ήδη έχουν. Αν λοιπόν είμαι σοφός, δεν έσφαλα· και αν έσφαλα, δεν είμαι σοφός. Οπότε και στις δύο περιπτώσεις θα ψεύδεσαι.</span></p>
+        </div>
+        
+
+        <div id="book-1-chapter-1-4" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-4" data-hash="book-1-chapter-1-4">
+            ΒΙΒΛΙΟΝ Α • Κεφάλαιο 1.4 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=36&page=4" target="_blank" class="page-link">Page 4</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[27]</span> ἀντικατηγορῆσαι δέ σου πολλὰ καὶ μεγάλα καὶ παλαιὰ καὶ νέα πράσσοντος δυνάμενος οὐ βούλομαι· ‹βούλομαι› γὰρ οὐ τοῖς σοῖς κακοῖς ἀλλὰ τοῖς ἐμοῖς ἀγαθοῖς ἀποφεύγειν τὴν αἰτίαν ταύτην. πρὸς μὲν οὖν σὲ ταῦτα.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[28]</span> πρὸς δ᾽ ὑμᾶς ὦ ἄνδρες κριταὶ περὶ ἐμοῦ βούλομαι εἰπεῖν ἐπίφθονον μὲν ἀληθὲς δέ, ‹μὴ› κατηγορημένῳ μὲν οὐκ ἀνεκτά, κατηγορουμένῳ δὲ προσήκοντα. νῦν γὰρ ἐν ὑμῖν εὐθύνας καὶ λόγον ὑπέχω τοῦ παροιχομένου βίου. δέομαι οὖν ὑμῶν, ἂν ὑμᾶς ὑπομνήσω τῶν τι ἐμοὶ πεπραγμένων καλῶν, μηδένα φθονῆσαι τοῖς λεγομένοις, ἀλλ᾽ ἀναγκαῖον ἡγήσασθαι κατηγορημένον δεινὰ καὶ ψευδῆ καί τι τῶν ἀληθῶν ἀγαθῶν εἰπεῖν ἐν εἰδόσιν ὑμῖν· ὅπερ ἥδιστόν μοι. <span class="marker">[29]</span> πρῶτον μὲν οὖν καὶ δεύτερον καὶ μέγιστον, διὰ παντὸς ἀπ᾽ ἀρχῆς εἰς τέλος ἀναμάρτητος ὁ παροιχόμενος βίος ἐστί μοι, καθαρὸς πάσης αἰτίας· οὐδεὶς γὰρ ἂν οὐδεμίαν αἰτίαν κακότητος ἀληθῆ πρὸς ὑμᾶς περὶ ἐμοῦ εἰπεῖν ἔχοι. καὶ γὰρ οὐδ᾽ αὐτὸς ὁ κατήγορος οὐδεμίαν ἀπόδειξιν εἴρηκεν ὧν εἴρηκεν· οὕτως λοιδορίαν οὐκ ἔχουσαν ἔλεγχον ὁ λόγος αὐτῷ δύναται. <span class="marker">[30]</span> φήσαιμι δ᾽ ἄν, καὶ φήσας οὐκ ἂν ψευσαίμην οὐδ᾽ ἂν ἐλεγχθείην, οὐ μόνον ἀναμάρτητος ἀλλὰ καὶ μέγας εὐεργέτης ὑμῶν καὶ τῶν Ἑλλήνων καὶ τῶν ἁπάντων ἀνθρώπων, οὐ μόνον τῶν νῦν ὄντων ἀλλὰ ‹καὶ› τῶν μελλόντων, εἶναι. τίς γὰρ ἂν ἐποίησε τὸν ἀνθρώπινον βίον πόριμον ἐξ ἀπόρου καὶ κεκοσμημένον ἐξ ἀκόσμου, τάξεις τε πολεμικὰς εὑρὼν μέγιστον εἰς πλεονεκτήματα, νόμους τε γραπτοὺς φύλακας <span class="marker">[τε]</span> τοῦ δικαίου, γράμματά τε μνήμης ὄργανον, μέτρα τε καὶ σταθμὰ συναλλαγῶν εὐπόρους διαλλαγάς, ἀριθμόν τε χρημάτων φύλακα, πυρσούς τε κρατίστους καὶ ταχίστους ἀγγέλους, πεσσούς τε σχολῆς ἄλυπον διατριβήν; τίνος οὖν ἕνεκα ταῦθ᾽ ὑμᾶς ὑπέμνησα; <span class="marker">[31]</span> δηλῶν ‹μὲν› ὅτι τοῖς τοιούτοις τὸν νοῦν προσέχω, σημεῖον δὲ ποιούμενος ὅτι τῶν αἰσχρῶν καὶ τῶν κακῶν ἔργων ἀπέχομαι· τὸν γὰρ ἐκείνοις τὸν νοῦν προσέχοντα τοῖς τοιούτοις προσέχειν ἀδύνατον. ἀξιῶ δέ, εἰ μηδὲν αὐτὸς ὑμᾶς ἀδικῶ, μηδὲ αὐτὸς ὑφ᾽ ὑμῶν ἀδικηθῆναι. <span class="marker">[32]</span> καὶ γὰρ οὐδὲ τῶν ἄλλων ἐπιτηδευμάτων οὕνεκα ἄξιός εἰμι κακῶς πάσχειν, οὔθ᾽ ὑπὸ νεωτέρων οὔθ᾽ ὑπὸ πρεσβυτέρων. τοῖς μὲν γὰρ πρεσβυτέροις ἄλυπός εἰμι, τοῖς δὲ νεωτέροις οὐκ ἀνωφελής, τοῖς εὐτυχοῦσιν οὐ φθονερός, τῶν δυστυχούντων οἰκτίρμων· οὔτε πενίας ὑπερορῶν, οὐδὲ πλοῦτον ἀρετῆς ἀλλ᾽ ἀρετὴν πλούτου προτιμῶν· οὔτε ἐν βουλαῖς ἄχρηστος οὔτε ἐν μάχαις ἀργός, ποιῶν τὸ τασσόμενον, πειθόμενος τοῖς ἄρχουσιν. ἀλλὰ γὰρ οὐκ ἐμὸν ἐμαυτὸν ἐπαινεῖν· ὁ δὲ παρὼν καιρὸς ἠνάγκασε, καὶ ταῦτα κατηγορημένον, πάντως ἀπολογήσασθαι.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[33]</span> λοιπὸν δὲ περὶ ὑμῶν πρὸς ὑμᾶς ἐστί μοι λόγος, ὃν εἰπὼν παύσομαι τῆς ἀπολογίας. οἶκτος μὲν οὖν καὶ λιταὶ καὶ φίλων παραίτησις ἐν ὄχλῳ μὲν οὔσης τῆς κρίσεως χρήσιμα· παρὰ δ᾽ ὑμῖν τοῖς πρώτοις οὖσι τῶν Ἑλλήνων καὶ δοκοῦσιν, οὐ φίλων βοηθείαις οὐδὲ λιταῖς οὐδὲ οἴκτοις δεῖ πείθειν ὑμᾶς, ἀλλὰ τῷ σαφεστάτῳ δικαίῳ, διδάξαντα τἀληθές, οὐκ ἀπατήσαντά με δεῖ διαφυγεῖν τὴν αἰτίαν ταύτην. <span class="marker">[34]</span> ὑμᾶς δὲ χρὴ μὴ τοῖς λόγοις μᾶλλον ἢ τοῖς ἔργοις προσέχειν τὸν νοῦν, μηδὲ τὰς αἰτίας τῶν ἐλέγχων προκρίνειν, μηδὲ τὸν ὀλίγον χρόνον τοῦ πολλοῦ σοφώτερον ἡγεῖσθαι κριτήν, μηδὲ τὴν διαβολὴν τῆς πείρας πιστοτέραν νομίζειν. ἅπαντα γὰρ τοῖς ἀγαθοῖς ἀνδράσι μεγάλης εὐλαβείας ἁμαρτάνειν, τὰ δὲ ἀνήκεστα τῶν ἀκεστῶν ἔτι μᾶλλον· ταῦτα γὰρ προνοήσασι μὲν δυνατά, μετανοήσασι δὲ ἀνίατα. τῶν δὲ τοιούτων ἐστίν, ὅταν ἄνδρες ἄνδρα περὶ θανάτου κρίνωσιν· ὅπερ ἐστὶ νῦν παρ᾽ ὑμῖν.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[27]</span> Δεν θέλω, ενώ μπορώ, να σε κατηγορήσω και εγώ με τη σειρά μου για πολλές και σημαντικές, παλαιές και πρόσφατες πράξεις σου· γιατί θέλω να απαλλαγώ από την κατηγορία αυτή όχι χάρη στη δική σου κακία αλλά χάρη στη δική μου αρετή. Αυτά λοιπόν για σένα.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[28]</span> Θέλω τώρα να απευθυνθώ σε σας, κύριοι δικαστές, και να πω για τον εαυτό μου κάτι που προκαλεί το φθόνο, είναι όμως αλήθεια, πράγμα που δεν είναι ανεκτό από κάποιον που δεν κατηγορείται, είναι σωστό όμως για ένα κατηγορούμενο. Γιατί τώρα κάνω απολογισμό και δίνω λόγο για τον πρότερό μου βίο. Σας παρακαλώ λοιπόν, αν σας υπενθυμίσω ορισμένα από τα καλά που έχω κάνει, κανένας σας να μη δυσανασχετήσει με όσα θα πω, αλλά να κατανοήσει ότι είναι αναγκαίο, εφόσον κατηγορούμαι για πράγματα φοβερά και ψευδή, να πω κάτι και για αληθινά καλά, παρόλο που εσείς τα γνωρίζετε — γεγονός που μου δίνει μεγάλη ευχαρίστηση. <span class="marker">[29]</span> Πρώτον, λοιπόν, και δεύτερο και σπουδαιότερο, η περασμένη μου ζωή είναι, από την αρχή μέχρι το τέλος της, απολύτως ανεπίληπτη, καθαρή από κάθε κατηγορία· γιατί κανένας δεν μπορεί να σας πει για μένα ούτε μιαν αληθινή κατηγορία για κακία. Και ούτε ο ίδιος ο κατήγορος ανέφερε καμίαν απόδειξη για όσα είπε· έτσι ο λόγος του έχει την ισχύ μιας ανεξέλεγκτης συκοφαντίας. <span class="marker">[30]</span> Θα μπορούσα επίσης να ισχυριστώ, και αν το ισχυριζόμουν δεν θα έλεγα ψέματα, ούτε θα μπορούσε κανείς να με αντικρούσει, ότι είμαι όχι μόνον ανεπίληπτος, αλλά κα μεγάλος ευεργέτης, δικός σας και όλων των Ελλήνων και του συνόλου των ανθρώπων, όχι μόνο των τωρινών αλλά και των μελλοντικών. Γιατί ποιός κατέστησε την ανθρώπινη ζωή από στερημένη εύπορη και από άκοσμη καλλιεργημένη, έχοντας εφεύρει τις πολεμικές τακτικές, το πιο μεγάλο πλεονέκτημα, και τους γραπτούς νόμους, φύλακες του δικαίου, τα γράμματα, εργαλείο της μνήμης, τα μέτρα και τα σταθμά, επινοήσεις για τη συνεννόηση στις συναλλαγές, τον αριθμό, φύλακα της περιουσίας, τους πυρσούς, τους ικανότερους και πιο ταχείς αγγελιαφόρους, τους πεσσούς, την ευχάριστη διασκέδαση στη σχόλη; Γιατί λοιπόν σας θύμισα αυτά; <span class="marker">[31]</span> Για να δείξω ότι με τέτοια πράγματα ασχολούμαι και να επισημάνω ότι βρίσκομαι μακριά από άσχημες και κακές ασχολίες· γιατί είναι αδύνατον αυτός που ασχολείται με τα πρώτα να ασχολείται με τα δεύτερα. Και θεωρώ σωστό, εφόσον δεν σας έχω κάνει κακό, να μην υποστώ και κανένα κακό από σας. <span class="marker">[32]</span> Ούτε και για τις άλλες ασχολίες μου δεν μου αξίζει να πάθω κακό, ούτε από τους νεότερους ούτε από τους μεγαλύτερούς μου. Αφού στους μεγαλύτερους δεν προκαλώ κακό, ενώ τους νεότερους τους ωφελώ· χωρίς φθόνο για τους ευτυχισμένους, είμαι πονετικός για τους δυστυχισμένους· δεν περιφρονώ τη φτώχεια, ούτε προτιμώ τον πλούτο από την αρετή, αλλά την αρετή από τον πλούτο· δεν είμαι άχρηστος στη λήψη αποφάσεων, ούτε νωθρός στις μάχες, και κάνω το καθήκον μου πειθαρχώντας στους αρχηγούς. Βέβαια δεν πρέπει εγώ να επαινέσω τον εαυτό μου· αλλά αναγκάστηκα να το κάνω κάτω από τις παρούσες συνθήκες και, εφόσον κατηγορήθηκα γι᾽ αυτά που κατηγορήθηκα, έπρεπε να υπερασπίσω τον εαυτό μου με κάθε τρόπο.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[33]</span> Απομένει, πριν σταματήσω την υπεράσπισή μου, να μιλήσω σε σας για σας. Οίκτος, ικεσίες και παρακλήσεις φίλων είναι χρήσιμα όταν η απόφαση εξαρτάται από έναν όχλο· μ᾽ εσάς όμως, που θεωρείστε και είστε οι πρώτοι από τους Έλληνες και δεν πρέπει να σας πείσουν η υποστήριξη των φίλων, ούτε οι ικεσίες, ούτε ο οίκτος, αλλά η καθαρή δικαιοσύνη, πρέπει εγώ, εκθέτοντας την αλήθεια και όχι με απάτη, να αποφύγω την κατηγορία αυτή. <span class="marker">[34]</span> Και σεις πρέπει να στρέψετε την προσοχή σας όχι στα λόγια αλλά στα γεγονότα, να μη βιαστείτε να προτιμήσετε τις κατηγορίες από τις αντικρούσεις τους, ούτε να θεωρήσετε ότι ο λίγος χρόνος είναι πιο σοφός κριτής από τον πολύν, ούτε να νομίσετε ότι η διαβολή είναι πιο πειστική από την εμπειρία. Γιατί οι αγαθοί άντρες δίνουν μεγάλη προσοχή μήπως σφάλουν, και περισσότερο σε ζητήματα όπου μπορεί να προκύψει ανεπανόρθωτη βλάβη, παρά όταν η βλάβη επανορθώνεται· επειδή αυτά μπορούν να γίνουν σωστά με την προνοητικότητα, δεν επανορθώνονται όμως με τη μετάνοια. Και σ᾽ αυτή την κατηγορία ανήκει η περίπτωση όταν άνθρωποι κρίνουν έναν άνθρωπο για ζήτημα ζωής ή θανάτου· πράγμα που συμβαίνει με σας τώρα.</span></p>
+        </div>
+        
+
+        <div id="book-1-chapter-1-5" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-5" data-hash="book-1-chapter-1-5">
+            ΒΙΒΛΙΟΝ Α • Κεφάλαιο 1.5 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=36&page=5" target="_blank" class="page-link">Page 5</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[35]</span> εἰ μὲν οὖν ἦν διὰ τῶν λόγων τὴν ἀλήθειαν τῶν ἔργων καθαράν τε γενέσθαι τοῖς ἀκούουσι ‹καὶ› φανεράν, εὔπορος ἂν εἴη κρίσις ἤδη ἀπὸ τῶν εἰρημένων· ἐπειδὴ δὲ οὐχ οὕτως ἔχει, τὸ μὲν σῶμα τοὐμὸν φυλάξατε, τὸν δὲ πλείω χρόνον ἐπιμείνατε, μετὰ δὲ τῆς ἀληθείας τὴν κρίσιν ποιήσατε. ὑμῖν μὲν γὰρ μέγας ὁ κίνδυνος, ἀδίκοις φανεῖσι δόξαν τὴν μὲν καταβαλεῖν, τὴν δὲ κτήσασθαι. τοῖς δὲ ἀγαθοῖς ἀνδράσιν αἱρετώτερος θάνατος δόξης αἰσχρᾶς· τὸ μὲν γὰρ τοῦ βίου τέλος, ἡ δὲ τῷ βίῳ νόσος. <span class="marker">[36]</span> ἐὰν δὲ ἀδίκως ἀποκτείνητέ με, πολλοῖς γενήσεται φανερόν· ἐγώ τε γὰρ ‹οὐκ› ἀγνώς, ὑμῶν τε πᾶσιν Ἕλλησι γνώριμος ἡ κακότης καὶ φανερά. καὶ τὴν αἰτίαν [φανερὰν] ἅπασαν ὑμεῖς ἕξετε τῆς ἀδικίας, οὐχ ὁ κατήγορος· ἐν ὑμῖν γὰρ τὸ τέλος ἐστὶ τῆς δίκης. ἁμαρτία δ᾽ οὐκ ἂν γένοιτο μείζων ταύτης. οὐ γὰρ μόνον εἰς ἐμὲ καὶ τοκέας τοὺς ἐμοὺς ἁμαρτήσεσθε δικάσαντες ἀδίκως, ἀλλ᾽ ὑμῖν αὐτοῖς δεινὸν ἄθεον ἄδικον ἄνομον ἔργον συνεπιστήσεσθε πεποιηκότες, ἀπεκτονότες ἄνδρα σύμμαχον, χρήσιμον ὑμῖν, εὐεργέτην τῆς Ἑλλάδος, Ἕλληνες Ἕλληνα, φανερὰν οὐδεμίαν ἀδικίαν οὐδὲ πιστὴν αἰτίαν ἀποδείξαντες.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[37]</span> εἴρηται τὰ παρ᾽ ἐμοῦ, καὶ παύομαι. τὸ γὰρ ὑπομνῆσαι τὰ διὰ μακρῶν εἰρημένα συντόμως πρὸς μὲν φαύλους δικαστὰς ἔχει λόγον· τοὺς δὲ πρώτους τῶν πρώτων Ἕλληνας Ἑλλήνων οὐκ ἄξιον οὐδ᾽ ἀξιῶσαι μήτε προσέχειν τὸν νοῦν μήτε μεμνῆσθαι τὰ λεχθέντα.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[35]</span> Αν λοιπόν μπορούσε με τα λόγια να ξεκαθαριστεί και να φανερωθεί στους ακροατές η αλήθεια για τα γεγονότα, θα ήταν εύκολο να βγάλει κανείς μιαν απόφαση ύστερα απ᾽ όσα έχουν λεχθεί· επειδή όμως αυτό δεν συμβαίνει, κρατείστε με στη φυλακή, περιμένετε να περάσει περισσότερος καιρός και βγάλτε την απόφασή σας σύμφωνη με την αλήθεια. Γιατί διατρέχετε τον μεγάλο κίνδυνο, αν φανείτε άδικοι, να χάσετε τη μια φήμη και ν᾽ αποκτήσετε την άλλη. Και για τους αγαθούς άντρες είναι προτιμότερος ο θάνατος από την κακή φήμη· γιατί το ένα είναι το τέλος της ζωής ενώ η άλλη είναι αρρώστια της ζωής. <span class="marker">[36]</span> Αν όμως με σκοτώσετε άδικα, αυτό θα γίνει φανερό σε πολλούς· γιατί δεν είμαι κανένας άγνωστος, και η κακή σας πράξη θα είναι γνωστή και φανερή σε όλους τους Έλληνες. Και την ευθύνη για την αδικία θα την έχετε όλη εσείς, όχι ο κατήγορος, αφού η έκβαση της δίκης εξαρτάται από σας. Αλλά δεν μπορεί να υπάρξει μεγαλύτερο σφάλμα απ᾽ αυτό. Γιατί δεν θα κάνετε σφάλμα μόνον ως προς εμένα και τους γονείς μου αν άδικα με καταδικάσετε, παρά θα γνωρίζετε και οι ίδιοι ότι διαπράξατε μια φοβερή, άθεη, άδικη, άνομη πράξη με το να σκοτώσετε έναν άνθρωπο που είναι σύμμαχος, χρήσιμος σε σας, ευεργέτης της Ελλάδας, σεις Έλληνες, έναν Έλληνα, χωρίς να έχετε αποδείξει καμιά φανερή αδικία του, ούτε καμιά πειστική κατηγορία.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[37]</span> Είπα όσα είχα να πω και σταματώ. Αφού το να θυμίσω περιληπτικά αυτά που ανέπτυξα προηγουμένως θα ταίριαζε για κακούς δικαστές· αλλά για τους πρώτους Έλληνες μεταξύ των πρώτων Ελλήνων δεν είναι σωστό, ούτε μπορεί κανείς να τους ζητήσει να δώσουν προσοχή ή να θυμηθούν όσα λέχθηκαν.</span></p>
+        </div>
+        
+        </section>
+    </main>
+
+    <script>
+        // Layout and Theme controls
+        function toggleLayout() {
+            const body = document.body;
+            const btn = document.getElementById('toggle-layout-btn');
+            
+            if (body.classList.contains('hide-original')) {
+                body.classList.remove('hide-original');
+                btn.innerText = 'Hide Original';
+                localStorage.setItem('ebook-hide-original', 'false');
+            } else {
+                body.classList.add('hide-original');
+                btn.innerText = 'Show Original';
+                localStorage.setItem('ebook-hide-original', 'true');
+            }
+        }
+
+        function setTheme(theme, buttonElement) {
+            if (theme === 'light') {
+                document.documentElement.removeAttribute('data-theme');
+            } else {
+                document.documentElement.setAttribute('data-theme', theme);
+            }
+            
+            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+            buttonElement.classList.add('active');
+            
+            localStorage.setItem('ebook-theme', theme);
+        }
+
+        function toggleSidebar() {
+            const body = document.body;
+            const overlay = document.getElementById('mobile-overlay');
+            const isMobile = window.innerWidth <= 900;
+            
+            if (isMobile) {
+                if (body.classList.contains('sidebar-open')) {
+                    body.classList.remove('sidebar-open');
+                    overlay.classList.remove('open');
+                } else {
+                    body.classList.add('sidebar-open');
+                    overlay.classList.add('open');
+                    // Close right sidebar if open
+                    body.classList.remove('chat-sidebar-open');
+                }
+            } else {
+                if (body.classList.contains('sidebar-closed')) {
+                    body.classList.remove('sidebar-closed');
+                    localStorage.setItem('ebook-sidebar-closed', 'false');
+                } else {
+                    body.classList.add('sidebar-closed');
+                    localStorage.setItem('ebook-sidebar-closed', 'true');
+                }
+            }
+        }
+        
+        function closeSidebarOnMobile() {
+            if (window.innerWidth <= 900) {
+                document.body.classList.remove('sidebar-open');
+                document.getElementById('mobile-overlay').classList.remove('open');
+            }
+        }
+        
+        function toggleMobileOptions() {
+            const header = document.querySelector('header');
+            const btn = document.querySelector('.options-toggle');
+            
+            if (header.classList.contains('options-open')) {
+                header.classList.remove('options-open');
+                document.body.classList.remove('mobile-options-open');
+                btn.classList.remove('active');
+            } else {
+                header.classList.add('options-open');
+                document.body.classList.add('mobile-options-open');
+                btn.classList.add('active');
+            }
+        }
+
+        // Adjusts sidebar height dynamically to match mobile visual viewport when virtual keyboard is launched
+        function adjustSidebarHeightForKeyboard() {
+            if (window.visualViewport) {
+                const chatSidebar = document.getElementById('chat-sidebar');
+                const isMobile = window.innerWidth <= 900;
+                if (isMobile && document.body.classList.contains('chat-sidebar-open')) {
+                    chatSidebar.style.height = window.visualViewport.height + 'px';
+                } else {
+                    chatSidebar.style.height = ''; // Fallback to CSS rules
+                }
+            }
+        }
+
+        // Right AI Sidebar Toggles
+        function toggleChatSidebar() {
+            const body = document.body;
+            if (body.classList.contains('chat-sidebar-open')) {
+                body.classList.remove('chat-sidebar-open');
+                adjustSidebarHeightForKeyboard();
+            } else {
+                body.classList.add('chat-sidebar-open');
+                // Close Left Sidebar on Mobile
+                if (window.innerWidth <= 900) {
+                    body.classList.remove('sidebar-open');
+                    document.getElementById('mobile-overlay').classList.remove('open');
+                }
+                // Focus text area
+                setTimeout(() => {
+                    document.getElementById('chat-input').focus();
+                    adjustSidebarHeightForKeyboard();
+                }, 100);
+            }
+        }
+
+        // AI Configuration Modal controls
+        function openAiSettings() {
+            document.getElementById('ai-config-modal').classList.add('open');
+            loadSavedAiSettings();
+        }
+
+        function closeAiSettings() {
+            document.getElementById('ai-config-modal').classList.remove('open');
+        }
+
+        function handleProviderChange() {
+            const p = document.getElementById('ai-provider').value;
+            const customUrlGroup = document.getElementById('group-custom-url');
+            const modelInput = document.getElementById('ai-model');
+
+            if (p === 'custom') {
+                customUrlGroup.style.display = 'flex';
+            } else {
+                customUrlGroup.style.display = 'none';
+            }
+
+            // Suggest model placeholders and default values based on provider selection
+            if (p === 'openai') {
+                modelInput.placeholder = 'gpt-4o-mini';
+                if (modelInput.value === 'gemini-flash-latest' || modelInput.value === '' || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gemini')) {
+                    modelInput.value = 'gpt-4o-mini';
+                }
+            } else if (p === 'anthropic') {
+                modelInput.placeholder = 'claude-3-5-sonnet-20241022';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('gemini') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'claude-3-5-sonnet-20241022';
+                }
+            } else if (p === 'gemini') {
+                modelInput.placeholder = 'gemini-flash-latest';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'gemini-flash-latest';
+                }
+            } else if (p === 'openrouter') {
+                modelInput.placeholder = 'meta-llama/llama-3-8b-instruct:free';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('gemini') || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'meta-llama/llama-3-8b-instruct:free';
+                }
+            } else if (p === 'custom') {
+                modelInput.placeholder = 'model-name';
+            }
+        }
+
+        function loadSavedAiSettings() {
+            const provider = localStorage.getItem('ai-prov') || 'openai';
+            const apiKey = localStorage.getItem('ai-key') || '';
+            const model = localStorage.getItem('ai-mod') || '';
+            const customUrl = localStorage.getItem('ai-url') || '';
+
+            document.getElementById('ai-provider').value = provider;
+            document.getElementById('ai-key').value = apiKey;
+            document.getElementById('ai-model').value = model;
+            document.getElementById('ai-custom-url').value = customUrl;
+
+            handleProviderChange();
+        }
+
+        function saveAiSettings() {
+            const provider = document.getElementById('ai-provider').value;
+            const apiKey = document.getElementById('ai-key').value;
+            const model = document.getElementById('ai-model').value;
+            const customUrl = document.getElementById('ai-custom-url').value;
+
+            localStorage.setItem('ai-prov', provider);
+            localStorage.setItem('ai-key', apiKey);
+            localStorage.setItem('ai-mod', model);
+            localStorage.setItem('ai-url', customUrl);
+
+            closeAiSettings();
+        }
+
+        // Text Selection & Chat logic
+        let currentSelection = "";
+        let currentContext = null;
+        let chatHistory = [];
+
+        function getPageContext(node) {
+            let current = node.nodeType === Node.TEXT_NODE ? node.parentElement : node;
+            let col = current.closest('.column');
+            if (!col) return null;
+
+            // Find the preceding page-divider element
+            let sibling = col.previousElementSibling;
+            while (sibling && !sibling.classList.contains('page-divider')) {
+                sibling = sibling.previousElementSibling;
+            }
+            if (!sibling) return null;
+
+            const pageNum = sibling.id.replace('page-', '');
+
+            // Identify parallel original and translation sibling columns
+            let origCol = sibling.nextElementSibling;
+            while (origCol && !origCol.classList.contains('original-col')) {
+                origCol = origCol.nextElementSibling;
+            }
+            let transCol = sibling.nextElementSibling;
+            while (transCol && !transCol.classList.contains('translation-col')) {
+                transCol = transCol.nextElementSibling;
+            }
+
+            const isOriginal = col.classList.contains('original-col');
+
+            return {
+                pageNum: pageNum,
+                dividerText: sibling.textContent.trim(),
+                originalText: origCol ? origCol.innerText : "",
+                translationText: transCol ? transCol.innerText : "",
+                selectedColType: isOriginal ? "original" : "translation"
+            };
+        }
+
+        function handleTextSelection(e) {
+            setTimeout(() => {
+                const selection = window.getSelection();
+                const text = selection.toString().trim();
+                const popup = document.getElementById('ai-selection-popup');
+
+                if (!text) {
+                    if (e.target && e.target.id !== 'ai-selection-popup') {
+                        popup.style.display = 'none';
+                    }
+                    return;
+                }
+
+                const anchorNode = selection.anchorNode;
+                if (!anchorNode) return;
+
+                const context = getPageContext(anchorNode);
+                if (!context) {
+                    popup.style.display = 'none';
+                    return;
+                }
+
+                currentSelection = text;
+                currentContext = context;
+
+                const isMobile = window.innerWidth <= 900;
+                
+                if (isMobile) {
+                    // Position fixed at the bottom on mobile to avoid native Android contextual menu overlap
+                    popup.style.display = 'flex';
+                    popup.style.position = 'fixed';
+                    popup.style.bottom = '24px';
+                    popup.style.left = '50%';
+                    popup.style.transform = 'translateX(-50%)';
+                    popup.style.top = 'auto';
+                    popup.style.width = 'calc(100% - 40px)';
+                    popup.style.maxWidth = '340px';
+                    popup.style.justifyContent = 'center';
+                    popup.style.boxShadow = '0 8px 24px rgba(0,0,0,0.3)';
+                } else {
+                    // Position relative to selection on desktop
+                    const range = selection.getRangeAt(0);
+                    const rect = range.getBoundingClientRect();
+
+                    popup.style.display = 'flex';
+                    popup.style.position = 'fixed';
+                    popup.style.bottom = 'auto';
+                    popup.style.transform = 'none';
+                    popup.style.width = 'auto';
+                    popup.style.maxWidth = 'none';
+                    popup.style.left = Math.max(10, Math.min(window.innerWidth - popup.offsetWidth - 10, rect.left + (rect.width / 2) - 50)) + "px";
+                    popup.style.top = (rect.top - 45) + "px";
+                    popup.style.justifyContent = 'flex-start';
+                    popup.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+                }
+            }, 10);
+        }
+
+        function openChatWithSelection() {
+            document.getElementById('ai-selection-popup').style.display = 'none';
+            
+            // Populate context card
+            const contextTextNode = document.getElementById('chat-context-text');
+            const colLabel = currentContext.selectedColType === 'original' ? 'Αρχαία' : 'Μετάφραση';
+            contextTextNode.textContent = '"' + currentSelection + '" (' + colLabel + ' • Σελίδα ' + currentContext.pageNum + ')';
+            
+            // Clear prior conversation when selecting new text
+            clearChat();
+
+            // Open sidebar
+            document.body.classList.add('chat-sidebar-open');
+            setTimeout(() => {
+                document.getElementById('chat-input').focus();
+                adjustSidebarHeightForKeyboard();
+            }, 100);
+        }
+
+        function clearChat() {
+            chatHistory = [];
+            const msgsContainer = document.getElementById('chat-messages');
+            
+            // Keep the context card, wipe standard bubble divs
+            const contextCard = document.getElementById('chat-context-card');
+            msgsContainer.innerHTML = '';
+            msgsContainer.appendChild(contextCard);
+        }
+
+        function handleChatKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendChatMessage();
+            }
+        }
+
+        function appendMessage(sender, text, isError = false, historyIndex = null) {
+            const msgsContainer = document.getElementById('chat-messages');
+            const msgDiv = document.createElement('div');
+            
+            if (isError) {
+                msgDiv.className = 'chat-message system-error';
+            } else {
+                msgDiv.className = 'chat-message ' + sender;
+            }
+
+            // If it is a user message and linked to history, attach interactive attributes
+            if (sender === 'user' && historyIndex !== null) {
+                msgDiv.setAttribute('data-history-index', historyIndex);
+                msgDiv.setAttribute('title', 'Κλικ για εκ νέου εκτέλεση από αυτό το σημείο');
+                msgDiv.addEventListener('click', () => handleHistoryClick(historyIndex));
+            }
+            
+            msgDiv.innerHTML = formatMarkdown(text);
+            msgsContainer.appendChild(msgDiv);
+            msgsContainer.scrollTop = msgsContainer.scrollHeight;
+        }
+
+        // Truncate history and re-run on user dialog click
+        async function handleHistoryClick(historyIndex) {
+            // Prevent duplicate triggers if query is running
+            const inputEl = document.getElementById('chat-input');
+            if (inputEl.disabled) return;
+
+            // Slice history array up to and including the selected user query
+            chatHistory = chatHistory.slice(0, historyIndex + 1);
+
+            // Redraw UI container to match truncated array
+            rebuildChatUI();
+
+            // Re-fire query
+            await runQuery();
+        }
+
+        // Clean redraw of current stack
+        function rebuildChatUI() {
+            const msgsContainer = document.getElementById('chat-messages');
+            const contextCard = document.getElementById('chat-context-card');
+            
+            msgsContainer.innerHTML = '';
+            msgsContainer.appendChild(contextCard);
+            
+            chatHistory.forEach((msg, idx) => {
+                if (msg.role === 'user') {
+                    let displayContent = msg.content;
+                    // Extract original question portion from first structured input turn for a clean UI
+                    if (idx === 0 && msg.content.includes("Ερώτηση:\n")) {
+                        displayContent = msg.content.split("Ερώτηση:\n").slice(1).join("Ερώτηση:\n");
+                    }
+                    appendMessage('user', displayContent, false, idx);
+                } else if (msg.role === 'assistant') {
+                    appendMessage('assistant', msg.content);
+                }
+            });
+        }
+
+        // Native Markdown parser leveraging standard Marked.js library
+        function formatMarkdown(text) {
+            if (!text) return "";
+            try {
+                // Parse standard markdown strings to structural HTML
+                return marked.parse(text);
+            } catch (err) {
+                // Fallback to basic text escaping on parse failure
+                return text
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/\n/g, "<br>");
+            }
+        }
+
+        // Modular core query runner
+        async function runQuery() {
+            const inputEl = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('chat-send-btn');
+            
+            // Disable inputs during network transaction
+            inputEl.disabled = true;
+            sendBtn.disabled = true;
+            
+            // Append loading container
+            appendMessage('assistant', 'Thinking...');
+            const lastMsgDiv = document.getElementById('chat-messages').lastChild;
+
+            // Load credentials
+            const provider = localStorage.getItem('ai-prov') || 'openai';
+            const apiKey = localStorage.getItem('ai-key') || '';
+            const savedMod = localStorage.getItem('ai-mod') || '';
+            const customUrl = localStorage.getItem('ai-url') || '';
+
+            if (!apiKey && provider !== 'custom') {
+                lastMsgDiv.className = 'chat-message system-error';
+                lastMsgDiv.innerText = '⚠️ Παρακαλούμε ρυθμίστε το API Key στις ρυθμίσεις AI Config πρώτα.';
+                openAiSettings();
+                inputEl.disabled = false;
+                sendBtn.disabled = false;
+                return;
+            }
+
+            // Build the System Prompt Context dynamically on EVERY call
+            const isOriginal = currentContext.selectedColType === 'original';
+            const contextText = isOriginal ? currentContext.originalText : currentContext.translationText;
+            const contextLabel = isOriginal ? "Αρχαίο Κείμενο" : "Σύγχρονη Μετάφραση";
+			const pageTitle = document.title;
+
+            let systemInstruction = "Είσαι διακεκριμένος φιλόσοφος και γνώστης της φιλοσοφίας του Αριστοτέλη και Πλάτωνα και άλλων αρχαίων ελλήνων συγγραφέων.\n" +
+                "Ο χρήστης διαβάζει το βιβλίου του " + pageTitle + " και βάσει αυτού θα σου κάνει μερικές ερωτήσεις, περιλαμβάνοντας κάποιες φορές αποσπάσματα απο το βιβλίο αυτό πάνω στα οποία σχετίζονται οι ερωτήσεις. Ακολουθεί το ευρύτειο πλαίσιο της σελίδας/κεφαλαίου (Σελίδα " + currentContext.pageNum + ", " + currentContext.dividerText + ") για αναφορά:\n" +
+                "--- " + contextLabel + ":\n" + contextText + "\n\n" +
+                "Απάντησε στις ερωτήσεις του χρήστη σε σχέση με το πλαίσιο του κειμένου που παρέχεται. " +
+                "Δώσε τις απαντήσεις σου στα νέα ελληνικά χρησιμοποιώντας markdown μορφοποίηση.";
+
+            // Construct Payload Messages (Always prepending system prompt at index 0)
+            let payloadMessages = [{ role: "system", content: systemInstruction }];
+            payloadMessages = payloadMessages.concat(chatHistory);
+
+            try {
+                const answer = await requestAPI(provider, apiKey, savedMod, payloadMessages, customUrl);
+                lastMsgDiv.innerHTML = formatMarkdown(answer);
+                chatHistory.push({ role: "assistant", content: answer });
+            } catch (error) {
+                lastMsgDiv.className = 'chat-message system-error';
+                lastMsgDiv.innerText = "Error: " + error.message;
+                // If API failed, keep the user question on screen so they can click to retry it,
+                // do not silently clear the UI anymore.
+            } finally {
+                inputEl.disabled = false;
+                sendBtn.disabled = false;
+                document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+                inputEl.focus();
+                adjustSidebarHeightForKeyboard();
+            }
+        }
+
+        async function sendChatMessage() {
+            const inputEl = document.getElementById('chat-input');
+            const prompt = inputEl.value.trim();
+            if (!prompt) return;
+
+            // If the last message in history is a 'user' query (due to a previous failed turn),
+            // pop it before sending so that our conversational stack maintains alternating roles.
+            if (chatHistory.length > 0 && chatHistory[chatHistory.length - 1].role === 'user') {
+                chatHistory.pop();
+            }
+
+            // 1. Manage Chat History & Highlight Context
+            let histIdx;
+            if (chatHistory.length === 0) {
+                // Incorporate highlighted text directly into the first user turn, NOT the system prompt
+                const firstUserContent = "Επισημασμένο κείμενο:\n\"" + currentSelection + "\"\n\nΕρώτηση:\n" + prompt;
+                chatHistory.push({ role: "user", content: firstUserContent });
+                histIdx = 0;
+            } else {
+                // Subsequent turns: push the raw user follow-up prompt
+                chatHistory.push({ role: "user", content: prompt });
+                histIdx = chatHistory.length - 1;
+            }
+
+            // 2. Display user message in UI with history index
+            appendMessage('user', prompt, false, histIdx);
+            inputEl.value = '';
+
+            // 3. Trigger query execution
+            await runQuery();
+        }
+
+        async function requestAPI(provider, apiKey, model, messages, customUrl) {
+            let url = "";
+            let headers = { "Content-Type": "application/json" };
+            let body = {};
+
+            // Normalize models to defaults if unspecified
+            let activeModel = model;
+            if (!activeModel) {
+                if (provider === 'openai') activeModel = 'gpt-4o-mini';
+                else if (provider === 'anthropic') activeModel = 'claude-3-5-sonnet-20241022';
+                else if (provider === 'gemini') activeModel = 'gemini-flash-latest';
+                else if (provider === 'openrouter') activeModel = 'meta-llama/llama-3-8b-instruct:free';
+                else activeModel = 'local-model';
+            }
+
+            if (provider === 'openai') {
+                url = "https://api.openai.com/v1/chat/completions";
+                headers["Authorization"] = "Bearer " + apiKey;
+                body = { model: activeModel, messages: messages };
+            } else if (provider === 'openrouter') {
+                url = "https://openrouter.ai/api/v1/chat/completions";
+                headers["Authorization"] = "Bearer " + apiKey;
+                headers["HTTP-Referer"] = window.location.href;
+                headers["X-Title"] = "Ancient Greek Bilingual Reader";
+                body = { model: activeModel, messages: messages };
+            } else if (provider === 'gemini') {
+                url = "https://generativelanguage.googleapis.com/v1beta/models/" + activeModel + ":generateContent?key=" + apiKey;
+                
+                // Restructure typical OpenAI formats to Gemini's native API structure
+                const systemItem = messages.find(m => m.role === 'system');
+                const userItems = messages.filter(m => m.role !== 'system');
+                
+                const contents = userItems.map(m => ({
+                    role: m.role === 'assistant' ? 'model' : 'user',
+                    parts: [{ text: m.content }]
+                }));
+
+                body = { contents: contents };
+                if (systemItem) {
+                    body.systemInstruction = { parts: [{ text: systemItem.content }] };
+                }
+            } else if (provider === 'anthropic') {
+                url = "https://api.anthropic.com/v1/messages";
+                headers["x-api-key"] = apiKey;
+                headers["anthropic-version"] = "2023-06-01";
+                headers["dangerously-allow-browser"] = "true";
+
+                const systemItem = messages.find(m => m.role === 'system');
+                const userItems = messages.filter(m => m.role !== 'system');
+
+                body = {
+                    model: activeModel,
+                    messages: userItems.map(m => ({ role: m.role, content: m.content })),
+                    max_tokens: 1500
+                };
+                if (systemItem) {
+                    body.system = systemItem.content;
+                }
+            } else if (provider === 'custom') {
+                url = customUrl || "http://localhost:11434/v1/chat/completions";
+                if (apiKey) {
+                    headers["Authorization"] = "Bearer " + apiKey;
+                }
+                body = { model: activeModel, messages: messages };
+            }
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(body)
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error("API Error (" + response.status + "): " + (errText || response.statusText));
+            }
+
+            const responseData = await response.json();
+
+            // Extract content responses safely depending on the selected engine
+            if (provider === 'gemini') {
+                return responseData.candidates[0].content.parts[0].text;
+            } else if (provider === 'anthropic') {
+                return responseData.content[0].text;
+            } else {
+                // OpenAI / OpenRouter / Ollama
+                return responseData.choices[0].message.content;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('ebook-theme');
+            if (savedTheme) {
+                const targetBtn = document.getElementById('theme-' + savedTheme);
+                if (targetBtn) setTheme(savedTheme, targetBtn);
+            }
+
+            const hideOriginal = localStorage.getItem('ebook-hide-original');
+            if (hideOriginal === 'true') {
+                document.body.classList.add('hide-original');
+                document.getElementById('toggle-layout-btn').innerText = 'Show Original';
+            }
+            
+            if (window.innerWidth > 900) {
+                const sidebarClosed = localStorage.getItem('ebook-sidebar-closed');
+                if (sidebarClosed === 'true') {
+                    document.body.classList.add('sidebar-closed');
+                }
+            }
+
+            // Restore saved chat width on desktop
+            const chatSidebar = document.getElementById('chat-sidebar');
+            const savedChatWidth = localStorage.getItem('ebook-chat-width');
+            if (savedChatWidth && window.innerWidth > 900) {
+                chatSidebar.style.width = savedChatWidth;
+            }
+
+            // Setup Resizing for AI Chat Sidebar
+            const resizeHandle = document.getElementById('chat-resize-handle');
+            let isResizing = false;
+
+            resizeHandle.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                chatSidebar.classList.add('resizing');
+                document.body.style.userSelect = 'none';
+                document.body.style.cursor = 'ew-resize';
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isResizing) return;
+                const newWidth = window.innerWidth - e.clientX;
+                // Limit range between 280px and 85% of total screen width
+                if (newWidth > 280 && newWidth < window.innerWidth * 0.85) {
+                    chatSidebar.style.width = newWidth + 'px';
+                    localStorage.setItem('ebook-chat-width', newWidth + 'px');
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (isResizing) {
+                    isResizing = false;
+                    chatSidebar.classList.remove('resizing');
+                    document.body.style.userSelect = '';
+                    document.body.style.cursor = '';
+                }
+            });
+            
+            // Listen for selection events on layout columns (supports mouse and touch handles)
+            document.addEventListener('mouseup', handleTextSelection);
+            document.addEventListener('keyup', handleTextSelection);
+            document.addEventListener('selectionchange', handleTextSelection);
+
+            // Bind selection popup using both mousedown and touchstart with preventDefault.
+            // This guarantees instant tap execution on touch devices before selection focus is lost.
+            const popup = document.getElementById('ai-selection-popup');
+            const handleTriggerTap = (e) => {
+                e.preventDefault();
+                openChatWithSelection();
+            };
+            popup.addEventListener('mousedown', handleTriggerTap);
+            popup.addEventListener('touchstart', handleTriggerTap);
+
+            // Hide the popup trigger during scroll shifts (desktop only to prevent mobile touch glitches)
+            window.addEventListener('scroll', () => {
+                if (window.innerWidth > 900) {
+                    document.getElementById('ai-selection-popup').style.display = 'none';
+                }
+            }, { passive: true });
+
+            // VisualViewport resizing adjustments (Handles Android virtual keyboard overlap natively)
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', adjustSidebarHeightForKeyboard);
+                window.visualViewport.addEventListener('scroll', adjustSidebarHeightForKeyboard);
+            }
+
+            const chatInput = document.getElementById('chat-input');
+            if (chatInput) {
+                chatInput.addEventListener('focus', () => {
+                    setTimeout(adjustSidebarHeightForKeyboard, 150);
+                });
+                chatInput.addEventListener('blur', () => {
+                    setTimeout(adjustSidebarHeightForKeyboard, 150);
+                });
+            }
+            
+            let lastScrollTop = 0;
+            const header = document.querySelector('header');
+            const optBtn = document.querySelector('.options-toggle');
+            
+            window.addEventListener('scroll', () => {
+                let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                
+                if (scrollTop < 0) scrollTop = 0;
+                
+                if (scrollTop > 10) {
+                    document.body.classList.add('scrolled');
+                } else {
+                    document.body.classList.remove('scrolled');
+                }
+                
+                if (scrollTop > lastScrollTop && scrollTop > 120) {
+                    header.classList.add('header-hidden');
+                    header.classList.remove('options-open');
+                    document.body.classList.remove('mobile-options-open');
+                    optBtn.classList.remove('active');
+                } else {
+                    header.classList.remove('header-hidden');
+                }
+                
+                lastScrollTop = scrollTop;
+            }, { passive: true });
+            
+            const observerOptions = {
+                root: null,
+                rootMargin: "-100px 0px -60% 0px", 
+                threshold: 0
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const hash = entry.target.getAttribute('data-hash');
+                        if (hash && window.location.hash !== '#' + hash) {
+                            history.replaceState(null, null, '#' + hash);
+                        }
+                    }
+                });
+            }, observerOptions);
+            
+            document.querySelectorAll('.page-divider').forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>

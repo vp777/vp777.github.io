@@ -1,0 +1,1768 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ΔΗΜΟΣΘΕΝΗΣ Ὑπὲρ Μεγαλοπολιτών</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Marked.js Markdown rendering library -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #faf8f5;
+            --text-color: #2c2520;
+            --accent-color: #8b263e;
+            --sidebar-bg: #f3efe9;
+            --border-color: #e3ded5;
+            --muted-text: #706357;
+            --font-serif: "Cardo", "Georgia", "Palatino", serif;
+        }
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --accent-color: #ff8a80;
+            --sidebar-bg: #2d2d2d;
+            --border-color: #404040;
+            --muted-text: #999999;
+        }
+        [data-theme="sepia"] {
+            --bg-color: #f4ecd8;
+            --text-color: #5b4636;
+            --accent-color: #a04000;
+            --sidebar-bg: #ebdcb9;
+            --border-color: #d7c59d;
+            --muted-text: #7c6857;
+        }
+        
+        body {
+            margin: 0;
+            font-family: var(--font-serif);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            transition: background-color 0.2s, color 0.2s;
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        #mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 90;
+        }
+        #mobile-overlay.open {
+            display: block;
+        }
+        
+        #expand-bar {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 24px;
+            height: 100vh;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            cursor: pointer;
+            z-index: 95;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+        #expand-bar:hover {
+            background-color: var(--border-color);
+        }
+        #expand-bar::after {
+            content: "›";
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        
+        #sidebar {
+            width: 340px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            height: 100vh;
+            position: fixed;
+            top: 0; left: 0;
+            overflow-y: auto;
+            padding: 24px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transform: translateX(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+        #sidebar h2 {
+            font-size: 1.25rem;
+            margin: 0;
+            color: var(--text-color);
+        }
+        .sidebar-close-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--accent-color);
+            font-size: 1.4rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            line-height: 1;
+        }
+        .sidebar-close-btn:hover {
+            background-color: var(--border-color);
+        }
+        
+        .toc-list-container { overflow-y: auto; flex-grow: 1; }
+        
+        details.book-group {
+            margin-bottom: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            background-color: var(--sidebar-bg);
+        }
+        details.book-group[open] { border-color: var(--accent-color); }
+        details.book-group summary {
+            font-weight: bold; font-size: 1.05rem; cursor: pointer; padding: 10px 14px;
+            background-color: var(--sidebar-bg); list-style: none; display: flex;
+            justify-content: space-between; align-items: center; user-select: none;
+        }
+        details.book-group summary::-webkit-details-marker { display: none; }
+        details.book-group summary::after { content: "▾"; font-size: 0.9rem; color: var(--accent-color); }
+        details.book-group[open] summary::after { transform: rotate(180deg); }
+        
+        .toc-sublist-container {
+            background-color: var(--bg-color);
+            border-top: 1px solid var(--border-color);
+        }
+        .toc-group-title {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            padding: 8px 14px 4px 14px;
+            line-height: 1.3;
+        }
+        .toc-sublist { list-style: none; padding: 4px 14px 8px 14px; margin: 0; }
+        .toc-sublist li { margin-bottom: 8px; font-size: 0.88rem; }
+        
+        .toc-sublist a { 
+            color: var(--text-color); 
+            text-decoration: none; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding: 4px; 
+        }
+        .toc-sublist a:hover { color: var(--accent-color); }
+        .toc-page {
+            color: var(--muted-text);
+            font-size: 0.8rem;
+            font-family: var(--font-serif);
+        }
+        
+        #main {
+            margin-left: 340px;
+            flex-grow: 1;
+            padding: 180px 40px 40px 40px;
+            box-sizing: border-box;
+            width: calc(100% - 340px);
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        padding-top 0.3s ease;
+        }
+        
+        header {
+            position: fixed;
+            top: 0;
+            left: 340px;
+            right: 0;
+            background-color: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px 40px;
+            z-index: 50;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transform: translateY(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        left 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        background-color 0.2s, 
+                        box-shadow 0.2s;
+        }
+        header.header-hidden {
+            transform: translateY(-100%);
+            box-shadow: none !important;
+        }
+        body.scrolled header {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        [data-theme="dark"] body.scrolled header {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .header-top { display: flex; align-items: center; gap: 20px; }
+        header h1 { margin: 0; font-size: 1.8rem; color: var(--accent-color); line-height: 1.2; }
+        
+        .controls-group {
+            display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+        }
+        .btn {
+            background-color: var(--sidebar-bg); color: var(--text-color);
+            border: 1px solid var(--border-color); padding: 8px 14px;
+            font-family: inherit; cursor: pointer; border-radius: 6px;
+            font-size: 0.9rem; font-weight: bold; transition: all 0.2s; white-space: nowrap;
+        }
+        .btn:hover { background-color: var(--border-color); }
+        .btn.active { background-color: var(--accent-color); color: white; border-color: var(--accent-color); }
+        .btn-layout { background-color: var(--bg-color); border: 2px solid var(--accent-color); color: var(--accent-color); }
+        
+        .menu-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+            white-space: nowrap;
+        }
+        .menu-toggle:hover {
+            background-color: var(--text-color);
+        }
+        
+        .options-toggle {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 6px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            width: 38px;
+            height: 38px;
+            transition: all 0.2s;
+        }
+        .options-toggle:hover {
+            background-color: var(--sidebar-bg);
+        }
+
+        #book-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            column-gap: 48px;
+            row-gap: 0;
+            margin: 0 auto;
+            max-width: 140ch;
+            width: 100%;
+        }
+        
+        body.sidebar-closed #expand-bar {
+            display: flex;
+        }
+        body.sidebar-closed #sidebar {
+            transform: translateX(-340px);
+        }
+        body.sidebar-closed #main {
+            margin-left: 24px;
+            width: calc(100% - 24px);
+        }
+        body.sidebar-closed header {
+            left: 24px;
+        }
+        
+        body.hide-original #book-content { 
+            grid-template-columns: 1fr; 
+            max-width: 140ch;
+        }
+        body.hide-original .original-col { display: none; }
+        body.hide-original .bilingual-header { grid-template-columns: 1fr; }
+        body.hide-original .original-title { display: none; }
+        body.hide-original .translation-col {
+            max-width: 100% !important;
+            justify-self: stretch !important;
+        }
+
+        .bilingual-header {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px; position: sticky; top: 0;
+            background-color: var(--bg-color); padding: 16px 0;
+            border-bottom: 2px solid var(--accent-color); z-index: 10;
+            font-weight: bold; text-transform: uppercase; font-size: 0.85rem;
+            letter-spacing: 0.05em; color: var(--muted-text);
+        }
+        
+        .chapter-anchor {
+            display: block;
+            scroll-margin-top: 180px;
+        }
+        
+        .page-divider {
+            grid-column: 1 / -1;
+            border-bottom: 1px solid var(--border-color);
+            padding-top: 48px; padding-bottom: 12px; margin-bottom: 24px;
+            font-size: 0.95rem; color: var(--accent-color); text-transform: uppercase;
+            letter-spacing: 0.05em; font-weight: bold; 
+            scroll-margin-top: 180px;
+        }
+        
+        .page-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--accent-color);
+            transition: color 0.2s, border-bottom-color 0.2s;
+        }
+        .page-link:hover {
+            color: var(--text-color);
+            border-bottom-color: var(--text-color);
+        }
+        
+        .column { 
+            box-sizing: border-box; 
+            padding-bottom: 24px; 
+            display: flex; 
+            flex-direction: column; 
+            max-width: 65ch;
+            width: fit-content;
+            min-width: 0;
+        }
+        
+        .original-col {
+            justify-self: end;
+        }
+        .translation-col {
+            justify-self: start;
+        }
+        
+        .passage { 
+            margin: 0 0 1.2em 0; 
+            font-size: 1.15rem; 
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 1.5rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .passage-text {
+            flex: 1;
+            min-width: 0;
+            text-align: justify;
+        }
+        .passage.indent .passage-text { text-indent: 2em; }
+        .marker { color: var(--accent-color); font-weight: bold; margin-right: 4px; }
+        .line-number { 
+            color: var(--muted-text); 
+            font-size: 0.85em; 
+            font-weight: normal; 
+            user-select: none;
+            margin-left: auto;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+        i { font-style: italic; }
+
+        /* Floating popover trigger styling */
+        #ai-selection-popup {
+            position: fixed;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 14px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1005;
+            display: none;
+            font-family: var(--font-serif);
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.1s ease;
+        }
+        #ai-selection-popup:hover {
+            transform: scale(1.05);
+        }
+
+        /* Resizable sliding Right Chat Sidebar */
+        #chat-sidebar {
+            width: 380px;
+            min-width: 280px;
+            max-width: 85vw;
+            background-color: var(--sidebar-bg);
+            border-left: 1px solid var(--border-color);
+            height: 100vh;
+            height: 100dvh;
+            position: fixed;
+            top: 0; right: 0;
+            transform: translateX(100%);
+            overflow: visible;
+            display: flex;
+            flex-direction: column;
+            z-index: 110;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-sizing: border-box;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.05);
+        }
+        body.chat-sidebar-open #chat-sidebar {
+            transform: translateX(0);
+        }
+        
+        /* Draggable Resize Handle */
+        #chat-resize-handle {
+            width: 8px;
+            height: 100%;
+            position: absolute;
+            left: -4px;
+            top: 0;
+            cursor: ew-resize;
+            z-index: 120;
+            background-color: transparent;
+            transition: background-color 0.2s;
+        }
+        #chat-resize-handle:hover,
+        #chat-sidebar.resizing #chat-resize-handle {
+            background-color: var(--accent-color);
+            opacity: 0.5;
+        }
+        
+        .chat-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-header h3 { margin: 0; font-size: 1.1rem; color: var(--accent-color); }
+        
+        .chat-header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .chat-context-card {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+        .chat-context-card h4 { margin: 0 0 6px 0; color: var(--accent-color); }
+        .chat-context-card p { 
+            margin: 0; 
+            font-style: italic; 
+            display: -webkit-box; 
+            -webkit-line-clamp: 3; 
+            -webkit-box-orient: vertical; 
+            overflow: hidden; 
+            line-height: 1.4;
+        }
+        
+        .chat-message {
+            max-width: 85%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        
+        /* Render styles for AI Markdown elements in chat boxes */
+        .chat-message p { margin: 0 0 8px 0; line-height: 1.5; }
+        .chat-message p:last-child { margin-bottom: 0; }
+        .chat-message strong { font-weight: bold; }
+        .chat-message em { font-style: italic; }
+        .chat-message ul, .chat-message ol { margin: 4px 0 8px 16px; padding: 0; }
+        .chat-message li { margin-bottom: 4px; font-size: 0.92rem; }
+        .chat-message h1, .chat-message h2, .chat-message h3, .chat-message h4, .chat-message h5 {
+            color: var(--accent-color);
+            margin: 12px 0 6px 0;
+            line-height: 1.3;
+        }
+        .chat-message h3 { font-size: 1.15rem; }
+        .chat-message h4 { font-size: 1.05rem; }
+        .chat-message h5 { font-size: 0.95rem; }
+        .chat-message blockquote {
+            border-left: 3px solid var(--accent-color);
+            margin: 8px 0;
+            padding-left: 10px;
+            color: var(--muted-text);
+            font-style: italic;
+        }
+        .chat-message pre {
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.85rem;
+            margin: 8px 0;
+        }
+        .chat-message code {
+            font-family: monospace;
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: var(--accent-color);
+        }
+        
+        .chat-message.user {
+            background-color: var(--accent-color);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .chat-message.user:hover {
+            filter: brightness(1.15);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        /* Override light-colored syntax highlights in dark bubbles */
+        .chat-message.user code {
+            color: #ff8a80;
+            background-color: rgba(0,0,0,0.2);
+            border-color: rgba(0,0,0,0.1);
+        }
+        .chat-message.user pre {
+            background-color: rgba(0,0,0,0.2);
+            border-color: rgba(0,0,0,0.1);
+            color: white;
+        }
+        
+        .chat-message.assistant {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .chat-message.system-error {
+            background-color: #fce8e6;
+            color: #c5221f;
+            border: 1px solid #fad2cf;
+            align-self: center;
+            max-width: 95%;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+        
+        [data-theme="dark"] .chat-message.system-error {
+            background-color: #371d1d;
+            color: #f28b82;
+            border-color: #5c2424;
+        }
+
+        .chat-input-area {
+            padding: 16px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 8px;
+            background-color: var(--sidebar-bg);
+            flex-shrink: 0;
+        }
+        .chat-input-area textarea {
+            flex-grow: 1;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 10px;
+            border-radius: 6px;
+            resize: none;
+            height: 42px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+        }
+        .chat-input-area button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .chat-input-area button:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* Modal Config Dialog */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-content {
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            padding: 24px;
+            box-sizing: border-box;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 12px;
+        }
+        .modal-header h3 { margin: 0; font-size: 1.25rem; color: var(--accent-color); }
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group label {
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        .form-control {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 14px;
+        }
+
+        @media (max-width: 900px) {
+            #sidebar { transform: translateX(-100%); width: 320px; }
+            body.sidebar-open #sidebar { transform: translateX(0); }
+            body.sidebar-closed #sidebar { transform: translateX(-100%); }
+            
+            #chat-sidebar {
+                width: 100% !important;
+                right: 0;
+                transform: translateX(100%);
+                height: 100vh;
+                height: 100dvh;
+            }
+            body.chat-sidebar-open #chat-sidebar {
+                transform: translateX(0);
+            }
+            #chat-resize-handle {
+                display: none;
+            }
+            
+            #main { 
+                margin-left: 0 !important; 
+                width: 100% !important; 
+                padding: 100px 20px 20px 20px !important;
+            }
+            body.mobile-options-open #main {
+                padding-top: 150px !important;
+            }
+            
+            header {
+                padding-bottom: 12px;
+                margin-bottom: 16px;
+                gap: 8px;
+            }
+            header h1 { 
+                font-size: 0.95rem !important;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                text-align: center;
+                flex-grow: 1;
+                margin: 0;
+            }
+            
+            header {
+                left: 0 !important;
+                padding: 12px 16px;
+            }
+            
+            .header-top { 
+                display: flex;
+                flex-direction: row !important;
+                align-items: center; 
+                justify-content: space-between; 
+                width: 100%;
+                gap: 12px; 
+            }
+            
+            .menu-toggle { 
+                width: auto !important; 
+                padding: 6px 12px;
+                font-size: 0.85rem;
+            }
+            
+            .options-toggle {
+                display: inline-flex;
+            }
+            
+            .controls-group {
+                display: none;
+                width: 100%;
+                justify-content: center;
+                padding-top: 12px;
+                border-top: 1px dashed var(--border-color);
+            }
+            header.options-open .controls-group {
+                display: flex;
+            }
+            
+            #book-content { grid-template-columns: 1fr; column-gap: 0; max-width: 100%; }
+            .column { max-width: 100% !important; width: 100% !important; }
+            .bilingual-header { display: none; }
+            .page-divider { padding-top: 32px; scroll-margin-top: 110px; }
+            .chapter-anchor { scroll-margin-top: 110px; }
+            .passage { font-size: 1.05rem; }
+        }
+        
+        @media (min-width: 901px) {
+            .menu-toggle {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="mobile-overlay" onclick="toggleSidebar()"></div>
+
+    <div id="expand-bar" onclick="toggleSidebar()" title="Ανάπτυξη Περιεχομένων"></div>
+
+    <aside id="sidebar">
+        <div class="sidebar-header">
+            <h2>Πίνακας Περιεχομένων</h2>
+            <button class="sidebar-close-btn" onclick="toggleSidebar()" title="Σύμπτυξη">‹</button>
+        </div>
+        <div class="toc-list-container">
+            <details class="book-group">
+    <summary>ΠΡΟΟΙΜΙΟ</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-1-chapter-1" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1</span> <span class="toc-page">#1</span></a></li>
+        </ul>
+    </div>
+</details>
+<details class="book-group">
+    <summary>ΠΡΟΘΕΣΗ</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-2-chapter-1" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1</span> <span class="toc-page">#2</span></a></li>
+        </ul>
+    </div>
+</details>
+<details class="book-group">
+    <summary>ΠΙΣΤΕΙΣ</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-3-chapter-1" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1</span> <span class="toc-page">#3</span></a></li>
+            <li><a href="#book-3-chapter-1-2" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.2</span> <span class="toc-page">#4</span></a></li>
+            <li><a href="#book-3-chapter-1-3" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.3</span> <span class="toc-page">#5</span></a></li>
+            <li><a href="#book-3-chapter-1-4" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.4</span> <span class="toc-page">#6</span></a></li>
+            <li><a href="#book-3-chapter-1-5" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.5</span> <span class="toc-page">#7</span></a></li>
+        </ul>
+    </div>
+</details>
+<details class="book-group">
+    <summary>ΕΠΙΛΟΓΟΣ</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-4-chapter-1" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1</span> <span class="toc-page">#8</span></a></li>
+        </ul>
+    </div>
+</details>
+        </div>
+    </aside>
+
+    <!-- AI Right Chat Sidebar -->
+    <aside id="chat-sidebar">
+        <div id="chat-resize-handle"></div>
+        <div class="chat-header">
+            <h3>AI Assistant</h3>
+            <div class="chat-header-actions">
+                <button class="btn" style="padding: 4px 8px; font-size: 0.8rem;" onclick="clearChat()">Clear</button>
+                <button class="sidebar-close-btn" style="width: 28px; height: 28px; font-size: 1.1rem;" onclick="toggleChatSidebar()" title="Κλείσιμο">›</button>
+            </div>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <!-- Active Context Card -->
+            <div class="chat-context-card" id="chat-context-card">
+                <h4>Επιλεγμένο Κείμενο</h4>
+                <p id="chat-context-text"></p>
+            </div>
+            <!-- Messages stream here -->
+        </div>
+        <div class="chat-input-area">
+            <textarea id="chat-input" placeholder="Ρωτήστε κάτι για το επιλεγμένο κείμενο..." onkeydown="handleChatKeyDown(event)"></textarea>
+            <button id="chat-send-btn" onclick="sendChatMessage()">Send</button>
+        </div>
+    </aside>
+
+    <!-- Floating Popover Trigger -->
+    <button id="ai-selection-popup"><span style="font-size: 1.1rem;">✨</span> Ask AI</button>
+
+    <!-- Settings Configuration Modal -->
+    <div id="ai-config-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Ρυθμίσεις LLM / AI</h3>
+                <button class="sidebar-close-btn" style="width: 28px; height: 28px; font-size: 1.1rem;" onclick="closeAiSettings()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="ai-provider">Πάροχος (Provider)</label>
+                    <select id="ai-provider" class="form-control" onchange="handleProviderChange()">
+                        <option value="openai">OpenAI (ChatGPT)</option>
+                        <option value="anthropic">Anthropic (Claude)</option>
+                        <option value="gemini">Google Gemini</option>
+                        <option value="openrouter">OpenRouter</option>
+                        <option value="custom">Custom Endpoint (Ollama / Local)</option>
+                    </select>
+                </div>
+                <div class="form-group" id="group-custom-url" style="display: none;">
+                    <label for="ai-custom-url">Base URL</label>
+                    <input type="text" id="ai-custom-url" class="form-control" placeholder="http://localhost:11434/v1/chat/completions">
+                </div>
+                <div class="form-group">
+                    <label for="ai-key">API Key</label>
+                    <input type="password" id="ai-key" class="form-control" placeholder="Εισάγετε το API Key">
+                </div>
+                <div class="form-group">
+                    <label for="ai-model">Μοντέλο (Model Name)</label>
+                    <input type="text" id="ai-model" class="form-control" placeholder="π.χ. gpt-4o-mini">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeAiSettings()">Άκυρο</button>
+                <button class="btn active" onclick="saveAiSettings()">Αποθήκευση</button>
+            </div>
+        </div>
+    </div>
+
+    <main id="main">
+        <header>
+            <div class="header-top">
+                <button class="btn menu-toggle" onclick="toggleSidebar()">☰ Περιεχόμενα</button>
+                <h1>ΔΗΜΟΣΘΕΝΗΣ Ὑπὲρ Μεγαλοπολιτών</h1>
+                <button class="btn options-toggle" onclick="toggleMobileOptions()" title="Ρυθμίσεις">⚙️</button>
+            </div>
+            
+            <div class="controls-group">
+                <button id="toggle-layout-btn" class="btn btn-layout" onclick="toggleLayout()">Hide Original</button>
+                <button class="btn" style="border-color: var(--accent-color);" onclick="openAiSettings()">⚙️ AI Config</button>
+                <button class="btn active theme-btn" id="theme-light" onclick="setTheme('light', this)">Light</button>
+                <button class="btn theme-btn" id="theme-sepia" onclick="setTheme('sepia', this)">Sepia</button>
+                <button class="btn theme-btn" id="theme-dark" onclick="setTheme('dark', this)">Dark</button>
+            </div>
+        </header>
+
+        <section id="book-content">
+            <div class="bilingual-header">
+                <div class="original-title">Αρχαία Ελληνικά (Original)</div>
+                <div class="translation-title">Νέα Ελληνικά (Translation)</div>
+            </div>
+
+            
+        <div id="book-1-chapter-1" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-1" data-hash="book-1-chapter-1">
+            ΠΡΟΟΙΜΙΟ • Κεφάλαιο 1 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=71&page=1" target="_blank" class="page-link">Page 1</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[1]</span> Ἀμφότεροί μοι δοκοῦσιν ἁμαρτάνειν, ὦ ἄνδρες Ἀθηναῖοι, καὶ οἱ τοῖς Ἀρκάσι καὶ οἱ τοῖς Λακεδαιμονίοις συνειρηκότες· ὥσπερ γὰρ ἀφ᾽ ἑκατέρων ἥκοντες, οὐχ ὑμῶν ὄντες [πολῖται], πρὸς οὓς ἀμφότεροι πρεσβεύουσι, κατηγοροῦσι καὶ διαβάλλουσιν ἀλλήλους. ἦν δὲ τοῦτο μὲν τῶν ἀφιγμένων ἔργον, τὸ δὲ κοινῶς ὑπὲρ τῶν πραγμάτων λέγειν καὶ τὰ βέλτισθ᾽ ὑπὲρ ὑμῶν σκοπεῖν ἄνευ φιλονικίας τῶν ἐνθάδε συμβουλεύειν ἀξιούντων. <span class="marker">[2]</span> νῦν δ᾽ ἔγωγε, εἴ τις αὐτῶν ἀφέλοι τὸ γιγνώσκεσθαι καὶ τὸ τῇ φωνῇ λέγειν Ἀττικιστί, πολλοὺς ἂν οἶμαι τοὺς μὲν Ἀρκάδας, τοὺς δὲ Λάκωνας αὐτῶν εἶναι νομίσαι. ἐγὼ δ᾽ ὁρῶ μὲν ὡς χαλεπὸν τὰ βέλτιστα λέγειν ἐστί· συνεξηπατημένων γὰρ ὑμῶν, καὶ τῶν μὲν ταυτί, τῶν δὲ ταυτὶ βουλομένων, ἂν τὰ μεταξύ τις ἐγχειρῇ λέγειν κᾆθ᾽ ὑμεῖς μὴ περιμένητε μαθεῖν, χαριεῖται μὲν οὐδετέροις, διαβεβλήσεται δὲ πρὸς ἀμφοτέρους· <span class="marker">[3]</span> οὐ μὴν ἀλλ᾽ αἱρήσομαι μᾶλλον αὐτός, ἂν ἄρα τοῦτο πάθω, δοκεῖν φλυαρεῖν, ἢ παρ᾽ ἃ βέλτιστα νομίζω τῇ πόλει, προέσθαι τισὶν ὑμᾶς ἐξαπατῆσαι. τὰ μὲν οὖν ἄλλ᾽ ὕστερον, ἂν ὑμῖν βουλομένοις ᾖ, λέξω· ἀπὸ δὲ τῶν ὁμολογουμένων ὑφ᾽ ἁπάντων ἄρξομαι, ἃ κράτιστα νομίζω διδάσκειν.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text"><i>ΠΡΟΟΙΜΙΟ (§§ 1-3)</i></span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[1]</span> Αθηναίοι, έχω την εντύπωση ότι σφάλλουν και οι δύο πλευρές, και αυτοί που συνηγόρησαν υπέρ των Αρκάδων και εκείνοι που συνηγόρησαν υπέρ των Λακεδαιμονίων· γιατί κατηγορούν και διαβάλλουν ο ένας τον άλλον, σαν να έχουν έρθει ως εκπρόσωποι της καθεμιάς από τις δύο αυτές πόλεις και σαν να μην είναι συμπολίτες δικοί σας, προς τους οποίους απευθύνονται και οι δυο αντιπροσωπείες. Οι αλληλοκατηγορίες όμως και οι αντεγκλήσεις ήταν έργο των αντιπροσωπειών, ενώ καθήκον αυτών που θεωρούν τους εαυτούς τους άξιους να σας δίνουν εδώ τις καλύτερες συμβουλές, είναι να μιλούν αμερόληπτα για την κατάσταση και να εξετάζουν την καλύτερη πολιτική για τα συμφέροντά σας έξω από μικροκομματικές σκοπιμότητες. <span class="marker">[2]</span> Τώρα όμως, αν εξαιρέσει κανείς ότι είναι γνωστά πρόσωπα και ότι μιλούν στην αττική διάλεκτο, πιστεύω ότι πολλοί θα τους περνούσαν άλλους για Αρκάδες και άλλους για Λάκωνες. Εγώ προσωπικά βλέπω πόσο δύσκολο είναι να δώσει κανείς την καλύτερη συμβουλή· γιατί, καθώς συμμερίζεστε τις αυταπάτες των συμβούλων σας και άλλοι θέλουν αυτό άλλοι εκείνο, αν κάποιος επιχειρήσει να προτείνει κάτι ενδιάμεσο και εσείς δεν έχετε την υπομονή να ακούσετε ως το τέλος, δεν θα ικανοποιήσει ούτε τη μια ούτε την άλλη πλευρά, αλλά θα συκοφαντηθεί και από τις δυο. <span class="marker">[3]</span> Παρ᾽ όλα αυτά, αν βρεθώ σε τέτοιο δίλημμα, θα προτιμήσω να φανώ ότι φλυαρώ παρά να σας αφήσω σε μερικούς να σας εξαπατήσουν, αντίθετα με όσα εγώ κρίνω ως τα καλύτερα για την πόλη. Τα άλλα γενικά σημεία θα τα πραγματευτώ, με την άδειά σας, αργότερα· τώρα θα αρχίσω από τις βασικές αρχές που αποδέχονται όλοι και που πιστεύω ότι είναι η καλύτερη πολιτική που πρέπει να σας εξηγήσω.</span></p>
+        </div>
+        
+
+        <div id="book-2-chapter-1" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-2" data-hash="book-2-chapter-1">
+            ΠΡΟΘΕΣΗ • Κεφάλαιο 1 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=71&page=2" target="_blank" class="page-link">Page 2</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[4]</span> Οὐκοῦν οὐδ᾽ ἂν εἷς ἀντείποι ὡς οὐ συμφέρει τῇ πόλει καὶ Λακεδαιμονίους ἀσθενεῖς εἶναι καὶ Θηβαίους τουτουσί. ἔστι τοίνυν ἔν τινι τοιούτῳ καιρῷ τὰ πράγματα νῦν, εἴ τι δεῖ τοῖς εἰρημένοις πολλάκις παρ᾽ ὑμῖν λόγοις τεκμήρασθαι, ὥστε Θηβαίους μὲν Ὀρχομενοῦ καὶ Θεσπιῶν καὶ Πλαταιῶν οἰκισθεισῶν ἀσθενεῖς γενέσθαι, Λακεδαιμονίους δ᾽, εἰ ποιήσονται τὴν Ἀρκαδίαν ὑφ᾽ ἑαυτοῖς καὶ Μεγάλην πόλιν ἀναιρήσουσι, πάλιν ἰσχυροὺς γενήσεσθαι. <span class="marker">[5]</span> σκεπτέον τοίνυν μὴ πρότερον τούσδε γενέσθαι φοβεροὺς καὶ μεγάλους ἐάσωμεν ἢ ᾽κεῖνοι μικροὶ γεγενήσονται, καὶ λάθωσιν ἡμᾶς πλείονι μείζους οἱ Λακεδαιμόνιοι γενόμενοι ἢ ὅσῳ τοὺς Θηβαίους ἐλάττους συμφέρει γενέσθαι. οὐ γὰρ ἐκεῖνό γ᾽ ἂν εἴποιμεν, ὡς ἀνταλλάξασθαι βουλοίμεθ᾽ ‹ἂν› ἀντιπάλους Λακεδαιμονίους ἀντὶ Θηβαίων, οὐδὲ τοῦτ᾽ ἔσθ᾽ ὃ σπουδάζομεν, ἀλλ᾽ ὅπως μηδέτεροι δυνήσονται μηδὲν ἡμᾶς ἀδικεῖν· οὕτω γὰρ ἂν ἡμεῖς μετὰ πλείστης ἀδείας εἴημεν.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text"><i>ΠΡΟΘΕΣΗ (§§ 4-5)</i></span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[4]</span> Κανείς λοιπόν δεν μπορεί να αρνηθεί ότι συμφέρει στην πόλη να είναι ανίσχυροι και οι Λακεδαιμόνιοι και οι Θηβαίοι οι γείτονές μας. Αν πρέπει να κρίνουμε από τα όσα έχουν λεχθεί επανειλημμένα σε σας, η κατάσταση σήμερα βρίσκεται σε τέτοιο κρίσιμο σημείο, ώστε να εξασθενήσουν οι Θηβαίοι με την επανίδρυση του Ορχομενού, των Θεσπιών και των Πλαταιών, αλλά να ενισχυθούν ξανά οι Λακεδαιμόνιοι, αν υποτάξουν την Αρκαδία και καταστρέψουν τη Μεγαλόπολη. <span class="marker">[5]</span> Γι᾽ αυτό, πρέπει να προσέξουμε μήπως οι Λακεδαιμόνιοι γίνουν τρομεροί και μεγάλοι πριν να έχουν εξασθενήσει οι Θηβαίοι, και μήπως, χωρίς να το αντιληφθούμε, γίνουν οι Λακεδαιμόνιοι πολύ πιο ισχυροί από όσο μας συμφέρει να εξασθενήσουν οι Θηβαίοι. Δεν θα υποστηρίξουμε άλλωστε ότι θα επιθυμούσαμε να έχουμε αντιπάλους τους Λακεδαιμονίους στη θέση των Θηβαίων και ούτε είναι αυτός ο στόχος μας, αλλά πώς θα βρούμε τρόπο ώστε να μην μπορούν να μας βλάψουν καθόλου μήτε οι μεν μήτε οι δε· γιατί έτσι μόνο θα έχουμε τη μεγαλύτερη δυνατή ασφάλεια.</span></p>
+        </div>
+        
+
+        <div id="book-3-chapter-1" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-3" data-hash="book-3-chapter-1">
+            ΠΙΣΤΕΙΣ • Κεφάλαιο 1 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=71&page=3" target="_blank" class="page-link">Page 3</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[6]</span> Ἀλλὰ νὴ Δία ταῦτα μὲν οὕτως δεῖν ἔχειν φήσομεν, δεινὸν δ᾽ εἰ, πρὸς οὓς παρεταττόμεθ᾽ ἐν Μαντινείᾳ, τούτους συμμάχους αἱρησόμεθα, εἶτα βοηθήσομεν τούτοις ἐναντί᾽ ἐκείνοις μεθ᾽ ὧν τότ᾽ ἐκινδυνεύομεν. κἀμοὶ ταῦτα δοκεῖ, προσδεῖσθαι δ᾽ ἔτι τοῦ «τὰ δίκαια ποιεῖν ἐθελόντων τῶν ἑτέρων.» <span class="marker">[7]</span> εἰ μὲν τοίνυν ἐθελήσουσιν εἰρήνην ἅπαντες ἄγειν, οὐ βοηθήσομεν τοῖς Μεγαλοπολίταις· οὐδὲν γὰρ δεήσει· ὥστ᾽ οὐδ᾽ ὁτιοῦν ὑπεναντίον ἡμῖν ἔσται πρὸς τοὺς συμπαραταξαμένους, σύμμαχοι δ᾽ ἡμῖν οἱ μὲν ὑπάρχουσιν, ὥς φασιν, οἱ δὲ προσγενήσονται νυνί. <span class="marker">[8]</span> καὶ τί ἂν ἄλλο βουλοίμεθα; ἐὰν δ᾽ ἀδικῶσι καὶ πολεμεῖν οἴωνται δεῖν, εἰ μὲν ὑπὲρ τούτου μόνον βουλευτέον, εἰ χρὴ Μεγάλην πόλιν ἡμᾶς προέσθαι Λακεδαιμονίοις ἢ μή, δίκαιον μὲν οὔ, συγχωρῶ δ᾽ ἔγωγ᾽ ἐᾶσαι καὶ μηδὲν ἐναντιωθῆναι τοῖς γε τῶν αὐτῶν μετασχοῦσι κινδύνων· εἰ δ᾽ ἅπαντες ἐπίστασθ᾽ ὅτι, ταύτην ἂν ἕλωσιν, ἴασ᾽ ἐπὶ Μεσσήνην, φρασάτω τις ἐμοὶ τῶν νῦν χαλεπῶν τοῖς Μεγαλοπολίταις, τί τόθ᾽ ἡμῖν συμβουλεύσει ποιεῖν. ἀλλ᾽ οὐδεὶς ἐρεῖ. <span class="marker">[9]</span> καὶ μὴν πάντες ἐπίστασθ᾽ ὡς, καὶ παραινούντων τούτων καὶ μή, βοηθητέον, καὶ διὰ τοὺς ὅρκους οὓς ὀμωμόκαμεν Μεσσηνίοις, καὶ διὰ τὸ συμφέρον εἶναι κατοικεῖσθαι ταύτην τὴν πόλιν. σκοπεῖσθε δὴ πρὸς ὑμᾶς αὐτοὺς ποτέραν τὴν ἀρχὴν καλλίονα καὶ φιλανθρωποτέραν ποιήσεσθε τοῦ μὴ ᾽πιτρέπειν ἀδικεῖν Λακεδαιμονίοις, τὴν ὑπὲρ Μεγάλης πόλεως ἢ τὴν ὑπὲρ Μεσσήνης. <span class="marker">[10]</span> νῦν μέν γε βοηθεῖν δόξετ᾽ Ἀρκάσι, καὶ τὴν εἰρήνην σπουδάζειν εἶναι βεβαίαν, ὑπὲρ ἧς ἐκινδυνεύσατε καὶ παρετάξασθε· τότε δ᾽ εὔδηλοι πᾶσιν ἔσεσθε οὐ τοῦ δικαίου μᾶλλον εἵνεκα Μεσσήνην εἶναι βουλόμενοι ἢ τοῦ πρὸς Λακεδαιμονίους φόβου. δεῖ δὲ σκοπεῖν μὲν καὶ πράττειν ἀεὶ τὰ δίκαια, συμπαρατηρεῖν δ᾽ ὅπως ἅμα καὶ συμφέροντ᾽ ἔσται ταῦτα.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text"><i>ΠΙΣΤΕΙΣ (§§ 6-31)</i></span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[6]</span> Μα τον Δία, θα δεχτούμε ότι έτσι έπρεπε να έχουν αυτά· θα ήταν όμως φοβερό να προτιμήσουμε ως συμμάχους μας αυτούς που αντιμετωπίσαμε στη Μαντίνεια και στη συνέχεια να τους βοηθήσουμε εναντίον εκείνων με τους οποίους μοιραστήκαμε τότε τους κινδύνους. Και εγώ είμαι της ίδιας γνώμης, αλλά να προστεθεί η φράση «εφόσον και οι άλλοι είναι αποφασισμένοι να κάνουν αυτό που είναι δίκαιο». <span class="marker">[7]</span> Αν λοιπόν είναι όλοι αποφασισμένοι να τηρήσουν την ειρήνη, δεν θα βοηθήσουμε τους Μεγαλοπολίτες, γιατί δεν θα χρειαστεί· επομένως, δεν θα υπάρξει από την πλευρά μας τίποτε εντελώς εχθρικό προς τους «εν όπλοις» συντρόφους μας· εξάλλου, οι μεν είναι σίγουροι σύμμαχοί μας, όπως δηλώνουν, οι άλλοι θα γίνουν τώρα. <span class="marker">[8]</span> Τι περισσότερο λοιπόν θα θέλαμε; Αν όμως οι Λακεδαιμόνιοι ενεργήσουν με άδικο τρόπο και πιστεύουν ότι είναι απαραίτητο να κάνουν πόλεμο, τότε, αν το ζήτημα για το οποίο πρέπει να αποφασίσουμε είναι τούτο μόνο, αν δηλαδή είναι σωστό να θυσιάσουμε τη Μεγαλόπολη σ᾽ αυτούς ή όχι, δεν είναι βέβαια δίκαιο, ωστόσο εγώ προσωπικά συμφωνώ να τους αφήσουμε και να μην εναντιωθούμε καθόλου σ᾽ αυτούς που μοιράστηκαν τους ίδιους κινδύνους με μας· από την άλλη όμως, αν όλοι γνωρίζετε καλά ότι μετά την κατάληψη της Μεγαλόπολης θα βαδίσουν εναντίον της Μεσσήνης, ας μου πει κάποιος από αυτούς που κρατούν τώρα σκληρή στάση απέναντι στους Μεγαλοπολίτες τι θα μας συμβουλεύσει τότε να κάνουμε. Δεν πρόκειται όμως να μου απαντήσει κανένας. <span class="marker">[9]</span> Και όμως όλοι γνωρίζετε καλά, είτε μας το συνιστούν οι ομιλητές είτε όχι, ότι πρέπει να βοηθήσουμε τους Μεσσηνίους και γιατί είμαστε δεσμευμένοι από τους όρκους που δώσαμε σ᾽ αυτούς και γιατί είναι προς το συμφέρον μας να υπάρχει αυτή η πόλη. Αναρωτηθείτε απλώς πότε θα αρχίζατε την αντίστασή σας στις αδικίες των Λακεδαιμονίων με περισσότερη τιμή και γενναιοφροσύνη, στην περίπτωση υπεράσπισης της Μεγαλόπολης ή στην περίπτωση υπεράσπισης της Μεσσήνης. <span class="marker">[10]</span> Στην πρώτη περίπτωση θα δείξετε ότι βοηθάτε τους Αρκάδες και ότι ενδιαφέρεστε για τη διασφάλιση της ειρήνης, για την οποία αντιμετωπίσατε κίνδυνο και πολεμήσατε· στην άλλη περίπτωση όμως θα δουν όλοι καθαρά ότι επιθυμείτε να υπάρχει αυτή η πόλη όχι τόσο χάριν του δικαίου όσο από φόβο προς τους Λακεδαιμονίους. Πρέπει κανείς να προσπαθεί πάντοτε να βλέπει ποιο είναι το δίκαιο και να ενεργεί σύμφωνα με αυτό· παράλληλα όμως να προσέχει αν αυτό θα είναι προς το συμφέρον του.</span></p>
+        </div>
+        
+
+        <div id="book-3-chapter-1-2" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-4" data-hash="book-3-chapter-1-2">
+            ΠΙΣΤΕΙΣ • Κεφάλαιο 1.2 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=71&page=4" target="_blank" class="page-link">Page 4</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[11]</span> Ἔστι τοίνυν τοιοῦτός τις λόγος παρὰ τῶν ἀντιλεγόντων, ὡς κομίσασθαι τὸν Ὠρωπὸν ἡμᾶς ἐγχειρεῖν δεῖ, εἰ δὲ τοὺς βοηθήσαντας ἂν ἡμῖν νῦν ἐπ᾽ αὐτὸν ἐχθροὺς κτησόμεθα, οὐχ ἕξομεν συμμάχους. ἐγὼ δὲ τὸ μὲν κομίσασθαι Ὠρωπὸν πειρᾶσθαι δεῖν φημι καὶ αὐτός· τὸ δ᾽ ἐχθροὺς ἡμῖν Λακεδαιμονίους ἔσεσθαι νῦν, ἐὰν ποιώμεθα συμμάχους Ἀρκάδων τοὺς βουλομένους ἡμῖν εἶναι φίλους, μόνοις οὐδ᾽ εἰπεῖν ἐξεῖναι νομίζω τοῖς πείσασιν ὑμᾶς, ὅτ᾽ ἐκινδύνευον Λακεδαιμόνιοι, βοηθεῖν. <span class="marker">[12]</span> οὐ γὰρ ταῦτα λέγοντες ἔπεισαν ὑμᾶς, πάντων Πελοποννησίων ἐλθόντων ὡς ὑμᾶς καὶ μεθ᾽ ὑμῶν ἀξιούντων ἐπὶ τοὺς Λακεδαιμονίους ἰέναι, τοὺς μὲν μὴ προσδέξασθαι (καὶ διὰ τοῦθ᾽, ὅπερ ἦν ὑπόλοιπον αὐτοῖς, ἐπὶ Θηβαίους ἦλθον), ὑπὲρ δὲ τῆς Λακεδαιμονίων σωτηρίας καὶ χρήματ᾽ εἰσφέρειν καὶ τοῖς σώμασι κινδυνεύειν· οὐδ᾽ ἂν ὑμεῖς ἠθελήσατε δήπου σῴζειν αὐτούς, εἰ τοῦτο προὔλεγον ὑμῖν, ὅτι σωθέντες, ἐὰν μὴ ποιεῖν ὅ τι βούλονται πάλιν αὐτοὺς ἐᾶτε καὶ ἀδικεῖν, οὐδεμίαν ὑμῖν χάριν ἕξουσι τῆς σωτηρίας. <span class="marker">[13]</span> καὶ μὴν εἰ σφόδρ᾽ ἐναντίον ἐστὶ τοῖς Λακεδαιμονίων ἐπιχειρήμασιν τὸ τοὺς Ἀρκάδας ἡμᾶς συμμάχους ποιήσασθαι, προσήκει δήπου πλείω χάριν αὐτοὺς ἔχειν ὧν ἐσώθησαν ὑφ᾽ ἡμῶν εἰς τοὺς ἐσχάτους ἐλθόντες κινδύνους ἢ ὧν ἀδικεῖν κωλύονται νῦν ὀργίζεσθαι. ὥστε πῶς οὐ βοηθήσουσιν ἡμῖν ἐπ᾽ Ὠρωπόν, ἢ κάκιστοι πάντων ἀνθρώπων δόξουσιν εἶναι; μὰ τοὺς θεοὺς ἔγωγ᾽ οὐχ ὁρῶ.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[14]</span> Θαυμάζω τοίνυν καὶ τῶν λεγόντων τοῦτον τὸν λόγον, ὡς εἰ συμμάχους ποιησόμεθ᾽ Ἀρκάδας καὶ ταῦτα πράξομεν, μεταβάλλεσθαι δόξει καὶ οὐδὲν ἔχειν πιστὸν ἡ πόλις. ἐμοὶ μὲν γὰρ δοκεῖ τοὐναντίον, ὦ ἄνδρες Ἀθηναῖοι. διὰ τί; ὅτι τῶν πάντων οὐδέν᾽ ἂν ἀντειπεῖν οἴομαι ὡς οὐ καὶ Λακεδαιμονίους καὶ πρότερον Θηβαίους καὶ τὸ τελευταῖον Εὐβοέας ἔσωσεν ἡ πόλις, καὶ μετὰ ταῦτα συμμάχους ἐποιήσατο, ἕν τι καὶ ταὔτ᾽ ἀεὶ βουλομένη πράττειν. <span class="marker">[15]</span> ἔστι δὲ τοῦτο τί; τοὺς ἀδικουμένους σῴζειν. εἰ τοίνυν ταῦθ᾽ οὕτως ἔχει, οὐκέτ᾽ ἂν ἡμεῖς εἴημεν οἱ μεταβαλλόμενοι, ἀλλ᾽ οἱ μὴ ᾽θέλοντες τοῖς δικαίοις ἐμμένειν, καὶ φανήσεται τὰ πράγματ᾽ ἀεὶ διὰ τοὺς πλεονεκτεῖν βουλομένους μεταβαλλόμενα, οὐχ ἡ πόλις ἡμῶν.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[11]</span> Οι αντίπαλοί μου υποστηρίζουν τώρα ότι πρέπει να επιχειρήσουμε να ανακτήσουμε τον Ωρωπό· αλλά αν κάνουμε τώρα εχθρούς αυτούς που θα μας βοηθήσουν σε αυτό το εγχείρημα, δεν θα έχουμε συμμάχους. Και εγώ προσωπικά φρονώ ότι πρέπει να προσπαθήσουμε να πάρουμε πίσω τον Ωρωπό· αλλά ότι οι Λακεδαιμόνιοι θα γίνουν τώρα εχθροί μας, αν κάνουμε συμμάχους όσους από τους Αρκάδες επιθυμούν να γίνουν φίλοι μας, νομίζω πως οι μόνοι που δεν έχουν καν δικαίωμα να το πουν είναι αυτοί που σας έπεισαν να βοηθήσετε τους Λακεδαιμονίους, όταν κινδύνευαν. <span class="marker">[12]</span> Γιατί, όταν όλοι οι Πελοποννήσιοι ήρθαν σε σας και αξίωναν να βαδίσουν μαζί με σας εναντίον των Λακεδαιμονίων, δεν σας έπεισαν με τέτοια επιχειρήματα οι άνδρες αυτοί να αρνηθείτε (και γι᾽ αυτό στράφηκαν προς τους Θηβαίους, το μόνο που τους απέμενε)· αντίθετα, σας έπεισαν και να συνεισφέρετε χρήματα και να διακινδυνεύσετε τη ζωή σας για τη σωτηρία των Λακεδαιμονίων. Ασφαλώς, δεν θα δείχνατε προθυμία να τους σώσετε, αν εκ των προτέρων σας έλεγαν ότι, αν σώζονταν, δεν θα σας χρωστούσαν καμιά ευγνωμοσύνη για τη σωτηρία τους, αν δεν τους αφήνατε να κάνουν ξανά ό,τι θέλουν και να διαπράττουν αδικίες. <span class="marker">[13]</span> Επίσης, ακόμη και αν η συμμαχία μας με τους Αρκάδες αποτελεί σοβαρό εμπόδιο στα σχέδια των Λακεδαιμονίων, οφείλουν να είναι, κατά τη γνώμη μου, περισσότερο ευγνώμονες για ό,τι κάναμε για τη σωτηρία τους, όταν διέτρεξαν τον σοβαρότερο κίνδυνο, παρά να οργίζονται τώρα για όσες αδικίες εμποδίζονται να κάνουν. Συνεπώς, πώς είναι δυνατόν να μην μας βοηθήσουν στην προσπάθειά μας να ανακτήσουμε τον Ωρωπό, αφού στην αντίθετη περίπτωση θα αποδειχτούν ότι είναι οι χειρότεροι των ανθρώπων; Μα τους θεούς, εγώ τουλάχιστον δεν βλέπω τον τρόπο.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[14]</span> Εκπλήσσομαι λοιπόν και με όσους προβάλλουν το επιχείρημα ότι τάχα, αν συμμαχήσουμε με τους Αρκάδες και υιοθετήσουμε αυτήν την πολιτική, θα φανεί πως η πόλη μας αλλάζει πολιτική και είναι τελείως αναξιόπιστη. Εγώ όμως, Αθηναίοι, έχω τη γνώμη ότι συμβαίνει το αντίθετο. Γιατί; Διότι πιστεύω ότι κανένας στον κόσμο δεν θα αρνιόταν ότι η πόλη μας έσωσε τους Λακεδαιμονίους και πιο πριν τους Θηβαίους και πρόσφατα τους Ευβοείς και ότι κατόπιν συμμάχησε με αυτούς, επειδή ο στόχος της ήταν πάντοτε ένας και ο αυτός. <span class="marker">[15]</span> Ποιός είναι αυτός; Να σώζει όσους αδικούνται. Αν λοιπόν έτσι έχουν τα πράγματα, δεν είμαστε εμείς αυτοί που αλλάζουμε, αλλά όσοι αρνούνται να μένουν πιστοί στις αρχές του δικαίου· και θα αποδειχτεί ότι η κατάσταση μεταβάλλεται εξαιτίας πάντοτε της πολιτικής αυτών που θέλουν να επωφελούνται από την αλλαγή, η πόλη μας όμως δεν αλλάζει.</span></p>
+        </div>
+        
+
+        <div id="book-3-chapter-1-3" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-5" data-hash="book-3-chapter-1-3">
+            ΠΙΣΤΕΙΣ • Κεφάλαιο 1.3 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=71&page=5" target="_blank" class="page-link">Page 5</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[16]</span> Δοκοῦσι δέ μοι Λακεδαιμόνιοι μάλα δεινῶν ἔργον ἀνθρώπων ποιεῖν. νῦν γάρ φασιν ἐκεῖνοι δεῖν Ἠλείους μὲν τῆς Τριφυλίας τινὰ κομίσασθαι, Φλειασίους δὲ τὸ Τρικάρανον, ἄλλους δέ τινας τῶν Ἀρκάδων τὴν αὑτῶν, καὶ τὸν Ὠρωπὸν ἡμᾶς, οὐχ ἵν᾽ ἑκάστους ἡμῶν ἴδωσιν ἔχοντας τὰ αὑτῶν, οὐδ᾽ ὀλίγου δεῖ· ὀψὲ γὰρ ἂν φιλάνθρωποι γεγονότες εἶεν· <span class="marker">[17]</span> ἀλλ᾽ ἵνα πᾶσι δοκῶσι συμπράττειν ὅπως ἕκαστοι κομίσωνται ταῦθ᾽ ἅ φασιν αὑτῶν εἶναι, ἐπειδὰν δ᾽ ἴωσ᾽ ἐπὶ Μεσσήνην αὐτοί, συστρατεύωνται πάντες αὐτοῖς οὗτοι καὶ βοηθῶσι προθύμως, ἢ δοκῶσ᾽ ἀδικεῖν, περὶ ὧν ἔφασαν ἕκαστοι σφῶν αὐτῶν εἶναι συμψήφους λαβόντες ἐκείνους, μὴ τὴν ὁμοίαν αὐτοῖς [χάριν] ἀποδιδόντες. <span class="marker">[18]</span> ἐγὼ δὲ νομίζω τὴν πόλιν, πρῶτον μὲν καὶ χωρὶς τοῦ καθυφεῖναι Λακεδαιμονίοις τινὰς Ἀρκάδων, Ὠρωπὸν ἂν κομίσασθαι, καὶ μετ᾽ ἐκείνων, ἂν τὰ δίκαια ποιεῖν ἐθέλωσι, καὶ μετὰ τῶν ἄλλων τῶν οὐκ οἰομένων δεῖν Θηβαίους ἐᾶν ἔχειν τἀλλότρια. εἰ δ᾽ ἄρα τοῦτ᾽ εὔδηλον ἡμῖν γένοιτο, ὅτι μὴ Λακεδαιμονίους ἐῶντες τὴν Πελοπόννησον καταστρέψασθαι οὐχ οἷοί τ᾽ ἐσόμεθ᾽ Ὠρωπὸν λαβεῖν, αἱρετώτερον, εἰ οἷόν τ᾽ εἰπεῖν, ἡγοῦμαι τὸν Ὠρωπὸν ἐᾶν ἢ Λακεδαιμονίοις Μεσσήνην προέσθαι καὶ Πελοπόννησον. οὐ γὰρ ἂν ἡγοῦμαι περὶ τούτου μόνον ἡμῖν εἶναι τὸν λόγον πρὸς ἐκείνους, ἀλλ᾽ — ἐάσω τό γ᾽ ἐπελθὸν εἰπεῖν μοι· περὶ πολλῶν δ᾽ ἂν οἶμαι κίνδυνον ἡμῖν γενέσθαι.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[16]</span> Η πολιτική που ακολουθούν οι Λακεδαιμόνιοι δείχνει ανθρώπους εξαιρετικά έξυπνους. Διακηρύττουν δηλαδή τώρα εκείνοι ότι πρέπει οι Ηλείοι να ανακτήσουν κάποια μέρη της Τριφυλίας, οι Φλειάσιοι το Τρικάρανο, κάποιοι άλλοι Αρκάδες τη γη που τους ανήκει και εμείς τον Ωρωπό, όχι για να δουν τον καθένα από μας να έχει αυτό που του ανήκει, κάθε άλλο —γιατί κάπως αργά θα είχαν δείξει τα φιλανθρωπικά τους αισθήματα— <span class="marker">[17]</span> αλλά για να φανεί σε όλους ότι τους βοηθούν να πάρουν πίσω ό,τι ο καθένας τους υποστηρίζει ότι είναι δικά του, ώστε, όταν οι ίδιοι βαδίσουν εναντίον της Μεσσήνης, όλοι αυτοί να σπεύσουν σε βοήθεια· διαφορετικά, θα χαρακτηριστούν άδικοι, εφόσον δεν τους ανταποδίδουν τα ίδια, ενώ είχαν τους Λακεδαιμονίους υποστηριχτές σχετικά με αυτά που ο καθένας τους υποστήριζε ότι του ανήκουν. <span class="marker">[18]</span> Εγώ προσωπικά νομίζω ότι κατ᾽ αρχάς, και χωρίς να θυσιάσουμε μερικούς Αρκάδες στους Σπαρτιάτες, θα μπορούσε η πόλη μας να ανακτήσει τον Ωρωπό με τη βοήθεια και των Λακεδαιμονίων, αν δεχτούν να ενεργήσουν δίκαια, και των άλλων, όσοι νομίζουν ότι δεν πρέπει να αφήνουν τους Θηβαίους να κατέχουν ξένα εδάφη. Αν πάλι γίνει σαφέστατο σε μας ότι, σε περίπτωση που δεν αφήσουμε τους Λακεδαιμονίους να υποτάξουν την Πελοπόννησο, δεν θα μπορέσουμε να πάρουμε πίσω τον Ωρωπό, τότε νομίζω ότι είναι προτιμότερο —επιτρέψτε μου να το πω— να μην διεκδικήσουμε τον Ωρωπό παρά να αφήσουμε στο έλεος των Λακεδαιμονίων τη Μεσσήνη και ολόκληρη την Πελοπόννησο. Γιατί νομίζω ότι ο Ωρωπός δεν θα ήταν το μόνο θέμα διένεξης μεταξύ μας, αλλά — ας αφήσω αυτό που μου ήρθε στο μυαλό να σας πω· πιστεύω όμως ότι θα διατρέξουμε κίνδυνο για πολλά.</span></p>
+        </div>
+        
+
+        <div id="book-3-chapter-1-4" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-6" data-hash="book-3-chapter-1-4">
+            ΠΙΣΤΕΙΣ • Κεφάλαιο 1.4 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=71&page=6" target="_blank" class="page-link">Page 6</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[19]</span> Ἀλλὰ μὴν ἅ γέ φασιν πεπρᾶχθαι διὰ Θηβαίους τοῖς Μεγαλοπολίταις ὑπεναντία πρὸς ἡμᾶς, ἄτοπον νῦν [μὲν] ἐν κατηγορίας μέρει ποιεῖσθαι, βουλομένων δὲ γενέσθαι φίλων αὐτῶν, ἵνα τοὐναντίον εὖ ποιῶσιν ἡμᾶς, βασκαίνειν καὶ σκοπεῖν ἐξ ὅτου τρόπου μὴ γενήσονται, καὶ μὴ γιγνώσκειν ὅτι, ὅσῳ ἂν σπουδαιοτέρους τούτους περὶ Θηβαίους γεγενημένους ἀποδείξωσι, τοσούτῳ πλείονος ὀργῆς αὐτοὶ δικαίως ἂν τυγχάνοιεν, εἰ τοιούτων συμμάχων τὴν πόλιν, ὅτ᾽ ἐφ᾽ ὑμᾶς προτέρους ἦλθον ἢ Θηβαίους, ἀπεστέρησαν. <span class="marker">[20]</span> ἀλλ᾽, οἶμαι, ταῦτα μέν ἐστι δεύτερον ἀνθρώπων βουλομένων ἑτέρων ποιῆσαι τούτους συμμάχους. ἐγὼ δ᾽ οἶδα, ὅσ᾽ ἂν ἐκ λογισμοῦ σκοπῶν τις εἰκάσαι, καὶ τοὺς πολλοὺς οἶμαι ὑμῶν ἐμοὶ ταὐτὰ φήσειν, ὅτι εἰ λήψονται Μεγάλην πόλιν Λακεδαιμόνιοι, κινδυνεύσει Μεσσήνη· εἰ δὲ καὶ ταύτην λήψονται, φήμ᾽ ἡμᾶς ἔσεσθαι συμμάχους Θηβαίων. <span class="marker">[21]</span> πολὺ δὴ κάλλιον καὶ ἄμεινον τὴν μὲν Θηβαίων συμμαχίαν αὐτοὺς παραλαβεῖν, τῇ δὲ Λακεδαιμονίων πλεονεξίᾳ μὴ ᾽πιτρέψαι, ἢ νῦν ὀκνοῦντας μὴ τοὺς Θηβαίων σώσωμεν συμμάχους, τούτους μὲν προέσθαι, πάλιν δὲ σῴζειν αὐτοὺς τοὺς Θηβαίους, καὶ προσέτ᾽ ἐν φόβῳ καθεστάναι περὶ ἡμῶν αὐτῶν. <span class="marker">[22]</span> οὐ γὰρ ἔγωγ᾽ ἀδεὲς τοῦθ᾽ ὑπολαμβάνω τῇ πόλει, τὸ λαβεῖν Μεγάλην πόλιν Λακεδαιμονίους καὶ πάλιν γενέσθαι μεγάλους. ὁρῶ γὰρ αὐτοὺς καὶ νῦν οὐχ ὑπὲρ τοῦ μὴ παθεῖν τι κακὸν πολεμεῖν αἱρουμένους, ἀλλ᾽ ὑπὲρ τοῦ κομίσασθαι τὴν πρότερον οὖσαν αὑτοῖς δύναμιν· ὧν δ᾽, ὅτ᾽ ἐκείνην εἶχον, ὠρέγοντο, ταῦθ᾽ ὑμεῖς μᾶλλον ἴσως εἰδότες ἢ ᾽γὼ φοβοῖσθ᾽ ἂν εἰκότως.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[23]</span> Ἡδέως δ᾽ ἂν πυθοίμην τῶν λεγόντων καὶ τοὺς Θηβαίους μισεῖν φασκόντων καὶ τοὺς Λακεδαιμονίους, πότερ᾽ ἑκάτεροι μισοῦσιν, οὓς δὴ μισοῦσιν, ὑπὲρ ὑμῶν καὶ τοῦ συμφέροντος ὑμῖν, ἢ ὑπὲρ Λακεδαιμονίων μὲν Θηβαίους, ὑπὲρ δὲ Θηβαίων Λακεδαιμονίους ἑκάτεροι. εἰ μὲν γὰρ ὑπὲρ ἐκείνων, οὐδετέροις ὡς μαινομένοις πείθεσθαι προσήκει· εἰ δ᾽ ὑπὲρ ὑμῶν φήσουσι, τί πέρα τοῦ καιροῦ τοὺς ἑτέρους ἐπαίρουσιν; <span class="marker">[24]</span> ἔστι γάρ, ἔστι Θηβαίους ταπεινοὺς ποιεῖν ἄνευ τοῦ Λακεδαιμονίους ἰσχυροὺς καθιστάναι, καὶ πολύ γε ῥᾷον· ὡς δ᾽, ἐγὼ πειράσομαι πρὸς ὑμᾶς εἰπεῖν. ἴσμεν ἅπαντες τοῦθ᾽ ὅτι τὰ μὲν δίκαια πάντες, ἐὰν καὶ μὴ βούλωνται, μέχρι τού γ᾽ αἰσχύνονται μὴ πράττειν, τοῖς δ᾽ ἀδίκοις ἐναντιοῦνται φανερῶς, ἄλλως τε κἄν τινες βλάπτωνται· καὶ τοῦτο λυμαινόμενον πάνθ᾽ εὑρήσομεν, καὶ ταύτην ἀρχὴν οὖσαν πάντων τῶν κακῶν, τὸ μὴ ᾽θέλειν τὰ δίκαια πράττειν ἁπλῶς. <span class="marker">[25]</span> ἵνα τοίνυν μὴ τοῦτ᾽ ἐμποδὼν γένηται τῷ Θηβαίους γενέσθαι μικρούς, τὰς μὲν Θεσπιὰς καὶ τὸν Ὀρχομενὸν καὶ τὰς Πλαταιὰς κατοικίζεσθαι φῶμεν δεῖν καὶ συμπράττωμεν αὐτοῖς καὶ τοὺς ἄλλους ἀξιῶμεν (ταῦτα γὰρ καὶ καλὰ καὶ δίκαια, μὴ περιορᾶν πόλεις ἀρχαίας ἐξανεστώσας), τὴν δὲ Μεγάλην πόλιν καὶ τὴν Μεσσήνην μὴ προώμεθα τοῖς ἀδικοῦσι, μηδ᾽ ἐπὶ τῇ προφάσει τῇ Πλαταιῶν καὶ Θεσπιῶν τὰς οὔσας καὶ κατοικουμένας πόλεις ἀναιρεθείσας περιίδωμεν. <span class="marker">[26]</span> κἂν ᾖ ταῦτα πρόδηλα, οὐδεὶς ὅστις οὐ βουλήσεται παύσασθαι Θηβαίους ἔχοντας τὴν ἀλλοτρίαν· εἰ δὲ μή, πρῶτον μὲν ἐναντίους ἕξομεν πρὸς ἐκεῖνα τούτους εἰκότως, ὅταν ἡγῶνται τὴν ἐκείνων κατοίκισιν αὑτοῖς ὄλεθρον φέρειν, εἶτ᾽ ἀνήνυτα πράγμαθ᾽ ἕξομεν αὐτοί· τί γὰρ ὡς ἀληθῶς ἔσται πέρας, ὅταν ἀεὶ τὰς μὲν οὔσας πόλεις ἐῶμεν ἀναιρεῖν, τὰς δ᾽ ἀνῃρημένας ἀξιῶμεν οἰκίζειν;</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[19]</span> Επίσης είναι γελοίο να θεωρήσουμε τώρα ως αιτία κατηγορίας τις ενέργειες που λένε ότι έχουν κάνει οι Μεγαλοπολίτες εις βάρος μας χάριν των Θηβαίων, και ενώ επιθυμούν να γίνουν φίλοι μας, για να μας ωφελήσουν τώρα πια, εμείς να δυσπιστούμε και να κοιτάζουμε να βρούμε τρόπους ώστε να μην γίνουν, και να μην καταλαβαίνετε ότι, όσο πιο ενθουσιώδεις δείξουν οι ομιλητές ότι υπήρξαν οι Μεγαλοπολίτες για τους Θηβαίους, τόσο μεγαλύτερη οργή δίκαια θα προκαλέσουν σε σας εναντίον τους, εφόσον στέρησαν την πόλη από τέτοιους συμμάχους, όταν ήρθαν σε σας πριν απευθυνθούν στη Θήβα. <span class="marker">[20]</span> Αλλά αυτά είναι κατά τη γνώμη μου ισχυρισμοί ανθρώπων που θέλουν για δεύτερη φορά να κάνουν τους Μεγαλοπολίτες συμμάχους άλλων. Εγώ όμως γνωρίζω, όσο μπορεί να προβλέψει κανείς, αν κρίνει με τη λογική του, και νομίζω ότι οι περισσότεροι από σας θα συμφωνήσουν μαζί μου, ότι, αν οι Λακεδαιμόνιοι καταλάβουν τη Μεγαλόπολη, θα κινδυνεύσει η Μεσσήνη· και αν καταλάβουν και αυτήν, φρονώ ότι θα βρεθούμε σύμμαχοι με τους Θηβαίους. <span class="marker">[21]</span> Είναι λοιπόν προτιμότερο και πολύ πιο έντιμο να δεχτούμε τη συμμαχία των Θηβαίων και να μην επιτρέψουμε την επεκτατική διάθεση των Λακεδαιμονίων παρά, διστάζοντας τώρα να σώσουμε τους συμμάχους των Θηβαίων, να τους εγκαταλείψουμε στην τύχη τους και τελικά να προσπαθούμε να σώσουμε τους ίδιους τους Θηβαίους και επιπλέον να είμαστε σε διαρκή φόβο για μας τους ίδιους. <span class="marker">[22]</span> Γιατί εγώ τουλάχιστον θεωρώ επικίνδυνο πράγμα για την Αθήνα την κατάληψη της Μεγαλόπολης από τους Λακεδαιμονίους και την εκ νέου ισχυροποίησή τους. Γιατί βλέπω ότι ακόμη και τώρα καταφεύγουν στον πόλεμο όχι για να μην πάθουν κάτι κακό, αλλά για να ανακτήσουν την παλαιά τους δύναμη· και καθώς γνωρίζετε καλύτερα από εμένα ποιες ήταν οι ορέξεις τους τον καιρό της παντοδυναμίας τους, θα ήταν ίσως πιο λογικό εσείς να ανησυχείτε περισσότερο.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[23]</span> Ευχαρίστως θα ζητούσα να μάθω από αυτούς που διακηρύσσουν ότι μισούν τόσο τους Θηβαίους όσο και τους Λακεδαιμονίους, για ποιόν λόγο μισεί η κάθε πλευρά όσους μισεί, χάριν υμών και των συμφερόντων σας ή η κάθε πλευρά μισεί τους Θηβαίους χάριν των Λακεδαιμονίων και τους Λακεδαιμονίους χάριν των Θηβαίων. Αν μισούν τους μεν χάριν των δε, δεν πρέπει να δώσετε βάση σε κανέναν από αυτούς, γιατί παραλογίζονται· αν πάλι ισχυριστούν ότι τους μισούν για το καλό σας, τότε για ποιόν λόγο προωθούν αδικαιολόγητα τα συμφέροντα τρίτων; <span class="marker">[24]</span> Γιατί μπορούμε, πράγματι μπορούμε να αποδυναμώσουμε τους Θηβαίους χωρίς να καταστήσουμε ισχυρούς τους Λακεδαιμονίους και μάλιστα πολύ πιο εύκολα· το πώς θα γίνει αυτό, θα προσπαθήσω να σας το πω εγώ. Ο καθένας μας γνωρίζει καλά ότι όλοι οι άνθρωποι, αν και δεν το θέλουν, ντρέπονται ως ένα σημείο να μην κάνουν αυτό που είναι δίκαιο, αλλά από την άλλη θέλουν να φαίνονται ότι είναι αντίθετοι στις αδικίες, ιδιαίτερα μάλιστα αν κάποιοι βλάπτονται από αυτές. Και θα διαπιστώσουμε ότι αυτό που καταστρέφει τα πάντα και αποτελεί τη ρίζα όλων των κακών είναι γενικώς η απροθυμία όλων να ενεργούν δίκαια. <span class="marker">[25]</span> Για να μην γίνει λοιπόν αυτό εμπόδιο στην εξασθένιση των Θηβαίων, ας δεχτούμε ότι πρέπει να επανιδρυθούν οι Θεσπιές, ο Ορχομενός και οι Πλαταιές, ας συνεργαστούμε με τους κατοίκους των πόλεων αυτών και ας αξιώσουμε το ίδιο και από τις άλλες πόλεις (άλλωστε είναι και έντιμη και δίκαιη πολιτική να μην ανεχόμαστε τον αφανισμό παλαιών πόλεων), αλλά παράλληλα ας μην προσφέρουμε θυσία σε άδικους ανθρώπους τη Μεγαλόπολη και τη Μεσσήνη μήτε με τη δικαιολογία της επανίδρυσης των Πλαταιών και των Θεσπιών να επιτρέψουμε να καταστραφούν πόλεις υπάρχουσες και κατοικημένες. <span class="marker">[26]</span> Αν διακηρύξουμε αυτά, δεν θα υπάρξει κανείς που να μην θελήσει να παύσουν οι Θηβαίοι να κρατούν τα ξένα εδάφη· διαφορετικά, κατ᾽ αρχήν θα αντιμετωπίσουμε την αντίδραση των Θηβαίων σε εκείνα τα σχέδια, όταν σκεφθούν ότι η επανίδρυση εκείνων των πόλεων θα προκαλέσει την καταστροφή τους, και έπειτα εμείς οι ίδιοι θα εμπλακούμε σε δυσάρεστες καταστάσεις χωρίς διέξοδο. Γιατί πού θα τελειώσει αλήθεια το πράγμα, όταν μόνιμα από τη μια επιτρέπουμε την καταστροφή υπαρκτών πόλεων και από την άλλη αξιώνουμε την επανίδρυση των κατεστραμμένων;</span></p>
+        </div>
+        
+
+        <div id="book-3-chapter-1-5" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-7" data-hash="book-3-chapter-1-5">
+            ΠΙΣΤΕΙΣ • Κεφάλαιο 1.5 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=71&page=7" target="_blank" class="page-link">Page 7</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[27]</span> Λέγουσι τοίνυν οἱ μάλιστα δοκοῦντες δίκαια λέγειν ὡς δεῖ τὰς στήλας καθελεῖν αὐτοὺς τὰς πρὸς Θηβαίους, εἴπερ ἡμέτεροι βεβαίως ἔσονται σύμμαχοι. οἱ δέ φασι μὲν αὑτοῖς οὐ[κ εἶναι] στήλας, ἀλλὰ τὸ συμφέρον εἶναι τὸ ποιοῦν τὴν φιλίαν, τοὺς δὲ βοηθοῦντας ἑαυτοῖς, τούτους νομίζειν εἶναι συμμάχους. ἐγὼ δ᾽, εἰ τὰ μάλιστ᾽ εἰσὶ τοιοῦτοι, ὡδί πως ἔχω. φημὶ δεῖν ἅμα τούτους ἀξιοῦν καθαιρεῖν τὰς στήλας καὶ Λακεδαιμονίους ἄγειν εἰρήνην, ἐὰν δὲ μὴ ᾽θέλωσι ποιεῖν ὁπότεροι ταῦτα, τότ᾽ ἤδη μετὰ τῶν ἐθελόντων ἡμᾶς γίγνεσθαι. <span class="marker">[28]</span> εἴτε γὰρ εἰρήνης γιγνομένης αὐτοῖς οἱ Μεγαλοπολῖται τῆς Θηβαίων συμμαχίας ἕξονται, φανεροὶ πᾶσιν ἔσονται τὴν πλεονεξίαν τὴν Θηβαίων, οὐ τὸ δίκαιον αἱρούμενοι· εἴτε συμμάχους ἡμᾶς ἀδόλως τῶν Μεγαλοπολιτῶν ποιουμένων μὴ ᾽θελήσουσιν ἄγειν εἰρήνην οἱ Λακεδαιμόνιοι, δῆλοι δήπου πᾶσιν ἔσονται, οὐχ ἵνα Θεσπιαὶ κατοικισθῶσι ποιούμενοι τὴν σπουδήν, ἀλλ᾽ ἵνα τοῦ πολέμου περιεστηκότος Θηβαίοις τὴν Πελοπόννησον ὑφ᾽ αὑτοῖς ποιήσωνται. <span class="marker">[29]</span> θαυμάζω δ᾽ ἐνίων, εἰ τὸ μὲν Θηβαίων συμμάχους εἶναι τοὺς Λακεδαιμονίων ἐχθροὺς φοβοῦνται, εἰ δὲ καταστρέψονται Λακεδαιμόνιοι τούτους, μηδὲν ἡγοῦνται φοβερόν, καὶ ταῦτ᾽ ἔργῳ πεῖραν ἡμῖν δεδωκότος τοῦ χρόνου ὅτι Θηβαῖοι μὲν τούτοις συμμάχοις ἐπὶ Λακεδαιμονίους ἀεὶ χρῶνται, Λακεδαιμόνιοι δ᾽ ὅτ᾽ εἶχον αὐτούς, ἐφ᾽ ἡμᾶς ἐχρῶντο.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[30]</span> Οἶμαι τοίνυν ἔγωγε κἀκεῖν᾽ ἐνθυμεῖσθαι δεῖν, ὅτι μὴ προσδεξαμένων μὲν ὑμῶν τοὺς Μεγαλοπολίτας, ἐὰν μὲν ἀναιρεθῶσι καὶ διοικισθῶσιν, ἰσχυροῖς Λακεδαιμονίοις ἔστιν εὐθὺς εἶναι, ἐὰν δὲ σωθῶσιν ἄρα, ὡς ἤδη τι καὶ παρ᾽ ἐλπίδας ἐξέβη, βέβαιοι σύμμαχοι Θηβαίων δικαίως ἔσονται· ἂν δὲ προσδέξησθε, τούτοις μὲν ὑπάρξει ἤδη σωθῆναι δι᾽ ὑμᾶς, τὸ δὲ συμβησόμενον, τὸν τοῦ κινδύνου λογισμὸν μετενεγκόντες, σκοπῶμεν ἐπὶ Θηβαίων καὶ Λακεδαιμονίων. <span class="marker">[31]</span> ἂν μὲν τοίνυν καταπολεμηθῶσιν οἱ Θηβαῖοι, ὥσπερ αὐτοὺς δεῖ, οὐκ ἔσονται μείζους τοῦ δέοντος οἱ Λακεδαιμόνιοι, τούτους ἔχοντες ἀντιπάλους τοὺς Ἀρκάδας ἐγγὺς οἰκοῦντας· ἂν δ᾽ ἀνενέγκωσιν ἄρ᾽ οἱ Θηβαῖοι καὶ σωθῶσιν, ἀλλ᾽ οὖν ἀσθενέστεροί γ᾽ ἔσονται, ἡμῖν συμμάχων γεγενημένων τῶνδε καὶ δι᾽ ἡμᾶς σεσωμένων. ὥστε πανταχῇ συμφέρει μήτε προέσθαι τοὺς Ἀρκάδας μήτε δι᾽ αὑτούς, ἂν ἄρα σωθῶσι, περιγεγονέναι δοκεῖν, μηδὲ δι᾽ ἄλλους τινάς, ἀλλὰ δι᾽ ὑμᾶς.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[27]</span> Όσοι σας δίνουν την εντύπωση ότι μιλούν σε πλήρη συμφωνία με το δίκαιο, υποστηρίζουν ότι, αν οι Μεγαλοπολίτες είναι αποφασισμένοι να γίνουν σταθεροί σύμμαχοι, πρέπει να καταστρέψουν τις στήλες που αναγράφουν τη συνθήκη συμμαχίας με τους Θηβαίους. Οι Μεγαλοπολίτες όμως απαντούν ότι κατά τη γνώμη τους αυτό που δημιουργεί τη φιλία δεν είναι οι στήλες αλλά τα αμοιβαία συμφέροντα, και ότι θεωρούν ως συμμάχους τους όσους τους υποστηρίζουν. Αν οι Μεγαλοπολίτες είναι απόλυτα ειλικρινείς, η δική μου θέση είναι η εξής: Υποστηρίζω ότι πρέπει να απαιτήσουμε ταυτόχρονα να καταστρέψουν αυτοί τις στήλες και οι Λακεδαιμόνιοι να τηρούν την ειρήνη· αν όμως αρνηθεί οποιοσδήποτε από τους δύο να συμμορφωθεί προς αυτά, τότε αμέσως εμείς να συνταχθούμε με αυτούς που θα συμφωνήσουν. <span class="marker">[28]</span> Αν δηλαδή οι Μεγαλοπολίτες, παρόλο που η ειρήνη θα είναι εξασφαλισμένη γι᾽ αυτούς, εξακολουθούν να είναι σύμμαχοι των Θηβαίων, θα γίνει ξεκάθαρο σε όλους ότι προτιμούν τις επεκτατικές διαθέσεις των Θηβαίων, όχι το δίκαιο· αν πάλι, παρόλο που οι Μεγαλοπολίτες συνάψουν με μας συμμαχία χωρίς δόλο, αρνηθούν οι Λακεδαιμόνιοι να τηρήσουν ειρηνική στάση, τότε χωρίς αμφιβολία θα γίνει φανερό σε όλους ότι δεν ενδιαφέρονται για την επανίδρυση των Θεσπιών αλλά αποβλέπουν στην υποταγή της Πελοποννήσου, καθώς ο πόλεμος έχει περισφίξει τους Θηβαίους. <span class="marker">[29]</span> Εκπλήσσομαι με ορισμένους που φοβούνται μήπως οι εχθροί των Λακεδαιμονίων γίνουν σύμμαχοι των Θηβαίων, αλλά δεν θεωρούν καθόλου φοβερό αν τους υποτάξουν οι Λακεδαιμόνιοι, όταν μάλιστα ο χρόνος έχει αποδείξει έμπρακτα σε μας ότι οι Θηβαίοι χρησιμοποιούν πάντα αυτούς ως συμμάχους εναντίον των Λακεδαιμονίων, ενώ οι Λακεδαιμόνιοι, όταν τους είχαν υπό τον έλεγχό τους, τους χρησιμοποιούσαν εναντίον μας.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[30]</span> Προσωπικά λοιπόν εγώ νομίζω ότι, αν απορρίψετε τους Μεγαλοπολίτες και καταστραφούν και αναγκαστούν να κατοικήσουν χωριστά, οι Λακεδαιμόνιοι μπορούν αμέσως να γίνουν ισχυροί· αν πάλι τυχόν σωθούν, γιατί κάτι τέτοιο ανέλπιστο έχει συμβεί στο παρελθόν, θα γίνουν με το δίκιο τους πιστοί σύμμαχοι των Θηβαίων. Αν όμως τους δεχτείτε στη συμμαχία σας, τότε σίγουρα θα έχουν τη δυνατότητα να σωθούν χάριν σε σας· εκτιμώντας όμως τους κινδύνους, ας εξετάσουμε ποιες θα είναι οι συνέπειες στις σχέσεις μας με τους Θηβαίους και τους Λακεδαιμονίους. <span class="marker">[31]</span> Αν οι Θηβαίοι ηττηθούν τελικά, όπως τους αξίζει, δεν πρόκειται να γίνουν υπερβολικά ισχυροί οι Λακεδαιμόνιοι, αν έχουν αντιπάλους τους γείτονές τους Αρκάδες· αν πάλι οι Θηβαίοι αναλάβουν τυχόν τις δυνάμεις τους και σωθούν, θα είναι οπωσδήποτε ασθενέστεροι, αφού οι Μεγαλοπολίτες θα έχουν γίνει σύμμαχοί μας και θα έχουν σωθεί χάριν σε μας. Επομένως, συμφέρει με κάθε τρόπο να μην θυσιάσουμε τους Αρκάδες μήτε, αν σωθούν, να φανεί ότι έχουν γλιτώσει από την καταστροφή με τις δικές τους δυνάμεις μήτε χάριν σε κάποιους άλλους, αλλά χάριν σε σας.</span></p>
+        </div>
+        
+
+        <div id="book-4-chapter-1" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-8" data-hash="book-4-chapter-1">
+            ΕΠΙΛΟΓΟΣ • Κεφάλαιο 1 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=71&page=8" target="_blank" class="page-link">Page 8</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[32]</span> Ἐγὼ μὲν οὖν, ὦ ἄνδρες Ἀθηναῖοι, μὰ τοὺς θεοὺς οὔτε φιλῶν οὐδετέρους οὔτε μισῶν ἰδίᾳ εἴρηκα, ἀλλ᾽ ἃ νομίζω συμφέρειν ὑμῖν· καὶ παραινῶ μὴ προέσθαι Μεγαλοπολίτας, μηδ᾽ ἄλλον ἁπλῶς μηδένα τῶν ἐλαττόνων τῷ μείζονι.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text"><i>ΕΠΙΛΟΓΟΣ (§ 32)</i></span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[32]</span> Εγώ λοιπόν, Αθηναίοι, μάρτυρές μου οι θεοί, είπα όσα νομίζω ότι είναι προς το συμφέρον σας, χωρίς να παρακινηθώ από προσωπικές συμπάθειες και αντιπάθειες προς τη μια ή την άλλη πλευρά, και σας προτρέπω να μην εγκαταλείψετε τους Μεγαλοπολίτες στους Λακεδαιμονίους μήτε γενικώς να θυσιάζετε κανέναν από τους αδύνατους στους ισχυρούς.</span></p>
+        </div>
+        
+        </section>
+    </main>
+
+    <script>
+        // Layout and Theme controls
+        function toggleLayout() {
+            const body = document.body;
+            const btn = document.getElementById('toggle-layout-btn');
+            
+            if (body.classList.contains('hide-original')) {
+                body.classList.remove('hide-original');
+                btn.innerText = 'Hide Original';
+                localStorage.setItem('ebook-hide-original', 'false');
+            } else {
+                body.classList.add('hide-original');
+                btn.innerText = 'Show Original';
+                localStorage.setItem('ebook-hide-original', 'true');
+            }
+        }
+
+        function setTheme(theme, buttonElement) {
+            if (theme === 'light') {
+                document.documentElement.removeAttribute('data-theme');
+            } else {
+                document.documentElement.setAttribute('data-theme', theme);
+            }
+            
+            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+            buttonElement.classList.add('active');
+            
+            localStorage.setItem('ebook-theme', theme);
+        }
+
+        function toggleSidebar() {
+            const body = document.body;
+            const overlay = document.getElementById('mobile-overlay');
+            const isMobile = window.innerWidth <= 900;
+            
+            if (isMobile) {
+                if (body.classList.contains('sidebar-open')) {
+                    body.classList.remove('sidebar-open');
+                    overlay.classList.remove('open');
+                } else {
+                    body.classList.add('sidebar-open');
+                    overlay.classList.add('open');
+                    // Close right sidebar if open
+                    body.classList.remove('chat-sidebar-open');
+                }
+            } else {
+                if (body.classList.contains('sidebar-closed')) {
+                    body.classList.remove('sidebar-closed');
+                    localStorage.setItem('ebook-sidebar-closed', 'false');
+                } else {
+                    body.classList.add('sidebar-closed');
+                    localStorage.setItem('ebook-sidebar-closed', 'true');
+                }
+            }
+        }
+        
+        function closeSidebarOnMobile() {
+            if (window.innerWidth <= 900) {
+                document.body.classList.remove('sidebar-open');
+                document.getElementById('mobile-overlay').classList.remove('open');
+            }
+        }
+        
+        function toggleMobileOptions() {
+            const header = document.querySelector('header');
+            const btn = document.querySelector('.options-toggle');
+            
+            if (header.classList.contains('options-open')) {
+                header.classList.remove('options-open');
+                document.body.classList.remove('mobile-options-open');
+                btn.classList.remove('active');
+            } else {
+                header.classList.add('options-open');
+                document.body.classList.add('mobile-options-open');
+                btn.classList.add('active');
+            }
+        }
+
+        // Adjusts sidebar height dynamically to match mobile visual viewport when virtual keyboard is launched
+        function adjustSidebarHeightForKeyboard() {
+            if (window.visualViewport) {
+                const chatSidebar = document.getElementById('chat-sidebar');
+                const isMobile = window.innerWidth <= 900;
+                if (isMobile && document.body.classList.contains('chat-sidebar-open')) {
+                    chatSidebar.style.height = window.visualViewport.height + 'px';
+                } else {
+                    chatSidebar.style.height = ''; // Fallback to CSS rules
+                }
+            }
+        }
+
+        // Right AI Sidebar Toggles
+        function toggleChatSidebar() {
+            const body = document.body;
+            if (body.classList.contains('chat-sidebar-open')) {
+                body.classList.remove('chat-sidebar-open');
+                adjustSidebarHeightForKeyboard();
+            } else {
+                body.classList.add('chat-sidebar-open');
+                // Close Left Sidebar on Mobile
+                if (window.innerWidth <= 900) {
+                    body.classList.remove('sidebar-open');
+                    document.getElementById('mobile-overlay').classList.remove('open');
+                }
+                // Focus text area
+                setTimeout(() => {
+                    document.getElementById('chat-input').focus();
+                    adjustSidebarHeightForKeyboard();
+                }, 100);
+            }
+        }
+
+        // AI Configuration Modal controls
+        function openAiSettings() {
+            document.getElementById('ai-config-modal').classList.add('open');
+            loadSavedAiSettings();
+        }
+
+        function closeAiSettings() {
+            document.getElementById('ai-config-modal').classList.remove('open');
+        }
+
+        function handleProviderChange() {
+            const p = document.getElementById('ai-provider').value;
+            const customUrlGroup = document.getElementById('group-custom-url');
+            const modelInput = document.getElementById('ai-model');
+
+            if (p === 'custom') {
+                customUrlGroup.style.display = 'flex';
+            } else {
+                customUrlGroup.style.display = 'none';
+            }
+
+            // Suggest model placeholders and default values based on provider selection
+            if (p === 'openai') {
+                modelInput.placeholder = 'gpt-4o-mini';
+                if (modelInput.value === 'gemini-flash-latest' || modelInput.value === '' || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gemini')) {
+                    modelInput.value = 'gpt-4o-mini';
+                }
+            } else if (p === 'anthropic') {
+                modelInput.placeholder = 'claude-3-5-sonnet-20241022';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('gemini') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'claude-3-5-sonnet-20241022';
+                }
+            } else if (p === 'gemini') {
+                modelInput.placeholder = 'gemini-flash-latest';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'gemini-flash-latest';
+                }
+            } else if (p === 'openrouter') {
+                modelInput.placeholder = 'meta-llama/llama-3-8b-instruct:free';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('gemini') || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'meta-llama/llama-3-8b-instruct:free';
+                }
+            } else if (p === 'custom') {
+                modelInput.placeholder = 'model-name';
+            }
+        }
+
+        function loadSavedAiSettings() {
+            const provider = localStorage.getItem('ai-prov') || 'openai';
+            const apiKey = localStorage.getItem('ai-key') || '';
+            const model = localStorage.getItem('ai-mod') || '';
+            const customUrl = localStorage.getItem('ai-url') || '';
+
+            document.getElementById('ai-provider').value = provider;
+            document.getElementById('ai-key').value = apiKey;
+            document.getElementById('ai-model').value = model;
+            document.getElementById('ai-custom-url').value = customUrl;
+
+            handleProviderChange();
+        }
+
+        function saveAiSettings() {
+            const provider = document.getElementById('ai-provider').value;
+            const apiKey = document.getElementById('ai-key').value;
+            const model = document.getElementById('ai-model').value;
+            const customUrl = document.getElementById('ai-custom-url').value;
+
+            localStorage.setItem('ai-prov', provider);
+            localStorage.setItem('ai-key', apiKey);
+            localStorage.setItem('ai-mod', model);
+            localStorage.setItem('ai-url', customUrl);
+
+            closeAiSettings();
+        }
+
+        // Text Selection & Chat logic
+        let currentSelection = "";
+        let currentContext = null;
+        let chatHistory = [];
+
+        function getPageContext(node) {
+            let current = node.nodeType === Node.TEXT_NODE ? node.parentElement : node;
+            let col = current.closest('.column');
+            if (!col) return null;
+
+            // Find the preceding page-divider element
+            let sibling = col.previousElementSibling;
+            while (sibling && !sibling.classList.contains('page-divider')) {
+                sibling = sibling.previousElementSibling;
+            }
+            if (!sibling) return null;
+
+            const pageNum = sibling.id.replace('page-', '');
+
+            // Identify parallel original and translation sibling columns
+            let origCol = sibling.nextElementSibling;
+            while (origCol && !origCol.classList.contains('original-col')) {
+                origCol = origCol.nextElementSibling;
+            }
+            let transCol = sibling.nextElementSibling;
+            while (transCol && !transCol.classList.contains('translation-col')) {
+                transCol = transCol.nextElementSibling;
+            }
+
+            const isOriginal = col.classList.contains('original-col');
+
+            return {
+                pageNum: pageNum,
+                dividerText: sibling.textContent.trim(),
+                originalText: origCol ? origCol.innerText : "",
+                translationText: transCol ? transCol.innerText : "",
+                selectedColType: isOriginal ? "original" : "translation"
+            };
+        }
+
+        function handleTextSelection(e) {
+            setTimeout(() => {
+                const selection = window.getSelection();
+                const text = selection.toString().trim();
+                const popup = document.getElementById('ai-selection-popup');
+
+                if (!text) {
+                    if (e.target && e.target.id !== 'ai-selection-popup') {
+                        popup.style.display = 'none';
+                    }
+                    return;
+                }
+
+                const anchorNode = selection.anchorNode;
+                if (!anchorNode) return;
+
+                const context = getPageContext(anchorNode);
+                if (!context) {
+                    popup.style.display = 'none';
+                    return;
+                }
+
+                currentSelection = text;
+                currentContext = context;
+
+                const isMobile = window.innerWidth <= 900;
+                
+                if (isMobile) {
+                    // Position fixed at the bottom on mobile to avoid native Android contextual menu overlap
+                    popup.style.display = 'flex';
+                    popup.style.position = 'fixed';
+                    popup.style.bottom = '24px';
+                    popup.style.left = '50%';
+                    popup.style.transform = 'translateX(-50%)';
+                    popup.style.top = 'auto';
+                    popup.style.width = 'calc(100% - 40px)';
+                    popup.style.maxWidth = '340px';
+                    popup.style.justifyContent = 'center';
+                    popup.style.boxShadow = '0 8px 24px rgba(0,0,0,0.3)';
+                } else {
+                    // Position relative to selection on desktop
+                    const range = selection.getRangeAt(0);
+                    const rect = range.getBoundingClientRect();
+
+                    popup.style.display = 'flex';
+                    popup.style.position = 'fixed';
+                    popup.style.bottom = 'auto';
+                    popup.style.transform = 'none';
+                    popup.style.width = 'auto';
+                    popup.style.maxWidth = 'none';
+                    popup.style.left = Math.max(10, Math.min(window.innerWidth - popup.offsetWidth - 10, rect.left + (rect.width / 2) - 50)) + "px";
+                    popup.style.top = (rect.top - 45) + "px";
+                    popup.style.justifyContent = 'flex-start';
+                    popup.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+                }
+            }, 10);
+        }
+
+        function openChatWithSelection() {
+            document.getElementById('ai-selection-popup').style.display = 'none';
+            
+            // Populate context card
+            const contextTextNode = document.getElementById('chat-context-text');
+            const colLabel = currentContext.selectedColType === 'original' ? 'Αρχαία' : 'Μετάφραση';
+            contextTextNode.textContent = '"' + currentSelection + '" (' + colLabel + ' • Σελίδα ' + currentContext.pageNum + ')';
+            
+            // Clear prior conversation when selecting new text
+            clearChat();
+
+            // Open sidebar
+            document.body.classList.add('chat-sidebar-open');
+            setTimeout(() => {
+                document.getElementById('chat-input').focus();
+                adjustSidebarHeightForKeyboard();
+            }, 100);
+        }
+
+        function clearChat() {
+            chatHistory = [];
+            const msgsContainer = document.getElementById('chat-messages');
+            
+            // Keep the context card, wipe standard bubble divs
+            const contextCard = document.getElementById('chat-context-card');
+            msgsContainer.innerHTML = '';
+            msgsContainer.appendChild(contextCard);
+        }
+
+        function handleChatKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendChatMessage();
+            }
+        }
+
+        function appendMessage(sender, text, isError = false, historyIndex = null) {
+            const msgsContainer = document.getElementById('chat-messages');
+            const msgDiv = document.createElement('div');
+            
+            if (isError) {
+                msgDiv.className = 'chat-message system-error';
+            } else {
+                msgDiv.className = 'chat-message ' + sender;
+            }
+
+            // If it is a user message and linked to history, attach interactive attributes
+            if (sender === 'user' && historyIndex !== null) {
+                msgDiv.setAttribute('data-history-index', historyIndex);
+                msgDiv.setAttribute('title', 'Κλικ για εκ νέου εκτέλεση από αυτό το σημείο');
+                msgDiv.addEventListener('click', () => handleHistoryClick(historyIndex));
+            }
+            
+            msgDiv.innerHTML = formatMarkdown(text);
+            msgsContainer.appendChild(msgDiv);
+            msgsContainer.scrollTop = msgsContainer.scrollHeight;
+        }
+
+        // Truncate history and re-run on user dialog click
+        async function handleHistoryClick(historyIndex) {
+            // Prevent duplicate triggers if query is running
+            const inputEl = document.getElementById('chat-input');
+            if (inputEl.disabled) return;
+
+            // Slice history array up to and including the selected user query
+            chatHistory = chatHistory.slice(0, historyIndex + 1);
+
+            // Redraw UI container to match truncated array
+            rebuildChatUI();
+
+            // Re-fire query
+            await runQuery();
+        }
+
+        // Clean redraw of current stack
+        function rebuildChatUI() {
+            const msgsContainer = document.getElementById('chat-messages');
+            const contextCard = document.getElementById('chat-context-card');
+            
+            msgsContainer.innerHTML = '';
+            msgsContainer.appendChild(contextCard);
+            
+            chatHistory.forEach((msg, idx) => {
+                if (msg.role === 'user') {
+                    let displayContent = msg.content;
+                    // Extract original question portion from first structured input turn for a clean UI
+                    if (idx === 0 && msg.content.includes("Ερώτηση:\n")) {
+                        displayContent = msg.content.split("Ερώτηση:\n").slice(1).join("Ερώτηση:\n");
+                    }
+                    appendMessage('user', displayContent, false, idx);
+                } else if (msg.role === 'assistant') {
+                    appendMessage('assistant', msg.content);
+                }
+            });
+        }
+
+        // Native Markdown parser leveraging standard Marked.js library
+        function formatMarkdown(text) {
+            if (!text) return "";
+            try {
+                // Parse standard markdown strings to structural HTML
+                return marked.parse(text);
+            } catch (err) {
+                // Fallback to basic text escaping on parse failure
+                return text
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/\n/g, "<br>");
+            }
+        }
+
+        // Modular core query runner
+        async function runQuery() {
+            const inputEl = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('chat-send-btn');
+            
+            // Disable inputs during network transaction
+            inputEl.disabled = true;
+            sendBtn.disabled = true;
+            
+            // Append loading container
+            appendMessage('assistant', 'Thinking...');
+            const lastMsgDiv = document.getElementById('chat-messages').lastChild;
+
+            // Load credentials
+            const provider = localStorage.getItem('ai-prov') || 'openai';
+            const apiKey = localStorage.getItem('ai-key') || '';
+            const savedMod = localStorage.getItem('ai-mod') || '';
+            const customUrl = localStorage.getItem('ai-url') || '';
+
+            if (!apiKey && provider !== 'custom') {
+                lastMsgDiv.className = 'chat-message system-error';
+                lastMsgDiv.innerText = '⚠️ Παρακαλούμε ρυθμίστε το API Key στις ρυθμίσεις AI Config πρώτα.';
+                openAiSettings();
+                inputEl.disabled = false;
+                sendBtn.disabled = false;
+                return;
+            }
+
+            // Build the System Prompt Context dynamically on EVERY call
+            const isOriginal = currentContext.selectedColType === 'original';
+            const contextText = isOriginal ? currentContext.originalText : currentContext.translationText;
+            const contextLabel = isOriginal ? "Αρχαίο Κείμενο" : "Σύγχρονη Μετάφραση";
+			const pageTitle = document.title;
+
+            let systemInstruction = "Είσαι διακεκριμένος φιλόσοφος και γνώστης της φιλοσοφίας του Αριστοτέλη και Πλάτωνα και άλλων αρχαίων ελλήνων συγγραφέων.\n" +
+                "Ο χρήστης διαβάζει το βιβλίου του " + pageTitle + " και βάσει αυτού θα σου κάνει μερικές ερωτήσεις, περιλαμβάνοντας κάποιες φορές αποσπάσματα απο το βιβλίο αυτό πάνω στα οποία σχετίζονται οι ερωτήσεις. Ακολουθεί το ευρύτειο πλαίσιο της σελίδας/κεφαλαίου (Σελίδα " + currentContext.pageNum + ", " + currentContext.dividerText + ") για αναφορά:\n" +
+                "--- " + contextLabel + ":\n" + contextText + "\n\n" +
+                "Απάντησε στις ερωτήσεις του χρήστη σε σχέση με το πλαίσιο του κειμένου που παρέχεται. " +
+                "Δώσε τις απαντήσεις σου στα νέα ελληνικά χρησιμοποιώντας markdown μορφοποίηση.";
+
+            // Construct Payload Messages (Always prepending system prompt at index 0)
+            let payloadMessages = [{ role: "system", content: systemInstruction }];
+            payloadMessages = payloadMessages.concat(chatHistory);
+
+            try {
+                const answer = await requestAPI(provider, apiKey, savedMod, payloadMessages, customUrl);
+                lastMsgDiv.innerHTML = formatMarkdown(answer);
+                chatHistory.push({ role: "assistant", content: answer });
+            } catch (error) {
+                lastMsgDiv.className = 'chat-message system-error';
+                lastMsgDiv.innerText = "Error: " + error.message;
+                // If API failed, keep the user question on screen so they can click to retry it,
+                // do not silently clear the UI anymore.
+            } finally {
+                inputEl.disabled = false;
+                sendBtn.disabled = false;
+                document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+                inputEl.focus();
+                adjustSidebarHeightForKeyboard();
+            }
+        }
+
+        async function sendChatMessage() {
+            const inputEl = document.getElementById('chat-input');
+            const prompt = inputEl.value.trim();
+            if (!prompt) return;
+
+            // If the last message in history is a 'user' query (due to a previous failed turn),
+            // pop it before sending so that our conversational stack maintains alternating roles.
+            if (chatHistory.length > 0 && chatHistory[chatHistory.length - 1].role === 'user') {
+                chatHistory.pop();
+            }
+
+            // 1. Manage Chat History & Highlight Context
+            let histIdx;
+            if (chatHistory.length === 0) {
+                // Incorporate highlighted text directly into the first user turn, NOT the system prompt
+                const firstUserContent = "Επισημασμένο κείμενο:\n\"" + currentSelection + "\"\n\nΕρώτηση:\n" + prompt;
+                chatHistory.push({ role: "user", content: firstUserContent });
+                histIdx = 0;
+            } else {
+                // Subsequent turns: push the raw user follow-up prompt
+                chatHistory.push({ role: "user", content: prompt });
+                histIdx = chatHistory.length - 1;
+            }
+
+            // 2. Display user message in UI with history index
+            appendMessage('user', prompt, false, histIdx);
+            inputEl.value = '';
+
+            // 3. Trigger query execution
+            await runQuery();
+        }
+
+        async function requestAPI(provider, apiKey, model, messages, customUrl) {
+            let url = "";
+            let headers = { "Content-Type": "application/json" };
+            let body = {};
+
+            // Normalize models to defaults if unspecified
+            let activeModel = model;
+            if (!activeModel) {
+                if (provider === 'openai') activeModel = 'gpt-4o-mini';
+                else if (provider === 'anthropic') activeModel = 'claude-3-5-sonnet-20241022';
+                else if (provider === 'gemini') activeModel = 'gemini-flash-latest';
+                else if (provider === 'openrouter') activeModel = 'meta-llama/llama-3-8b-instruct:free';
+                else activeModel = 'local-model';
+            }
+
+            if (provider === 'openai') {
+                url = "https://api.openai.com/v1/chat/completions";
+                headers["Authorization"] = "Bearer " + apiKey;
+                body = { model: activeModel, messages: messages };
+            } else if (provider === 'openrouter') {
+                url = "https://openrouter.ai/api/v1/chat/completions";
+                headers["Authorization"] = "Bearer " + apiKey;
+                headers["HTTP-Referer"] = window.location.href;
+                headers["X-Title"] = "Ancient Greek Bilingual Reader";
+                body = { model: activeModel, messages: messages };
+            } else if (provider === 'gemini') {
+                url = "https://generativelanguage.googleapis.com/v1beta/models/" + activeModel + ":generateContent?key=" + apiKey;
+                
+                // Restructure typical OpenAI formats to Gemini's native API structure
+                const systemItem = messages.find(m => m.role === 'system');
+                const userItems = messages.filter(m => m.role !== 'system');
+                
+                const contents = userItems.map(m => ({
+                    role: m.role === 'assistant' ? 'model' : 'user',
+                    parts: [{ text: m.content }]
+                }));
+
+                body = { contents: contents };
+                if (systemItem) {
+                    body.systemInstruction = { parts: [{ text: systemItem.content }] };
+                }
+            } else if (provider === 'anthropic') {
+                url = "https://api.anthropic.com/v1/messages";
+                headers["x-api-key"] = apiKey;
+                headers["anthropic-version"] = "2023-06-01";
+                headers["dangerously-allow-browser"] = "true";
+
+                const systemItem = messages.find(m => m.role === 'system');
+                const userItems = messages.filter(m => m.role !== 'system');
+
+                body = {
+                    model: activeModel,
+                    messages: userItems.map(m => ({ role: m.role, content: m.content })),
+                    max_tokens: 1500
+                };
+                if (systemItem) {
+                    body.system = systemItem.content;
+                }
+            } else if (provider === 'custom') {
+                url = customUrl || "http://localhost:11434/v1/chat/completions";
+                if (apiKey) {
+                    headers["Authorization"] = "Bearer " + apiKey;
+                }
+                body = { model: activeModel, messages: messages };
+            }
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(body)
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error("API Error (" + response.status + "): " + (errText || response.statusText));
+            }
+
+            const responseData = await response.json();
+
+            // Extract content responses safely depending on the selected engine
+            if (provider === 'gemini') {
+                return responseData.candidates[0].content.parts[0].text;
+            } else if (provider === 'anthropic') {
+                return responseData.content[0].text;
+            } else {
+                // OpenAI / OpenRouter / Ollama
+                return responseData.choices[0].message.content;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('ebook-theme');
+            if (savedTheme) {
+                const targetBtn = document.getElementById('theme-' + savedTheme);
+                if (targetBtn) setTheme(savedTheme, targetBtn);
+            }
+
+            const hideOriginal = localStorage.getItem('ebook-hide-original');
+            if (hideOriginal === 'true') {
+                document.body.classList.add('hide-original');
+                document.getElementById('toggle-layout-btn').innerText = 'Show Original';
+            }
+            
+            if (window.innerWidth > 900) {
+                const sidebarClosed = localStorage.getItem('ebook-sidebar-closed');
+                if (sidebarClosed === 'true') {
+                    document.body.classList.add('sidebar-closed');
+                }
+            }
+
+            // Restore saved chat width on desktop
+            const chatSidebar = document.getElementById('chat-sidebar');
+            const savedChatWidth = localStorage.getItem('ebook-chat-width');
+            if (savedChatWidth && window.innerWidth > 900) {
+                chatSidebar.style.width = savedChatWidth;
+            }
+
+            // Setup Resizing for AI Chat Sidebar
+            const resizeHandle = document.getElementById('chat-resize-handle');
+            let isResizing = false;
+
+            resizeHandle.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                chatSidebar.classList.add('resizing');
+                document.body.style.userSelect = 'none';
+                document.body.style.cursor = 'ew-resize';
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isResizing) return;
+                const newWidth = window.innerWidth - e.clientX;
+                // Limit range between 280px and 85% of total screen width
+                if (newWidth > 280 && newWidth < window.innerWidth * 0.85) {
+                    chatSidebar.style.width = newWidth + 'px';
+                    localStorage.setItem('ebook-chat-width', newWidth + 'px');
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (isResizing) {
+                    isResizing = false;
+                    chatSidebar.classList.remove('resizing');
+                    document.body.style.userSelect = '';
+                    document.body.style.cursor = '';
+                }
+            });
+            
+            // Listen for selection events on layout columns (supports mouse and touch handles)
+            document.addEventListener('mouseup', handleTextSelection);
+            document.addEventListener('keyup', handleTextSelection);
+            document.addEventListener('selectionchange', handleTextSelection);
+
+            // Bind selection popup using both mousedown and touchstart with preventDefault.
+            // This guarantees instant tap execution on touch devices before selection focus is lost.
+            const popup = document.getElementById('ai-selection-popup');
+            const handleTriggerTap = (e) => {
+                e.preventDefault();
+                openChatWithSelection();
+            };
+            popup.addEventListener('mousedown', handleTriggerTap);
+            popup.addEventListener('touchstart', handleTriggerTap);
+
+            // Hide the popup trigger during scroll shifts (desktop only to prevent mobile touch glitches)
+            window.addEventListener('scroll', () => {
+                if (window.innerWidth > 900) {
+                    document.getElementById('ai-selection-popup').style.display = 'none';
+                }
+            }, { passive: true });
+
+            // VisualViewport resizing adjustments (Handles Android virtual keyboard overlap natively)
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', adjustSidebarHeightForKeyboard);
+                window.visualViewport.addEventListener('scroll', adjustSidebarHeightForKeyboard);
+            }
+
+            const chatInput = document.getElementById('chat-input');
+            if (chatInput) {
+                chatInput.addEventListener('focus', () => {
+                    setTimeout(adjustSidebarHeightForKeyboard, 150);
+                });
+                chatInput.addEventListener('blur', () => {
+                    setTimeout(adjustSidebarHeightForKeyboard, 150);
+                });
+            }
+            
+            let lastScrollTop = 0;
+            const header = document.querySelector('header');
+            const optBtn = document.querySelector('.options-toggle');
+            
+            window.addEventListener('scroll', () => {
+                let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                
+                if (scrollTop < 0) scrollTop = 0;
+                
+                if (scrollTop > 10) {
+                    document.body.classList.add('scrolled');
+                } else {
+                    document.body.classList.remove('scrolled');
+                }
+                
+                if (scrollTop > lastScrollTop && scrollTop > 120) {
+                    header.classList.add('header-hidden');
+                    header.classList.remove('options-open');
+                    document.body.classList.remove('mobile-options-open');
+                    optBtn.classList.remove('active');
+                } else {
+                    header.classList.remove('header-hidden');
+                }
+                
+                lastScrollTop = scrollTop;
+            }, { passive: true });
+            
+            const observerOptions = {
+                root: null,
+                rootMargin: "-100px 0px -60% 0px", 
+                threshold: 0
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const hash = entry.target.getAttribute('data-hash');
+                        if (hash && window.location.hash !== '#' + hash) {
+                            history.replaceState(null, null, '#' + hash);
+                        }
+                    }
+                });
+            }, observerOptions);
+            
+            document.querySelectorAll('.page-divider').forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>

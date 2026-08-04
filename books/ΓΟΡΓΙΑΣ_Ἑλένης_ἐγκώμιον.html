@@ -1,0 +1,1682 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ΓΟΡΓΙΑΣ Ἑλένης ἐγκώμιον</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Marked.js Markdown rendering library -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #faf8f5;
+            --text-color: #2c2520;
+            --accent-color: #8b263e;
+            --sidebar-bg: #f3efe9;
+            --border-color: #e3ded5;
+            --muted-text: #706357;
+            --font-serif: "Cardo", "Georgia", "Palatino", serif;
+        }
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --accent-color: #ff8a80;
+            --sidebar-bg: #2d2d2d;
+            --border-color: #404040;
+            --muted-text: #999999;
+        }
+        [data-theme="sepia"] {
+            --bg-color: #f4ecd8;
+            --text-color: #5b4636;
+            --accent-color: #a04000;
+            --sidebar-bg: #ebdcb9;
+            --border-color: #d7c59d;
+            --muted-text: #7c6857;
+        }
+        
+        body {
+            margin: 0;
+            font-family: var(--font-serif);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            transition: background-color 0.2s, color 0.2s;
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        #mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 90;
+        }
+        #mobile-overlay.open {
+            display: block;
+        }
+        
+        #expand-bar {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 24px;
+            height: 100vh;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            cursor: pointer;
+            z-index: 95;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+        #expand-bar:hover {
+            background-color: var(--border-color);
+        }
+        #expand-bar::after {
+            content: "›";
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        
+        #sidebar {
+            width: 340px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            height: 100vh;
+            position: fixed;
+            top: 0; left: 0;
+            overflow-y: auto;
+            padding: 24px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transform: translateX(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+        #sidebar h2 {
+            font-size: 1.25rem;
+            margin: 0;
+            color: var(--text-color);
+        }
+        .sidebar-close-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--accent-color);
+            font-size: 1.4rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            line-height: 1;
+        }
+        .sidebar-close-btn:hover {
+            background-color: var(--border-color);
+        }
+        
+        .toc-list-container { overflow-y: auto; flex-grow: 1; }
+        
+        details.book-group {
+            margin-bottom: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            background-color: var(--sidebar-bg);
+        }
+        details.book-group[open] { border-color: var(--accent-color); }
+        details.book-group summary {
+            font-weight: bold; font-size: 1.05rem; cursor: pointer; padding: 10px 14px;
+            background-color: var(--sidebar-bg); list-style: none; display: flex;
+            justify-content: space-between; align-items: center; user-select: none;
+        }
+        details.book-group summary::-webkit-details-marker { display: none; }
+        details.book-group summary::after { content: "▾"; font-size: 0.9rem; color: var(--accent-color); }
+        details.book-group[open] summary::after { transform: rotate(180deg); }
+        
+        .toc-sublist-container {
+            background-color: var(--bg-color);
+            border-top: 1px solid var(--border-color);
+        }
+        .toc-group-title {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            padding: 8px 14px 4px 14px;
+            line-height: 1.3;
+        }
+        .toc-sublist { list-style: none; padding: 4px 14px 8px 14px; margin: 0; }
+        .toc-sublist li { margin-bottom: 8px; font-size: 0.88rem; }
+        
+        .toc-sublist a { 
+            color: var(--text-color); 
+            text-decoration: none; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding: 4px; 
+        }
+        .toc-sublist a:hover { color: var(--accent-color); }
+        .toc-page {
+            color: var(--muted-text);
+            font-size: 0.8rem;
+            font-family: var(--font-serif);
+        }
+        
+        #main {
+            margin-left: 340px;
+            flex-grow: 1;
+            padding: 180px 40px 40px 40px;
+            box-sizing: border-box;
+            width: calc(100% - 340px);
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        padding-top 0.3s ease;
+        }
+        
+        header {
+            position: fixed;
+            top: 0;
+            left: 340px;
+            right: 0;
+            background-color: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px 40px;
+            z-index: 50;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transform: translateY(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        left 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        background-color 0.2s, 
+                        box-shadow 0.2s;
+        }
+        header.header-hidden {
+            transform: translateY(-100%);
+            box-shadow: none !important;
+        }
+        body.scrolled header {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        [data-theme="dark"] body.scrolled header {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .header-top { display: flex; align-items: center; gap: 20px; }
+        header h1 { margin: 0; font-size: 1.8rem; color: var(--accent-color); line-height: 1.2; }
+        
+        .controls-group {
+            display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+        }
+        .btn {
+            background-color: var(--sidebar-bg); color: var(--text-color);
+            border: 1px solid var(--border-color); padding: 8px 14px;
+            font-family: inherit; cursor: pointer; border-radius: 6px;
+            font-size: 0.9rem; font-weight: bold; transition: all 0.2s; white-space: nowrap;
+        }
+        .btn:hover { background-color: var(--border-color); }
+        .btn.active { background-color: var(--accent-color); color: white; border-color: var(--accent-color); }
+        .btn-layout { background-color: var(--bg-color); border: 2px solid var(--accent-color); color: var(--accent-color); }
+        
+        .menu-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+            white-space: nowrap;
+        }
+        .menu-toggle:hover {
+            background-color: var(--text-color);
+        }
+        
+        .options-toggle {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 6px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            width: 38px;
+            height: 38px;
+            transition: all 0.2s;
+        }
+        .options-toggle:hover {
+            background-color: var(--sidebar-bg);
+        }
+
+        #book-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            column-gap: 48px;
+            row-gap: 0;
+            margin: 0 auto;
+            max-width: 140ch;
+            width: 100%;
+        }
+        
+        body.sidebar-closed #expand-bar {
+            display: flex;
+        }
+        body.sidebar-closed #sidebar {
+            transform: translateX(-340px);
+        }
+        body.sidebar-closed #main {
+            margin-left: 24px;
+            width: calc(100% - 24px);
+        }
+        body.sidebar-closed header {
+            left: 24px;
+        }
+        
+        body.hide-original #book-content { 
+            grid-template-columns: 1fr; 
+            max-width: 140ch;
+        }
+        body.hide-original .original-col { display: none; }
+        body.hide-original .bilingual-header { grid-template-columns: 1fr; }
+        body.hide-original .original-title { display: none; }
+        body.hide-original .translation-col {
+            max-width: 100% !important;
+            justify-self: stretch !important;
+        }
+
+        .bilingual-header {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px; position: sticky; top: 0;
+            background-color: var(--bg-color); padding: 16px 0;
+            border-bottom: 2px solid var(--accent-color); z-index: 10;
+            font-weight: bold; text-transform: uppercase; font-size: 0.85rem;
+            letter-spacing: 0.05em; color: var(--muted-text);
+        }
+        
+        .chapter-anchor {
+            display: block;
+            scroll-margin-top: 180px;
+        }
+        
+        .page-divider {
+            grid-column: 1 / -1;
+            border-bottom: 1px solid var(--border-color);
+            padding-top: 48px; padding-bottom: 12px; margin-bottom: 24px;
+            font-size: 0.95rem; color: var(--accent-color); text-transform: uppercase;
+            letter-spacing: 0.05em; font-weight: bold; 
+            scroll-margin-top: 180px;
+        }
+        
+        .page-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--accent-color);
+            transition: color 0.2s, border-bottom-color 0.2s;
+        }
+        .page-link:hover {
+            color: var(--text-color);
+            border-bottom-color: var(--text-color);
+        }
+        
+        .column { 
+            box-sizing: border-box; 
+            padding-bottom: 24px; 
+            display: flex; 
+            flex-direction: column; 
+            max-width: 65ch;
+            width: fit-content;
+            min-width: 0;
+        }
+        
+        .original-col {
+            justify-self: end;
+        }
+        .translation-col {
+            justify-self: start;
+        }
+        
+        .passage { 
+            margin: 0 0 1.2em 0; 
+            font-size: 1.15rem; 
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 1.5rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .passage-text {
+            flex: 1;
+            min-width: 0;
+            text-align: justify;
+        }
+        .passage.indent .passage-text { text-indent: 2em; }
+        .marker { color: var(--accent-color); font-weight: bold; margin-right: 4px; }
+        .line-number { 
+            color: var(--muted-text); 
+            font-size: 0.85em; 
+            font-weight: normal; 
+            user-select: none;
+            margin-left: auto;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+        i { font-style: italic; }
+
+        /* Floating popover trigger styling */
+        #ai-selection-popup {
+            position: fixed;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 14px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1005;
+            display: none;
+            font-family: var(--font-serif);
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.1s ease;
+        }
+        #ai-selection-popup:hover {
+            transform: scale(1.05);
+        }
+
+        /* Resizable sliding Right Chat Sidebar */
+        #chat-sidebar {
+            width: 380px;
+            min-width: 280px;
+            max-width: 85vw;
+            background-color: var(--sidebar-bg);
+            border-left: 1px solid var(--border-color);
+            height: 100vh;
+            height: 100dvh;
+            position: fixed;
+            top: 0; right: 0;
+            transform: translateX(100%);
+            overflow: visible;
+            display: flex;
+            flex-direction: column;
+            z-index: 110;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-sizing: border-box;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.05);
+        }
+        body.chat-sidebar-open #chat-sidebar {
+            transform: translateX(0);
+        }
+        
+        /* Draggable Resize Handle */
+        #chat-resize-handle {
+            width: 8px;
+            height: 100%;
+            position: absolute;
+            left: -4px;
+            top: 0;
+            cursor: ew-resize;
+            z-index: 120;
+            background-color: transparent;
+            transition: background-color 0.2s;
+        }
+        #chat-resize-handle:hover,
+        #chat-sidebar.resizing #chat-resize-handle {
+            background-color: var(--accent-color);
+            opacity: 0.5;
+        }
+        
+        .chat-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-header h3 { margin: 0; font-size: 1.1rem; color: var(--accent-color); }
+        
+        .chat-header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .chat-context-card {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+        .chat-context-card h4 { margin: 0 0 6px 0; color: var(--accent-color); }
+        .chat-context-card p { 
+            margin: 0; 
+            font-style: italic; 
+            display: -webkit-box; 
+            -webkit-line-clamp: 3; 
+            -webkit-box-orient: vertical; 
+            overflow: hidden; 
+            line-height: 1.4;
+        }
+        
+        .chat-message {
+            max-width: 85%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        
+        /* Render styles for AI Markdown elements in chat boxes */
+        .chat-message p { margin: 0 0 8px 0; line-height: 1.5; }
+        .chat-message p:last-child { margin-bottom: 0; }
+        .chat-message strong { font-weight: bold; }
+        .chat-message em { font-style: italic; }
+        .chat-message ul, .chat-message ol { margin: 4px 0 8px 16px; padding: 0; }
+        .chat-message li { margin-bottom: 4px; font-size: 0.92rem; }
+        .chat-message h1, .chat-message h2, .chat-message h3, .chat-message h4, .chat-message h5 {
+            color: var(--accent-color);
+            margin: 12px 0 6px 0;
+            line-height: 1.3;
+        }
+        .chat-message h3 { font-size: 1.15rem; }
+        .chat-message h4 { font-size: 1.05rem; }
+        .chat-message h5 { font-size: 0.95rem; }
+        .chat-message blockquote {
+            border-left: 3px solid var(--accent-color);
+            margin: 8px 0;
+            padding-left: 10px;
+            color: var(--muted-text);
+            font-style: italic;
+        }
+        .chat-message pre {
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.85rem;
+            margin: 8px 0;
+        }
+        .chat-message code {
+            font-family: monospace;
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: var(--accent-color);
+        }
+        
+        .chat-message.user {
+            background-color: var(--accent-color);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .chat-message.user:hover {
+            filter: brightness(1.15);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        /* Override light-colored syntax highlights in dark bubbles */
+        .chat-message.user code {
+            color: #ff8a80;
+            background-color: rgba(0,0,0,0.2);
+            border-color: rgba(0,0,0,0.1);
+        }
+        .chat-message.user pre {
+            background-color: rgba(0,0,0,0.2);
+            border-color: rgba(0,0,0,0.1);
+            color: white;
+        }
+        
+        .chat-message.assistant {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .chat-message.system-error {
+            background-color: #fce8e6;
+            color: #c5221f;
+            border: 1px solid #fad2cf;
+            align-self: center;
+            max-width: 95%;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+        
+        [data-theme="dark"] .chat-message.system-error {
+            background-color: #371d1d;
+            color: #f28b82;
+            border-color: #5c2424;
+        }
+
+        .chat-input-area {
+            padding: 16px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 8px;
+            background-color: var(--sidebar-bg);
+            flex-shrink: 0;
+        }
+        .chat-input-area textarea {
+            flex-grow: 1;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 10px;
+            border-radius: 6px;
+            resize: none;
+            height: 42px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+        }
+        .chat-input-area button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .chat-input-area button:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* Modal Config Dialog */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-content {
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            padding: 24px;
+            box-sizing: border-box;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 12px;
+        }
+        .modal-header h3 { margin: 0; font-size: 1.25rem; color: var(--accent-color); }
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group label {
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        .form-control {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 14px;
+        }
+
+        @media (max-width: 900px) {
+            #sidebar { transform: translateX(-100%); width: 320px; }
+            body.sidebar-open #sidebar { transform: translateX(0); }
+            body.sidebar-closed #sidebar { transform: translateX(-100%); }
+            
+            #chat-sidebar {
+                width: 100% !important;
+                right: 0;
+                transform: translateX(100%);
+                height: 100vh;
+                height: 100dvh;
+            }
+            body.chat-sidebar-open #chat-sidebar {
+                transform: translateX(0);
+            }
+            #chat-resize-handle {
+                display: none;
+            }
+            
+            #main { 
+                margin-left: 0 !important; 
+                width: 100% !important; 
+                padding: 100px 20px 20px 20px !important;
+            }
+            body.mobile-options-open #main {
+                padding-top: 150px !important;
+            }
+            
+            header {
+                padding-bottom: 12px;
+                margin-bottom: 16px;
+                gap: 8px;
+            }
+            header h1 { 
+                font-size: 0.95rem !important;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                text-align: center;
+                flex-grow: 1;
+                margin: 0;
+            }
+            
+            header {
+                left: 0 !important;
+                padding: 12px 16px;
+            }
+            
+            .header-top { 
+                display: flex;
+                flex-direction: row !important;
+                align-items: center; 
+                justify-content: space-between; 
+                width: 100%;
+                gap: 12px; 
+            }
+            
+            .menu-toggle { 
+                width: auto !important; 
+                padding: 6px 12px;
+                font-size: 0.85rem;
+            }
+            
+            .options-toggle {
+                display: inline-flex;
+            }
+            
+            .controls-group {
+                display: none;
+                width: 100%;
+                justify-content: center;
+                padding-top: 12px;
+                border-top: 1px dashed var(--border-color);
+            }
+            header.options-open .controls-group {
+                display: flex;
+            }
+            
+            #book-content { grid-template-columns: 1fr; column-gap: 0; max-width: 100%; }
+            .column { max-width: 100% !important; width: 100% !important; }
+            .bilingual-header { display: none; }
+            .page-divider { padding-top: 32px; scroll-margin-top: 110px; }
+            .chapter-anchor { scroll-margin-top: 110px; }
+            .passage { font-size: 1.05rem; }
+        }
+        
+        @media (min-width: 901px) {
+            .menu-toggle {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="mobile-overlay" onclick="toggleSidebar()"></div>
+
+    <div id="expand-bar" onclick="toggleSidebar()" title="Ανάπτυξη Περιεχομένων"></div>
+
+    <aside id="sidebar">
+        <div class="sidebar-header">
+            <h2>Πίνακας Περιεχομένων</h2>
+            <button class="sidebar-close-btn" onclick="toggleSidebar()" title="Σύμπτυξη">‹</button>
+        </div>
+        <div class="toc-list-container">
+            <details class="book-group">
+    <summary>ΒΙΒΛΙΟΝ Α</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-1-chapter-1" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1</span> <span class="toc-page">#1</span></a></li>
+            <li><a href="#book-1-chapter-1-2" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.2</span> <span class="toc-page">#2</span></a></li>
+            <li><a href="#book-1-chapter-1-3" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.3</span> <span class="toc-page">#3</span></a></li>
+        </ul>
+    </div>
+</details>
+        </div>
+    </aside>
+
+    <!-- AI Right Chat Sidebar -->
+    <aside id="chat-sidebar">
+        <div id="chat-resize-handle"></div>
+        <div class="chat-header">
+            <h3>AI Assistant</h3>
+            <div class="chat-header-actions">
+                <button class="btn" style="padding: 4px 8px; font-size: 0.8rem;" onclick="clearChat()">Clear</button>
+                <button class="sidebar-close-btn" style="width: 28px; height: 28px; font-size: 1.1rem;" onclick="toggleChatSidebar()" title="Κλείσιμο">›</button>
+            </div>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <!-- Active Context Card -->
+            <div class="chat-context-card" id="chat-context-card">
+                <h4>Επιλεγμένο Κείμενο</h4>
+                <p id="chat-context-text"></p>
+            </div>
+            <!-- Messages stream here -->
+        </div>
+        <div class="chat-input-area">
+            <textarea id="chat-input" placeholder="Ρωτήστε κάτι για το επιλεγμένο κείμενο..." onkeydown="handleChatKeyDown(event)"></textarea>
+            <button id="chat-send-btn" onclick="sendChatMessage()">Send</button>
+        </div>
+    </aside>
+
+    <!-- Floating Popover Trigger -->
+    <button id="ai-selection-popup"><span style="font-size: 1.1rem;">✨</span> Ask AI</button>
+
+    <!-- Settings Configuration Modal -->
+    <div id="ai-config-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Ρυθμίσεις LLM / AI</h3>
+                <button class="sidebar-close-btn" style="width: 28px; height: 28px; font-size: 1.1rem;" onclick="closeAiSettings()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="ai-provider">Πάροχος (Provider)</label>
+                    <select id="ai-provider" class="form-control" onchange="handleProviderChange()">
+                        <option value="openai">OpenAI (ChatGPT)</option>
+                        <option value="anthropic">Anthropic (Claude)</option>
+                        <option value="gemini">Google Gemini</option>
+                        <option value="openrouter">OpenRouter</option>
+                        <option value="custom">Custom Endpoint (Ollama / Local)</option>
+                    </select>
+                </div>
+                <div class="form-group" id="group-custom-url" style="display: none;">
+                    <label for="ai-custom-url">Base URL</label>
+                    <input type="text" id="ai-custom-url" class="form-control" placeholder="http://localhost:11434/v1/chat/completions">
+                </div>
+                <div class="form-group">
+                    <label for="ai-key">API Key</label>
+                    <input type="password" id="ai-key" class="form-control" placeholder="Εισάγετε το API Key">
+                </div>
+                <div class="form-group">
+                    <label for="ai-model">Μοντέλο (Model Name)</label>
+                    <input type="text" id="ai-model" class="form-control" placeholder="π.χ. gpt-4o-mini">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeAiSettings()">Άκυρο</button>
+                <button class="btn active" onclick="saveAiSettings()">Αποθήκευση</button>
+            </div>
+        </div>
+    </div>
+
+    <main id="main">
+        <header>
+            <div class="header-top">
+                <button class="btn menu-toggle" onclick="toggleSidebar()">☰ Περιεχόμενα</button>
+                <h1>ΓΟΡΓΙΑΣ Ἑλένης ἐγκώμιον</h1>
+                <button class="btn options-toggle" onclick="toggleMobileOptions()" title="Ρυθμίσεις">⚙️</button>
+            </div>
+            
+            <div class="controls-group">
+                <button id="toggle-layout-btn" class="btn btn-layout" onclick="toggleLayout()">Hide Original</button>
+                <button class="btn" style="border-color: var(--accent-color);" onclick="openAiSettings()">⚙️ AI Config</button>
+                <button class="btn active theme-btn" id="theme-light" onclick="setTheme('light', this)">Light</button>
+                <button class="btn theme-btn" id="theme-sepia" onclick="setTheme('sepia', this)">Sepia</button>
+                <button class="btn theme-btn" id="theme-dark" onclick="setTheme('dark', this)">Dark</button>
+            </div>
+        </header>
+
+        <section id="book-content">
+            <div class="bilingual-header">
+                <div class="original-title">Αρχαία Ελληνικά (Original)</div>
+                <div class="translation-title">Νέα Ελληνικά (Translation)</div>
+            </div>
+
+            
+        <div id="book-1-chapter-1" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-1" data-hash="book-1-chapter-1">
+            ΒΙΒΛΙΟΝ Α • Κεφάλαιο 1 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=35&page=1" target="_blank" class="page-link">Page 1</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[1]</span> Κόσμος πόλει μὲν εὐανδρία, σώματι δὲ κάλλος, ψυχῇ δὲ σοφία, πράγματι δὲ ἀρετή, λόγῳ δὲ ἀλήθεια· τὰ δὲ ἐναντία τούτων ἀκοσμία. ἄνδρα δὲ καὶ γυναῖκα καὶ λόγον καὶ ἔργον καὶ πόλιν καὶ πρᾶγμα χρὴ τὸ μὲν ἄξιον ἐπαίνου ἐπαίνῳ τιμᾶν, τῷ δὲ ἀναξίῳ μῶμον ἐπιθεῖναι· ἴση γὰρ ἁμαρτία καὶ ἀμαθία μέμφεσθαί τε τὰ ἐπαινετὰ καὶ ἐπαινεῖν τὰ μωμητά. <span class="marker">[2]</span> τοῦ δ᾽ αὐτοῦ ἀνδρὸς λέξαι τε τὸ δέον ὀρθῶς καὶ ἐλέγξαι τοὺς μεμφομένους Ἑλένην, γυναῖκα περὶ ἧς ὁμόφωνος καὶ ὁμόψυχος γέγονεν ἥ τε τῶν ποιητῶν ἀκουσάντων πίστις ἥ τε τοῦ ὀνόματος φήμη, ὃ τῶν συμφορῶν μνήμη γέγονεν. ἐγὼ δὲ βούλομαι λογισμόν τινα τῷ λόγῳ δοὺς τὴν μὲν κακῶς ἀκούουσαν παῦσαι τῆς αἰτίας, τοὺς δὲ μεμφομένους ψευδομένους ἐπιδεῖξαι καὶ δείξας τἀληθὲς [ἢ] παῦσαι τῆς ἀμαθίας.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[3]</span> ὅτι μὲν οὖν φύσει καὶ γένει τὰ πρῶτα τῶν πρώτων ἀνδρῶν καὶ γυναικῶν ἡ γυνὴ περὶ ἧς ὅδε ὁ λόγος, οὐκ ἄδηλον, οὐδὲ ὀλίγοις. δῆλον γὰρ ὡς μητρὸς μὲν Λήδας, πατρὸς δὲ τοῦ μὲν γενομένου θεοῦ, τοῦ δὲ λεγομένου θνητοῦ, Τυνδάρεω καὶ Διός, ὧν ὁ μὲν διὰ τὸ εἶναι ἔδοξεν, ὁ δὲ διὰ τὸ φάναι ἐλέχθη. καὶ ἦν ὁ μὲν ἀνδρῶν κράτιστος ὁ δὲ πάντων τύραννος. <span class="marker">[4]</span> ἐκ τοιούτων δὲ γενομένη ἔσχε τὸ ἰσόθεον κάλλος, ὃ λαβοῦσα καὶ οὐ λαθοῦσα ἔσχε· πλείστας δὲ πλείστοις ἐπιθυμίας ἔρωτος ἐνειργάσατο, ἑνὶ δὲ σώματι πολλὰ σώματα συνήγαγεν ἀνδρῶν ἐπὶ μεγάλοις μέγα φρονούντων, ὧν οἱ μὲν πλούτου μεγέθη, οἱ δὲ εὐγενείας παλαιᾶς εὐδοξίαν, οἱ δὲ ἀλκῆς οἰκείας εὐεξίαν, οἱ δὲ σοφίας ἐπικτήτου δύναμιν ἔσχον· καὶ ἧκον ἅπαντες ὑπ᾽ ἔρωτός τε φιλονίκου φιλοτιμίας τε ἀνικήτου. <span class="marker">[5]</span> ὅστις μὲν οὖν καὶ δι᾽ ὅ τι καὶ ὅπως ἀπέπλησε τὸν ἔρωτα τὴν Ἑλένην λαβών, οὐ λέξω· τὸ γὰρ τοῖς εἰδόσιν ἃ ἴσασι λέγειν πίστιν μὲν ἔχει, τέρψιν δὲ οὐ φέρει. τὸν χρόνον δὲ τῷ λόγῳ τὸν τότε νῦν ὑπερβὰς ἐπὶ τὴν ἀρχὴν τοῦ μέλλοντος λόγου προβήσομαι, καὶ προθήσομαι τὰς αἰτίας, δι᾽ ἃς εἰκὸς ἦν γενέσθαι τὸν τῆς Ἑλένης εἰς τὴν Τροίαν στόλον.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[6]</span> ἢ γὰρ Τύχης βουλήμασι καὶ θεῶν βουλεύμασι καὶ Ἀνάγκης ψηφίσμασιν ἔπραξεν ἃ ἔπραξεν, ἢ βίᾳ ἁρπασθεῖσα, ἢ λόγοις πεισθεῖσα, ‹ἢ ὄψει ἐρασθεῖσα›. εἰ μὲν οὖν διὰ τὸ πρῶτον, ἄξιος αἰτιᾶσθαι ὁ αἴτιος μόνος· θεοῦ γὰρ προθυμίαν ἀνθρωπίνῃ προμηθίᾳ ἀδύνατον κωλύειν. πέφυκε γὰρ οὐ τὸ κρεῖσσον ὑπὸ τοῦ ἥσσονος κωλύεσθαι, ἀλλὰ τὸ ἧσσον ὑπὸ τοῦ κρείσσονος ἄρχεσθαι καὶ ἄγεσθαι, καὶ τὸ μὲν κρεῖσσον ἡγεῖσθαι, τὸ δὲ ἧσσον ἕπεσθαι. θεὸς δ᾽ ἀνθρώπου κρεῖσσον καὶ βίᾳ καὶ σοφίᾳ καὶ τοῖς ἄλλοις. εἰ οὖν τῇ Τύχῃ καὶ τῷ θεῷ τὴν αἰτίαν ἀναθετέον, ἦ τὴν Ἑλένην τῆς δυσκλείας ἀπολυτέον.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[1]</span> Ευκοσμία είναι για την πόλη οι γεροί άντρες, για το σώμα η ομορφιά, για την ψυχή η σοφία, για την πράξη η αρετή, για το λόγο η αλήθεια· τα αντίθετά τους ακοσμία. Τον άντρα και τη γυναίκα, το λόγο και την πράξη, την πόλη και το πράγμα που αξίζουν τον έπαινο πρέπει με επαίνους να τα τιμάμε, ενώ τα ανάξια να τα κατακρίνουμε· γιατί είναι εξίσου σφάλμα όσο και αμάθεια να κατακρίνει κανείς τα αξιέπαινα και να επαινεί τα αξιοκατάκριτα. <span class="marker">[2]</span> Ο ίδιος άνθρωπος λοιπόν είναι που πρέπει και να πει σωστά αυτό που πρέπει, και να αντικρούσει όσους κατακρίνουν την Ελένη, μια γυναίκα για την οποία έχει υπάρξει ομόφωνη και ομόψυχη και η γνώμη όσων έχουν ακούσει τους ποιητές, αλλά και η φήμη του ονόματός της, το οποίο έχει καταστεί υπόμνηση συμφορών. Εγώ όμως θέλω, προσδίδοντας κάποια λογική στον λόγο μου, από τη μια μεριά αυτήν να την απαλλάξω από το να δέχεται κατηγορίες άδικες, και από την άλλη να καταδείξω ότι αυτοί που την κατακρίνουν λένε ψέματα· και δείχνοντας την αλήθεια να σταματήσω την αμάθεια.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[3]</span> Δεν είναι άγνωστο, ούτε καν σε λίγους, πως η γυναίκα την οποία αυτός ο λόγος αφορά είναι, ως προς τη φύση και την καταγωγή της, πρώτη από τους πρώτους, άντρες και γυναίκες. Είναι γνωστό ότι μητέρα της ήταν η Λήδα και πατέρας της, ο πραγματικός, ένας θεός, ενώ ο υποτιθέμενος, ένας θνητός, ο Τυνδάρεως και ο Δίας —από τους οποίους ο ένας πιστεύτηκε ότι ήταν επειδή πράγματι ήταν, ενώ ο άλλος λέχθηκε ότι ήταν επειδή το ισχυρίστηκε— και ο ένας ήταν ο ισχυρότερος από τους ανθρώπους, ο άλλος κυρίαρχος των πάντων. <span class="marker">[4]</span> Έχοντας απ᾽ αυτούς γεννηθεί, είχε ομορφιά όση οι θεοί, που την δέχτηκε και δεν την έκρυψε· προκάλεσε σε πάρα πολλούς πάρα πολύ ερωτικό πάθος, και με ένα σώμα συγκέντρωσε σώματα πολλών ανδρών που είχαν επιδιώξεις μεγάλες για μεγάλους στόχους· απ᾽ αυτούς άλλοι είχαν μεγάλο πλούτο, άλλοι ένδοξη παλαιά γενιά, άλλοι την ευρωστία της δικής τους αλκής, άλλοι τη δύναμη της κατακτημένης σοφίας· και όλοι έρχονταν οδηγημένοι από άμιλλα ερωτική και φιλοδοξία απαράμιλλη. <span class="marker">[5]</span> Δεν θα αναφερθώ στο ποιός και γιατί και πώς ικανοποίησε τον έρωτά του παίρνοντας την Ελένη· γιατί το να λέει κανείς σ᾽ αυτούς που ξέρουν αυτά που γνωρίζουν είναι πειστικό, δεν φέρνει όμως ευχαρίστηση. Αφήνω τώρα με το λόγο μου τον τότε χρόνο και θα προχωρήσω στην αρχή του μελλοντικού μου λόγου· θα εκθέσω τις αιτίες για τις οποίες ήταν πιθανό να έγινε το ταξίδι της Ελένης στην Τροία.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[6]</span> Έκανε όσα έκανε είτε από θέλημα της Τύχης και απόφαση των θεών και της Ανάγκης προσταγή, είτε επειδή αρπάχτηκε με τη βία, είτε επειδή πείσθηκε με λόγια, είτε επειδή από τη θωριά ερωτεύτηκε. Αν λοιπόν είναι το πρώτο, πρέπει την ευθύνη να την έχει μόνο ο υπαίτιος· γιατί είναι αδύνατον η προαπόφαση του θεού να εμποδιστεί από την ανθρώπινη προνοητικότητα. Αφού από τη φύση του το ανώτερο δεν εμποδίζεται από το κατώτερο, παρά το κατώτερο κυριαρχείται και καθοδηγείται από το ανώτερο, και το ανώτερο κυβερνά ενώ το κατώτερο ακολουθεί. Αλλά ο θεός είναι ανώτερος από τον άνθρωπο και ως προς τη βία και ως προς τη σοφία και ως προς τα υπόλοιπα. Αν λοιπόν πρέπει να αποδώσουμε την ευθύνη στην Τύχη και στο θεό, την Ελένη πρέπει οπωσδήποτε να την απαλλάξουμε από την καταισχύνη.</span></p>
+        </div>
+        
+
+        <div id="book-1-chapter-1-2" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-2" data-hash="book-1-chapter-1-2">
+            ΒΙΒΛΙΟΝ Α • Κεφάλαιο 1.2 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=35&page=2" target="_blank" class="page-link">Page 2</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[7]</span> εἰ δὲ βίᾳ ἡρπάσθη καὶ ἀνόμως ἐβιάσθη καὶ ἀδίκως ὑβρίσθη, δῆλον ὅτι ὁ ‹μὲν› ἁρπάσας ὡς ὑβρίσας ἠδίκησεν, ἡ δὲ ἁρπασθεῖσα ὡς ὑβρισθεῖσα ἐδυστύχησεν. ἄξιος οὖν ὁ μὲν ἐπιχειρήσας βάρβαρος βάρβαρον ἐπιχείρημα καὶ λόγῳ καὶ νόμῳ καὶ ἔργῳ λόγῳ μὲν αἰτίας, νόμῳ δὲ ἀτιμίας, ἔργῳ δὲ ζημίας τυχεῖν· ἡ δὲ βιασθεῖσα καὶ τῆς πατρίδος στερηθεῖσα καὶ τῶν φίλων ὀρφανισθεῖσα πῶς οὐκ ἂν εἰκότως ἐλεηθείη μᾶλλον ἢ κακολογηθείη; ὁ μὲν γὰρ ἔδρασε δεινά, ἡ δὲ ἔπαθε· δίκαιον οὖν τὴν μὲν οἰκτίρειν, τὸν δὲ μισῆσαι.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[8]</span> εἰ δὲ λόγος ὁ πείσας καὶ τὴν ψυχὴν ἀπατήσας, οὐδὲ πρὸς τοῦτο χαλεπὸν ἀπολογήσασθαι καὶ τὴν αἰτίαν ἀπολύσασθαι ὧδε. λόγος δυνάστης μέγας ἐστίν, ὃς σμικροτάτῳ σώματι καὶ ἀφανεστάτῳ θειότατα ἔργα ἀποτελεῖ· δύναται γὰρ καὶ φόβον παῦσαι καὶ λύπην ἀφελεῖν καὶ χαρὰν ἐνεργάσασθαι καὶ ἔλεον ἐπαυξῆσαι. ταῦτα δὲ ὡς οὕτως ἔχει δείξω· <span class="marker">[9]</span> δεῖ δὲ καὶ δόξῃ δεῖξαι τοῖς ἀκούουσι· τὴν ποίησιν ἅπασαν καὶ νομίζω καὶ ὀνομάζω λόγον ἔχοντα μέτρον· ἧς τοὺς ἀκούοντας εἰσῆλθε καὶ φρίκη περίφοβος καὶ ἔλεος πολύδακρυς καὶ πόθος φιλοπενθής, ἐπ᾽ ἀλλοτρίων τε πραγμάτων καὶ σωμάτων εὐτυχίαις καὶ δυσπραγίαις ἴδιόν τι πάθημα διὰ τῶν λόγων ἔπαθεν ἡ ψυχή. φέρε δὴ πρὸς ἄλλον ἀπ᾽ ἄλλου μεταστῶ λόγον. <span class="marker">[10]</span> αἱ γὰρ ἔνθεοι διὰ λόγων ἐπῳδαὶ ἐπαγωγοὶ ἡδονῆς, ἀπαγωγοὶ λύπης γίνονται· συγγινομένη γὰρ τῇ δόξῃ τῆς ψυχῆς ἡ δύναμις τῆς ἐπῳδῆς ἔθελξε καὶ ἔπεισε καὶ μετέστησεν αὐτὴν γοητείᾳ. γοητείας δὲ καὶ μαγείας δισσαὶ τέχναι εὕρηνται, αἵ εἰσι ψυχῆς ἁμαρτήματα καὶ δόξης ἀπατήματα. <span class="marker">[11]</span> ὅσοι δὲ ὅσους περὶ ὅσων καὶ ἔπεισαν καὶ πείθουσι δὲ ψευδῆ λόγον πλάσαντες. εἰ μὲν γὰρ πάντες περὶ πάντων εἶχον τῶν ‹τε› παροιχομένων μνήμην τῶν τε παρόντων ‹ἔννοιαν› τῶν τε μελλόντων πρόνοιαν, οὐκ ἂν ὁμοίως [ὅμοιος ἦν] ὁ λόγος ἠπάτα. νῦν δὲ οὔτε μνησθῆναι τὸ παροιχόμενον οὔτε σκέψασθαι τὸ παρὸν οὔτε μαντεύσασθαι τὸ μέλλον εὐπόρως ἔχει· ὥστε περὶ τῶν πλείστων οἱ πλεῖστοι τὴν δόξαν σύμβουλον τῇ ψυχῇ παρέχονται. ἡ δὲ δόξα σφαλερὰ καὶ ἀβέβαιος οὖσα σφαλεραῖς καὶ ἀβεβαίοις εὐτυχίαις περιβάλλει τοὺς αὐτῇ χρωμένους. <span class="marker">[12]</span> τίς οὖν αἰτία κωλύει καὶ τὴν Ἑλένην νομίσαι ἐλθεῖν ὁμοίως ἄκουσαν οὖσαν ὥσπερ εἰ βιατήρων βίᾳ ἡρπάσθη; ἡ γὰρ τῆς πειθοῦς ἕξις, καίτοι εἰ ἀνάγκης εἶδος ἔχει μὲν οὔ, τὴν δὲ δύναμιν τὴν αὐτὴν ἔχει. λόγος γὰρ ψυχὴν ὁ πείσας, ἣν ἔπεισεν, ἠνάγκασε καὶ πιθέσθαι τοῖς λεγομένοις καὶ συναινέσαι τοῖς ποιουμένοις. ὁ μὲν οὖν πείσας ὡς ἀναγκάσας ἀδικεῖ, ἡ δὲ πεισθεῖσα ὡς ἀναγκασθεῖσα τῷ λόγῳ μάτην ἀκούει κακῶς. <span class="marker">[13]</span> ὅτι δ᾽ ἡ πειθὼ προσιοῦσα τῷ λόγῳ καὶ τὴν ψυχὴν ἐτυπώσατο ὅπως ἐβούλετο, χρὴ μαθεῖν πρῶτον μὲν τοὺς τῶν μετεωρολόγων λόγους, οἵτινες δόξαν ἀντὶ δόξης τὴν μὲν ἀφελόμενοι τὴν δ᾽ ἐνεργασάμενοι τὰ ἄπιστα καὶ ἄδηλα φαίνεσθαι τοῖς τῆς δόξης ὄμμασιν ἐποίησαν· δεύτερον δὲ τοὺς ἀναγκαίους διὰ λόγων ἀγῶνας, ἐν οἷς εἷς λόγος πολὺν ὄχλον ἔτερψε καὶ ἔπεισε τέχνῃ γραφείς, οὐκ ἀληθείᾳ λεχθείς· τρίτον ‹δὲ› φιλοσόφων λόγων ἁμίλλας, ἐν αἷς δείκνυται καὶ γνώμης τάχος ὡς εὐμετάβολον ποιοῦν τὴν τῆς δόξης πίστιν. <span class="marker">[14]</span> τὸν αὐτὸν δὲ λόγον ἔχει ἥ τε τοῦ λόγου δύναμις πρὸς τὴν τῆς ψυχῆς τάξιν ἥ τε τῶν φαρμάκων τάξις πρὸς τὴν τῶν σωμάτων φύσιν. ὥσπερ γὰρ τῶν φαρμάκων ἄλλους ἄλλα χυμοὺς ἐκ τοῦ σώματος ἐξάγει, καὶ τὰ μὲν νόσου τὰ δὲ βίου παύει, οὕτω καὶ τῶν λόγων οἱ μὲν ἐλύπησαν, οἱ δὲ ἔτερψαν, οἱ δὲ ἐφόβησαν, οἱ δὲ εἰς θάρσος κατέστησαν τοὺς ἀκούοντας, οἱ δὲ πειθοῖ τινι κακῇ τὴν ψυχὴν ἐφαρμάκευσαν καὶ ἐξεγοήτευσαν.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[7]</span> Αν όμως την άρπαξαν με τη βία και άσκησαν πάνω της βία παράνομη και προπηλακίσθηκε άδικα, είναι φανερό ότι αυτός που την άρπαξε της έκανε με την προσβολή του κακό, ενώ εκείνη, που την άρπαξαν, υπέφερε από την προσβολή. Αξίζει λοιπόν ο βάρβαρος που διέπραξε το βάρβαρο εγχείρημα, και με το λόγο και με το νόμο και με τις πράξεις, και να κατηγορηθεί με το λόγο και να ατιμασθεί με το νόμο και να τιμωρηθεί με πράξεις· ενώ αυτή που έπεσε θύμα βίας και στερήθηκε την πατρίδα της και απορφανίστηκε από τους φίλους της, τί, δεν είναι σωστό να τη λυπηθούμε μάλλον παρά να την κακολογούμε; Γιατί αυτός διέπραξε πράγματα φοβερά, ενώ εκείνη τα υπέστη· είναι λοιπόν σωστό να την πονέσουμε αυτήν και να μισήσουμε εκείνον.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[8]</span> Αν όμως ήταν ο λόγος που την έπεισε και εξαπάτησε την ψυχή της, ούτε σ᾽ αυτή την περίπτωση είναι δύσκολη η υπεράσπιση και η ανασκευή της κατηγορίας ως εξής: Ο λόγος είναι ένας μεγάλος δυνάστης, που ενώ έχει το πιο μικρό και αφανές σώμα, επιτελεί τα έργα τα πιο θεϊκά· γιατί μπορεί και το φόβο να σταματήσει και τη λύπη να διώξει και χαρά να προκαλέσει και τον οίκτο να αυξήσει. Και θα δείξω ότι έτσι είναι αυτά. <span class="marker">[9]</span> Αλλά πρέπει να το δείξω στους ακροατές μου και μέσω της πεποίθησης· θεωρώ και ονομάζω όλη την ποίηση λόγο που έχει μέτρο· όποιοι την ακούν, εισχωρεί μέσα τους φρίκη γεμάτη φόβο, οίκτος όλο δάκρυα, πόθος όλο λαχτάρα, και η ψυχή, με τα λόγια, παθαίνει η ίδια αυτά που ξένα πράγματα και σώματα παθαίνουν στις ευτυχίες και στις δυστυχίες τους. Ας στραφώ τώρα από τον ένα λόγο στον άλλο. <span class="marker">[10]</span> Και οι θεϊκές επωδές που λέγονται με λόγια προξενούν ηδονή και διώχνουν τη λύπη· γιατί όταν η δύναμη της επωδής αναμιχθεί με την πίστη της ψυχής, την θέλγει, την πείθει και τη μεταβάλλει με τη μαγεία της. Και έχουν εφευρεθεί δύο ειδών τέχνες, η γοητεία και η μαγεία, οι οποίες συνίστανται σε σφάλματα της ψυχής και εξαπατήσεις της πίστης. <span class="marker">[11]</span> Πόσοι δεν έχουν πείσει ή δεν πείθουν τόσους και τόσους για τόσα πράγματα, πλάθοντας έναν ψευδή λόγο! Γιατί αν οι πάντες είχαν για τα πάντα, μνήμη για τα περασμένα, συνείδηση για τα παρόντα και πρόγνωση για τα μελλοντικά, ο λόγος δεν θα εξαπατούσε έτσι· στην πραγματικότητα όμως δεν είναι εύκολο ούτε να θυμόμαστε το παρελθόν, ούτε να έχουμε γνώση του παρόντος, ούτε να μαντεύουμε το μέλλον· έτσι, για τα περισσότερα ζητήματα οι περισσότεροι άνθρωποι έχουν σύμβουλο της ψυχής τους την πίστη. Επειδή όμως η πίστη είναι σφαλερή και αβέβαιη, οδηγεί όσους τη χρησιμοποιούν σε σφαλερές και αβέβαιες επιτυχίες. <span class="marker">[12]</span> Ποιά αιτία λοιπόν μας εμποδίζει να θεωρήσουμε ότι η Ελένη ήρθε στην Τροία χωρίς τη θέλησή της, το ίδιο όπως αν αρπάχτηκε από απαγωγέων τη βία; Αφού η επίδραση της πειθούς, αν και δεν έχει του εξαναγκασμού τη μορφή, έχει την ίδια μ᾽ αυτόν δύναμη. Γιατί ο λόγος που έπεισε την ψυχή εξανάγκασε και αυτήν την οποία έπεισε να πιστέψει αυτά που λέχθηκαν και να συγκατατεθεί σ᾽ αυτά που έγιναν. Αυτός λοιπόν που την έπεισε, εφόσον την εξανάγκασε, διέπραξε αδίκημα, ενώ αυτή που πείσθηκε, εφόσον εξαναγκάστηκε από τον λόγο, άδικα κατηγορείται. <span class="marker">[13]</span> Και για να αντιληφθεί κανείς ότι η πειθώ, όταν προστεθεί στο λόγο, προκαλεί και στην ψυχή την εντύπωση που θέλει, πρέπει να μελετήσει, πρώτον, τα λόγια των κοσμολόγων, οι οποίοι, αντικαθιστώντας τη μια πεποίθηση με την άλλη, απορρίπτοντας τη μια και εφαρμόζοντας την άλλη, καθιστούν τα απίστευτα και άδηλα φανερά στα μάτια της πίστης· δεύτερον, τους υποχρεωτικούς στους δικαστικούς αγώνες λόγους, όπου ένας με τέχνη γραμμένος λόγος τέρπει και πείθει ένα μεγάλο πλήθος, κι ας μη λέει την αλήθεια· και τρίτον, τους διαγωνισμούς των φιλοσοφικών λόγων, στους οποίους φανερώνεται, μεταξύ άλλων, ότι η ταχύτητα της σκέψης κάνει ευμετάβλητη την πίστη σε μια πεποίθηση. <span class="marker">[14]</span> Και η δύναμη του λόγου είναι για την ψυχή ό,τι τα φάρμακα για τη φύση των σωμάτων. Γιατί όπως κάθε φάρμακο εξάγει από το σώμα διαφορετικούς χυμούς, και άλλα σταματούν την αρρώστια ενώ άλλα τη ζωή, έτσι και οι λόγοι, άλλοι προκαλούν λύπη, άλλοι ευχαρίστηση, άλλοι φόβο, άλλοι δίνουν στους ακροατές τους θάρρος, και άλλοι φαρμακώνουν και μαγεύουν την ψυχή με ένα είδος δόλιας πειθούς.</span></p>
+        </div>
+        
+
+        <div id="book-1-chapter-1-3" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-3" data-hash="book-1-chapter-1-3">
+            ΒΙΒΛΙΟΝ Α • Κεφάλαιο 1.3 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=35&page=3" target="_blank" class="page-link">Page 3</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[15]</span> καὶ ὅτι μέν, εἰ λόγῳ ἐπείσθη, οὐκ ἠδίκησεν ἀλλ᾽ ἠτύχησεν, εἴρηται· τὴν δὲ τετάρτην αἰτίαν τῷ τετάρτῳ λόγῳ διέξειμι. εἰ γὰρ ἔρως ἦν ὁ ταῦτα πάντα πράξας, οὐ χαλεπῶς διαφεύξεται τὴν τῆς λεγομένης γεγονέναι ἁμαρτίας αἰτίαν. ἃ γὰρ ὁρῶμεν, ἔχει φύσιν οὐχ ἣν ἡμεῖς θέλομεν, ἀλλ᾽ ἣν ἕκαστον ἔτυχε· διὰ δὲ τῆς ὄψεως ἡ ψυχὴ κἀν τοῖς τρόποις τυποῦται. <span class="marker">[16]</span> αὐτίκα γὰρ ὅταν πολέμια σώματα καὶ πολέμιον ἐπὶ πολεμίᾳ ὁπλίσει κόσμον χαλκοῦ καὶ σιδήρου, τοῦ μὲν ἀλεξητήρια τοῦ δὲ προβλήματα, ἐπιθεάσηται ἡ ὄψις, ἐταράχθη καὶ ἐτάραξε τὴν ψυχήν, ὥστε πολλάκις κινδύνου τοῦ μέλλοντος ‹ὡς› ὄντος φεύγουσιν ἐκπλαγέντες. ἰσχυρὰ γὰρ ἡ ἀλήθεια τοῦ πόνου διὰ τὸν φόβον εἰσῳκίσθη τὸν ἀπὸ τῆς ὄψεως, ἥτις ἐλθοῦσα ἐποίησεν ἀμελῆσαι καὶ τοῦ καλοῦ τοῦ διὰ τὸν νόμον κρινομένου καὶ τοῦ ἀγαθοῦ τοῦ διὰ τὴν νίκην γινομένου. <span class="marker">[17]</span> ἤδη δέ τινες ἰδόντες φοβερὰ καὶ τοῦ παρόντος ἐν τῷ παρόντι χρόνῳ φρονήματος ἐξέστησαν· οὕτως ἀπέσβεσε καὶ ἐξήλασεν ὁ φόβος τὸ νόημα. πολλοὶ δὲ ματαίοις πόνοις καὶ δειναῖς νόσοις καὶ δυσιάτοις μανίαις περιέπεσον· οὕτως εἰκόνας τῶν ὁρωμένων πραγμάτων ἡ ὄψις ἐνέγραψεν ἐν τῷ φρονήματι. καὶ τὰ μὲν δειματοῦντα πολλὰ μὲν παραλείπεται, ὅμοια δ᾽ ἐστὶ τὰ παραλειπόμενα οἷάπερ ‹τὰ› λεγόμενα. <span class="marker">[18]</span> ἀλλὰ μὴν οἱ γραφεῖς ὅταν ἐκ πολλῶν χρωμάτων καὶ σωμάτων ἓν σῶμα καὶ σχῆμα τελείως ἀπεργάσωνται, τέρπουσι τὴν ὄψιν· ἡ δὲ τῶν ἀνδριάντων ποίησις καὶ ἡ τῶν ἀγαλμάτων ἐργασία θέαν ἡδεῖαν παρέσχετο τοῖς ὄμμασιν. οὕτω τὰ μὲν λυπεῖν τὰ δὲ ποθεῖν πέφυκε τὴν ὄψιν. πολλὰ δὲ πολλοῖς πολλῶν ἔρωτα καὶ πόθον ἐνεργάζεται πραγμάτων καὶ σωμάτων. <span class="marker">[19]</span> εἰ οὖν τῷ τοῦ Ἀλεξάνδρου σώματι τὸ τῆς Ἑλένης ὄμμα ἡσθὲν προθυμίαν καὶ ἅμιλλαν ἔρωτος τῇ ψυχῇ παρέδωκε, τί θαυμαστόν; ὃς εἰ μὲν θεὸς θεῶν θείαν δύναμιν ‹ἔχων›, πῶς ἂν ὁ ἥσσων εἴη τοῦτον ἀπώσασθαι καὶ ἀμύνασθαι δυνατός; εἰ δ᾽ ἐστὶν ἀνθρώπινον νόσημα καὶ ψυχῆς ἀγνόημα, οὐχ ὡς ἁμάρτημα μεμπτέον ἀλλ᾽ ὡς ἀτύχημα νομιστέον· ἦλθε γάρ, ὡς ἦλθε, ψυχῆς ἀγρεύμασιν, οὐ γνώμης βουλεύμασιν, καὶ ἔρωτος ἀνάγκαις, οὐ τέχνης παρασκευαῖς.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[20]</span> πῶς οὖν χρὴ δίκαιον ἡγήσασθαι τὸν τῆς Ἑλένης μῶμον, ἥτις εἴτ᾽ ἐρασθεῖσα εἴτε λόγῳ πεισθεῖσα εἴτε βίᾳ ἁρπασθεῖσα εἴτε ὑπὸ θείας ἀνάγκης ἀναγκασθεῖσα ἔπραξεν ἃ ἔπραξε, πάντως διαφεύγει τὴν αἰτίαν;</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[21]</span> ἀφεῖλον τῷ λόγῳ δύσκλειαν γυναικός, ἐνέμεινα τῷ νόμῳ ὃν ἐθέμην ἐν ἀρχῇ τοῦ λόγου· ἐπειράθην καταλῦσαι μώμου ἀδικίαν καὶ δόξης ἀμαθίαν· ἐβουλήθην γράψαι τὸν λόγον Ἑλένης μὲν ἐγκώμιον, ἐμὸν δὲ παίγνιον.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[15]</span> Είπαμε λοιπόν ότι αν πείσθηκε με λόγο, δεν έκανε αδίκημα αλλά υπέστη ατύχημα· και την τέταρτη κατηγορία θα την εξετάσω με τον τέταρτο λόγο μου. Αν αυτός που έκανε όλα αυτά ήταν ο έρωτας, η κατηγορουμένη θα αποφύγει χωρίς δυσκολία την κατηγορία για το αδίκημα που υποτίθεται ότι διεπράχθη. Ό,τι βλέπουμε έχει όχι τη φύση που εμείς θέλουμε, αλλά αυτήν που το καθένα τυχόν έχει· και οι εντυπώσεις της όρασης επηρεάζουν μέχρι και την ψυχική μας κατάσταση. <span class="marker">[16]</span> Αφού και όταν η όραση αντικρίσει στον πόλεμο τα εχθρικά σώματα και τα από χαλκό και σίδερα εχθρικά εξαρτήματα πάνω στον εχθρικό οπλισμό, άλλα επιθετικά και άλλα αμυντικά, ταράζεται και ταράζει και την ψυχή, έτσι ώστε πολλές φορές οι αντίπαλοι, θαρρώντας ως παρόντα τον μελλοντικό κίνδυνο, τρέπονται πανικόβλητοι σε φυγή. Γιατί είναι ισχυρή η εντύπωση του άχθους του πολέμου, που όταν, εξαιτίας του φόβου που προκαλείται από την όραση, εισχωρήσει στην ψυχή, έρχεται και την κάνει να ξεχάσει και αυτό που ο νόμος κρίνει καλό και το αγαθό που θα προκύψει από τη νίκη. <span class="marker">[17]</span> Μερικοί μάλιστα, έχοντας δει κάτι φοβερό, έχασαν τη στιγμή εκείνη και το νου που είχαν· τόσο ο φόβος έσβησε και έδιωξε το λογικό τους. Και πολλοί έπεσαν έτσι σε μάταιους κόπους, φοβερές αρρώστιες και αθεράπευτη τρέλα· τόσο η όραση χάραξε στο νου τους τις εικόνες των πραγμάτων που είδαν. Υπάρχουν και πολλά άλλα τρομερά που δεν τα αναφέρουμε εδώ, όμως αυτά που παραλείπονται είναι όπως αυτά που είπαμε. <span class="marker">[18]</span> Εξάλλου οι ζωγράφοι, όταν από πλήθος χρώματα και σώματα φτιάχνουν ένα ενιαίο τέλειο σώμα και σχήμα, προξενούν στην όραση ευχαρίστηση. Και το πλάσιμο αγαλμάτων και το δούλεμα εικόνων παρέχουν στα μάτια ένα όμορφο θέαμα. Ώστε άλλα πράγματα μπορεί να προκαλέσουν λύπη στην όραση, άλλα πόθο. Και είναι πολλά που προκαλούν σε πολλούς έρωτα και πόθο για πολλά πράγματα και σώματα. <span class="marker">[19]</span> Αν λοιπόν τα μάτια της Ελένης ένιωσαν ευχαρίστηση από το σώμα του Αλέξανδρου και μετέδωσαν στην ψυχή της επιθυμία και έλξη ερωτική, τί το παράξενο; Αν ο ερωτάς έχει, ως θεός, τη θεϊκή δύναμη των θεών, πώς θα μπορούσε ο κατώτερός του να έχει τη δυνατότητα να τον αποκρούσει και να αμυνθεί; Αν πάλι είναι μια ανθρώπινη αρρώστια και αποτέλεσμα άγνοιας της ψυχής, πρέπει να μην το καταλογίσουμε ως σφάλμα αλλά να το θεωρήσουμε ως ατύχημα· γιατί εκείνη πήγε καθώς πήγε, πιασμένη σε δίχτυα της ψυχής, όχι από συνειδητή απόφαση, εξαναγκασμένη από τον έρωτα, όχι μετά από έντεχνη προπαρασκευή.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[20]</span> Πώς λοιπόν μπορεί κανείς να θεωρήσει δίκαιη τη μομφή εναντίον της Ελένης αφού, είτε ερωτεύτηκε, είτε πείσθηκε με λόγια, είτε αρπάχτηκε με τη βία, είτε εξαναγκάστηκε από θεϊκή ανάγκη και έκανε ό,τι έκανε, οπωσδήποτε απαλλάσσεται από την κατηγορία;</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[21]</span> Με το λόγο μου απάλλαξα από τη δυσφήμηση μια γυναίκα· έμεινα πιστός στους όρους που έθεσα στην αρχή του λόγου· δοκίμασα να καταλύσω την αδικία της μομφής και την αμάθεια της πεποίθησης· θέλησα να γράψω τον λόγο ως εγκώμιο της Ελένης και δικό μου παιχνίδι.</span></p>
+        </div>
+        
+        </section>
+    </main>
+
+    <script>
+        // Layout and Theme controls
+        function toggleLayout() {
+            const body = document.body;
+            const btn = document.getElementById('toggle-layout-btn');
+            
+            if (body.classList.contains('hide-original')) {
+                body.classList.remove('hide-original');
+                btn.innerText = 'Hide Original';
+                localStorage.setItem('ebook-hide-original', 'false');
+            } else {
+                body.classList.add('hide-original');
+                btn.innerText = 'Show Original';
+                localStorage.setItem('ebook-hide-original', 'true');
+            }
+        }
+
+        function setTheme(theme, buttonElement) {
+            if (theme === 'light') {
+                document.documentElement.removeAttribute('data-theme');
+            } else {
+                document.documentElement.setAttribute('data-theme', theme);
+            }
+            
+            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+            buttonElement.classList.add('active');
+            
+            localStorage.setItem('ebook-theme', theme);
+        }
+
+        function toggleSidebar() {
+            const body = document.body;
+            const overlay = document.getElementById('mobile-overlay');
+            const isMobile = window.innerWidth <= 900;
+            
+            if (isMobile) {
+                if (body.classList.contains('sidebar-open')) {
+                    body.classList.remove('sidebar-open');
+                    overlay.classList.remove('open');
+                } else {
+                    body.classList.add('sidebar-open');
+                    overlay.classList.add('open');
+                    // Close right sidebar if open
+                    body.classList.remove('chat-sidebar-open');
+                }
+            } else {
+                if (body.classList.contains('sidebar-closed')) {
+                    body.classList.remove('sidebar-closed');
+                    localStorage.setItem('ebook-sidebar-closed', 'false');
+                } else {
+                    body.classList.add('sidebar-closed');
+                    localStorage.setItem('ebook-sidebar-closed', 'true');
+                }
+            }
+        }
+        
+        function closeSidebarOnMobile() {
+            if (window.innerWidth <= 900) {
+                document.body.classList.remove('sidebar-open');
+                document.getElementById('mobile-overlay').classList.remove('open');
+            }
+        }
+        
+        function toggleMobileOptions() {
+            const header = document.querySelector('header');
+            const btn = document.querySelector('.options-toggle');
+            
+            if (header.classList.contains('options-open')) {
+                header.classList.remove('options-open');
+                document.body.classList.remove('mobile-options-open');
+                btn.classList.remove('active');
+            } else {
+                header.classList.add('options-open');
+                document.body.classList.add('mobile-options-open');
+                btn.classList.add('active');
+            }
+        }
+
+        // Adjusts sidebar height dynamically to match mobile visual viewport when virtual keyboard is launched
+        function adjustSidebarHeightForKeyboard() {
+            if (window.visualViewport) {
+                const chatSidebar = document.getElementById('chat-sidebar');
+                const isMobile = window.innerWidth <= 900;
+                if (isMobile && document.body.classList.contains('chat-sidebar-open')) {
+                    chatSidebar.style.height = window.visualViewport.height + 'px';
+                } else {
+                    chatSidebar.style.height = ''; // Fallback to CSS rules
+                }
+            }
+        }
+
+        // Right AI Sidebar Toggles
+        function toggleChatSidebar() {
+            const body = document.body;
+            if (body.classList.contains('chat-sidebar-open')) {
+                body.classList.remove('chat-sidebar-open');
+                adjustSidebarHeightForKeyboard();
+            } else {
+                body.classList.add('chat-sidebar-open');
+                // Close Left Sidebar on Mobile
+                if (window.innerWidth <= 900) {
+                    body.classList.remove('sidebar-open');
+                    document.getElementById('mobile-overlay').classList.remove('open');
+                }
+                // Focus text area
+                setTimeout(() => {
+                    document.getElementById('chat-input').focus();
+                    adjustSidebarHeightForKeyboard();
+                }, 100);
+            }
+        }
+
+        // AI Configuration Modal controls
+        function openAiSettings() {
+            document.getElementById('ai-config-modal').classList.add('open');
+            loadSavedAiSettings();
+        }
+
+        function closeAiSettings() {
+            document.getElementById('ai-config-modal').classList.remove('open');
+        }
+
+        function handleProviderChange() {
+            const p = document.getElementById('ai-provider').value;
+            const customUrlGroup = document.getElementById('group-custom-url');
+            const modelInput = document.getElementById('ai-model');
+
+            if (p === 'custom') {
+                customUrlGroup.style.display = 'flex';
+            } else {
+                customUrlGroup.style.display = 'none';
+            }
+
+            // Suggest model placeholders and default values based on provider selection
+            if (p === 'openai') {
+                modelInput.placeholder = 'gpt-4o-mini';
+                if (modelInput.value === 'gemini-flash-latest' || modelInput.value === '' || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gemini')) {
+                    modelInput.value = 'gpt-4o-mini';
+                }
+            } else if (p === 'anthropic') {
+                modelInput.placeholder = 'claude-3-5-sonnet-20241022';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('gemini') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'claude-3-5-sonnet-20241022';
+                }
+            } else if (p === 'gemini') {
+                modelInput.placeholder = 'gemini-flash-latest';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'gemini-flash-latest';
+                }
+            } else if (p === 'openrouter') {
+                modelInput.placeholder = 'meta-llama/llama-3-8b-instruct:free';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('gemini') || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'meta-llama/llama-3-8b-instruct:free';
+                }
+            } else if (p === 'custom') {
+                modelInput.placeholder = 'model-name';
+            }
+        }
+
+        function loadSavedAiSettings() {
+            const provider = localStorage.getItem('ai-prov') || 'openai';
+            const apiKey = localStorage.getItem('ai-key') || '';
+            const model = localStorage.getItem('ai-mod') || '';
+            const customUrl = localStorage.getItem('ai-url') || '';
+
+            document.getElementById('ai-provider').value = provider;
+            document.getElementById('ai-key').value = apiKey;
+            document.getElementById('ai-model').value = model;
+            document.getElementById('ai-custom-url').value = customUrl;
+
+            handleProviderChange();
+        }
+
+        function saveAiSettings() {
+            const provider = document.getElementById('ai-provider').value;
+            const apiKey = document.getElementById('ai-key').value;
+            const model = document.getElementById('ai-model').value;
+            const customUrl = document.getElementById('ai-custom-url').value;
+
+            localStorage.setItem('ai-prov', provider);
+            localStorage.setItem('ai-key', apiKey);
+            localStorage.setItem('ai-mod', model);
+            localStorage.setItem('ai-url', customUrl);
+
+            closeAiSettings();
+        }
+
+        // Text Selection & Chat logic
+        let currentSelection = "";
+        let currentContext = null;
+        let chatHistory = [];
+
+        function getPageContext(node) {
+            let current = node.nodeType === Node.TEXT_NODE ? node.parentElement : node;
+            let col = current.closest('.column');
+            if (!col) return null;
+
+            // Find the preceding page-divider element
+            let sibling = col.previousElementSibling;
+            while (sibling && !sibling.classList.contains('page-divider')) {
+                sibling = sibling.previousElementSibling;
+            }
+            if (!sibling) return null;
+
+            const pageNum = sibling.id.replace('page-', '');
+
+            // Identify parallel original and translation sibling columns
+            let origCol = sibling.nextElementSibling;
+            while (origCol && !origCol.classList.contains('original-col')) {
+                origCol = origCol.nextElementSibling;
+            }
+            let transCol = sibling.nextElementSibling;
+            while (transCol && !transCol.classList.contains('translation-col')) {
+                transCol = transCol.nextElementSibling;
+            }
+
+            const isOriginal = col.classList.contains('original-col');
+
+            return {
+                pageNum: pageNum,
+                dividerText: sibling.textContent.trim(),
+                originalText: origCol ? origCol.innerText : "",
+                translationText: transCol ? transCol.innerText : "",
+                selectedColType: isOriginal ? "original" : "translation"
+            };
+        }
+
+        function handleTextSelection(e) {
+            setTimeout(() => {
+                const selection = window.getSelection();
+                const text = selection.toString().trim();
+                const popup = document.getElementById('ai-selection-popup');
+
+                if (!text) {
+                    if (e.target && e.target.id !== 'ai-selection-popup') {
+                        popup.style.display = 'none';
+                    }
+                    return;
+                }
+
+                const anchorNode = selection.anchorNode;
+                if (!anchorNode) return;
+
+                const context = getPageContext(anchorNode);
+                if (!context) {
+                    popup.style.display = 'none';
+                    return;
+                }
+
+                currentSelection = text;
+                currentContext = context;
+
+                const isMobile = window.innerWidth <= 900;
+                
+                if (isMobile) {
+                    // Position fixed at the bottom on mobile to avoid native Android contextual menu overlap
+                    popup.style.display = 'flex';
+                    popup.style.position = 'fixed';
+                    popup.style.bottom = '24px';
+                    popup.style.left = '50%';
+                    popup.style.transform = 'translateX(-50%)';
+                    popup.style.top = 'auto';
+                    popup.style.width = 'calc(100% - 40px)';
+                    popup.style.maxWidth = '340px';
+                    popup.style.justifyContent = 'center';
+                    popup.style.boxShadow = '0 8px 24px rgba(0,0,0,0.3)';
+                } else {
+                    // Position relative to selection on desktop
+                    const range = selection.getRangeAt(0);
+                    const rect = range.getBoundingClientRect();
+
+                    popup.style.display = 'flex';
+                    popup.style.position = 'fixed';
+                    popup.style.bottom = 'auto';
+                    popup.style.transform = 'none';
+                    popup.style.width = 'auto';
+                    popup.style.maxWidth = 'none';
+                    popup.style.left = Math.max(10, Math.min(window.innerWidth - popup.offsetWidth - 10, rect.left + (rect.width / 2) - 50)) + "px";
+                    popup.style.top = (rect.top - 45) + "px";
+                    popup.style.justifyContent = 'flex-start';
+                    popup.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+                }
+            }, 10);
+        }
+
+        function openChatWithSelection() {
+            document.getElementById('ai-selection-popup').style.display = 'none';
+            
+            // Populate context card
+            const contextTextNode = document.getElementById('chat-context-text');
+            const colLabel = currentContext.selectedColType === 'original' ? 'Αρχαία' : 'Μετάφραση';
+            contextTextNode.textContent = '"' + currentSelection + '" (' + colLabel + ' • Σελίδα ' + currentContext.pageNum + ')';
+            
+            // Clear prior conversation when selecting new text
+            clearChat();
+
+            // Open sidebar
+            document.body.classList.add('chat-sidebar-open');
+            setTimeout(() => {
+                document.getElementById('chat-input').focus();
+                adjustSidebarHeightForKeyboard();
+            }, 100);
+        }
+
+        function clearChat() {
+            chatHistory = [];
+            const msgsContainer = document.getElementById('chat-messages');
+            
+            // Keep the context card, wipe standard bubble divs
+            const contextCard = document.getElementById('chat-context-card');
+            msgsContainer.innerHTML = '';
+            msgsContainer.appendChild(contextCard);
+        }
+
+        function handleChatKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendChatMessage();
+            }
+        }
+
+        function appendMessage(sender, text, isError = false, historyIndex = null) {
+            const msgsContainer = document.getElementById('chat-messages');
+            const msgDiv = document.createElement('div');
+            
+            if (isError) {
+                msgDiv.className = 'chat-message system-error';
+            } else {
+                msgDiv.className = 'chat-message ' + sender;
+            }
+
+            // If it is a user message and linked to history, attach interactive attributes
+            if (sender === 'user' && historyIndex !== null) {
+                msgDiv.setAttribute('data-history-index', historyIndex);
+                msgDiv.setAttribute('title', 'Κλικ για εκ νέου εκτέλεση από αυτό το σημείο');
+                msgDiv.addEventListener('click', () => handleHistoryClick(historyIndex));
+            }
+            
+            msgDiv.innerHTML = formatMarkdown(text);
+            msgsContainer.appendChild(msgDiv);
+            msgsContainer.scrollTop = msgsContainer.scrollHeight;
+        }
+
+        // Truncate history and re-run on user dialog click
+        async function handleHistoryClick(historyIndex) {
+            // Prevent duplicate triggers if query is running
+            const inputEl = document.getElementById('chat-input');
+            if (inputEl.disabled) return;
+
+            // Slice history array up to and including the selected user query
+            chatHistory = chatHistory.slice(0, historyIndex + 1);
+
+            // Redraw UI container to match truncated array
+            rebuildChatUI();
+
+            // Re-fire query
+            await runQuery();
+        }
+
+        // Clean redraw of current stack
+        function rebuildChatUI() {
+            const msgsContainer = document.getElementById('chat-messages');
+            const contextCard = document.getElementById('chat-context-card');
+            
+            msgsContainer.innerHTML = '';
+            msgsContainer.appendChild(contextCard);
+            
+            chatHistory.forEach((msg, idx) => {
+                if (msg.role === 'user') {
+                    let displayContent = msg.content;
+                    // Extract original question portion from first structured input turn for a clean UI
+                    if (idx === 0 && msg.content.includes("Ερώτηση:\n")) {
+                        displayContent = msg.content.split("Ερώτηση:\n").slice(1).join("Ερώτηση:\n");
+                    }
+                    appendMessage('user', displayContent, false, idx);
+                } else if (msg.role === 'assistant') {
+                    appendMessage('assistant', msg.content);
+                }
+            });
+        }
+
+        // Native Markdown parser leveraging standard Marked.js library
+        function formatMarkdown(text) {
+            if (!text) return "";
+            try {
+                // Parse standard markdown strings to structural HTML
+                return marked.parse(text);
+            } catch (err) {
+                // Fallback to basic text escaping on parse failure
+                return text
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/\n/g, "<br>");
+            }
+        }
+
+        // Modular core query runner
+        async function runQuery() {
+            const inputEl = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('chat-send-btn');
+            
+            // Disable inputs during network transaction
+            inputEl.disabled = true;
+            sendBtn.disabled = true;
+            
+            // Append loading container
+            appendMessage('assistant', 'Thinking...');
+            const lastMsgDiv = document.getElementById('chat-messages').lastChild;
+
+            // Load credentials
+            const provider = localStorage.getItem('ai-prov') || 'openai';
+            const apiKey = localStorage.getItem('ai-key') || '';
+            const savedMod = localStorage.getItem('ai-mod') || '';
+            const customUrl = localStorage.getItem('ai-url') || '';
+
+            if (!apiKey && provider !== 'custom') {
+                lastMsgDiv.className = 'chat-message system-error';
+                lastMsgDiv.innerText = '⚠️ Παρακαλούμε ρυθμίστε το API Key στις ρυθμίσεις AI Config πρώτα.';
+                openAiSettings();
+                inputEl.disabled = false;
+                sendBtn.disabled = false;
+                return;
+            }
+
+            // Build the System Prompt Context dynamically on EVERY call
+            const isOriginal = currentContext.selectedColType === 'original';
+            const contextText = isOriginal ? currentContext.originalText : currentContext.translationText;
+            const contextLabel = isOriginal ? "Αρχαίο Κείμενο" : "Σύγχρονη Μετάφραση";
+			const pageTitle = document.title;
+
+            let systemInstruction = "Είσαι διακεκριμένος φιλόσοφος και γνώστης της φιλοσοφίας του Αριστοτέλη και Πλάτωνα και άλλων αρχαίων ελλήνων συγγραφέων.\n" +
+                "Ο χρήστης διαβάζει το βιβλίου του " + pageTitle + " και βάσει αυτού θα σου κάνει μερικές ερωτήσεις, περιλαμβάνοντας κάποιες φορές αποσπάσματα απο το βιβλίο αυτό πάνω στα οποία σχετίζονται οι ερωτήσεις. Ακολουθεί το ευρύτειο πλαίσιο της σελίδας/κεφαλαίου (Σελίδα " + currentContext.pageNum + ", " + currentContext.dividerText + ") για αναφορά:\n" +
+                "--- " + contextLabel + ":\n" + contextText + "\n\n" +
+                "Απάντησε στις ερωτήσεις του χρήστη σε σχέση με το πλαίσιο του κειμένου που παρέχεται. " +
+                "Δώσε τις απαντήσεις σου στα νέα ελληνικά χρησιμοποιώντας markdown μορφοποίηση.";
+
+            // Construct Payload Messages (Always prepending system prompt at index 0)
+            let payloadMessages = [{ role: "system", content: systemInstruction }];
+            payloadMessages = payloadMessages.concat(chatHistory);
+
+            try {
+                const answer = await requestAPI(provider, apiKey, savedMod, payloadMessages, customUrl);
+                lastMsgDiv.innerHTML = formatMarkdown(answer);
+                chatHistory.push({ role: "assistant", content: answer });
+            } catch (error) {
+                lastMsgDiv.className = 'chat-message system-error';
+                lastMsgDiv.innerText = "Error: " + error.message;
+                // If API failed, keep the user question on screen so they can click to retry it,
+                // do not silently clear the UI anymore.
+            } finally {
+                inputEl.disabled = false;
+                sendBtn.disabled = false;
+                document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+                inputEl.focus();
+                adjustSidebarHeightForKeyboard();
+            }
+        }
+
+        async function sendChatMessage() {
+            const inputEl = document.getElementById('chat-input');
+            const prompt = inputEl.value.trim();
+            if (!prompt) return;
+
+            // If the last message in history is a 'user' query (due to a previous failed turn),
+            // pop it before sending so that our conversational stack maintains alternating roles.
+            if (chatHistory.length > 0 && chatHistory[chatHistory.length - 1].role === 'user') {
+                chatHistory.pop();
+            }
+
+            // 1. Manage Chat History & Highlight Context
+            let histIdx;
+            if (chatHistory.length === 0) {
+                // Incorporate highlighted text directly into the first user turn, NOT the system prompt
+                const firstUserContent = "Επισημασμένο κείμενο:\n\"" + currentSelection + "\"\n\nΕρώτηση:\n" + prompt;
+                chatHistory.push({ role: "user", content: firstUserContent });
+                histIdx = 0;
+            } else {
+                // Subsequent turns: push the raw user follow-up prompt
+                chatHistory.push({ role: "user", content: prompt });
+                histIdx = chatHistory.length - 1;
+            }
+
+            // 2. Display user message in UI with history index
+            appendMessage('user', prompt, false, histIdx);
+            inputEl.value = '';
+
+            // 3. Trigger query execution
+            await runQuery();
+        }
+
+        async function requestAPI(provider, apiKey, model, messages, customUrl) {
+            let url = "";
+            let headers = { "Content-Type": "application/json" };
+            let body = {};
+
+            // Normalize models to defaults if unspecified
+            let activeModel = model;
+            if (!activeModel) {
+                if (provider === 'openai') activeModel = 'gpt-4o-mini';
+                else if (provider === 'anthropic') activeModel = 'claude-3-5-sonnet-20241022';
+                else if (provider === 'gemini') activeModel = 'gemini-flash-latest';
+                else if (provider === 'openrouter') activeModel = 'meta-llama/llama-3-8b-instruct:free';
+                else activeModel = 'local-model';
+            }
+
+            if (provider === 'openai') {
+                url = "https://api.openai.com/v1/chat/completions";
+                headers["Authorization"] = "Bearer " + apiKey;
+                body = { model: activeModel, messages: messages };
+            } else if (provider === 'openrouter') {
+                url = "https://openrouter.ai/api/v1/chat/completions";
+                headers["Authorization"] = "Bearer " + apiKey;
+                headers["HTTP-Referer"] = window.location.href;
+                headers["X-Title"] = "Ancient Greek Bilingual Reader";
+                body = { model: activeModel, messages: messages };
+            } else if (provider === 'gemini') {
+                url = "https://generativelanguage.googleapis.com/v1beta/models/" + activeModel + ":generateContent?key=" + apiKey;
+                
+                // Restructure typical OpenAI formats to Gemini's native API structure
+                const systemItem = messages.find(m => m.role === 'system');
+                const userItems = messages.filter(m => m.role !== 'system');
+                
+                const contents = userItems.map(m => ({
+                    role: m.role === 'assistant' ? 'model' : 'user',
+                    parts: [{ text: m.content }]
+                }));
+
+                body = { contents: contents };
+                if (systemItem) {
+                    body.systemInstruction = { parts: [{ text: systemItem.content }] };
+                }
+            } else if (provider === 'anthropic') {
+                url = "https://api.anthropic.com/v1/messages";
+                headers["x-api-key"] = apiKey;
+                headers["anthropic-version"] = "2023-06-01";
+                headers["dangerously-allow-browser"] = "true";
+
+                const systemItem = messages.find(m => m.role === 'system');
+                const userItems = messages.filter(m => m.role !== 'system');
+
+                body = {
+                    model: activeModel,
+                    messages: userItems.map(m => ({ role: m.role, content: m.content })),
+                    max_tokens: 1500
+                };
+                if (systemItem) {
+                    body.system = systemItem.content;
+                }
+            } else if (provider === 'custom') {
+                url = customUrl || "http://localhost:11434/v1/chat/completions";
+                if (apiKey) {
+                    headers["Authorization"] = "Bearer " + apiKey;
+                }
+                body = { model: activeModel, messages: messages };
+            }
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(body)
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error("API Error (" + response.status + "): " + (errText || response.statusText));
+            }
+
+            const responseData = await response.json();
+
+            // Extract content responses safely depending on the selected engine
+            if (provider === 'gemini') {
+                return responseData.candidates[0].content.parts[0].text;
+            } else if (provider === 'anthropic') {
+                return responseData.content[0].text;
+            } else {
+                // OpenAI / OpenRouter / Ollama
+                return responseData.choices[0].message.content;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('ebook-theme');
+            if (savedTheme) {
+                const targetBtn = document.getElementById('theme-' + savedTheme);
+                if (targetBtn) setTheme(savedTheme, targetBtn);
+            }
+
+            const hideOriginal = localStorage.getItem('ebook-hide-original');
+            if (hideOriginal === 'true') {
+                document.body.classList.add('hide-original');
+                document.getElementById('toggle-layout-btn').innerText = 'Show Original';
+            }
+            
+            if (window.innerWidth > 900) {
+                const sidebarClosed = localStorage.getItem('ebook-sidebar-closed');
+                if (sidebarClosed === 'true') {
+                    document.body.classList.add('sidebar-closed');
+                }
+            }
+
+            // Restore saved chat width on desktop
+            const chatSidebar = document.getElementById('chat-sidebar');
+            const savedChatWidth = localStorage.getItem('ebook-chat-width');
+            if (savedChatWidth && window.innerWidth > 900) {
+                chatSidebar.style.width = savedChatWidth;
+            }
+
+            // Setup Resizing for AI Chat Sidebar
+            const resizeHandle = document.getElementById('chat-resize-handle');
+            let isResizing = false;
+
+            resizeHandle.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                chatSidebar.classList.add('resizing');
+                document.body.style.userSelect = 'none';
+                document.body.style.cursor = 'ew-resize';
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isResizing) return;
+                const newWidth = window.innerWidth - e.clientX;
+                // Limit range between 280px and 85% of total screen width
+                if (newWidth > 280 && newWidth < window.innerWidth * 0.85) {
+                    chatSidebar.style.width = newWidth + 'px';
+                    localStorage.setItem('ebook-chat-width', newWidth + 'px');
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (isResizing) {
+                    isResizing = false;
+                    chatSidebar.classList.remove('resizing');
+                    document.body.style.userSelect = '';
+                    document.body.style.cursor = '';
+                }
+            });
+            
+            // Listen for selection events on layout columns (supports mouse and touch handles)
+            document.addEventListener('mouseup', handleTextSelection);
+            document.addEventListener('keyup', handleTextSelection);
+            document.addEventListener('selectionchange', handleTextSelection);
+
+            // Bind selection popup using both mousedown and touchstart with preventDefault.
+            // This guarantees instant tap execution on touch devices before selection focus is lost.
+            const popup = document.getElementById('ai-selection-popup');
+            const handleTriggerTap = (e) => {
+                e.preventDefault();
+                openChatWithSelection();
+            };
+            popup.addEventListener('mousedown', handleTriggerTap);
+            popup.addEventListener('touchstart', handleTriggerTap);
+
+            // Hide the popup trigger during scroll shifts (desktop only to prevent mobile touch glitches)
+            window.addEventListener('scroll', () => {
+                if (window.innerWidth > 900) {
+                    document.getElementById('ai-selection-popup').style.display = 'none';
+                }
+            }, { passive: true });
+
+            // VisualViewport resizing adjustments (Handles Android virtual keyboard overlap natively)
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', adjustSidebarHeightForKeyboard);
+                window.visualViewport.addEventListener('scroll', adjustSidebarHeightForKeyboard);
+            }
+
+            const chatInput = document.getElementById('chat-input');
+            if (chatInput) {
+                chatInput.addEventListener('focus', () => {
+                    setTimeout(adjustSidebarHeightForKeyboard, 150);
+                });
+                chatInput.addEventListener('blur', () => {
+                    setTimeout(adjustSidebarHeightForKeyboard, 150);
+                });
+            }
+            
+            let lastScrollTop = 0;
+            const header = document.querySelector('header');
+            const optBtn = document.querySelector('.options-toggle');
+            
+            window.addEventListener('scroll', () => {
+                let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                
+                if (scrollTop < 0) scrollTop = 0;
+                
+                if (scrollTop > 10) {
+                    document.body.classList.add('scrolled');
+                } else {
+                    document.body.classList.remove('scrolled');
+                }
+                
+                if (scrollTop > lastScrollTop && scrollTop > 120) {
+                    header.classList.add('header-hidden');
+                    header.classList.remove('options-open');
+                    document.body.classList.remove('mobile-options-open');
+                    optBtn.classList.remove('active');
+                } else {
+                    header.classList.remove('header-hidden');
+                }
+                
+                lastScrollTop = scrollTop;
+            }, { passive: true });
+            
+            const observerOptions = {
+                root: null,
+                rootMargin: "-100px 0px -60% 0px", 
+                threshold: 0
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const hash = entry.target.getAttribute('data-hash');
+                        if (hash && window.location.hash !== '#' + hash) {
+                            history.replaceState(null, null, '#' + hash);
+                        }
+                    }
+                });
+            }, observerOptions);
+            
+            document.querySelectorAll('.page-divider').forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1765 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ΔΗΜΟΣΘΕΝΗΣ Κατὰ Φιλίππου δ΄</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Marked.js Markdown rendering library -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #faf8f5;
+            --text-color: #2c2520;
+            --accent-color: #8b263e;
+            --sidebar-bg: #f3efe9;
+            --border-color: #e3ded5;
+            --muted-text: #706357;
+            --font-serif: "Cardo", "Georgia", "Palatino", serif;
+        }
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --accent-color: #ff8a80;
+            --sidebar-bg: #2d2d2d;
+            --border-color: #404040;
+            --muted-text: #999999;
+        }
+        [data-theme="sepia"] {
+            --bg-color: #f4ecd8;
+            --text-color: #5b4636;
+            --accent-color: #a04000;
+            --sidebar-bg: #ebdcb9;
+            --border-color: #d7c59d;
+            --muted-text: #7c6857;
+        }
+        
+        body {
+            margin: 0;
+            font-family: var(--font-serif);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            transition: background-color 0.2s, color 0.2s;
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        #mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 90;
+        }
+        #mobile-overlay.open {
+            display: block;
+        }
+        
+        #expand-bar {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 24px;
+            height: 100vh;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            cursor: pointer;
+            z-index: 95;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+        #expand-bar:hover {
+            background-color: var(--border-color);
+        }
+        #expand-bar::after {
+            content: "›";
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        
+        #sidebar {
+            width: 340px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            height: 100vh;
+            position: fixed;
+            top: 0; left: 0;
+            overflow-y: auto;
+            padding: 24px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transform: translateX(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+        #sidebar h2 {
+            font-size: 1.25rem;
+            margin: 0;
+            color: var(--text-color);
+        }
+        .sidebar-close-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--accent-color);
+            font-size: 1.4rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            line-height: 1;
+        }
+        .sidebar-close-btn:hover {
+            background-color: var(--border-color);
+        }
+        
+        .toc-list-container { overflow-y: auto; flex-grow: 1; }
+        
+        details.book-group {
+            margin-bottom: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            background-color: var(--sidebar-bg);
+        }
+        details.book-group[open] { border-color: var(--accent-color); }
+        details.book-group summary {
+            font-weight: bold; font-size: 1.05rem; cursor: pointer; padding: 10px 14px;
+            background-color: var(--sidebar-bg); list-style: none; display: flex;
+            justify-content: space-between; align-items: center; user-select: none;
+        }
+        details.book-group summary::-webkit-details-marker { display: none; }
+        details.book-group summary::after { content: "▾"; font-size: 0.9rem; color: var(--accent-color); }
+        details.book-group[open] summary::after { transform: rotate(180deg); }
+        
+        .toc-sublist-container {
+            background-color: var(--bg-color);
+            border-top: 1px solid var(--border-color);
+        }
+        .toc-group-title {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            padding: 8px 14px 4px 14px;
+            line-height: 1.3;
+        }
+        .toc-sublist { list-style: none; padding: 4px 14px 8px 14px; margin: 0; }
+        .toc-sublist li { margin-bottom: 8px; font-size: 0.88rem; }
+        
+        .toc-sublist a { 
+            color: var(--text-color); 
+            text-decoration: none; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding: 4px; 
+        }
+        .toc-sublist a:hover { color: var(--accent-color); }
+        .toc-page {
+            color: var(--muted-text);
+            font-size: 0.8rem;
+            font-family: var(--font-serif);
+        }
+        
+        #main {
+            margin-left: 340px;
+            flex-grow: 1;
+            padding: 180px 40px 40px 40px;
+            box-sizing: border-box;
+            width: calc(100% - 340px);
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        padding-top 0.3s ease;
+        }
+        
+        header {
+            position: fixed;
+            top: 0;
+            left: 340px;
+            right: 0;
+            background-color: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px 40px;
+            z-index: 50;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transform: translateY(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        left 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        background-color 0.2s, 
+                        box-shadow 0.2s;
+        }
+        header.header-hidden {
+            transform: translateY(-100%);
+            box-shadow: none !important;
+        }
+        body.scrolled header {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        [data-theme="dark"] body.scrolled header {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .header-top { display: flex; align-items: center; gap: 20px; }
+        header h1 { margin: 0; font-size: 1.8rem; color: var(--accent-color); line-height: 1.2; }
+        
+        .controls-group {
+            display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+        }
+        .btn {
+            background-color: var(--sidebar-bg); color: var(--text-color);
+            border: 1px solid var(--border-color); padding: 8px 14px;
+            font-family: inherit; cursor: pointer; border-radius: 6px;
+            font-size: 0.9rem; font-weight: bold; transition: all 0.2s; white-space: nowrap;
+        }
+        .btn:hover { background-color: var(--border-color); }
+        .btn.active { background-color: var(--accent-color); color: white; border-color: var(--accent-color); }
+        .btn-layout { background-color: var(--bg-color); border: 2px solid var(--accent-color); color: var(--accent-color); }
+        
+        .menu-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+            white-space: nowrap;
+        }
+        .menu-toggle:hover {
+            background-color: var(--text-color);
+        }
+        
+        .options-toggle {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 6px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            width: 38px;
+            height: 38px;
+            transition: all 0.2s;
+        }
+        .options-toggle:hover {
+            background-color: var(--sidebar-bg);
+        }
+
+        #book-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            column-gap: 48px;
+            row-gap: 0;
+            margin: 0 auto;
+            max-width: 140ch;
+            width: 100%;
+        }
+        
+        body.sidebar-closed #expand-bar {
+            display: flex;
+        }
+        body.sidebar-closed #sidebar {
+            transform: translateX(-340px);
+        }
+        body.sidebar-closed #main {
+            margin-left: 24px;
+            width: calc(100% - 24px);
+        }
+        body.sidebar-closed header {
+            left: 24px;
+        }
+        
+        body.hide-original #book-content { 
+            grid-template-columns: 1fr; 
+            max-width: 140ch;
+        }
+        body.hide-original .original-col { display: none; }
+        body.hide-original .bilingual-header { grid-template-columns: 1fr; }
+        body.hide-original .original-title { display: none; }
+        body.hide-original .translation-col {
+            max-width: 100% !important;
+            justify-self: stretch !important;
+        }
+
+        .bilingual-header {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px; position: sticky; top: 0;
+            background-color: var(--bg-color); padding: 16px 0;
+            border-bottom: 2px solid var(--accent-color); z-index: 10;
+            font-weight: bold; text-transform: uppercase; font-size: 0.85rem;
+            letter-spacing: 0.05em; color: var(--muted-text);
+        }
+        
+        .chapter-anchor {
+            display: block;
+            scroll-margin-top: 180px;
+        }
+        
+        .page-divider {
+            grid-column: 1 / -1;
+            border-bottom: 1px solid var(--border-color);
+            padding-top: 48px; padding-bottom: 12px; margin-bottom: 24px;
+            font-size: 0.95rem; color: var(--accent-color); text-transform: uppercase;
+            letter-spacing: 0.05em; font-weight: bold; 
+            scroll-margin-top: 180px;
+        }
+        
+        .page-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--accent-color);
+            transition: color 0.2s, border-bottom-color 0.2s;
+        }
+        .page-link:hover {
+            color: var(--text-color);
+            border-bottom-color: var(--text-color);
+        }
+        
+        .column { 
+            box-sizing: border-box; 
+            padding-bottom: 24px; 
+            display: flex; 
+            flex-direction: column; 
+            max-width: 65ch;
+            width: fit-content;
+            min-width: 0;
+        }
+        
+        .original-col {
+            justify-self: end;
+        }
+        .translation-col {
+            justify-self: start;
+        }
+        
+        .passage { 
+            margin: 0 0 1.2em 0; 
+            font-size: 1.15rem; 
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 1.5rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .passage-text {
+            flex: 1;
+            min-width: 0;
+            text-align: justify;
+        }
+        .passage.indent .passage-text { text-indent: 2em; }
+        .marker { color: var(--accent-color); font-weight: bold; margin-right: 4px; }
+        .line-number { 
+            color: var(--muted-text); 
+            font-size: 0.85em; 
+            font-weight: normal; 
+            user-select: none;
+            margin-left: auto;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+        i { font-style: italic; }
+
+        /* Floating popover trigger styling */
+        #ai-selection-popup {
+            position: fixed;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 14px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1005;
+            display: none;
+            font-family: var(--font-serif);
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.1s ease;
+        }
+        #ai-selection-popup:hover {
+            transform: scale(1.05);
+        }
+
+        /* Resizable sliding Right Chat Sidebar */
+        #chat-sidebar {
+            width: 380px;
+            min-width: 280px;
+            max-width: 85vw;
+            background-color: var(--sidebar-bg);
+            border-left: 1px solid var(--border-color);
+            height: 100vh;
+            height: 100dvh;
+            position: fixed;
+            top: 0; right: 0;
+            transform: translateX(100%);
+            overflow: visible;
+            display: flex;
+            flex-direction: column;
+            z-index: 110;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-sizing: border-box;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.05);
+        }
+        body.chat-sidebar-open #chat-sidebar {
+            transform: translateX(0);
+        }
+        
+        /* Draggable Resize Handle */
+        #chat-resize-handle {
+            width: 8px;
+            height: 100%;
+            position: absolute;
+            left: -4px;
+            top: 0;
+            cursor: ew-resize;
+            z-index: 120;
+            background-color: transparent;
+            transition: background-color 0.2s;
+        }
+        #chat-resize-handle:hover,
+        #chat-sidebar.resizing #chat-resize-handle {
+            background-color: var(--accent-color);
+            opacity: 0.5;
+        }
+        
+        .chat-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-header h3 { margin: 0; font-size: 1.1rem; color: var(--accent-color); }
+        
+        .chat-header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .chat-context-card {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+        .chat-context-card h4 { margin: 0 0 6px 0; color: var(--accent-color); }
+        .chat-context-card p { 
+            margin: 0; 
+            font-style: italic; 
+            display: -webkit-box; 
+            -webkit-line-clamp: 3; 
+            -webkit-box-orient: vertical; 
+            overflow: hidden; 
+            line-height: 1.4;
+        }
+        
+        .chat-message {
+            max-width: 85%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        
+        /* Render styles for AI Markdown elements in chat boxes */
+        .chat-message p { margin: 0 0 8px 0; line-height: 1.5; }
+        .chat-message p:last-child { margin-bottom: 0; }
+        .chat-message strong { font-weight: bold; }
+        .chat-message em { font-style: italic; }
+        .chat-message ul, .chat-message ol { margin: 4px 0 8px 16px; padding: 0; }
+        .chat-message li { margin-bottom: 4px; font-size: 0.92rem; }
+        .chat-message h1, .chat-message h2, .chat-message h3, .chat-message h4, .chat-message h5 {
+            color: var(--accent-color);
+            margin: 12px 0 6px 0;
+            line-height: 1.3;
+        }
+        .chat-message h3 { font-size: 1.15rem; }
+        .chat-message h4 { font-size: 1.05rem; }
+        .chat-message h5 { font-size: 0.95rem; }
+        .chat-message blockquote {
+            border-left: 3px solid var(--accent-color);
+            margin: 8px 0;
+            padding-left: 10px;
+            color: var(--muted-text);
+            font-style: italic;
+        }
+        .chat-message pre {
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.85rem;
+            margin: 8px 0;
+        }
+        .chat-message code {
+            font-family: monospace;
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: var(--accent-color);
+        }
+        
+        .chat-message.user {
+            background-color: var(--accent-color);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .chat-message.user:hover {
+            filter: brightness(1.15);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        /* Override light-colored syntax highlights in dark bubbles */
+        .chat-message.user code {
+            color: #ff8a80;
+            background-color: rgba(0,0,0,0.2);
+            border-color: rgba(0,0,0,0.1);
+        }
+        .chat-message.user pre {
+            background-color: rgba(0,0,0,0.2);
+            border-color: rgba(0,0,0,0.1);
+            color: white;
+        }
+        
+        .chat-message.assistant {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .chat-message.system-error {
+            background-color: #fce8e6;
+            color: #c5221f;
+            border: 1px solid #fad2cf;
+            align-self: center;
+            max-width: 95%;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+        
+        [data-theme="dark"] .chat-message.system-error {
+            background-color: #371d1d;
+            color: #f28b82;
+            border-color: #5c2424;
+        }
+
+        .chat-input-area {
+            padding: 16px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 8px;
+            background-color: var(--sidebar-bg);
+            flex-shrink: 0;
+        }
+        .chat-input-area textarea {
+            flex-grow: 1;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 10px;
+            border-radius: 6px;
+            resize: none;
+            height: 42px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+        }
+        .chat-input-area button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .chat-input-area button:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* Modal Config Dialog */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-content {
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            padding: 24px;
+            box-sizing: border-box;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 12px;
+        }
+        .modal-header h3 { margin: 0; font-size: 1.25rem; color: var(--accent-color); }
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group label {
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        .form-control {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 14px;
+        }
+
+        @media (max-width: 900px) {
+            #sidebar { transform: translateX(-100%); width: 320px; }
+            body.sidebar-open #sidebar { transform: translateX(0); }
+            body.sidebar-closed #sidebar { transform: translateX(-100%); }
+            
+            #chat-sidebar {
+                width: 100% !important;
+                right: 0;
+                transform: translateX(100%);
+                height: 100vh;
+                height: 100dvh;
+            }
+            body.chat-sidebar-open #chat-sidebar {
+                transform: translateX(0);
+            }
+            #chat-resize-handle {
+                display: none;
+            }
+            
+            #main { 
+                margin-left: 0 !important; 
+                width: 100% !important; 
+                padding: 100px 20px 20px 20px !important;
+            }
+            body.mobile-options-open #main {
+                padding-top: 150px !important;
+            }
+            
+            header {
+                padding-bottom: 12px;
+                margin-bottom: 16px;
+                gap: 8px;
+            }
+            header h1 { 
+                font-size: 0.95rem !important;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                text-align: center;
+                flex-grow: 1;
+                margin: 0;
+            }
+            
+            header {
+                left: 0 !important;
+                padding: 12px 16px;
+            }
+            
+            .header-top { 
+                display: flex;
+                flex-direction: row !important;
+                align-items: center; 
+                justify-content: space-between; 
+                width: 100%;
+                gap: 12px; 
+            }
+            
+            .menu-toggle { 
+                width: auto !important; 
+                padding: 6px 12px;
+                font-size: 0.85rem;
+            }
+            
+            .options-toggle {
+                display: inline-flex;
+            }
+            
+            .controls-group {
+                display: none;
+                width: 100%;
+                justify-content: center;
+                padding-top: 12px;
+                border-top: 1px dashed var(--border-color);
+            }
+            header.options-open .controls-group {
+                display: flex;
+            }
+            
+            #book-content { grid-template-columns: 1fr; column-gap: 0; max-width: 100%; }
+            .column { max-width: 100% !important; width: 100% !important; }
+            .bilingual-header { display: none; }
+            .page-divider { padding-top: 32px; scroll-margin-top: 110px; }
+            .chapter-anchor { scroll-margin-top: 110px; }
+            .passage { font-size: 1.05rem; }
+        }
+        
+        @media (min-width: 901px) {
+            .menu-toggle {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="mobile-overlay" onclick="toggleSidebar()"></div>
+
+    <div id="expand-bar" onclick="toggleSidebar()" title="Ανάπτυξη Περιεχομένων"></div>
+
+    <aside id="sidebar">
+        <div class="sidebar-header">
+            <h2>Πίνακας Περιεχομένων</h2>
+            <button class="sidebar-close-btn" onclick="toggleSidebar()" title="Σύμπτυξη">‹</button>
+        </div>
+        <div class="toc-list-container">
+            <details class="book-group">
+    <summary>ΠΡΟΟΙΜΙΟ</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-1-chapter-1" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1</span> <span class="toc-page">#1</span></a></li>
+        </ul>
+    </div>
+</details>
+<details class="book-group">
+    <summary>ΔΙΗΓΗΣΗ</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-2-chapter-1" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1</span> <span class="toc-page">#2</span></a></li>
+        </ul>
+    </div>
+</details>
+<details class="book-group">
+    <summary>ΠΡΟΤΑΣΗ</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-3-chapter-1" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1</span> <span class="toc-page">#3</span></a></li>
+        </ul>
+    </div>
+</details>
+<details class="book-group">
+    <summary>ΠΙΣΤΕΙΣ</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-4-chapter-1" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1</span> <span class="toc-page">#4</span></a></li>
+            <li><a href="#book-4-chapter-1-2" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.2</span> <span class="toc-page">#5</span></a></li>
+            <li><a href="#book-4-chapter-1-3" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.3</span> <span class="toc-page">#6</span></a></li>
+        </ul>
+    </div>
+</details>
+<details class="book-group">
+    <summary>ΕΠΙΛΟΓΟΣ</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-5-chapter-1" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1</span> <span class="toc-page">#7</span></a></li>
+        </ul>
+    </div>
+</details>
+        </div>
+    </aside>
+
+    <!-- AI Right Chat Sidebar -->
+    <aside id="chat-sidebar">
+        <div id="chat-resize-handle"></div>
+        <div class="chat-header">
+            <h3>AI Assistant</h3>
+            <div class="chat-header-actions">
+                <button class="btn" style="padding: 4px 8px; font-size: 0.8rem;" onclick="clearChat()">Clear</button>
+                <button class="sidebar-close-btn" style="width: 28px; height: 28px; font-size: 1.1rem;" onclick="toggleChatSidebar()" title="Κλείσιμο">›</button>
+            </div>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <!-- Active Context Card -->
+            <div class="chat-context-card" id="chat-context-card">
+                <h4>Επιλεγμένο Κείμενο</h4>
+                <p id="chat-context-text"></p>
+            </div>
+            <!-- Messages stream here -->
+        </div>
+        <div class="chat-input-area">
+            <textarea id="chat-input" placeholder="Ρωτήστε κάτι για το επιλεγμένο κείμενο..." onkeydown="handleChatKeyDown(event)"></textarea>
+            <button id="chat-send-btn" onclick="sendChatMessage()">Send</button>
+        </div>
+    </aside>
+
+    <!-- Floating Popover Trigger -->
+    <button id="ai-selection-popup"><span style="font-size: 1.1rem;">✨</span> Ask AI</button>
+
+    <!-- Settings Configuration Modal -->
+    <div id="ai-config-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Ρυθμίσεις LLM / AI</h3>
+                <button class="sidebar-close-btn" style="width: 28px; height: 28px; font-size: 1.1rem;" onclick="closeAiSettings()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="ai-provider">Πάροχος (Provider)</label>
+                    <select id="ai-provider" class="form-control" onchange="handleProviderChange()">
+                        <option value="openai">OpenAI (ChatGPT)</option>
+                        <option value="anthropic">Anthropic (Claude)</option>
+                        <option value="gemini">Google Gemini</option>
+                        <option value="openrouter">OpenRouter</option>
+                        <option value="custom">Custom Endpoint (Ollama / Local)</option>
+                    </select>
+                </div>
+                <div class="form-group" id="group-custom-url" style="display: none;">
+                    <label for="ai-custom-url">Base URL</label>
+                    <input type="text" id="ai-custom-url" class="form-control" placeholder="http://localhost:11434/v1/chat/completions">
+                </div>
+                <div class="form-group">
+                    <label for="ai-key">API Key</label>
+                    <input type="password" id="ai-key" class="form-control" placeholder="Εισάγετε το API Key">
+                </div>
+                <div class="form-group">
+                    <label for="ai-model">Μοντέλο (Model Name)</label>
+                    <input type="text" id="ai-model" class="form-control" placeholder="π.χ. gpt-4o-mini">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeAiSettings()">Άκυρο</button>
+                <button class="btn active" onclick="saveAiSettings()">Αποθήκευση</button>
+            </div>
+        </div>
+    </div>
+
+    <main id="main">
+        <header>
+            <div class="header-top">
+                <button class="btn menu-toggle" onclick="toggleSidebar()">☰ Περιεχόμενα</button>
+                <h1>ΔΗΜΟΣΘΕΝΗΣ Κατὰ Φιλίππου δ΄</h1>
+                <button class="btn options-toggle" onclick="toggleMobileOptions()" title="Ρυθμίσεις">⚙️</button>
+            </div>
+            
+            <div class="controls-group">
+                <button id="toggle-layout-btn" class="btn btn-layout" onclick="toggleLayout()">Hide Original</button>
+                <button class="btn" style="border-color: var(--accent-color);" onclick="openAiSettings()">⚙️ AI Config</button>
+                <button class="btn active theme-btn" id="theme-light" onclick="setTheme('light', this)">Light</button>
+                <button class="btn theme-btn" id="theme-sepia" onclick="setTheme('sepia', this)">Sepia</button>
+                <button class="btn theme-btn" id="theme-dark" onclick="setTheme('dark', this)">Dark</button>
+            </div>
+        </header>
+
+        <section id="book-content">
+            <div class="bilingual-header">
+                <div class="original-title">Αρχαία Ελληνικά (Original)</div>
+                <div class="translation-title">Νέα Ελληνικά (Translation)</div>
+            </div>
+
+            
+        <div id="book-1-chapter-1" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-1" data-hash="book-1-chapter-1">
+            ΠΡΟΟΙΜΙΟ • Κεφάλαιο 1 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=65&page=1" target="_blank" class="page-link">Page 1</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[1]</span> Καὶ σπουδαῖα νομίζων, ὦ ἄνδρες Ἀθηναῖοι, περὶ ὧν βουλεύεσθε, καὶ ἀναγκαῖα τῇ πόλει, πειράσομαι περὶ αὐτῶν εἰπεῖν ἃ νομίζω συμφέρειν. Οὐκ ὀλίγων δ᾽ ὄντων ἁμαρτημάτων οὐδ᾽ ἐκ μικροῦ χρόνου συνειλεγμένων, ἐξ ὧν φαύλως ταῦτ᾽ ἔχει, οὐδέν ἐστιν, ὦ ἄνδρες Ἀθηναῖοι, τῶν πάντων δυσκολώτερον εἰς τὸ παρὸν ἢ ὅτι ταῖς γνώμαις ὑμεῖς ἀφεστήκατε τῶν πραγμάτων, καὶ τοσοῦτον χρόνον σπουδάζεθ᾽ ὅσον ἂν κάθησθ᾽ ἀκούοντες ἢ προσαγγελθῇ τι νεώτερον, εἶτ᾽ ἀπελθὼν ἕκαστος ὑμῶν οὐ μόνον οὐδὲν φροντίζει περὶ αὐτῶν, ἀλλ᾽ οὐδὲ μέμνηται. <span class="marker">[2]</span> ἡ μὲν οὖν ἀσέλγεια καὶ πλεονεξία, ᾗ πρὸς ἅπαντας ἀνθρώπους Φίλιππος χρῆται, τοσαύτη τὸ πλῆθος ὅσην ἀκούετε· ὅτι δ᾽ οὐκ ἔνι ταύτης ἐκεῖνον ἐπισχεῖν ἐκ λόγου καὶ δημηγορίας οὐδεὶς ἀγνοεῖ δήπου. καὶ γὰρ εἰ μηδ᾽ ἀφ᾽ ἑνὸς τῶν ἄλλων τοῦτο μαθεῖν δύναταί τις, ὡδὶ λογισάσθω. ἡμεῖς οὐδαμοῦ πώποτε, ὅπου περὶ τῶν δικαίων εἰπεῖν ἐδέησεν, ἡττήθημεν οὐδ᾽ ἀδικεῖν ἐδόξαμεν, ἀλλὰ πάντων πανταχοῦ κρατοῦμεν καὶ περίεσμεν τῷ λόγῳ. <span class="marker">[3]</span> ἆρ᾽ οὖν διὰ τοῦτ᾽ ἐκείνῳ φαύλως ἔχει τὰ πράγματα, ἢ τῇ πόλει καλῶς; πολλοῦ γε καὶ δεῖ· ἐπειδὰν γὰρ ὁ μὲν λαβὼν μετὰ ταῦτα βαδίζῃ τὰ ὅπλα, πᾶσιν τοῖς οὖσιν ἑτοίμως κινδυνεύσων, ἡμεῖς δὲ καθώμεθ᾽ εἰρηκότες τὰ δίκαια, οἱ δ᾽ ἀκηκοότες, εἰκότως, οἶμαι, τοὺς λόγους τἄργα παρέρχεται, καὶ προσέχουσιν ἅπαντες οὐχ οἷς εἴπομέν ποθ᾽ ἡμεῖς δικαίοις ἢ νῦν ἂν εἴποιμεν, ἀλλ᾽ οἷς ποιοῦμεν. ἔστι δὲ ταῦτ᾽ οὐδένα τῶν ἀδικουμένων σῴζειν δυνάμενα· οὐδὲν γὰρ δεῖ πλείω περὶ αὐτῶν λέγειν. <span class="marker">[4]</span> τοιγάρτοι διεστηκότων εἰς δύο ταῦτα τῶν ἐν ταῖς πόλεσι, τῶν μὲν εἰς τὸ μήτ᾽ ἄρχειν βίᾳ βούλεσθαι μηδενὸς μήτε δουλεύειν ἄλλῳ, ἀλλ᾽ ἐν ἐλευθερίᾳ καὶ νόμοις ἐξ ἴσου πολιτεύεσθαι, τῶν δ᾽ εἰς τὸ ἄρχειν μὲν τῶν πολιτῶν ἐπιθυμεῖν, ἑτέρῳ δ᾽ ὑπακούειν, δι᾽ ὅτου ποτ᾽ ἂν οἴωνται τοῦτο δυνήσεσθαι ποιῆσαι, οἱ τῆς ἐκείνου προαιρέσεως, οἱ τυραννίδων καὶ δυναστειῶν ἐπιθυμοῦντες, κεκρατήκασι πανταχοῦ, καὶ πόλις δημοκρατουμένη βεβαίως οὐκ οἶδ᾽ εἴ τίς ἐστι τῶν πασῶν λοιπὴ πλὴν ἡ ἡμετέρα. <span class="marker">[5]</span> καὶ κεκρατήκασιν οἱ δι᾽ ἐκείνου τὰς πολιτείας ποιούμενοι πᾶσιν ὅσοις πράγματα πράττεται, πρώτῳ μὲν πάντων καὶ πλείστῳ τῷ τοῖς βουλομένοις χρήματα λαμβάνειν ἔχειν τὸν δώσονθ᾽ ὑπὲρ αὑτῶν, δευτέρῳ δὲ καὶ οὐδὲν ἐλάττονι τούτου τῷ δύναμιν τὴν καταστρεψομένην τοὺς ἐναντιουμένους αὐτοῖς ἐν οἷς ἂν αἰτήσωσι χρόνοις παρεῖναι. <span class="marker">[6]</span> ἡμεῖς δ᾽ οὐ μόνον τούτοις ὑπολειπόμεθ᾽, ὦ ἄνδρες Ἀθηναῖοι, ἀλλ᾽ οὐδ᾽ ἀνεγερθῆναι δυνάμεθα, ἀλλὰ μανδραγόραν πεπωκόσιν ἤ τι φάρμακον ἄλλο τοιοῦτον ἐοίκαμεν ἀνθρώποις· εἶτ᾽, οἶμαι, (δεῖ γάρ, ὡς ἐγὼ κρίνω, λέγειν τἀληθῆ) οὕτω διαβεβλήμεθα καὶ καταπεφρονήμεθ᾽ ἐκ τούτων ὥστε τῶν ἐν αὐτῷ τῷ κινδυνεύειν ὄντων οἱ μὲν ὑπὲρ τῆς ἡγεμονίας ἡμῖν ἀντιλέγουσιν, οἱ δ᾽ ὑπὲρ τοῦ ποῦ συνεδρεύσουσι, τινὲς δὲ καθ᾽ αὑτοὺς ἀμύνεσθαι μᾶλλον ἢ μεθ᾽ ἡμῶν ἐγνώκασιν.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text"><i>ΠΡΟΟΙΜΙΟ (§§ 1-6)</i></span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[1]</span> Αθηναίοι, επειδή νομίζω ότι τα ζητήματα για τα οποία συζητάτε είναι πολύ σημαντικά και κατεπείγοντα για την πόλη, θα προσπαθήσω να σας πω σχετικά με αυτά όσα θεωρώ ότι σας συμφέρουν. Μολονότι τα σφάλματα, εξαιτίας των οποίων η κατάσταση είναι κακή, δεν είναι λίγα ούτε και έχουν συσσωρευτεί μέσα σε μικρό χρονικό διάστημα, εντούτοις, Αθηναίοι, τίποτε από όλα αυτά δεν είναι πιο εξοργιστικό στην παρούσα περίπτωση όσο το ότι έχετε αποστασιοποιηθεί ψυχικά από τις υποθέσεις της πόλης και το ενδιαφέρον σας διαρκεί τόσο μόνο χρόνο όσο κάθεστε εδώ και ακούτε ή ώσπου να φτάσει κάποια καινούργια είδηση· στη συνέχεια ο καθένας αποχωρεί και όχι μόνο δεν δίνει καμιά σημασία στις δημόσιες υποθέσεις αλλά ούτε καν τις θυμάται. <span class="marker">[2]</span> Η αλαζονεία λοιπόν και η απληστία που δείχνει ο Φίλιππος στις σχέσεις του με όλους έχουν λάβει τέτοια έκταση όσην ακριβώς έχετε ακουστά, και κανένας δεν αγνοεί ότι είναι αδύνατο να τον συγκρατήσει κανείς από αυτήν την τάση με επιχειρήματα και δημηγορίες. Και αν πράγματι δεν μπορεί κανείς να το μάθει αυτό από πουθενά αλλού, ας κάνει τον ακόλουθο συλλογισμό: όπου χρειάστηκε να μιλήσουμε για τα δίκαιά μας, πουθενά ως τώρα δεν νικηθήκαμε ούτε και φανήκαμε ότι αδικούμε, αλλά σε όλες τις περιπτώσεις νικούμε και υπερισχύουμε με τη λογική των επιχειρημάτων μας. <span class="marker">[3]</span> Γι᾽ αυτό άραγε τα πράγματα είναι άσχημα για᾽ κείνον και καλά για την πόλη μας; Κάθε άλλο βέβαια· γιατί, όταν εκείνος ύστερα από αυτά παίρνει τα όπλα και προχωρεί πρόθυμος να διακινδυνεύσει όλα όσα έχει, ενώ εμείς καθόμαστε άπραγοι, άλλοι γιατί έχουμε διατυπώσει τα δίκαιά μας, άλλοι γιατί τα έχουμε ακούσει, εύλογα κατά τη γνώμη μου τα έργα υπερισχύουν των λόγων και όλοι γενικά προσέχουν όχι σε ό,τι δίκαιο είπαμε κάποτε ή τώρα θα πούμε, αλλά σε όσα κάνουμε. Αυτά όμως δεν μπορούν να σώσουν κανέναν απ᾽ όσους αδικούνται· δεν χρειάζεται βέβαια να πω τίποτε περισσότερο γι᾽ αυτά.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[4]</span> Σε όλες τις πόλεις οι Έλληνες είναι χωρισμένοι σε δύο συγκεκριμένες παρατάξεις· στη μια ανήκουν αυτοί που δεν επιθυμούν μήτε να επιβάλλονται σε κανέναν με τη βία μήτε να είναι υποδουλωμένοι σε κανέναν άλλον, αλλά να πολιτεύονται με ισότητα σε καθεστώς ελεύθερο και δίκαιο σύμφωνα με τους νόμους· στην άλλη ανήκουν εκείνοι που επιθυμούν να εξουσιάζουν τους συμπολίτες τους, αλλά να υπακούουν σε κάποιον άλλον, μέσω του οποίου πιστεύουν ότι θα μπορέσουν να πραγματοποιήσουν αυτά. Έτσι, η φατρία του Φιλίππου, αυτοί δηλαδή που επιθυμούν τυραννίδες και οικογενειοκρατίες, έχουν υπερισχύσει παντού και αμφιβάλλω αν έχει απομείνει από όλες τις πόλεις δημοκρατία σταθερή εκτός από τη δική μας. <span class="marker">[5]</span> Η επικράτηση όσων ασκούν την πολιτική με τη βοήθεια εκείνου έχει επιτευχθεί με όλα τα μέσα της πολιτικής· με πρώτο και σπουδαιότερο από όλα ότι έχουν εξασφαλισμένο τον άνθρωπο που θα δώσει γι᾽ αυτούς χρήματα σε όσους θέλουν να τα πάρουν, και δεύτερο, καθόλου μικρότερης σημασίας και αυτό, με το να έχουν δηλαδή στη διάθεσή τους τη δύναμη εκείνη που θα συντρίψει τους αντιπάλους τους σε όποια στιγμή τη ζητήσουν. <span class="marker">[6]</span> Αντίθετα, εμείς, Αθηναίοι, όχι μόνο υστερούμε ως προς αυτά, αλλά δεν είμαστε σε θέση ούτε και να αφυπνιστούμε· μοιάζουμε με ανθρώπους που έχουν πιει μανδραγόρα ή κάποιο άλλο παρόμοιο ναρκωτικό. Εξάλλου, γνώμη μου είναι (γιατί πρέπει να πω την αλήθεια όπως εγώ την αντιλαμβάνομαι), έχουμε διαβληθεί και περιφρονηθεί εξαιτίας αυτών τόσο πολύ, ώστε, ενώ οι Έλληνες αντιμετωπίζουν πραγματικό κίνδυνο, άλλοι ερίζουν με μας για την ηγεμονία, άλλοι για το πού θα συνεδριάσουν, κάποιοι πάλι έχουν αποφασίσει να αμυνθούν μόνοι τους παρά μαζί με μας.</span></p>
+        </div>
+        
+
+        <div id="book-2-chapter-1" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-2" data-hash="book-2-chapter-1">
+            ΔΙΗΓΗΣΗ • Κεφάλαιο 1 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=65&page=2" target="_blank" class="page-link">Page 2</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[7]</span> Τοῦ χάριν δὴ ταῦτα λέγω καὶ διεξέρχομαι; οὐ γὰρ ἀπεχθάνεσθαι μὰ τὸν Δία καὶ πάντας θεοὺς προαιροῦμαι. ἵν᾽ ὑμῶν ἕκαστος, ὦ ἄνδρες Ἀθηναῖοι, τοῦτο γνῷ καὶ εἰδῇ, ὅτι ἡ καθ᾽ ἡμέραν ῥᾳστώνη καὶ ῥᾳθυμία, ὥσπερ τοῖς ἰδίοις βίοις, οὕτω καὶ ταῖς πόλεσιν οὐκ ἐφ᾽ ἑκάστου τῶν ἀμελουμένων ποιεῖ τὴν αἴσθησιν εὐθέως, ἀλλ᾽ ἐπὶ τῷ κεφαλαίῳ τῶν πραγμάτων ἀπαντᾷ. <span class="marker">[8]</span> ὁρᾶτε Σέρριον καὶ Δορίσκον· ταῦτα γὰρ πρῶτον ὠλιγωρήθη μετὰ τὴν εἰρήνην, ἃ πολλοῖς ὑμῶν οὐδὲ γνώριμ᾽ ἐστὶν ἴσως. ταῦτα μέντοι τότ᾽ ἐαθέντα καὶ παροφθέντ᾽ ἀπώλεσε Θρᾴκην καὶ Κερσοβλέπτην, σύμμαχον ὄνθ᾽ ὑμῶν. πάλιν ταῦτ᾽ ἀμελούμεν᾽ ἰδὼν καὶ οὐδεμιᾶς βοηθείας τυγχάνοντα παρ᾽ ὑμῶν κατέσκαπτε Πορθμόν, καὶ τυραννίδ᾽ ἀπαντικρὺ τῆς Ἀττικῆς ἐπετείχισεν ὑμῖν ἐν τῇ Εὐβοίᾳ. <span class="marker">[9]</span> ταύτης ὀλιγωρουμένης, Μέγαρ᾽ ἑάλω παρὰ μικρόν. οὐδὲν ἐφροντίσατ᾽ οὐδ᾽ ἐπεστράφητ᾽ οὐδὲν τούτων, οὐδ᾽ ἐνεδείξασθε τοῦθ᾽ ὅτι οὐκ ἐπιτρέψετε τοῦτο ποιεῖν αὐτῷ· Ἀντρῶνας ἐπρίατο καὶ μετ᾽ οὐ πολὺν χρόνον τὰ ἐν Ὠρεῷ πράγματ᾽ εἰλήφει. <span class="marker">[10]</span> πολλὰ δὲ καὶ παραλείπω, Φεράς, τὴν ἐπ᾽ Ἀμβρακίαν ὁδόν, τὰς ἐν Ἤλιδι σφαγάς, ἄλλα μυρία· οὐ γὰρ ἵν᾽ ἐξαριθμήσωμαι τοὺς βεβιασμένους καὶ τοὺς ἠδικημένους ὑπὸ Φιλίππου, ταῦτα διεξῆλθον, ἀλλ᾽ ἵνα τοῦθ᾽ ὑμῖν δείξω, ὅτι οὐ στήσεται πάντας ἀνθρώπους ἀδικῶν, τὰ δ᾽ ὑφ᾽ αὑτῷ ποιούμενος Φίλιππος, εἰ μή τις αὐτὸν κωλύσει.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text"><i>ΔΙΗΓΗΣΗ (§§ 7-10)</i></span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[7]</span> Για ποιόν λόγο λοιπόν τα λέω αυτά και μπαίνω και σε λεπτομέρειες; Γιατί, μα τον Δία και όλους τους θεούς, δεν έχω καμιά διάθεση να γίνω μισητός σε σας, αλλά για να μάθει και να αντιληφθεί ο καθένας σας, Αθηναίοι, τούτο, ότι η καθημερινή αδράνεια και ραθυμία, όπως στην ιδιωτική ζωή, έτσι και στις υποθέσεις της πόλης δεν κάνουν αισθητά τα αποτελέσματά τους άμεσα σε καθετί χωριστά που παραμελείται, αλλά εμφανίζονται στο σύνολο της πολιτικής. <span class="marker">[8]</span> Κοιτάξτε το Σέρριο και τον Δορίσκο· ήταν τα πρώτα μέρη για τα οποία αδιαφορήσαμε μετά την ειρήνη και ίσως μερικοί από σας να μην τα ξέρουν καν. Η εγκατάλειψη και η παραμέληση αυτών των μερών συνετέλεσε ώστε να χαθεί η Θράκη και ο Κερσοβλέπτης, ο σύμμαχός σας. Στη συνέχεια, βλέποντας ο Φίλιππος ότι τα οχυρά αυτά μέρη παραμελούνταν από σας και δεν έπαιρναν καμιά βοήθεια, άρχισε να γκρεμίζει τα τείχη του Πορθμού και απέναντι από την Αττική, στην Εύβοια, εγκατέστησε τυραννίδα σαν τείχος πραγματικό εναντίον σας. <span class="marker">[9]</span> Και επειδή αδιαφορήσατε για την Εύβοια, λίγο έλειψε να κυριέψει τα Μέγαρα. Δεν φροντίσατε καθόλου ούτε καν ανησυχήσατε γι᾽ αυτά· ούτε και του δείξατε ότι δεν θα του επιτρέψετε να συνεχίσει αυτήν την τακτική. Εξαγόρασε τους Ανδρώνες και ύστερα από λίγο καιρό είχε υπό τον έλεγχό του την πολιτική κατάσταση στον Ωρεό. <span class="marker">[10]</span> Πολλές άλλες περιπτώσεις τις παραλείπω, όπως για παράδειγμα τις Φερές, την προέλαση προς την Αμβρακία, τις σφαγές στην Ήλιδα και μύριες άλλες. Δεν ανέφερα αυτές τις περιπτώσεις για να απαριθμήσω τα θύματα της βίας και της αδικίας του Φιλίππου, αλλά για να σας δείξω τούτο, ότι δεν πρόκειται να σταματήσει ο Φίλιππος να αδικεί όλο τον κόσμο και να προσπαθεί να τον υποτάξει, εκτός και αν κάποιος τον εμποδίσει.</span></p>
+        </div>
+        
+
+        <div id="book-3-chapter-1" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-3" data-hash="book-3-chapter-1">
+            ΠΡΟΤΑΣΗ • Κεφάλαιο 1 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=65&page=3" target="_blank" class="page-link">Page 3</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[11]</span> Εἰσὶν δέ τινες οἳ πρὶν ἀκοῦσαι τοὺς ὑπὲρ τῶν πραγμάτων λόγους εὐθέως εἰώθασιν ἐρωτᾶν «τί οὖν χρὴ ποιεῖν;» οὐχ ἵν᾽ ἀκούσαντες ποιήσωσι (χρησιμώτατοι γὰρ ἂν ἦσαν ἁπάντων), ἀλλ᾽ ἵνα τοῦ λέγοντος ἀπαλλαγῶσιν. δεῖ δ᾽ ὅμως εἰπεῖν ὅ τι χρὴ ποιεῖν. πρῶτον μέν, ὦ ἄνδρες Ἀθηναῖοι, τοῦτο παρ᾽ ὑμῖν αὐτοῖς βεβαίως γνῶναι, ὅτι τῇ πόλει Φίλιππος πολεμεῖ καὶ τὴν εἰρήνην λέλυκεν, καὶ κακόνους μέν ἐστι καὶ ἐχθρὸς ὅλῃ τῇ πόλει καὶ τῷ τῆς πόλεως ἐδάφει, προσθήσω δὲ καὶ τοῖς ἐν τῇ πόλει θεοῖς, οἵπερ αὐτὸν ἐξολέσειαν, οὐδενὶ μέντοι μᾶλλον ἢ τῇ πολιτείᾳ πολεμεῖ οὐδ᾽ ἐπιβουλεύει, καὶ σκοπεῖ μᾶλλον οὐδὲν τῶν πάντων ἢ πῶς ταύτην καταλύσει. <span class="marker">[12]</span> καὶ τοῦτ᾽ ἐξ ἀνάγκης τρόπον τινὰ νῦν γε δὴ ποιεῖ. λογίζεσθε γάρ. ἄρχειν βούλεται, τούτου δ᾽ ἀνταγωνιστὰς μόνους ὑπείληφεν ὑμᾶς. ἀδικεῖ πολὺν χρόνον ἤδη, καὶ τοῦτ᾽ αὐτὸς ἄριστα σύνοιδεν αὑτῷ· οἷς γὰρ οὖσιν ὑμετέροις ἔχει [χρῆσθαι], τούτοις ἅπαντα τἄλλα βεβαίως κέκτηται· εἰ γὰρ Ἀμφίπολιν καὶ Ποτείδαιαν προεῖτο, οὐδ᾽ ἂν ἐν Μακεδονίᾳ μένειν ἀσφαλῶς ἐδύνατο. <span class="marker">[13]</span> ἀμφότερ᾽ οὖν οἶδε, καὶ αὑτὸν ὑμῖν ἐπιβουλεύοντα καὶ ὑμᾶς αἰσθανομένους· εὖ φρονεῖν δ᾽ ὑμᾶς ὑπολαμβάνων μισεῖν αὑτὸν ἡγεῖται. πρὸς δὲ τούτοις τοσούτοις οὖσιν οἶδεν ἀκριβῶς ὅτι, οὐδ᾽ ἂν ἁπάντων τῶν ἄλλων γένηται κύριος, οὐδὲν ἔστ᾽ αὐτῷ βεβαίως ἔχειν, ἕως ἂν ὑμεῖς δημοκρατῆσθε, ἀλλ᾽ ἄν ποτε συμβῇ τι πταῖσμα (πολλὰ δ᾽ ἂν γένοιτ᾽ ἀνθρώπῳ), ἥξει πάντα τὰ νῦν βεβιασμένα καὶ καταφεύξεται πρὸς ὑμᾶς. <span class="marker">[14]</span> ἐστὲ γὰρ ὑμεῖς οὐκ αὐτοὶ πλεονεκτῆσαι καὶ κατασχεῖν ἀρχὴν εὖ πεφυκότες, ἀλλ᾽ ἕτερον λαβεῖν κωλῦσαι καὶ ἔχοντ᾽ ἀφελέσθαι καὶ ὅλως ἐνοχλῆσαι τοῖς ἄρχειν βουλομένοις καὶ πάντας ἀνθρώπους εἰς ἐλευθερίαν ἐξελέσθαι δεινοί. οὔκουν βούλεται τοῖς αὑτοῦ καιροῖς τὴν παρ᾽ ὑμῶν ἐλευθερίαν ἐφεδρεύειν, οὐ κακῶς οὐδ᾽ ἀργῶς ταῦτα λογιζόμενος. <span class="marker">[15]</span> πρῶτον μὲν δὴ τοῦτο δεῖ, ἐχθρὸν ὑπειληφέναι τῆς πολιτείας καὶ τῆς δημοκρατίας ἀδιάλλακτον ἐκεῖνον, δεύτερον δ᾽ εἰδέναι σαφῶς ὅτι πάνθ᾽ ὅσα πραγματεύεται καὶ κατασκευάζεται νῦν, ἐπὶ τὴν ἡμετέραν πόλιν παρασκευάζεται. οὐ γὰρ οὕτως εὐήθης ὑμῶν ἐστὶν οὐδεὶς ὥσθ᾽ ὑπολαμβάνειν τὸν Φίλιππον τῶν μὲν ἐν Θρᾴκῃ κακῶν (τί γὰρ ἂν ἄλλο τις εἴποι Δρογγίλον καὶ Καβύλην καὶ Μάστειραν καὶ ἃ νῦν φασιν αὐτὸν ἔχειν;) τούτων μὲν ἐπιθυμεῖν καὶ ὑπὲρ τοῦ ταῦτα λαβεῖν καὶ πόνους καὶ χειμῶνας καὶ τοὺς ἐσχάτους κινδύνους ὑπομένειν, <span class="marker">[16]</span> τῶν δ᾽ Ἀθηναίων λιμένων καὶ νεωρίων καὶ τριήρων καὶ τόπου καὶ δόξης, ὧν μήτ᾽ ἐκείνῳ μήτ᾽ ἄλλῳ γένοιτο μηδενὶ χειρωσαμένῳ τὴν πόλιν τὴν ἡμετέραν κυριεῦσαι, οὐκ ἐπιθυμεῖν, ἀλλὰ ταῦτα μὲν ὑμᾶς ἐάσειν ἔχειν, ὑπὲρ δὲ τῶν μελινῶν καὶ τῶν ὀλυρῶν τῶν ἐν τοῖς Θρᾳκίοις σιροῖς ἐν τῷ βαράθρῳ χειμάζειν. <span class="marker">[17]</span> οὐκ ἔστι ταῦτα, ἀλλὰ κἀκεῖν᾽ ὑπὲρ τοῦ τούτων γίγνεσθαι κύριος καὶ τἄλλα πάντα πραγματεύεται. ταῦτα τοίνυν ἕκαστον εἰδότα καὶ γιγνώσκοντα παρ᾽ αὑτῷ δεῖ μὰ Δί᾽ οὐ γράψαι κελεύειν πόλεμον τὸν τὰ βέλτιστ᾽ ἐπὶ πᾶσι δικαίοις συμβουλεύοντα· τοῦτο μὲν γάρ ἐστι λαβεῖν ὅτῳ πολεμήσετε βουλομένων, οὐχ ἃ τῇ πόλει συμφέρει πράττειν. <span class="marker">[18]</span> ὁρᾶτε γάρ. εἰ δι᾽ ἃ πρῶτα παρεσπόνδησε Φίλιππος ἢ δεύτερ᾽ ἢ τρίτα (πολλὰ γάρ ἐστιν ἐφεξῆς) ἔγραψέ τις αὐτῷ πολεμεῖν, ὁ δ᾽ ὁμοίως ὥσπερ νῦν, οὐ γράφοντος οὐδενὸς ὑμῶν πόλεμον, Καρδιανοῖς ἐβοήθει, οὐκ ἂν ἀνηρπασμένος ἦν ὁ γράψας, καὶ διὰ τοῦτο πάντες ᾐτιῶντ᾽ ἂν αὐτὸν Καρδιανοῖς βεβοηθηκέναι; <span class="marker">[19]</span> μὴ τοίνυν ζητεῖθ᾽ ὅντιν᾽ ἀνθ᾽ ὧν Φίλιππος ἐξαμαρτάνει μισήσετε καὶ τοῖς παρ᾽ ἐκείνου μισθαρνοῦσι διασπάσασθαι παραβαλεῖτε· μηδ᾽ αὐτοὶ χειροτονήσαντες πόλεμον βούλεσθε παρ᾽ αὐτοῖς ὑμῖν ἐρίζειν, εἰ δέον ἢ μὴ δέον ὑμᾶς τοῦτο πεποιηκέναι· ἀλλ᾽ ὃν ἐκεῖνος πολεμεῖ τρόπον, τοῦτον μιμεῖσθε, τοῖς μὲν ἀμυνομένοις ἤδη χρήματα καὶ τἄλλ᾽ ὅσων δέονται διδόντες, αὐτοὶ δ᾽ εἰσφέροντες, ὦ ἄνδρες Ἀθηναῖοι, καὶ κατασκευαζόμενοι στράτευμα, τριήρεις ταχείας, ἵππους, ἱππαγωγούς, τἄλλ᾽ ὅσ᾽ εἰς πόλεμον· <span class="marker">[20]</span> ἐπεὶ νῦν γε γέλως ἔσθ᾽ ὡς χρώμεθα τοῖς πράγμασι, καὶ Φίλιππον δ᾽ αὐτὸν οὐδὲν ἂν ἄλλ᾽ οἶμαι μὰ τοὺς θεοὺς εὔξασθαι ποιεῖν τὴν πόλιν ἢ ταῦθ᾽ ἃ νῦν ποιεῖτε· ὑστερίζετε, ἀναλίσκετε· ὅτῳ παραδώσετε τὰ πράγματα ζητεῖτε, δυσχεραίνετε· ἀλλήλους αἰτιᾶσθε. ἀφ᾽ οὗ δὲ ταῦτα γίγνεται ἐγὼ διδάξω, καὶ ὅπως παύσεται λέξω. <span class="marker">[21]</span> οὐδὲν πώποτ᾽, ὦ ἄνδρες Ἀθηναῖοι, τῶν πραγμάτων ἐξ ἀρχῆς ἐνεστήσασθ᾽ οὐδὲ κατεσκευάσασθ᾽ ὀρθῶς, ἀλλὰ τὸ συμβαῖνον ἀεὶ διώκετε, εἶτ᾽ ἐπειδὰν ὑστερίσητε παύεσθε· ἕτερον πάλιν ἂν συμβῇ τι παρασκευάζεσθε καὶ θορυβεῖσθε. <span class="marker">[22]</span> τὸ δ᾽ οὐχ οὕτως ἔχει· οὐκ ἔνεστι βοηθείαις χρωμένους οὐδὲν τῶν δεόντων ποτὲ πρᾶξαι, ἀλλὰ κατασκευάσαντας δεῖ δύναμιν, καὶ τροφὴν ταύτῃ πορίσαντας καὶ ταμίας καὶ δημοσίους, καὶ ὅπως ἔνι τὴν τῶν χρημάτων φυλακὴν ἀκριβεστάτην γενέσθαι, οὕτω ποιήσαντας, τὸν μὲν τῶν χρημάτων λόγον παρὰ τούτων λαμβάνειν, τὸν δὲ τῶν ἔργων παρὰ τοῦ στρατηγοῦ, καὶ μηδεμίαν πρόφασιν τοῦ πλεῖν ἄλλοσε ἢ πράττειν ἄλλο τι τῷ στρατηγῷ καταλείπειν. <span class="marker">[23]</span> ἂν οὕτω ποιήσητε καὶ τοῦτ᾽ ἐθελήσηθ᾽ ὡς ἀληθῶς, ἄγειν εἰρήνην δικαίαν καὶ μένειν ἐπὶ τοῦ τόπου Φίλιππον ἀναγκάσετε, ἢ πολεμήσετ᾽ ἐξ ἴσου· καὶ ἴσως ἄν, ἴσως, ὥσπερ νῦν ὑμεῖς πυνθάνεσθε τί ποιεῖ Φίλιππος καὶ ποῖ πορεύεται, οὕτως ἂν ἐκεῖνος φροντίσαι ποῖ ποθ᾽ ἡ τῆς πόλεως ἀπῆρκεν δύναμις καὶ ποῦ φανήσεται.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text"><i>ΠΡΟΤΑΣΗ (§§ 11-23)</i></span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[11]</span> Υπάρχουν όμως μερικοί που, πριν ακούσουν τους λόγους που αφορούν τα ζητήματα, έχουν τη συνήθεια να ρωτούν αμέσως «τι πρέπει λοιπόν να κάνουμε;», όχι για να το κάνουν μόλις το ακούσουν (γιατί τότε θα ήταν οι πιο χρήσιμοι από όλους τους πολίτες), αλλά για να απαλλαγούν από τον ρήτορα. Ωστόσο, πρέπει να σας πω τι πρέπει να κάνετε. Κατά πρώτον, Αθηναίοι, πρέπει να βάλετε καλά στο μυαλό σας τούτο, ότι ο Φίλιππος πολεμά την πόλη μας, έχει καταλύσει την ειρήνη και ότι είναι δυσμενώς διατεθειμένος και εχθρός ολόκληρης της πόλης, ακόμη και του εδάφους της πόλης μας, θα προσθέσω δε και των θεών της πόλης, που μακάρι να τον καταστρέψουν. Ωστόσο, τίποτε δεν πολεμά ούτε και επιβουλεύεται περισσότερο όσο το πολίτευμα της πόλης και τίποτε απ᾽ όλα δεν σκέφτεται περισσότερο παρά πώς θα το καταλύσει. <span class="marker">[12]</span> Και αυτό κατά κάποιον τρόπο τώρα μάλιστα το κάνει αναγκαστικά. Γιατί σκεφθείτε. Θέλει να εξουσιάζει και σ᾽ αυτό θεωρεί ανταγωνιστές μόνο εσάς. Σας αδικεί εδώ και πολύν καιρό ήδη και αυτό το ξέρει άριστα και ο ίδιος· γιατί με τις δικές σας κτήσεις που κατέχει και χρησιμοποιεί, με αυτές κρατά με ασφάλεια και όλες τις άλλες· αν δηλαδή άφηνε την Αμφίπολη και την Ποτίδαια, ούτε και στη Μακεδονία δεν θα μπορούσε να μένει με σιγουριά. <span class="marker">[13]</span> Γνωρίζει καλά δύο πράγματα, ότι σας επιβουλεύεται και ότι εσείς το αισθάνεστε και, επειδή νομίζει ότι είστε γνωστικοί, θεωρεί ότι τον μισείτε. Εκτός από αυτά που είναι τόσο σημαντικά, γνωρίζει επακριβώς ότι, και αν ακόμη εξουσιάσει σε όλους τους άλλους, δεν θα μπορεί να κατέχει τίποτε με σιγουριά, όσο εσείς έχετε δημοκρατικό πολίτευμα, και, αν ποτέ του συμβεί κάποια ατυχία (πολλά μπορούν να συμβούν στον άνθρωπο), όλοι όσοι τώρα είναι καταπιεσμένοι θα τρέξουν να βρουν καταφύγιο σε σας. <span class="marker">[14]</span> Γιατί από τη φύση σας δεν είστε πλασμένοι να επιδιώκετε επέκταση και μόνιμη εξουσία, αλλά είστε φοβεροί στο να εμποδίζετε άλλον να την πάρει και να του την αφαιρείτε, αν την έχει, και γενικά στο να προκαλείτε σύγχυση σε όσους θέλουν να εξουσιάζουν, και τέλος βγάζοντας όλους τους ανθρώπους από τη σκλαβιά να τους οδηγείτε στην ελευθερία. Γι᾽ αυτό δεν θέλει η ελευθερία που ξεκινάει από σας να καιροφυλακτεί για να του αρπάξει τις ευκαιρίες του, και οι σκέψεις του αυτές δεν είναι λανθασμένες ούτε και εκτός λογικής. <span class="marker">[15]</span> Το πρώτο λοιπόν που επιβάλλεται είναι να έχετε ήδη θεωρήσει εκείνον αδιάλλακτο εχθρό του κράτους της Αθήνας και της δημοκρατίας και το δεύτερο να είστε απόλυτα σίγουροι ότι όλες οι σημερινές ενέργειες και μηχανορραφίες του είναι προετοιμασίες εναντίον της πόλης μας. Γιατί κανένας από σας δεν είναι τόσο αφελής, ώστε να νομίζει ότι ο Φίλιππος επιθυμεί τα ασήμαντα μέρη της Θράκης (γιατί ποιον άλλο χαρακτηρισμό θα μπορούσε κανείς να δώσει στον Δρογγίλο, την Καβύλη και τη Μάστειρα και σε όσα άλλα μέρη λένε ότι κατέχει σήμερα;) και ότι, προκειμένου να αποκτήσει αυτά, υπομένει κόπους και κακουχίες και διατρέχει τους έσχατους κινδύνους, <span class="marker">[16]</span> αλλά ότι δεν επιθυμεί τα αθηναϊκά λιμάνια και τα νεώρια και τις τριήρεις και τον τόπο και τη δόξα του, μέρη τα οποία είθε να μην συμβεί να τα κυριεύσει μήτε εκείνος μήτε κανένας άλλος κατακτώντας την πόλη μας, αλλά ότι θα σας αφήσει να τα κρατήσετε, ενώ αυτός θα ξεχειμωνιάζει σε εκείνον τον όλεθρο για το κεχρί και το κριθάρι, που βρίσκονται στα θρακικά πιθάρια. <span class="marker">[17]</span> Δεν γίνονται αυτά, αλλά τόσο εκείνες όσο και όλες οι άλλες δραστηριότητές του αποσκοπούν στο να γίνει κύριος των εδώ δικών σας πραγμάτων. Επομένως, αν ο καθένας γνωρίζει αυτά και τα έχει συνειδητοποιήσει, δεν πρέπει, μα τον Δία, να κατηγορήσετε ότι εισηγείται πόλεμο αυτός που με όλο το δίκιο του σας δίνει τις καλύτερες συμβουλές. Γιατί μια τέτοια ενέργεια ταιριάζει σε ανθρώπους που θέλουν να βρουν ποιον θα πολεμήσετε, και όχι σε ανθρώπους που ενεργούν για τα συμφέροντα της πόλης. <span class="marker">[18]</span> Κοιτάξτε δηλαδή· αν για την πρώτη παραβίαση του Φιλίππου ή για τη δεύτερη ή την τρίτη (γιατί είναι ολόκληρη σειρά από παραβιάσεις), πρότεινε κάποιος να κάνουμε πόλεμο εναντίον του, και αν ο Φίλιππος όπως ακριβώς κάνει τώρα και που κανένας από σας δεν πρότεινε πόλεμο, είχε σπεύσει να βοηθήσει τους Καρδιανούς, δεν θα είχε συλληφθεί αυτός που θα έκανε την πρόταση και δεν θα είχε κατηγορηθεί ως υπαίτιος για τη βοήθεια προς τους Καρδιανούς; <span class="marker">[19]</span> Συνεπώς, μην ψάχνετε τον άνθρωπο που θα μισήσετε για τα εγκλήματα που διαπράττει ο Φίλιππος, και που θα τον παραδώσετε στα μίσθαρνα όργανα εκείνου, για να τον κατασπαράξουν. Μήτε, όταν μόνοι σας πάρετε απόφαση για πόλεμο, να θέλετε να μαλώνετε μεταξύ σας αν έπρεπε να το είχατε κάνει αυτό ή όχι· αλλά με όποιον τρόπο σας πολεμά εκείνος με τον ίδιο να τον αντιμετωπίζετε και εσείς, εφοδιάζοντας δηλαδή από τη μια με χρήματα και με όσα χρειάζονται όσους τώρα αντιστέκονται σ᾽ αυτόν, από την άλλη συνεισφέροντας οι ίδιοι, Αθηναίοι, ετοιμάζοντας στρατό, ταχύπλοες τριήρεις, ίππους, ιππαγωγά πλοία και όσα άλλα είναι απαραίτητα για πόλεμο. <span class="marker">[20]</span> Γιατί τώρα είναι για γέλια έτσι όπως αντιμετωπίζουμε τα πράγματα, και, μα τους θεούς, νομίζω πως και ο ίδιος ο Φίλιππος δεν θα ευχόταν να κάνει η πόλη μας τίποτε διαφορετικό από αυτά που κάνετε εσείς τώρα: καθυστερείτε, σπαταλάτε χρήματα, αναζητάτε αυτόν στον οποίο θα εμπιστευθείτε τις υποθέσεις σας, δημιουργείτε δυσκολίες, κατηγορείτε ο ένας τον άλλον. Εγώ όμως θα σας εξηγήσω από πού δημιουργούνται αυτά και πώς θα τα σταματήσετε. <span class="marker">[21]</span> Τίποτε ως τώρα, Αθηναίοι, δεν επιχειρήσατε από την αρχή ούτε και το οργανώσατε σωστά, αλλά πάντοτε ακολουθείτε τα γεγονότα· στη συνέχεια, όταν φτάνετε καθυστερημένα, σταματάτε· αν πάλι συμβεί κάποιο άλλο γεγονός, αρχίζετε πάλι να ετοιμάζεστε και αναστατώνεστε. <span class="marker">[22]</span> Δεν είναι όμως αυτή η σωστή τακτική. Με περιστασιακές αποστολές βοήθειας δεν είναι δυνατόν να πετύχετε ποτέ τίποτε απ᾽ όσα πρέπει, αλλά αφού συγκροτήσετε στρατιωτική δύναμη, της εξασφαλίσετε τα μέσα συντήρησης, διορίσετε ταμίες και υπαλλήλους και ρυθμίσετε με ποιον τρόπο θα είναι δυνατόν να υπάρχει αυστηρότατος έλεγχος· αφού λοιπόν κάνετε αυτά, πρέπει στη συνέχεια να ζητήσετε από αυτούς μεν λογαριασμό της διαχείρισης των χρημάτων, ευθύνες όμως για τις επιχειρήσεις από τον στρατηγό· και μην του αφήσετε καμιά δικαιολογία για το αν πλέει προς άλλο μέρος ή προχωρήσει σε κάποιες άλλες ενέργειες. <span class="marker">[23]</span> Αν ενεργήσετε έτσι και το θελήσετε πραγματικά, θα αναγκάσετε τον Φίλιππο να τηρεί δίκαιη ειρήνη και να μένει σε ένα ορισμένο μέρος, διαφορετικά θα τον πολεμήσετε με ίσους όρους. Και ίσως, ναι ίσως, όπως εσείς τώρα ζητάτε να πληροφορηθείτε τι κάνει ο Φίλιππος και προς τα πού προχωρεί, έτσι και εκείνος πιθανόν να ανησυχεί να μάθει για πού άραγε ξεκίνησε η στρατιωτική δύναμη της πόλης και που θα εμφανιστεί.</span></p>
+        </div>
+        
+
+        <div id="book-4-chapter-1" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-4" data-hash="book-4-chapter-1">
+            ΠΙΣΤΕΙΣ • Κεφάλαιο 1 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=65&page=4" target="_blank" class="page-link">Page 4</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[24]</span> Εἰ δέ τῳ δοκεῖ ταῦτα καὶ δαπάνης πολλῆς καὶ πόνων πολλῶν καὶ πραγματείας εἶναι, καὶ μάλ᾽ ὀρθῶς δοκεῖ· ἀλλ᾽ ἐὰν λογίσηται τὰ τῇ πόλει μετὰ ταῦτα γενησόμενα, ἐὰν ταῦτα μὴ ἐθέλῃ ποιεῖν, εὑρήσει λυσιτελοῦν τὸ ἑκόντας ποιεῖν τὰ δέοντα. εἰ μὲν γάρ ἐστί τις ἐγγυητὴς ὑμῖν θεῶν (οὐ γὰρ ἀνθρώπων γ᾽ οὐδεὶς ἂν γένοιτ᾽ ἀξιόχρεως τηλικούτου πράγματος) ὡς, ἐὰν ἄγηθ᾽ ἡσυχίαν καὶ ἅπαντα προῆσθε, οὐκ ἐπ᾽ αὐτοὺς ὑμᾶς τελευτῶν ἐκεῖνος ἥξει, <span class="marker">[25]</span> αἰσχρὸν μὲν νὴ τὸν Δία καὶ πάντας θεοὺς καὶ ἀνάξιον ὑμῶν καὶ τῶν ὑπαρχόντων τῇ πόλει καὶ πεπραγμένων τοῖς προγόνοις, τῆς ἰδίας ῥᾳθυμίας ἕνεκα τοὺς ἄλλους ἅπαντας Ἕλληνας εἰς δουλείαν προέσθαι, καὶ ἔγωγε αὐτὸς μὲν τεθνάναι μᾶλλον ἂν ἢ ταῦτ᾽ εἰρηκέναι βουλοίμην· <span class="marker">[26]</span> οὐ μὴν ἀλλ᾽ εἴ τις ἄλλος λέγει καὶ ὑμᾶς πείθει, ἔστω, μὴ ἀμύνεσθε, ἅπαντα πρόεσθε. εἰ δὲ μηδενὶ τοῦτο δοκεῖ, τοὐναντίον δὲ πρόϊσμεν ἅπαντες ὅτι, ὅσῳ ἂν πλειόνων ἐάσωμεν ἐκεῖνον γενέσθαι κύριον, τοσούτῳ χαλεπωτέρῳ καὶ ἰσχυροτέρῳ χρησόμεθ᾽ ἐχθρῷ, ποῖ ἀναδυόμεθα, ἢ τί μέλλομεν; ἢ πότ᾽, ὦ ἄνδρες Ἀθηναῖοι, τὰ δέοντα ποιεῖν ἐθελήσομεν; ὅταν νὴ Δί᾽ ἀναγκαῖον ᾖ. <span class="marker">[27]</span> ἀλλ᾽ ἣν μὲν ἄν τις ἐλευθέρων ἀνθρώπων ἀνάγκην εἴποι, οὐ μόνον ἤδη πάρεστιν, ἀλλὰ καὶ πάλαι παρελήλυθε, τὴν δὲ τῶν δούλων ἀπεύχεσθαι δήπου μὴ γενέσθαι δεῖ. διαφέρει δὲ τί; ὅτι ἐστὶν ἐλευθέρῳ μὲν ἀνθρώπῳ μεγίστη ἀνάγκη ἡ ὑπὲρ τῶν γιγνομένων αἰσχύνη, καὶ μείζω ταύτης οὐκ οἶδ᾽ ἥντιν᾽ ἂν εἴποι τις· δούλῳ δὲ πληγαὶ χὠ τοῦ σώματος αἰκισμός, ὃ μήτε γένοιτο οὔτε λέγειν ἄξιον.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[28]</span> Τὸ μὲν τοίνυν, ὦ ἄνδρες Ἀθηναῖοι, πρὸς τὰ τοιαῦτ᾽ ὀκνηρῶς διακεῖσθαι, ἃ δεῖ τοῖς σώμασι καὶ ταῖς οὐσίαις λῃτουργῆσαι ἕκαστον, ἐστὶ μὲν οὐκ ὀρθῶς ἔχον, οὐδὲ πολλοῦ δεῖ, οὐ μὴν ἀλλ᾽ ἔχει τινὰ πρόφασιν ὅμως· τὸ δὲ μηδ᾽ ὅσ᾽ ἀκοῦσαι δεῖ μηδ᾽ ὅσα βουλεύσασθαι προσήκει, μηδὲ ταῦτ᾽ ἐθέλειν [ἀκούειν], τοῦτ᾽ ἤδη πᾶσαν ἐπιδέχεται κατηγορίαν. <span class="marker">[29]</span> ὑμεῖς τοίνυν οὐκ ἀκούειν, πρὶν ἂν ὥσπερ νῦν αὐτὰ παρῇ τὰ πράγματα, οὐχὶ βουλεύεσθαι περὶ οὐδενὸς εἰώθατ᾽ ἐφ᾽ ἡσυχίας, ἀλλ᾽ ὅταν μὲν ἐκεῖνος παρασκευάζηται, ἀμελήσαντες τοῦ ποιεῖν ταὐτὸ καὶ ἀντιπαρασκευάζεσθαι ῥᾳθυμεῖτε, καὶ ἄν τι λέγῃ τις, ἐκβάλλετε, ἐπειδὰν δ᾽ ἀπολωλὸς ἢ πολιορκούμενόν τι πύθησθε, ἀκροᾶσθε καὶ παρασκευάζεσθε· <span class="marker">[30]</span> ἦν δ᾽ ἀκηκοέναι μὲν καὶ βεβουλεῦσθαι τότε καιρός, ὅθ᾽ ὑμεῖς οὐκ ἠθέλετε, πράττειν δὲ καὶ χρῆσθαι τοῖς παρεσκευασμένοις νῦν, ἡνίκ᾽ ἀκούετε. τοιγαροῦν ἐκ τῶν τοιούτων ἐθῶν μόνοι τῶν πάντων ἀνθρώπων ὑμεῖς τοῖς ἄλλοις τοὐναντίον ποιεῖτε· οἱ μὲν γὰρ ἄλλοι πρὸ τῶν πραγμάτων εἰώθασι χρῆσθαι τῷ βουλεύεσθαι, ὑμεῖς δὲ μετὰ τὰ πράγματα.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[31]</span> Ὃ δὴ λοιπόν ἐστι, καὶ πάλαι μὲν ἔδει, διαφεύγει δ᾽ οὐδὲ νῦν, τοῦτ᾽ ἐρῶ. οὐδενὸς τῶν πάντων οὕτως ὡς χρημάτων δεῖ τῇ πόλει πρὸς τὰ νῦν ἐπιόντα πράγματα. συμβέβηκε δ᾽ εὐτυχήματ᾽ ἀπὸ ταὐτομάτου, οἷς ἂν χρησώμεθ᾽ ὀρθῶς, ἴσως ἂν γένοιτο τὰ δέοντα. πρῶτον μὲν γὰρ οἷς βασιλεὺς πιστεύει καὶ εὐεργέτας ὑπείληφεν ἑαυτοῦ, οὗτοι μισοῦσι καὶ πολεμοῦσι Φίλιππον. <span class="marker">[32]</span> ἔπειθ᾽ ὁ πράττων καὶ συνειδὼς ἅπανθ᾽ ἃ Φίλιππος κατὰ βασιλέως παρασκευάζεται, οὗτος ἀνάσπαστος γέγονε, καὶ πάσας τὰς πράξεις βασιλεὺς οὐχ ἡμῶν κατηγορούντων ἀκούσεται, οὓς ὑπὲρ τοῦ συμφέροντος ἂν ἡγήσαιτο τοῦ ἰδίου λέγειν, ἀλλὰ τοῦ πράξαντος αὐτοῦ καὶ διοικοῦντος, ὥστ᾽ εἶναι πιστάς, καὶ λοιπὸν λόγον εἶναι τοῖς παρ᾽ ὑμῶν πρέσβεσιν, ὃν βασιλεὺς ἥδιστ᾽ ἂν ἀκούσαι, <span class="marker">[33]</span> ὡς τὸν ἀμφοτέρους ἀδικοῦντα κοινῇ τιμωρήσασθαι δεῖ, καὶ ὅτι πολὺ τῷ βασιλεῖ φοβερώτερός ἐσθ᾽ ὁ Φίλιππος, ἂν προτέροις ἡμῖν ἐπιθῆται· εἰ γὰρ ἐγκαταλειπόμενοί τι πεισόμεθ᾽ ἡμεῖς, ἀδεῶς ἐπ᾽ ἐκεῖνον ἤδη πορεύσεται. ὑπὲρ δὴ τούτων ἁπάντων οἶμαι δεῖν ὑμᾶς πρεσβείαν ἐκπέμπειν, ἥτις τῷ βασιλεῖ διαλέξεται, καὶ τὴν ἀβελτερίαν ἀποθέσθαι, δι᾽ ἣν πολλάκις ἠλαττώθητε, «ὁ δὴ βάρβαρος, καὶ ὁ κοινὸς ἅπασιν ἐχθρός,» καὶ πάντα τὰ τοιαῦτα. <span class="marker">[34]</span> ἐγὼ γὰρ ὅταν τιν᾽ ἴδω τὸν μὲν ἐν Σούσοις καὶ Ἐγβατάνοις δεδοικότα καὶ κακόνουν εἶναι τῇ πόλει φάσκοντα, ὃς καὶ πρότερον συνεπηνώρθωσε τὰ τῆς πόλεως πράγματα καὶ νῦν ἐπηγγέλλετο (εἰ δὲ μὴ ἐδέχεσθ᾽ ὑμεῖς, ἀλλ᾽ ἀπεψηφίζεσθε, οὐ τἀκείνου αἴτια), ὑπὲρ δὲ τοῦ ἐπὶ ταῖς θύραις ἐγγὺς οὑτωσὶ ἐν μέσῃ τῇ Ἑλλάδι αὐξανομένου λῃστοῦ τῶν Ἑλλήνων ἄλλο τι λέγοντα, θαυμάζω, καὶ δέδοικα τοῦτον, ὅστις ἂν ᾖ ποτ᾽, ἔγωγε, ἐπειδὴ οὐχ οὗτος Φίλιππον.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text"><i>ΠΙΣΤΕΙΣ (§§ 24-74)</i></span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[24]</span> Αν όμως κάποιος νομίζει ότι αυτά απαιτούν πολλά έξοδα, πολλούς κόπους και πολλές ταλαιπωρίες, έχει απόλυτο δίκαιο· αλλά αν σκεφθεί τις κατοπινές συνέπειες για την πόλη, εφόσον δεν θελήσει να κάνει αυτά, θα διαπιστώσει ότι είναι προς όφελός σας να κάνετε με προθυμία αυτά που πρέπει. Γιατί, αν γίνει εγγυητής σε σας, κάποιος από τους θεούς (γιατί από τους ανθρώπους βέβαια κανένας δεν θα μπορούσε να γίνει αξιόπιστος εγγυητής ενός τόσο σπουδαίου ζητήματος) ότι, αν μένετε αδρανείς και αφήσετε τα πάντα στην τύχη τους, δεν θα βαδίσει εκείνος τελικά και εναντίον σας, <span class="marker">[25]</span> θα ήταν ντροπή, μα τον Δία και όλους τους θεούς, και ανάξιο για σας, για τα πλούτη της πόλης και τα έργα των προγόνων σας να ρίξετε όλους τους Έλληνες σε σκλαβιά από δική σας ραθυμία. Εγώ τουλάχιστον θα προτιμούσα να είχα πεθάνει παρά να είχα προτείνει κάτι τέτοιο. <span class="marker">[26]</span> Ωστόσο, αν κάποιος το προτείνει και σας πείθει, ας είναι, μη προβάλλετε αντίσταση, εγκαταλείψτε στην τύχη τους όλα. Αν όμως κανείς δεν το επιδοκιμάζει, αλλά αντίθετα, αν όλοι γνωρίζουμε καλά εκ των προτέρων ότι όσο περισσότερων εδαφών του επιτρέψουμε να γίνει κύριος, τόσο πιο δύσκολο και πιο ισχυρό εχθρό θα έχουμε να αντιμετωπίσουμε, προς τα πού θα πάμε να γλιτώσουμε; Ή γιατί καθυστερούμε; Ή πότε, Αθηναίοι, θα θελήσουμε να κάνουμε το καθήκον μας; Όταν, μα τον Δία, το επιβάλει η ανάγκη. <span class="marker">[27]</span> Αλλά, ό,τι θα αποκαλούσε ανάγκη ένας ελεύθερος άνθρωπος, όχι μόνο είναι τώρα παρόν αλλά και παρελθόν εδώ και καιρό· η ανάγκη όμως των δούλων πρέπει να εύχεσθε να μην έρθει ποτέ. Σε τι όμως διαφέρει; Στο ότι η μεγαλύτερη ανάγκη για έναν ελεύθερο άνθρωπο είναι η ντροπή για όσα γίνονται, και αμφιβάλλω αν μπορεί κανείς να κατονομάσει κάποιαν άλλη πιο ισχυρή από αυτήν· για έναν δούλο όμως ανάγκη είναι τα χτυπήματα και η κάκωση του σώματος, παθήματα ανάξια λόγου και μακάρι να μην μας συμβούν ποτέ.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[28]</span> Το να δείχνετε λοιπόν, Αθηναίοι, διστακτικότητα σε ό,τι αφορά τις προς την πόλη υποχρεώσεις, τις οποίες πρέπει να εκπληρώνει ο καθένας και με την προσωπική του συμβολή και με την περιουσία του, δεν είναι σωστό· κάθε άλλο μάλιστα· ωστόσο όμως υπάρχει και κάποια δικαιολογία· αλλά το να μην θέλετε να ακούτε μήτε όσα πρέπει να ακούσετε μήτε όσα έχετε υποχρέωση να αποφασίσετε, αυτό πια επιδέχεται κάθε κατηγορία. <span class="marker">[29]</span> Έχετε λοιπόν συνηθίσει να μην ακούτε πριν παρουσιαστούν, όπως τώρα, τα ίδια τα γεγονότα, μήτε να συζητάτε για κανένα ζήτημα με την ησυχία σας. Αντίθετα, όταν εκείνος ετοιμάζεται, εσείς παραμελώντας να κάνετε το ίδιο και να προχωρήσετε στις ανάλογες προετοιμασίες, ζείτε αμέριμνα· και αν κάποιος προτείνει κάτι, τον διώχνετε από το βήμα, αλλά όταν πληροφορηθείτε ότι κάποιο μέρος έχει χαθεί ή ότι πολιορκείται, τότε μόνο δίνετε προσοχή και αρχίζετε να ετοιμάζεστε. <span class="marker">[30]</span> Η κατάλληλη όμως στιγμή να ακούσετε και να έχετε πάρει αποφάσεις ήταν τότε όταν εσείς δεν θέλατε· τώρα που ακούτε είναι η κατάλληλη στιγμή να δράσετε και να χρησιμοποιήσετε τις προετοιμασίες σας. Έτσι λοιπόν, με τις συνήθειές σας αυτές είστε οι μόνοι από όλους τους ανθρώπους που κάνετε το αντίθετο από τους άλλους· οι άλλοι άνθρωποι δηλαδή συνηθίζουν να παίρνουν αποφάσεις πριν από τα γεγονότα, ενώ εσείς μετά από αυτά.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[31]</span> Εκείνο λοιπόν που απομένει και που έπρεπε να είχε γίνει εδώ και πολύν καιρό, μα που και τώρα ακόμη δεν έχει χαθεί η ευκαιρία, αυτό θα πω. Τίποτε απ᾽ όλα δεν χρειάζεται η πόλη πιο πολύ για την αντιμετώπιση των επερχόμενων δυσκολιών όσο χρήματα. Έχουν συμβεί από μόνα τους ευχάριστα πράγματα, που αν τα εκμεταλλευτούμε σωστά, ίσως να γίνουν αυτά που πρέπει. Πρώτον όσους εμπιστεύεται ο Βασιλιάς των Περσών και θεωρεί ευεργέτες του, αυτοί μισούν και πολεμούν τον Φίλιππο. <span class="marker">[32]</span> Δεύτερον ο άνθρωπος που ενεργούσε και γνώριζε όλα όσα σχεδίαζε ο Φίλιππος εναντίον του Βασιλιά των Περσών έχει απαχθεί δέσμιος· έτσι ο Μεγάλος Βασιλιάς θα πληροφορηθεί για όλες τις ενέργειες του Φιλίππου όχι από μας που τον κατηγορούμε, γιατί θα μπορούσε να πιστέψει ότι μιλούμε εναντίον του Φιλίππου για το δικό μας συμφέρον, αλλά από τον ίδιο τον δικό του πράκτορα και σχεδιαστή, ώστε να είναι πιστευτές. Έτσι, το μόνο που θα απομένει στους δικούς σας πρέσβεις να πουν και που ο βασιλιάς θα άκουγε με πολύ μεγάλη ευχαρίστηση είναι <span class="marker">[33]</span> ότι ο άνθρωπος που αδικεί και τις δύο πλευρές πρέπει να τιμωρηθεί από κοινού και από τις δύο και ότι ο Φίλιππος είναι πολύ πιο φοβερός για τον Μεγάλο Βασιλιά, αν πρώτος αυτός μας επιτεθεί. Γιατί, αν εγκαταλειφθούμε και πάθουμε κανένα κακό, τότε θα βαδίσει αμέσως χωρίς φόβο εναντίον εκείνου. Για όλα αυτά λοιπόν έχω τη γνώμη ότι πρέπει να στείλετε πρεσβεία, για να συνομιλήσει με τον Μεγάλο Βασιλιά, και να αφήσετε κατά μέρος την ανόητη προκατάληψη, εξαιτίας της οποίας πολλές φορές ζημιωθήκατε, «ο βάρβαρος, ο κοινός εχθρός όλων», και όλα τα παρόμοια. <span class="marker">[34]</span> Γιατί, όταν δω κάποιον να φοβάται τον άνθρωπο που βρίσκεται στα Σούσα και στα Εκβάτανα και να ισχυρίζεται ότι αυτός διάκειται εχθρικά προς την πόλη μας, αυτός που στο παρελθόν βοήθησε στην ανόρθωσή της και που τώρα από μόνος του έκανε προτάσεις (αν δεν τις αποδεχτήκατε, αλλά τις απορρίψατε, δεν είναι υπαίτιος εκείνος) και από την άλλη όταν βλέπω, για τον ληστή των Ελλήνων που προσπαθεί κατ᾽ αυτόν τον τρόπο να επεκτείνει την εξουσία του σχεδόν ως τις πύλες μας μέσα στην καρδιά της Ελλάδας, να μιλάει με άλλη γλώσσα, εγώ τουλάχιστον φοβάμαι αυτόν τον άνθρωπο, όποιος και αν είναι, και εκπλήσσομαι που αυτός δεν φοβάται τον Φίλιππο.</span></p>
+        </div>
+        
+
+        <div id="book-4-chapter-1-2" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-5" data-hash="book-4-chapter-1-2">
+            ΠΙΣΤΕΙΣ • Κεφάλαιο 1.2 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=65&page=5" target="_blank" class="page-link">Page 5</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[35]</span> Ἔστι τοίνυν τι πρᾶγμα καὶ ἄλλο, ὃ λυμαίνεται τὴν πόλιν ὑπὸ βλασφημίας ἀδίκου καὶ λόγων οὐ προσηκόντων διαβεβλημένον, εἶτα τοῖς μηδὲν τῶν ἐν τῇ πολιτείᾳ δικαίων βουλομένοις ποιεῖν πρόφασιν παρέχει· καὶ πάντων, ὅσ᾽ ἐκλείπει, δέον παρά του γίγνεσθαι, ἐπὶ τοῦθ᾽ εὑρήσετε τὴν αἰτίαν ἀναφερομένην. περὶ οὗ πάνυ μὲν φοβοῦμαι, οὐ μὴν ἀλλ᾽ ἐρῶ· <span class="marker">[36]</span> οἶμαι γὰρ ἕξειν καὶ ὑπὲρ τῶν ἀπόρων τὰ δίκαι᾽ ἐπὶ τῷ συμφέροντι τῆς πόλεως εἰπεῖν πρὸς τοὺς εὐπόρους, καὶ ὑπὲρ τῶν κεκτημένων τὰς οὐσίας πρὸς τοὺς ἐπιδεεῖς. εἰ ἀνέλοιμεν ἐκ μέσου καὶ τὰς βλασφημίας ἃς ἐπὶ τῷ θεωρικῷ ποιοῦνταί τινες οὐχὶ δικαίως, καὶ τὸν φόβον, ὡς οὐ στήσεται τοῦτ᾽ ἄνευ μεγάλου τινὸς κακοῦ, οὐδὲν ἂν εἰς τὰ πράγματα μεῖζον εἰσενεγκαίμεθα, οὐδ᾽ ὅ τι κοινῇ μᾶλλον ἂν ὅλην ἐπιρρώσειε τὴν πόλιν. <span class="marker">[37]</span> οὑτωσὶ δὲ σκοπεῖτε· ἐρῶ δ᾽ ὑπὲρ τῶν ἐν χρείᾳ δοκούντων εἶναι πρότερον. ἦν ποτ᾽ οὐ πάλαι παρ᾽ ὑμῖν, ὅτ᾽ οὐ προσῄει τῇ πόλει τάλανθ᾽ ὑπὲρ τριάκοντα καὶ ἑκατόν· καὶ οὐδεὶς [ἐστι] τῶν τριηραρχεῖν δυναμένων οὐδὲ τῶν εἰσφέρειν ὅστις οὐκ ἠξίου τὰ καθήκοντ᾽ ἐφ᾽ ἑαυτὸν ποιεῖν, ὅτι χρήματ᾽ οὐ περιῆν, ἀλλὰ καὶ τριήρεις ἔπλεον καὶ χρήματ᾽ ἐγίγνετο καὶ πάντ᾽ ἐποιοῦμεν τὰ δέοντα. <span class="marker">[38]</span> μετὰ ταῦθ᾽ ἡ τύχη, καλῶς ποιοῦσα, πολλὰ πεποίηκε τὰ κοινά, καὶ τετρακόσι᾽ ἀντὶ τῶν ἑκατὸν ταλάντων προσέρχεται, οὐδενὸς οὐδὲν ζημιουμένου τῶν τὰς οὐσίας ἐχόντων, ἀλλὰ καὶ προσλαμβάνοντος· οἱ γὰρ εὔποροι πάντες ἔρχονται μεθέξοντες τούτου, καὶ καλῶς ποιοῦσιν. <span class="marker">[39]</span> τί οὖν μαθόντες τοῦτ᾽ ὀνειδίζομεν ἀλλήλοις καὶ προφάσει χρώμεθα τοῦ μηδὲν ποιεῖν, πλὴν εἰ τῇ παρὰ τῆς τύχης βοηθείᾳ γεγονυίᾳ τοῖς ἀπόροις φθονοῦμεν; οὓς οὔτ᾽ ἂν αἰτιασαίμην ἔγωγε, οὔτ᾽ ἀξιῶ. <span class="marker">[40]</span> οὐδὲ γὰρ ἐν ταῖς ἰδίαις οἰκίαις ὁρῶ τὸν ἐν ἡλικίᾳ πρὸς τοὺς πρεσβυτέρους οὕτω διακείμενον οὐδ᾽ οὕτως ἀγνώμον᾽ οὐδ᾽ ἄτοπον τῶν ὄντων οὐδένα, ὥστε, εἰ μὴ ποιήσουσιν ἅπαντες ὅσ᾽ ἂν αὐτός, οὐ φάσκοντα ποιήσειν οὐδὲν οὐδ᾽ αὐτόν· καὶ γὰρ ἂν τοῖς τῆς κακώσεως εἴη νόμοις οὕτω γ᾽ ἔνοχος· δεῖ γάρ, οἶμαι, τοῖς γονεῦσι τὸν ὡρισμένον ἐξ ἀμφοτέρων ἔρανον, καὶ παρὰ τῆς φύσεως καὶ παρὰ τοῦ νόμου, δικαίως φέρειν καὶ ἑκόνθ᾽ ὑποτελεῖν. <span class="marker">[41]</span> ὥσπερ τοίνυν ἑνὸς ἡμῶν ἑκάστου τίς ἐστι γονεύς, οὕτω συμπάσης τῆς πόλεως κοινοὺς δεῖ τοὺς γονέας σύμπαντας ἡγεῖσθαι, καὶ προσήκειν τούτους οὐχ ὅπως ὧν ἡ πόλις δίδωσ᾽ ἀφελέσθαι τι, ἀλλ᾽ εἰ καὶ μηδὲν ἦν τούτων, ἄλλοθεν σκοπεῖν ὅπως μηδενὸς ὄντες ἐνδεεῖς περιοφθήσονται. <span class="marker">[42]</span> τοὺς μὲν τοίνυν εὐπόρους ταύτῃ χρωμένους τῇ γνώμῃ οὐ μόνον ἡγοῦμαι τὰ δίκαι᾽ ἂν ποιεῖν, ἀλλὰ καὶ τὰ λυσιτελῆ· τὸ γὰρ τῶν ἀναγκαίων τιν᾽ ἀποστερεῖν κοινῇ κακόνους ἐστὶ ποιεῖν πολλοὺς ἀνθρώπους τοῖς πράγμασι· τοῖς δ᾽ ἐν ἐνδείᾳ, δι᾽ ὃ δυσχεραίνουσι τὸ πρᾶγμ᾽ οἱ τὰς οὐσίας ἔχοντες καὶ κατηγοροῦσι δικαίως, τοῦτ᾽ ἀφελεῖν ἂν συμβουλεύσαιμι. <span class="marker">[43]</span> δίειμι δέ, ὥσπερ ἄρτι, τὸν αὐτὸν τρόπον καὶ ὑπὲρ τῶν εὐπόρων, οὐ κατοκνήσας εἰπεῖν τἀληθῆ. ἐμοὶ γὰρ οὐδεὶς οὕτως ἄθλιος οὐδ᾽ ὠμὸς εἶναι δοκεῖ τὴν γνώμην, οὔκουν Ἀθηναίων γε, ὥστε λυπεῖσθαι ταῦτα λαμβάνοντας ὁρῶν τοὺς ἀπόρους καὶ τῶν ἀναγκαίων ἐνδεεῖς ὄντας. <span class="marker">[44]</span> ἀλλὰ ποῦ συντρίβεται τὸ πρᾶγμα καὶ ποῦ δυσχεραίνεται; ὅταν τὸ ἀπὸ τῶν κοινῶν ἔθος ἐπὶ τὰ ἴδια μεταβιβάζοντας ὁρῶσί τινας, καὶ μέγαν μὲν ὄντα παρ᾽ ὑμῖν εὐθέως τὸν λέγοντα, ἀθάνατον δ᾽ ἕνεκ᾽ ἀσφαλείας, ἑτέραν δὲ τὴν κρύβδην ψῆφον τοῦ φανερῶς θορύβου. <span class="marker">[45]</span> ταῦτ᾽ ἀπιστίαν, ταῦτ᾽ ὀργὴν ἔχει. δεῖ γάρ, ὦ ἄνδρες Ἀθηναῖοι, δικαίως ἀλλήλοις τῆς πολιτείας κοινωνεῖν, τοὺς μὲν εὐπόρους εἰς μὲν τὸν βίον τὰ ἑαυτῶν ἀσφαλῶς ἔχειν νομίζοντας καὶ ὑπὲρ τούτων μὴ δεδοικότας, εἰς δὲ τοὺς κινδύνους κοινὰ ὑπὲρ τῆς σωτηρίας τὰ ὄντα τῇ πατρίδι παρέχοντας, τοὺς δὲ λοιποὺς τὰ μὲν κοινὰ κοινὰ νομίζοντας καὶ μετέχοντας τὸ μέρος, τὰ δ᾽ ἑκάστου ἴδια τοῦ κεκτημένου. οὕτω καὶ μικρὰ μεγάλη πόλις γίγνεται καὶ μεγάλη σῴζεται. ὡς μὲν οὖν εἴποι τις ἄν, ἃ παρ᾽ ἑκατέρων εἶναι δεῖ, ταῦτ᾽ ἴσως ἐστίν· ὡς δὲ καὶ γένοιτ᾽ ἄν, [ἐν] νόμῳ διορθώσασθαι δεῖ.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[46]</span> Τῶν δὲ παρόντων πραγμάτων καὶ τῆς ταραχῆς πολλὰ πόρρωθέν ἐστι τὰ αἴτια· ἃ εἰ βουλομένοις ὑμῖν ἀκούειν ἐστίν, ἐθέλω λέγειν. ἐξέστητ᾽, ὦ ἄνδρες Ἀθηναῖοι, τῆς ὑποθέσεως ἐφ᾽ ἧς ὑμᾶς οἱ πρόγονοι κατέλιπον, καὶ τὸ μὲν προΐστασθαι τῶν Ἑλλήνων καὶ δύναμιν συνεστηκυῖαν ἔχοντας πᾶσι τοῖς ἀδικουμένοις βοηθεῖν περίεργον ἐπείσθητ᾽ εἶναι καὶ μάταιον ἀνάλωμ᾽ ὑπὸ τῶν ταῦτα πολιτευομένων, τὸ δ᾽ ἐν ἡσυχίᾳ διάγειν καὶ μηδὲν τῶν δεόντων πράττειν, ἀλλὰ προϊεμένους καθ᾽ ἓν ἕκαστον πάνθ᾽ ἑτέρους ἐᾶσαι λαβεῖν, θαυμαστὴν εὐδαιμονίαν καὶ πολλὴν ἀσφάλειαν ἔχειν ᾤεσθε. <span class="marker">[47]</span> ἐκ δὲ τούτων παρελθὼν ἐπὶ τὴν τάξιν ἐφ᾽ ἧς ὑμῖν τετάχθαι προσῆκεν ἕτερος, οὗτος εὐδαίμων καὶ μέγας καὶ πολλῶν κύριος γέγονεν, εἰκότως· πρᾶγμα γὰρ ἔντιμον καὶ μέγα καὶ λαμπρόν, καὶ περὶ οὗ πάντα τὸν χρόνον αἱ μέγισται τῶν πόλεων πρὸς αὑτὰς διεφέροντο, Λακεδαιμονίων μὲν ἠτυχηκότων, Θηβαίων δ᾽ ἀσχόλων διὰ τὸν Φωκικὸν πόλεμον γενομένων, ἡμῶν δ᾽ ἀμελούντων, ἔρημον ἀνείλετο. <span class="marker">[48]</span> τοιγάρτοι τὸ μὲν φοβεῖσθαι τοῖς ἄλλοις, τὸ δὲ συμμάχους πολλοὺς ἔχειν καὶ δύναμιν μεγάλην ἐκείνῳ περιγέγονε, καὶ τοσαῦτα πράγματα καὶ τοιαῦτ᾽ ἤδη περιέστηκε τοὺς Ἕλληνας ἅπαντας, ὥστε μηδ᾽ ὅ τι χρὴ συμβουλεύειν εὔπορον εἶναι.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[35]</span> Υπάρχει επίσης και ένα άλλο ζήτημα που, διαστρεβλωμένο από άδικη δυσφήμιση και ανάρμοστα λόγια, βλάπτει την πόλη και δίνει δικαιολογία σε όσους δεν θέλουν να κάνουν κανένα από τα καθήκοντά τους ως πολίτες. Πράγματι, για την παράλειψη οποιουδήποτε πράγματος που έπρεπε να γίνει από κάποιον, θα διαπιστώσετε ότι σ᾽ αυτό επιρρίπτουν την αιτία. Πολύ φοβάμαι βέβαια να αναφερθώ σ᾽ αυτό, αλλά παρ᾽ όλα αυτά θα μιλήσω. <span class="marker">[36]</span> Γιατί πιστεύω πως χάρη του συμφέροντος της πόλης θα μπορέσω να υπερασπίσω τα δίκαια των φτωχών απέναντι στους πλούσιους και όσων έχουν περιουσία απέναντι στους άκληρους. Αν βγάλουμε από τη μέση τόσο τη δυσφήμιση που άδικα κάνουν μερικοί εναντίον των θεωρικών, όσο και τον φόβο ότι είναι αδύνατο να διακοπεί η διανομή τους χωρίς να γίνει μεγάλο κακό, δεν υπάρχει μεγαλύτερη υπηρεσία που θα μπορούσαμε να προσφέρουμε στις δημόσιες υποθέσεις ούτε ακόμη κάτι που θα ενίσχυε γενικά όλη την πόλη περισσότερο από κάθε άλλο. <span class="marker">[37]</span> Προσέξτε την εξής σκέψη μου· κατά πρώτον θα μιλήσω γι᾽ αυτούς που θεωρούνται ότι ανήκουν στις φτωχές τάξεις. Ήταν κάποτε μια εποχή, όχι πολύ παλιά, που τα έσοδα του κράτους δεν ξεπερνούσαν τα εκατόν τριάντα τάλαντα· παρ᾽ όλα αυτά, από όσους μπορούσαν να αναλάβουν τη συντήρηση τριήρους και να πληρώσουν τον ειδικό φόρο δεν υπήρχε κανένας που να μην θεωρούσε σωστό να εκτελεί το καθήκον του με τη δικαιολογία ότι δεν του περίσσευαν χρήματα· αντίθετα μάλιστα, και τριήρεις έπλεαν και χρήματα εισέρρεαν και εμείς κάναμε όλα όσα έπρεπε. <span class="marker">[38]</span> Αργότερα η τύχη αύξησε ευτυχώς τα έσοδα του δημοσίου και αντί για εκατό τάλαντα μπαίνουν στο δημόσιο ταμείο τετρακόσια, χωρίς να υποστεί καμιά ζημία κανένας από όσους έχουν τις περιουσίες, αλλά αντίθετα και με κάποιο κέρδος. Γιατί όλοι οι εύποροι πολίτες έρχονται και παίρνουν μερίδιο από αυτήν την αύξηση των εσόδων και καλά κάνουν. <span class="marker">[39]</span> Τι λόγο λοιπόν έχουμε και κατηγορούμε ο ένας τον άλλον για το θεωρικό και το χρησιμοποιούμε ως δικαιολογία για να μην κάνουμε τίποτε από όσα πρέπει; Εκτός και αν φθονούμε τη βοήθεια που έχει προσφέρει η τύχη στους φτωχούς. Αυτούς εγώ τουλάχιστον ούτε θα κατηγορήσω ούτε θεωρώ σωστό να γίνει από κάποιον άλλον. <span class="marker">[40]</span> Γιατί και στην ιδιωτική ζωή δεν παρατηρώ τους ενήλικες να συμπεριφέρονται έτσι προς τους μεγαλύτερους ούτε κανέναν άνθρωπο στον κόσμο να είναι τόσο σκληρός ή ανόητος, ώστε να ισχυρίζεται ότι, αν δεν κάνουν όλοι όσα κάνει αυτός, δεν πρόκειται να κάνει τίποτε ούτε και ο ίδιος· καθόσον τότε θα ήταν ένοχος προς τους νόμους της κακομεταχείρισης των γονιών. Γιατί, υποθέτω, πως τη συνεισφορά την καθορισμένη από δύο αρχές, τόσο από τη φύση όσο και από τους νόμους, πρέπει δίκαια να την αποδίδουμε στους γονείς και να την παρέχουμε αυθόρμητα. <span class="marker">[41]</span> Συνεπώς, όπως ακριβώς στον καθένα από μας υπάρχει ένας γονιός, έτσι πρέπει να θεωρούμε το σύνολο των πολιτών κοινούς γονείς όλης της πόλης, και οφείλουμε όχι μόνο να μην τους στερούμε κάτι που τους παρέχει η πόλη, αλλά, και αν ακόμη δεν υπήρχε τίποτε από αυτά, επιβάλλεται να ψάξουμε και να βρούμε από κάπου αλλού πώς δεν θα τους αφήσουμε να τους λείψει τίποτε. <span class="marker">[42]</span> Επομένως, αν οι εύποροι ακολουθούσαν αυτήν την τακτική, νομίζω ότι θα έκαναν όχι μόνο τα δίκαια αλλά και τα ωφέλιμα· γιατί το να στερείς έναν πολίτη από τα απαραίτητα είναι σαν να κάνεις τους πολλούς να δυσαρεστούνται με την κυβέρνηση. Στους φτωχούς εξάλλου θα συμβούλευα να παύσουν τα παράπονα εξαιτίας των οποίων δυσανασχετούν με το σύστημα των θεωρικών αυτοί που έχουν τις περιουσίες και δίκαια κατηγορούν το σύστημα αυτό. <span class="marker">[43]</span> Όπως έκανα προηγουμένως, έτσι και τώρα θα εκθέσω κατά τον ίδιο τρόπο τα σχετικά με τους εύπορους, χωρίς να διστάσω να πω την αλήθεια. Κατά τη γνώμη μου λοιπόν δεν υπάρχει κανένας —τουλάχιστον όχι από τους Αθηναίους, φαντάζομαι, αλλ᾽ ούτε και από τους άλλους Έλληνες— τόσο αξιοθρήνητος και τόσο σκληρός ώστε να ενοχλείται βλέποντας τους απόρους και εκείνους που στερούνται και τα πιο αναγκαία να παίρνουν αυτές τις παροχές. <span class="marker">[44]</span> Αλλά πού σκοντάφτει το σύστημα και πού οφείλεται η δυσανασχέτηση των ευπόρων; Όταν οι εύποροι βλέπουν κάποιους να προσπαθούν να μεταφέρουν τη συνήθεια της διανομής του δημοσίου χρήματος και στην ιδιωτική περιουσία, όταν βλέπουν τον ρήτορα να γίνεται σπουδαίος ανάμεσά σας ακόμη και αθάνατος, στον βαθμό που αυτό του το διασφαλίζει η εμπιστοσύνη του λαού, από την άλλη όμως το αποτέλεσμα της μυστικής ψηφοφορίας να είναι διαφορετικό από τις φωνές επιδοκιμασίας. <span class="marker">[45]</span> Αυτά δημιουργούν τη δυσπιστία, αυτά προκαλούν την οργή. Γιατί και οι δύο κοινωνικές τάξεις πρέπει, Αθηναίοι, να μοιραζόμαστε δίκαια μεταξύ μας τα εκ του πολιτεύματος δικαιώματα και τις υποχρεώσεις· οι εύποροι δηλαδή να νιώθουν ότι έχουν στη ζωή τους σε ασφάλεια την περιουσία τους και να μην φοβούνται γι᾽ αυτήν, στους κινδύνους όμως να την προσφέρουν στην πατρίδα, ώστε να καθίσταται κοινή για τη σωτηρία της, ενώ οι υπόλοιποι να θεωρούν βέβαια την κρατική περιουσία κοινή για όλους και να μετέχουν σ᾽ αυτήν κατά ένα μέρος, αλλά την ατομική περιουσία του καθενός να τη θεωρούν ιδιοκτησία του κατόχου. Έτσι, και μια μικρή πόλη γίνεται μεγάλη και μια μεγάλη διατηρείται μεγάλη. Όσες λοιπόν υποχρεώσεις απορρέουν από καθεμιά από τις δύο κοινωνικές τάξεις, είναι αυτές ίσως, θα μπορούσε να πει κανείς· πώς όμως θα πραγματοποιηθούν, χρειάζεται νομική ρύθμιση.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[46]</span> Τα αίτια των σημερινών δυσκολιών και της αναταραχής είναι πολλά και μακροχρόνια, και αν επιθυμείτε να τα ακούσετε, είμαι διατεθειμένος να σας τα αναφέρω. Έχετε εγκαταλείψει, Αθηναίοι, τη βασική αρχή που σας κληροδότησαν οι πρόγονοί σας· το να προΐστασθε των Ελλήνων και το να βοηθάτε με συγκροτημένη δύναμη όλους τους αδικουμένους το θεωρείτε καθήκον περιττό και δαπάνη μάταιη· αυτό σας έκαναν να πιστέψετε όσοι ακολουθούν μια τέτοια πολιτική· απεναντίας, το να ζείτε ειρηνικά και να μην προχωρείτε σε καμιά από τις πρέπουσες ενέργειες, αλλά εγκαταλείποντας όλες τις κτήσεις στην τύχη τους να αφήνετε να σας τις παίρνουν άλλοι μία μία, πιστεύατε ότι με την τακτική αυτήν είχατε αποκτήσει θαυμαστή ευημερία και απόλυτη ασφάλεια. <span class="marker">[47]</span> Για όλους αυτούς τους λόγους παρουσιάστηκε κάποιος άλλος στη θέση στην οποία εσείς άρμοζε να είστε τεταγμένοι, και έχει γίνει αυτός τώρα ευτυχής και μεγάλος και ρυθμιστής πολλών πραγμάτων, και δικαιολογημένα. Γιατί τον ρόλο αυτόν τον τιμημένο, τον μεγάλο και τον λαμπρό, που για χάρη του φιλονικούσαν μεταξύ τους όλο τον καιρό οι μεγαλύτερες ελληνικές πόλεις, τον οικειοποιήθηκε ο Φίλιππος, γιατί κανένας τώρα δεν τον διεκδικούσε, επειδή οι Λακεδαιμόνιοι ατύχησαν, οι Θηβαίοι είναι απασχολημένοι με τον Φωκικό πόλεμο, ενώ εμείς αδιαφορούμε. <span class="marker">[48]</span> Γι᾽ αυτό, στους άλλους έχει απομείνει ο φόβος, ενώ σ᾽ εκείνον η εξασφάλιση πολλών συμμάχων και μεγάλης δύναμης· και τόσο μεγάλα και τόσο δύσκολα προβλήματα έχουν περιβάλει τώρα τους Έλληνες, ώστε να μην είναι εύκολο ούτε και τι πρέπει να συμβουλεύσει κανείς.</span></p>
+        </div>
+        
+
+        <div id="book-4-chapter-1-3" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-6" data-hash="book-4-chapter-1-3">
+            ΠΙΣΤΕΙΣ • Κεφάλαιο 1.3 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=65&page=6" target="_blank" class="page-link">Page 6</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[49]</span> Ὄντων δ᾽, ὦ ἄνδρες Ἀθηναῖοι, τῶν παρόντων πραγμάτων πᾶσιν, ὡς ἐγὼ κρίνω, φοβερῶν, οὐδένες ἐν μείζονι κινδύνῳ τῶν πάντων εἰσὶν ὑμῶν, οὐ μόνον τῷ μάλισθ᾽ ὑμῖν ἐπιβουλεύειν Φίλιππον, ἀλλὰ καὶ τῷ πάντων ἀργότατ᾽ αὐτοὶ διακεῖσθαι. εἰ τοίνυν τὸ τῶν ὠνίων πλῆθος ὁρῶντες καὶ τὴν εὐετηρίαν τὴν κατὰ τὴν ἀγοράν, τούτοις κεκήλησθ᾽ ὡς ἐν οὐδενὶ δεινῷ τῆς πόλεως οὔσης, οὔτε προσηκόντως οὔτ᾽ ὀρθῶς τὸ πρᾶγμα κρίνετε· <span class="marker">[50]</span> ἀγορὰν μὲν γὰρ ἄν τις καὶ πανήγυριν ἐκ τούτων ἢ φαύλως ἢ καλῶς παρεσκευάσθαι κρίνοι· πόλιν δ᾽ ἣν ὑπείληφεν, ὃς ἂν τῶν Ἑλλήνων ἄρχειν ἀεὶ βούληται, μόνην ἂν ἐναντιωθῆναι καὶ τῆς πάντων ἐλευθερίας προστῆναι, οὐ μὰ Δί᾽ ἐκ τῶν ὠνίων, εἰ καλῶς ἔχει, δοκιμάζειν δεῖ, ἀλλ᾽ εἰ συμμάχων εὐνοίᾳ πιστεύει, εἰ τοῖς ὅπλοις ἰσχύει, ταῦθ᾽ ὑπὲρ τῆς πόλεως δεῖ σκοπεῖν· ἃ σφαλερῶς ὑμῖν καὶ †οὐδαμῶς ἅπαντ᾽† ἔχει. <span class="marker">[51]</span> γνοίητε δ᾽ ἄν, εἰ σκέψαισθ᾽ ἐκείνως. πότε μάλιστ᾽ ἐν ταραχῇ τὰ τῶν Ἑλλήνων γέγονε πράγματα; οὐδένα γὰρ χρόνον ἄλλον ἢ τὸν νυνὶ παρόντ᾽ οὐδ᾽ ἂν εἷς εἴποι. τὸν μὲν γὰρ ἄλλον ἅπαντ᾽ εἰς δύο ταῦτα διῄρητο τὰ τῶν Ἑλλήνων, Λακεδαιμονίους καὶ ἡμᾶς, τῶν δ᾽ ἄλλων [Ἑλλήνων] οἱ μὲν ἡμῖν, οἱ δ᾽ ἐκείνοις ὑπήκουον. βασιλεὺς δὲ καθ᾽ αὑτὸν μὲν ὁμοίως ἅπασιν ἄπιστος ἦν, τοὺς δὲ κρατουμένους τῷ πολέμῳ προσλαμβάνων, ἄχρι οὗ τοῖς ἑτέροις ἐξ ἴσου ποιήσαι, διεπιστεύετο, ἔπειτ᾽ οὐχ ἧττον αὐτὸν ἐμίσουν οὓς σώσειε τῶν ὑπαρχόντων ἐχθρῶν ἐξ ἀρχῆς. <span class="marker">[52]</span> νῦν δὲ πρῶτον μὲν ὁ βασιλεὺς ἅπασι τοῖς Ἕλλησιν οἰκείως ἔχει, †καὶ πάντων ἥκιστα δὴ† ἡμῖν, ἄν τι μὴ νῦν ἐπανορθωσώμεθα· ἔπειτα προστασίαι πολλαὶ καὶ πανταχόθεν γίγνονται, καὶ τοῦ πρωτεύειν ἀντιποιοῦνται μὲν πάντες, ἀφεστᾶσι δ᾽ ἔργῳ, καὶ φθονοῦσι καὶ ἀπιστοῦσιν αὑτοῖς, οὐχ οἷς ἔδει, καὶ γεγόνασι καθ᾽ αὑτοὺς ἕκαστοι, Ἀργεῖοι, Θηβαῖοι, Λακεδαιμόνιοι, Κορίνθιοι, Ἀρκάδες, ἡμεῖς. <span class="marker">[53]</span> ἀλλ᾽ ὅμως εἰς τοσαῦτα μέρη καὶ τοσαύτας δυναστείας διῃρημένων [τῶν Ἑλληνικῶν πραγμάτων], εἰ δεῖ τἀληθῆ μετὰ παρρησίας εἰπεῖν, τὰ παρ᾽ οὐδέσι τούτων ἀρχεῖα καὶ βουλευτήρι᾽ ἐρημότερ᾽ ἄν τις ἴδοι τῶν Ἑλληνικῶν πραγμάτων ἢ τὰ παρ᾽ ἡμῖν, εἰκότως· οὔτε γὰρ φιλῶν οὔτε πιστεύων οὔτε φοβούμενος οὐδεὶς ἡμῖν διαλέγεται. <span class="marker">[54]</span> αἴτιον δὲ τούτων οὐχ ἕν, ὦ ἄνδρες Ἀθηναῖοι, (ῥᾴδιον γὰρ ἂν ἦν ὑμῖν μεταθεῖναι), ἀλλὰ πολλὰ καὶ παντοδαπὰ ἐκ παντὸς ἡμαρτημένα τοῦ χρόνου, ὧν τὸ καθ᾽ ἕκαστον ἐάσας, εἰς ὃ πάντα τείνει λέξω, δεηθεὶς ὑμῶν, ἂν λέγω τἀληθῆ μετὰ παρρησίας, μηδὲν ἀχθεσθῆναί μοι. πέπραται τὰ συμφέροντ᾽ ἐφ᾽ ἑκάστου τῶν καιρῶν, καὶ μετειλήφαθ᾽ ὑμεῖς μὲν τὴν σχολὴν καὶ τὴν ἡσυχίαν, ὑφ᾽ ὧν κεκηλημένοι τοῖς ἀδικοῦσιν οὐ πικρῶς ἔχετε, ἕτεροι δὲ τὰς τιμὰς ἔχουσιν. <span class="marker">[55]</span> καὶ τὰ μὲν περὶ τἄλλ᾽ οὐκ ἄξιον ἐξετάσαι νῦν· ἀλλ᾽ ἐπειδάν τι τῶν πρὸς Φίλιππον ἐμπέσῃ, εὐθὺς ἀναστάς τις λέγει ὡς οὐ δεῖ ληρεῖν οὐδὲ γράφειν πόλεμον, παραθεὶς εὐθέως ἑξῆς τὸ τὴν εἰρήνην ἄγειν ὡς ἀγαθὸν καὶ τὸ τρέφειν μεγάλην δύναμιν ὡς χαλεπόν, καὶ «διαρπάζειν τινὲς τὰ χρήματα βούλονται,» καὶ ἄλλους λόγους ὡς οἷόν τ᾽ ἀληθεστάτους λέγουσιν. <span class="marker">[56]</span> ἀλλὰ δεῖ δήπου τὴν μὲν εἰρήνην ἄγειν οὐχ ὑμᾶς πείθειν, οἳ πεπεισμένοι κάθησθε, ἀλλὰ τὸν τὰ τοῦ πολέμου πράττοντα· ἂν γὰρ ἐκεῖνος πεισθῇ, τά γ᾽ ἀφ᾽ ὑμῶν ὑπάρχει· νομίζειν δ᾽ εἶναι χαλεπὰ οὐχ ὅσ᾽ ἂν εἰς σωτηρίαν δαπανῶμεν, ἀλλ᾽ ἃ πεισόμεθα, ἂν μὴ ταῦτ᾽ ἐθέλωμεν ποιεῖν, καὶ τὸ «διαρπασθήσεται τὰ χρήματα» τῷ φυλακὴν εὑρεῖν δι᾽ ἧς σωθήσεται κωλύειν, οὐχὶ τῷ τοῦ συμφέροντος ἀποστῆναι. <span class="marker">[57]</span> καίτοι ἔγωγ᾽ ἀγανακτῶ καὶ αὐτὸ τοῦτο, εἰ τὰ μὲν χρήματα λυπεῖ τινὰς ὑμῶν εἰ διαρπασθήσεται, ἃ καὶ φυλάττειν καὶ κολάζειν τοὺς ἀδικοῦντας ἐφ᾽ ὑμῖν ἐστι, τὴν δ᾽ Ἑλλάδα πᾶσαν ἐφεξῆς οὑτωσὶ Φίλιππος ἁρπάζων οὐ λυπεῖ, καὶ ταῦτ᾽ ἐφ᾽ ὑμᾶς ἁρπάζων. <span class="marker">[58]</span> τί ποτ᾽ οὖν, ὦ ἄνδρες Ἀθηναῖοι, τὸν μὲν οὕτω φανερῶς ἀδικοῦντα καὶ πόλεις καταλαμβάνοντα οὐδεὶς πώποτε τούτων εἶπεν ὡς ἀδικεῖ καὶ πόλεμον ποιεῖ, τοὺς δὲ μὴ ἐπιτρέπειν μηδὲ προΐεσθαι ταῦτα συμβουλεύοντας, τούτους πόλεμον ποιεῖν φασίν; ὅτι τὴν αἰτίαν τῶν ἐκ τοῦ πολέμου συμβησομένων δυσχερῶν (ἀνάγκη γάρ, ἀνάγκη πολλὰ λυπηρὰ ἐκ τοῦ πολέμου γίγνεσθαι) τοῖς ὑπὲρ ὑμῶν τὰ βέλτιστα λέγειν εἰθισμένοις ἀναθεῖναι βούλονται. <span class="marker">[59]</span> ἡγοῦνται γάρ, ἂν μὲν ὑμεῖς ὁμοθυμαδὸν ἐκ μιᾶς γνώμης Φίλιππον ἀμύνησθε, κἀκείνου κρατήσειν ὑμᾶς καὶ αὑτοῖς οὐκέτ᾽ ἔσεσθαι μισθαρνεῖν, ἂν δ᾽ ἀπὸ τῶν πρώτων θορύβων αἰτιασάμενοί τινας πρὸς τὸ κρίνειν τράπησθε, αὐτοὶ μὲν τούτων κατηγοροῦντες ἀμφότερ᾽ ἕξειν, καὶ παρ᾽ ὑμῖν εὐδοκιμήσειν καὶ παρ᾽ ἐκείνου χρήματα λήψεσθαι, ὑμᾶς δ᾽ ὑπὲρ ὧν δεῖ παρὰ τούτων δίκην λαβεῖν, παρὰ τῶν ὑπὲρ ὑμῶν εἰρηκότων λήψεσθαι. <span class="marker">[60]</span> αἱ μὲν ἐλπίδες αἱ τούτων αὗται καὶ τὸ κατασκεύασμα τὸ τῶν αἰτιῶν, ὡς ἄρα βούλονταί τινες πόλεμον ποιῆσαι. ἐγὼ δ᾽ οἶδ᾽ ἀκριβῶς ὅτι, οὐ γράψαντος Ἀθηναίων οὐδενὸς πόλεμον, πολλὰ Φίλιππος ἔχει τῶν τῆς πόλεως καὶ νῦν εἰς Καρδίαν πέπομφε βοήθειαν. εἰ μέντοι βουλόμεθ᾽ ἡμεῖς μὴ προσποιεῖσθαι πολεμεῖν ἡμῖν ἐκεῖνον, ἀνοητότατος πάντων ἂν εἴη, εἰ τοῦτ᾽ ἐξελέγχοι· ὅταν γὰρ οἱ ἀδικούμενοι ἀρνῶνται, τί τῷ ἀδικοῦντι προσήκει; <span class="marker">[61]</span> ἀλλ᾽ ἐπειδὰν ἐφ᾽ ἡμᾶς αὐτοὺς ἴῃ, τί φήσομεν τότε; ἐκεῖνος μὲν γὰρ οὐ πολεμεῖν, ὥσπερ οὐδ᾽ Ὠρείταις, τῶν στρατιωτῶν ὄντων ἐν τῇ χώρᾳ, οὐδὲ Φεραίοις πρότερον, πρὸς τὰ τείχη προσβάλλων, οὐδ᾽ Ὀλυνθίοις ἐξ ἀρχῆς, ἕως ἐν αὐτῇ τῇ χώρᾳ τὸ στράτευμα παρῆν ἔχων. ἢ καὶ τότε τοὺς ἀμύνεσθαι κελεύοντας πόλεμον ποιεῖν φήσομεν; οὐκοῦν ὑπόλοιπον δουλεύειν· οὐδὲ γὰρ ἄλλο γ᾽ οὐδὲν ἔνι. <span class="marker">[62]</span> καὶ μὴν οὐχ ὑπὲρ τῶν ἴσων ὑμῖν καὶ τοῖς ἄλλοις ἔσθ᾽ ὁ κίνδυνος· οὐ γὰρ ὑφ᾽ αὑτῷ ποιήσασθαι τὴν πόλιν βούλεται Φίλιππος ὑμῶν, οὔ, ἀλλ᾽ ὅλως ἀνελεῖν. οἶδε γὰρ ἀκριβῶς ὅτι δουλεύειν μὲν ὑμεῖς οὔτ᾽ ἐθελήσετε, οὔτ᾽, ἐὰν ἐθέλητε, ἐπιστήσεσθε (ἄρχειν γὰρ εἰώθατε), πράγματα δὲ παρασχεῖν αὐτῷ, ἂν καιρὸν λάβητε, πλείω τῶν ἄλλων ἀνθρώπων ἁπάντων δυνήσεσθε. διὰ ταῦθ᾽ ὑμῶν οὐχὶ φείσεται, εἴπερ ἐγκρατὴς γενήσεται. <span class="marker">[63]</span> ὡς οὖν ὑπὲρ τῶν ἐσχάτων ἐσομένου τοῦ ἀγῶνος, οὕτω προσήκει γιγνώσκειν, καὶ τοὺς πεπρακότας αὑτοὺς ἐκείνῳ φανερῶς ἀποτυμπανίσαι· οὐ γὰρ ἔστιν, οὐκ ἔστι τῶν ἔξω τῆς πόλεως ἐχθρῶν κρατῆσαι, πρὶν ἂν τοὺς ἐν αὐτῇ τῇ πόλει κολάσητ᾽ ἐχθρούς, ἀλλ᾽ ἀνάγκη τούτοις ὥσπερ προβόλοις προσπταίσαντας ὑστερίζειν ἐκείνων. <span class="marker">[64]</span> πόθεν οἴεσθε νῦν αὐτὸν ὑβρίζειν ὑμᾶς (οὐδὲν γὰρ ἄλλ᾽ ἔμοιγε δοκεῖ ποιεῖν ἢ τοῦτο) καὶ τοὺς μὲν ἄλλους εὖ ποιοῦντα, εἰ μηδὲν ἄλλο, ἐξαπατᾶν, ὑμῖν δ᾽ ἀπειλεῖν ἤδη; οἷον Θετταλοὺς πολλὰ δοὺς ὑπηγάγετ᾽ εἰς τὴν νῦν παροῦσαν δουλείαν· οὐδ᾽ ἂν εἰπεῖν δύναιτ᾽ οὐδεὶς ὅσα τοὺς ταλαιπώρους Ὀλυνθίους πρότερον δοὺς Ποτείδαιαν ἐξηπάτησε καὶ πόλλ᾽ ἕτερα· Θηβαίους τὰ νῦν ὑπάγει τὴν Βοιωτίαν αὐτοῖς παραδοὺς καὶ ἀπαλλάξας πολέμου πολλοῦ καὶ χαλεποῦ· <span class="marker">[65]</span> ὥστε καρπωσάμενοί τιν᾽ ἕκαστοι τούτων πλεονεξίαν, οἱ μὲν ἤδη πεπόνθασιν ἃ δὴ πεπόνθασιν, οἱ δ᾽ ὅταν ποτὲ συμβῇ πείσονται. ὑμεῖς δ᾽ ὧν μὲν †ἀπεστέρησθε† σιωπῶ· ἀλλ᾽ ἐν αὐτῷ τῷ τὴν εἰρήνην ποιήσασθαι, πόσ᾽ ἐξηπάτησθε, πόσων ἀπεστέρησθε. οὐχὶ Φωκέας, οὐ Πύλας, οὐχὶ τἀπὶ Θρᾴκης, Δορίσκον, Σέρριον, τὸν Κερσοβλέπτην αὐτόν; οὐ νῦν Καρδίαν ἔχει καὶ ὁμολογεῖ; <span class="marker">[66]</span> τί ποτ᾽ οὖν ἐκείνως τοῖς ἄλλοις, καὶ ὑμῖν οὐ τοῦτον τὸν τρόπον προσφέρεται; ὅτι ἐν μόνῃ τῶν πασῶν πόλεων τῇ ὑμετέρᾳ ἄδει᾽ ὑπὲρ τῶν ἐχθρῶν λέγειν δέδοται, καὶ λαβόντα χρήματ᾽ αὐτὸν ἀφαλές ἐστι λέγειν παρ᾽ ὑμῖν, κἂν ἀφῃρημένοι τὰ ὑμέτερ᾽ αὐτῶν ἦτε. <span class="marker">[67]</span> οὐκ ἦν ἀσφαλὲς λέγειν ἐν Ὀλύνθῳ τὰ Φιλίππου μὴ σὺν εὖ πεπονθότων τῶν πολλῶν Ὀλυνθίων τῷ Ποτείδαιαν καρποῦσθαι· οὐκ ἦν ἀσφαλὲς λέγειν ἐν Θετταλίᾳ μὴ σὺν εὖ πεπονθότος τοῦ πλήθους τοῦ Θετταλῶν τῷ τοὺς τυράννους ἐκβαλεῖν Φίλιππον αὐτοῖς καὶ τὴν Πυλαίαν ἀποδοῦναι· οὐκ ἦν ἐν Θήβαις ἀσφαλές, πρὶν τὴν Βοιωτίαν ἀπέδωκε καὶ τοὺς Φωκέας ἀνεῖλεν. <span class="marker">[68]</span> ἀλλ᾽ Ἀθήνησιν, οὐ μόνον Ἀμφίπολιν καὶ τὴν Καρδιανῶν χώραν ἀπεστερηκότος Φιλίππου, ἀλλὰ καὶ κατασκευάζοντος ὑμῖν ἐπιτείχισμα τὴν Εὔβοιαν καὶ νῦν ἐπὶ Βυζάντιον παριόντος, ἀσφαλές ἐστι λέγειν ὑπὲρ Φιλίππου. καὶ γάρ τοι τούτων μὲν ἐκ πτωχῶν ἔνιοι ταχὺ πλούσιοι γίγνονται, καὶ ἐξ ἀνωνύμων καὶ ἀδόξων ἔνδοξοι καὶ γνώριμοι, ὑμεῖς δὲ τοὐναντίον ἐκ μὲν ἐνδόξων ἄδοξοι, ἐκ δ᾽ εὐπόρων ἄποροι· <span class="marker">[69]</span> πόλεως γὰρ ἔγωγε πλοῦτον ἡγοῦμαι συμμάχους, πίστιν, εὔνοιαν, ὧν πάντων ὑμεῖς ἔστ᾽ ἄποροι. ἐκ δὲ τοῦ τούτων ὀλιγώρως ὑμᾶς ἔχειν καὶ ἐᾶν τοῦτον τὸν τρόπον φέρεσθαι, ὁ μὲν εὐδαίμων καὶ μέγας καὶ φοβερὸς πᾶσιν Ἕλλησι καὶ βαρβάροις, ὑμεῖς δ᾽ ἔρημοι καὶ ταπεινοί, τῇ μὲν κατὰ τὴν ἀγορὰν εὐετηρίᾳ λαμπροί, τῇ δ᾽ ὧν προσῆκε παρασκευῇ καταγέλαστοι. <span class="marker">[70]</span> οὐ τὸν αὐτὸν δὲ τρόπον περί θ᾽ ὑμῶν καὶ περὶ αὑτῶν ἐνίους τῶν λεγόντων ὁρῶ βουλευομένους· ὑμᾶς μὲν γὰρ ἡσυχίαν ἄγειν φασὶ δεῖν, κἄν τις ὑμᾶς ἀδικῇ, αὐτοὶ δ᾽ οὐ δύνανται παρ᾽ ὑμῖν ἡσυχίαν ἄγειν οὐδενὸς αὐτοὺς ἀδικοῦντος. καίτοι λοιδορίας εἴ τις χωρὶς ἔροιτο «εἰπέ μοι, τί δὴ γιγνώσκων ἀκριβῶς, Ἀριστόμηδες, (οὐδεὶς γὰρ τὰ τοιαῦτ᾽ ἀγνοεῖ) τὸν μὲν τῶν ἰδιωτῶν βίον ἀσφαλῆ καὶ ἀπράγμονα καὶ ἀκίνδυνον ὄντα, τὸν δὲ τῶν πολιτευομένων φιλαίτιον καὶ σφαλερὸν καὶ καθ᾽ ἑκάστην ἡμέραν ἀγώνων καὶ κακῶν μεστόν, οὐ τὸν ἡσύχιον, ἀλλὰ τὸν ἐν τοῖς κινδύνοις αἱρεῖ;» τί ἂν εἴποις; <span class="marker">[71]</span> εἰ γὰρ ὃ βέλτιστον εἰπεῖν ἂν ἔχοις, τοῦτό σοι δοίημεν ἀληθὲς λέγειν, ὡς ὑπὲρ φιλοτιμίας καὶ δόξης ταῦτα πάντα ποιεῖς, θαυμάζω τί δήποτε σαυτῷ μὲν ὑπὲρ τούτων ἅπαντα ποιητέον εἶναι νομίζεις καὶ πονητέον καὶ κινδυνευτέον, τῇ πόλει δὲ προέσθαι ταῦτα μετὰ ῥᾳθυμίας συμβουλεύεις. οὐ γὰρ ἐκεῖνό γ᾽ ἂν εἴποις, ὡς σὲ μὲν ἐν τῇ πόλει δεῖ τινὰ φαίνεσθαι, τὴν πόλιν δ᾽ ἐν τοῖς Ἕλλησι μηδενὸς ἀξίαν εἶναι. <span class="marker">[72]</span> καὶ μὴν οὐδ᾽ ἐκεῖνό γ᾽ ὁρῶ, ὡς τῇ μὲν πόλει ἀσφαλὲς τὸ τὰ αὑτῆς πράττειν, σοὶ δὲ κίνδυνος, εἰ μηδὲν τῶν ἄλλων πλέον περιεργάσει, ἀλλὰ τοὐναντίον σοὶ μὲν ἐξ ὧν ἐργάζει καὶ περιεργάζει τοὺς ἐσχάτους ὄντας κινδύνους, τῇ πόλει δ᾽ ἐκ τῆς ἡσυχίας. <span class="marker">[73]</span> ἀλλὰ νὴ Δία παππῴα σοι καὶ πατρῴα δόξ᾽ ὑπάρχει, ἣν αἰσχρόν ἐστιν ἐν σοὶ καταλῦσαι· τῇ πόλει δ᾽ ὑπῆρξεν ἀνώνυμα καὶ φαῦλα τὰ τῶν προγόνων. ἀλλ᾽ οὐδὲ τοῦθ᾽ οὕτως ἔχει· σοὶ μὲν γὰρ ἦν κλέπτης ὁ πατήρ, εἴπερ ἦν ὅμοιος σοί, τῇ πόλει δ᾽ ἡμῶν οὓς πάντες ἴσασιν οἱ Ἕλληνες ἐκ τῶν μεγίστων κινδύνων σεσωσμένοι. <span class="marker">[74]</span> ἀλλὰ γὰρ οὐκ ἴσως οὐδὲ πολιτικῶς ἔνιοι τὰ καθ᾽ αὑτοὺς καὶ τὰ κατὰ τὴν πόλιν πολιτεύονται· πῶς γάρ ἐστιν ἴσον τούτων μέν τινας ἐκ τοῦ δεσμωτηρίου ἥκοντας ἑαυτοὺς ἀγνοεῖν, τὴν πόλιν δ᾽, ἣ προειστήκει τῶν Ἑλλήνων τέως καὶ τὸ πρωτεῖον εἶχε, νῦν ἐν ἀδοξίᾳ πάσῃ καὶ ταπεινότητι καθεστάναι;</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[49]</span> Όσο φοβερή και αν είναι για όλους, κατά τη γνώμη μου, η σημερινή κατάσταση, Αθηναίοι, κανένας από όλους δεν βρίσκεται σε μεγαλύτερο κίνδυνο όσο εσείς, όχι μόνο γιατί εσάς προπάντων επιβουλεύεται ο Φίλιππος αλλά και γιατί εσείς είστε οι πιο νωθροί από όλους. Εάν λοιπόν βλέποντας την αφθονία των αγαθών και τη φθήνια στην αγορά ξεγελαστείτε από αυτά, πιστεύοντας ότι δεν διατρέχει η πόλη κανέναν κίνδυνο, δεν κρίνετε την κατάσταση ούτε όπως πρέπει ούτε σωστά. <span class="marker">[50]</span> Γιατί με βάση τα στοιχεία αυτά, μόνο σε ό,τι αφορά μια αγορά ή ένα πανηγύρι θα μπορούσε κανείς να κρίνει ότι έχει οργανωθεί άσχημα ή καλά· μια πόλη όμως, που κάθε επίδοξος κυρίαρχος της Ελλάδας θεωρεί ως τον μόνο πιθανό αντίπαλο και ως υπερασπιστή της ελευθερίας όλων δεν πρέπει, μα τον Δία, να κρίνεται από τα εμπορεύματά της για να διαπιστωθεί αν όλα πηγαίνουν καλά, αλλά από το αν βασίζεται στην εύνοια των συμμάχων και στην ισχύ των όπλων της· αυτά πρέπει να εξετάζει κανείς προκειμένου για μια πόλη· σε σας όμως όλα αυτά είναι επισφαλή και ανύπαρκτα. <span class="marker">[51]</span> Θα το καταλάβετε όμως, αν εξετάσετε το πράγμα ως εξής. Πότε η κατάσταση στην Ελλάδα βρισκόταν σε μεγαλύτερη αναταραχή; Γιατί καμιά άλλη περίοδο δεν θα μπορούσε να αναφέρει κανείς παρά τη σημερινή. Πάντοτε στο παρελθόν η Ελλάδα ήταν χωρισμένη στα δύο γνωστά στρατόπεδα, στο Λακεδαιμονίων και στο δικό μας, και από τους υπόλοιπους Έλληνες άλλοι έπαιρναν διαταγές από μας και άλλοι από εκείνους. Ο Πέρσης βασιλιάς, όσο ακολουθούσε ουδέτερη πολιτική, ήταν στον ίδιο βαθμό αναξιόπιστος σε όλους· από τη στιγμή όμως που άρχισε να παίρνει το μέρος των ηττημένων στον πόλεμο, ανακτούσε την εμπιστοσύνη τους ως το σημείο που πετύχαινε ισορροπία δυνάμεων· αλλά στη συνέχεια οι σωθέντες από αυτόν τον μισούσαν όχι λιγότερο από εκείνους που ήταν εξαρχής εχθροί του. <span class="marker">[52]</span> Κατά πρώτον σήμερα ο Πέρσης βασιλιάς διάκειται φιλικά προς όλους τους Έλληνες, λιγότερο όμως φιλικά από όλους προς εμάς, ως γνωστόν, εκτός και αν τώρα βελτιώσουμε κάπως τα πράγματα. Έπειτα εμφανίζονται από παντού πολλοί υποψήφιοι προστάτες και όλοι διεκδικούν την ηγεμονία, στην πράξη όμως απομακρύνονται από την διεκδίκηση αυτής, φθονούν και δυσπιστούν ο ένας στον άλλον και όχι σ᾽ αυτούς που έπρεπε· έτσι έχουν κλειστεί όλοι στον εαυτό τους, Αργείοι, Θηβαίοι, Λακεδαιμόνιοι, Κορίνθιοι, Αρκάδες, εμείς. <span class="marker">[53]</span> Αλλ᾽ όμως, παρόλο που τα ελληνικά πράγματα είναι χωρισμένα σε τόσες φατρίες και τόσες εξουσίες, αν με παρρησία πρέπει να πω την αλήθεια, σε καμιά άλλη πόλη δεν θα μπορούσε να δει κανείς τις κυβερνήσεις και τα βουλευτήρια να είναι λιγότερο απασχολημένα με τις ελληνικές υποθέσεις απ᾽ όσο εδώ σε μας, και είναι φυσικό, αφού κανείς, είτε από αγάπη είτε από εμπιστοσύνη, είτε από φόβο, δεν έρχεται να συζητήσει με μας. <span class="marker">[54]</span> Η αιτία όλων αυτών δεν είναι μια, Αθηναίοι (γιατί θα ήταν εύκολο για μας να την αντιμετωπίσουμε), αλλά λάθη πολλά κάθε λογής, μαζεμένα από πολύν καιρό. Χωρίς να αναφέρω το καθένα χωριστά, θα μιλήσω για ένα, στο οποίο συνοψίζονται όλα, παρακαλώντας σας να μην τα βάλετε μαζί μου, αν με παρρησία πω την αλήθεια. Έχετε ξεπουλήσει τα συμφέροντά σας σε κάθε ευκαιρία και τα έχετε ανταλλάξει με την απραξία και την ησυχία, από τις οποίες μαγεμένοι δεν οργίζεστε με αυτούς που σας αδικούν, ενώ άλλοι απολαμβάνουν το αντίτιμο της προδοσίας. <span class="marker">[55]</span> Όσο για τα λάθη μας σχετικά με τα άλλα ζητήματα δεν αξίζει να τα εξετάσουμε τώρα· μόλις όμως συμπτωματικά ανακύψει κάποιο ζήτημα σχετικά με τον Φίλιππο, αμέσως σηκώνεται κάποιος και υποστηρίζει ότι δεν πρέπει να φλυαρούμε ούτε να κηρύξουμε επίσημα πόλεμο, παραθέτοντας στη συνέχεια τα γνωστά: πόσο καλό πράγμα είναι η διατήρηση της ειρήνης και πόσο δύσκολο η συντήρηση μεγάλης δύναμης, επίσης το «ορισμένοι θέλουν να αρπάξουν τα χρήματά σας», καθώς και άλλα που πολύ λίγο πλησιάζουν στην αλήθεια. <span class="marker">[56]</span> Αλλά δεν χρειάζεται βέβαια να πείσουν εσάς να τηρείτε την ειρήνη, γιατί εσείς έχετε πεισθεί και κάθεστε ήσυχοι, αλλά αυτόν που τώρα διεξάγει πόλεμο· γιατί, αν εκείνος πεισθεί, από τη δική σας πλευρά τουλάχιστον αυτό είναι δεδομένο. Ακόμη πρέπει να καταλάβουν ότι σκληρό για μας δεν είναι όσα θα ξοδέψουμε για τη σωτηρία μας, αλλά όσα θα πάθουμε, αν δεν θέλουμε να υποβληθούμε σ᾽ αυτά τα έξοδα. Και όσο για «τη διασπάθιση των χρημάτων σας», οφείλουν να την αποτρέψουν με το να βρουν μέτρα προστασίας με τα οποία θα σωθούν τα χρήματά σας και όχι με το να εγκαταλείπουν τα συμφέροντά σας. <span class="marker">[57]</span> Και όμως εγώ τουλάχιστον αγανακτώ με αυτό ακριβώς, αν δηλαδή ενοχλεί μερικούς από σας η διασπάθιση των χρημάτων, τα οποία είναι στο χέρι σας και να τα προστατέψετε και να τιμωρήσετε τους άρπαγες, αλλά δεν σας ενοχλεί που ο Φίλιππος αρπάζει όλα τα ελληνικά κράτη, το ένα πίσω από το άλλο, όπως βλέπετε, και μάλιστα όταν οι άρπαγες αυτοί στρέφονται εναντίον σας.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[58]</span> Γιατί λοιπόν τέλος πάντων, Αθηναίοι, για τον άνθρωπο που αδικεί τόσο κατάφωρα και καταλαμβάνει πόλεις, κανείς από αυτούς ποτέ μέχρι σήμερα δεν είπε ότι αδικεί και προκαλεί, αλλά ισχυρίζονται ότι προκαλούν πόλεμο όσοι σας συμβουλεύουν να μην επιτρέπετε αυτά στον Φίλιππο μήτε να αδιαφορείτε; Γιατί θέλουν να επιρρίψουν την ευθύνη των εκ του πολέμου ενδεχόμενων ταλαιπωριών (γιατί αναπόφευκτα, ναι αναπόφευκτα πολλά λυπηρά θα συμβούν από τον πόλεμο) σ᾽ αυτούς που πιστεύουν ότι σας δίνουν τις καλύτερες συμβουλές. <span class="marker">[59]</span> Γιατί νομίζουν ότι, αν εσείς αντιμετωπίσετε τον Φίλιππο με μια καρδιά και με ομοψυχία, και θα τον νικήσετε και δεν θα μπορούν να παίρνουν τον μισθό τους· αν όμως με την πρώτη αναταραχή του πολέμου κατηγορήσετε κάποιους και ασχοληθείτε με τις δίκες, αυτοί από τη μεριά τους κατηγορώντας τους θα πετύχουν και τους δύο στόχους τους, και καλό όνομα σε σας και χρήματα από εκείνον, ενώ εσείς, για εγκλήματα για τα οποία πρέπει να τιμωρήσετε αυτούς, θα έχετε τιμωρήσει τους ανθρώπους που έχουν υπερασπισθεί τα συμφέροντά σας. <span class="marker">[60]</span> Αυτές είναι οι ελπίδες τους και αυτόν τον στόχο έχει η χαλκευμένη κατηγορία ότι κάποιοι τάχα επιθυμούν να προκαλέσουν τον πόλεμο. Εγώ όμως γνωρίζω επακριβώς ότι, μολονότι κανένας από τους Αθηναίους δεν εισηγήθηκε πόλεμο, ο Φίλιππος κατέχει πολλά μέρη της πόλης μας και τώρα τελευταία μάλιστα έστειλε βοήθεια στην Καρδία. Αν όμως θέλουμε να προσποιούμαστε ότι εκείνος δεν κάνει πόλεμο εναντίον μας, θα ήταν ο πιο ανόητος απ᾽ όλους, αν ο ίδιος το έλεγε φανερά· διότι, όταν οι αδικούμενοι το αρνούνται, τότε τι πρέπει να κάνει αυτός που αδικεί; <span class="marker">[61]</span> Αλλά όταν θα βαδίσει εναντίον μας, τι θα πούμε τότε; Γιατί εκείνος θα πει ότι δεν μας πολεμά, όπως ακριβώς έλεγε ότι δεν πολεμούσε εναντίον των Ωρειτών, ενώ οι στρατιώτες του βρίσκονταν μέσα στη χώρα τους, ούτε προηγουμένως εναντίον των Φεραίων, ενώ χτυπούσε τα τείχη τους, ούτε και εναντίον των Ολυνθίων στην αρχή, ως τη στιγμή που παρουσιάστηκε με τον στρατό του μέσα στην ίδια τη χώρα τους. Ή μήπως και τότε θα πούμε ότι πόλεμο παρακινούν όσοι μας προτρέπουν να αντισταθούμε; Τότε λοιπόν δεν μένει παρά να γίνουμε δούλοι· γιατί δεν υπάρχει καμιά άλλη λύση. <span class="marker">[62]</span> Επίσης δεν διακυβεύονται στον ίδιο βαθμό τα δικά σας συμφέροντα και τα συμφέροντα κάποιων άλλων· γιατί ο Φίλιππος δεν θέλει απλώς να υποτάξει την πόλη σας, όχι, αλλά να την καταστρέψει ολοσχερώς. Γιατί ξέρει πολύ καλά ότι δεν θα θελήσετε να γίνετε δούλοι, ούτε, αν το θελήσετε, θα μπορέσετε να μείνετε δούλοι (γιατί έχετε συνηθίσει να εξουσιάζετε). Αντίθετα, αν βρείτε ευκαιρία, θα είστε σε θέση να του δημιουργήσετε τα περισσότερα προβλήματα από όλους γενικά τους υπόλοιπους ανθρώπους. Γι᾽ αυτό, αν πέσετε στα χέρια του, δεν πρόκειται να σας λυπηθεί. <span class="marker">[63]</span> Επομένως, πρέπει να καταλάβετε ότι ο αγώνας θα είναι για ζωή ή θάνατο, και όσοι έχουν πουληθεί σ᾽ εκείνον πρέπει να αποτυμπανιστούν δημόσια. Γιατί δεν είναι δυνατό, είναι αδύνατο να νικήσετε τους εξωτερικούς εχθρούς, αν προηγουμένως δεν τιμωρήσετε τους εχθρούς που βρίσκονται μέσα στην ίδια την πόλη, αλλά αναπόφευκτα θα σκοντάψετε επάνω τους, σαν σε σκοπέλους, και θα φτάνετε καθυστερημένοι σ᾽ εκείνους. <span class="marker">[64]</span> Από πού φαντάζεστε ότι κινείται και σας λοιδορεί (γιατί κατά τη γνώμη μου τουλάχιστον δεν κάνει τίποτε άλλο παρά αυτό), και για ποιόν λόγο εξαπατά τους άλλους με περιποιήσεις, αν όχι με κάτι άλλο, ενώ στην περίπτωσή σας καταφεύγει ήδη σε απειλές; Για παράδειγμα τους Θεσσαλούς, αφού στην αρχή τους έδωσε πολλά, στη συνέχεια τους έσυρε ύπουλα στη σημερινή κατάσταση υποδούλωσης· ούτε και θα μπορούσε να πει κανείς πόσο παραπλάνησε τους ταλαίπωρους τους Ολυνθίους, δίνοντάς τους την Ποτίδαια και άλλα μέρη· τώρα εξάλλου προσπαθεί ύπουλα να παρασύρει τους Θηβαίους δίνοντάς τους τη Βοιωτία και απαλλάσσοντάς τους από έναν πόλεμο μακροχρόνιο και σκληρό. <span class="marker">[65]</span> Έτσι, αφού ο καθένας από αυτούς έδρεψαν μερικούς καρπούς της πλεονεξίας τους, άλλοι έχουν ήδη πάθει όσα έχουν πάθει, άλλοι πάλι θα πάθουν, όταν θα έρθει η ώρα τους. Δεν αναφέρω όσα έχετε χάσει στον πόλεμο· πόσο όμως έχετε εξαπατηθεί και πόσα έχετε στερηθεί στον χρόνο που διήρκεσαν οι διαπραγματεύσεις για την ειρήνη! Δεν εξαπατηθήκατε για τους Φωκείς, για τις Θερμοπύλες, για τα οχυρά σας στη Θράκη, Δορίσκο, Σέρριο, ακόμη και για τον ίδιο τον Κερσοβλέπτη; Δεν κατέχει αυτήν τη στιγμή ο Φίλιππος την Καρδία και το λέει μάλιστα; <span class="marker">[66]</span> Γιατί λοιπόν τέλος πάντων προς τους άλλους Έλληνες φέρεται με εκείνον τον τρόπο, ενώ προς εσάς με αυτόν; Γιατί μόνο στη δική σας από όλες τις πόλεις παρέχεται το δικαίωμα να υπερασπίζεται κανείς άφοβα τα συμφέροντα των εχθρών, και όταν ακόμη κάποιος δωροδοκηθεί, μπορεί χωρίς κίνδυνο να μιλάει εδώ σε σας, έστω και αν έχουν αποσπάσει από σας δικά σας εδάφη. <span class="marker">[67]</span> Κανένας δεν θα μπορούσε να μιλήσει με ασφάλεια στην Όλυνθο για τα συμφέροντα του Φιλίππου, αν δεν είχε συμμετάσχει και ο λαός των Ολυνθίων στο κέρδος από την παραχώρηση της Ποτίδαιας· ούτε στη Θεσσαλία θα μπορούσε κανείς να μιλήσει με ασφάλεια υπέρ του Φιλίππου, αν ο Θεσσαλικός λαός δεν είχε συμμετάσχει στο κέρδος από την εκ μέρους του Φιλίππου εκδίωξη των τυράννων τους και από την αποκατάσταση των αμφικτυονικών προνομίων· ούτε και στη Θήβα, παρά αφού τους απέδωσε τη Βοιωτία και κατέστρεψε τους Φωκείς. <span class="marker">[68]</span> Αντίθετα, στην Αθήνα μπορεί κάποιος με ασφάλεια να υπερασπίζεται τα συμφέροντα του Φιλίππου, μολονότι αυτός όχι μόνο σας έχει αρπάξει την Αμφίπολη και την περιοχή της Καρδίας αλλά και μετατρέπει την Εύβοια σε τείχος εναντίον σας και αυτήν τη στιγμή κατευθύνεται εναντίον του Βυζαντίου. Πράγματι, μερικοί από τους εδώ πολιτικούς από φτωχοί έγιναν ξαφνικά πλούσιοι και από άγνωστοι και άσημοι ένδοξοι και διάσημοι· εσείς, αντίθετα, από ένδοξοι καταντήσατε άσημοι και από εύποροι ζητιάνοι. <span class="marker">[69]</span> Γιατί εγώ τουλάχιστον θεωρώ πλούτο μιας πόλης τους συμμάχους, την αξιοπιστία, την καλή προαίρεση· όλα αυτά εσείς τα στερείστε. Και επειδή εσείς αδιαφορείτε γι᾽ αυτά και επιτρέπετε να σας τα αφαιρούν κατ᾽ αυτόν τον τρόπο, ο Φίλιππος ευημερεί και έγινε μεγάλος και τρομερός σε όλους τους Έλληνες και τους βαρβάρους, ενώ εσείς εγκαταλειμμένοι και ταπεινωμένοι, λαμπροί βέβαια για την αφθονία στην αγορά, καταγέλαστοι όμως σε ό,τι αφορά την προετοιμασία των βασικών πολεμικών αναγκών. <span class="marker">[70]</span> Βλέπω ότι μερικοί από τους ρήτορες δεν σκέφτονται για σας κατά τον ίδιο τρόπο όπως για τον εαυτό τους. Υποστηρίζουν πως εσείς πρέπει να κάθεστε ήσυχοι, και αν ακόμη κάποιος σας αδικεί, οι ίδιοι όμως δεν μπορούν να κάθονται ήσυχοι, μολονότι κανένας δεν τους αδικεί. Αλήθεια, αν κάποιος, χωρίς τη διάθεση να σε κοροϊδέψει, σε ρωτήσει «πες μου, Αριστομήδη, γιατί, αφού ξέρεις επακριβώς (γιατί κανένας δεν αγνοεί τέτοια ζητήματα) ότι η ζωή των απλών πολιτών είναι ασφαλής, χωρίς προβλήματα και κινδύνους, ενώ η ζωή των πολιτικών ανοιχτή σε επιθέσεις, επισφαλής και γεμάτη αγώνες και συμφορές σε καθημερινή βάση, γιατί δεν προτιμάς την ήσυχη ζωή αλλά επιλέγεις αυτήν που είναι γεμάτη κινδύνους;» Τι θα απαντούσες; <span class="marker">[71]</span> Γιατί αν σου επιτρέπαμε να δώσεις ως αληθινή την καλύτερη δυνατή απάντηση, ότι δηλαδή τα κάνεις όλα αυτά από αγάπη προς τις τιμές και για τη δόξα, αναρωτιέμαι για ποιόν λόγο άραγε νομίζεις ότι, προκειμένου να αποκτήσεις εσύ όλα αυτά, πρέπει να κάνεις τα πάντα, να μοχθείς και να κινδυνεύεις, ενώ συμβουλεύεις την πόλη να εγκαταλείψει αυτά μένοντας τελείως αδιάφορη. Γιατί δεν μπορείς βέβαια να πεις ότι εσύ πρέπει να φαίνεσαι σπουδαίος μέσα στην πόλη, ενώ η πόλη δεν έχει καμιά αξία στους Έλληνες. <span class="marker">[72]</span> Επίσης και κάτι άλλο βέβαια δεν καταλαβαίνω, ότι είναι ασφαλές για την πόλη να ασχολείται μόνο με τις δικές της υποθέσεις, αλλά κίνδυνος για σένα, αν δεν κάνεις κάτι παραπάνω από τους άλλους για ξένες υποθέσεις. Αντίθετα, για σένα μεν βλέπω τον έσχατο κίνδυνο από τα όσα κάνεις και ανακατεύεις, για δε την πόλη από την αδράνεια. <span class="marker">[73]</span> Αλλά, μα τον Δία, σε σένα βέβαια υπάρχει καλή φήμη από τον παππού και τον πατέρα σου και είναι ντροπή να σβήσει με σένα· ενώ η πόλη είχε προγόνους άσημους και φαύλους. Αλλά κάθε άλλο παρά έτσι έχει το πράγμα· γιατί ο πατέρας σου, αν βέβαια σου έμοιαζε, ήταν κλέφτης, ενώ οι πρόγονοι της πόλης μας ήταν αυτοί που όλοι οι Έλληνες γνωρίζουν καλά, αφού από αυτούς έχουν σωθεί από τους μεγαλύτερους κινδύνους. <span class="marker">[74]</span> Αλήθεια, μερικοί, σε ό,τι αφορά τις προσωπικές τους υποθέσεις και τα ζητήματα της πόλης, δεν πολιτεύονται με πνεύμα ισότητας ούτε και ως δημοκρατικοί πολίτες. Γιατί πού βρίσκεται η ισότητα και η δικαιοσύνη, όταν κάποιοι από αυτούς που βγήκαν από τη φυλακή προσποιούνται ότι ξεχνούν ποιοι είναι, ενώ η πόλη, που λίγο πιο μπροστά ήταν η ηγέτις των Ελλήνων και κατείχε τα πρωτεία, έχει περιέλθει τώρα σε πλήρη ανυποληψία και ταπείνωση;</span></p>
+        </div>
+        
+
+        <div id="book-5-chapter-1" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-7" data-hash="book-5-chapter-1">
+            ΕΠΙΛΟΓΟΣ • Κεφάλαιο 1 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=65&page=7" target="_blank" class="page-link">Page 7</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[75]</span> Πολλὰ τοίνυν ἔχων ἔτι καὶ περὶ πολλῶν εἰπεῖν παύσομαι· καὶ γὰρ οὐ λόγων ἐνδείᾳ μοι δοκεῖ τὰ πράγματ᾽ οὔτε νῦν οὔτ᾽ ἄλλοτε πώποτε φαύλως ἔχειν, ἀλλ᾽ ὅταν πάντ᾽ ἀκούσαντες ὑμεῖς τὰ δέοντα, καὶ ὁμογνώμονες ὡς ὀρθῶς λέγεται γενόμενοι, τῶν λυμαίνεσθαι καὶ διαστρέφειν ταῦτα βουλομένων ἐξ ἴσου κάθησθ᾽ ἀκροώμενοι, οὐκ ἀγνοοῦντες αὐτούς (ἴστε γὰρ εὐθὺς ἰδόντες ἀκριβῶς, τίς μισθοῦ λέγει καὶ [τίς] ὑπὲρ Φιλίππου πολιτεύεται, καὶ τίς ὡς ἀληθῶς ὑπὲρ τῶν βελτίστων), ἀλλ᾽ ἵν᾽ αἰτιασάμενοι τούτους καὶ τὸ πρᾶγμ᾽ εἰς γέλωτα καὶ λοιδορίαν ἐμβαλόντες μηδὲν αὐτοὶ τῶν δεόντων ποιῆτε. <span class="marker">[76]</span> ταῦτ᾽ ἐστὶ τἀληθῆ, μετὰ πάσης παρρησίας, ἁπλῶς εὐνοίᾳ τὰ βέλτιστ᾽ εἰρημένα, οὐ κολακείᾳ βλάβης καὶ ἀπάτης λόγος μεστός, ἀργύριον τῷ λέγοντι ποιήσων, τὰ δὲ πράγματα τῆς πόλεως τοῖς ἐχθροῖς ἐγχειριῶν. ἢ οὖν παυστέον τούτων τῶν ἐθῶν, ἢ μηδέν᾽ ἄλλον αἰτιατέον τοῦ πάντα φαύλως ἔχειν ἢ ὑμᾶς αὐτούς.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text"><i>ΕΠΙΛΟΓΟΣ (§§ 75-76)</i></span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[75]</span> Μόλο που πολλά και για πολλά ζητήματα έχω να πω ακόμη, θα σταματήσω. Καθόσον έχω τη γνώμη ότι η αιτία που τα πράγματα είναι άσχημα είτε τώρα είτε στο παρελθόν δεν είναι η έλλειψη λόγων, αλλά το ότι, ενώ ακούσατε όλα όσα έπρεπε και ομόφωνα αναγνωρίσατε ότι σωστά λέγονται, κάθεστε και ακούτε με την ίδια προσοχή εκείνους που επιθυμούν να τα υπονομεύουν και να τα διαστρεβλώνουν· και αυτό γίνεται, όχι γιατί δεν τους ξέρετε (γιατί μόλις τους δείτε, είστε απόλυτα σίγουροι ποιος μιλάει αντί αμοιβής, <span class="marker">[ποιος]</span> πολιτεύεται για λογαριασμό του Φιλίππου, και ποιος στ᾽ αλήθεια για το καλό σας), αλλά γιατί σκοπός σας είναι, αφού κατηγορήσετε αυτούς που πολιτεύονται για τα συμφέροντά σας και ρίξετε το πράγμα σε γέλιο και σε λοιδορία, να μην κάνετε οι ίδιοι τίποτε απ᾽ όσα πρέπει. <span class="marker">[76]</span> Αυτή είναι η αλήθεια, αυτά είναι τα καλύτερα που είχα να πω με κάθε ειλικρίνεια, με απλότητα και από καλή προαίρεση, όχι για κολακεία· δεν είναι λόγος για να σας βλάψει και να σας εξαπατήσει, λόγος που θα εξασφαλίσει χρήματα στον ρήτορα και που θα εμπιστευθεί τις υποθέσεις της πόλης στους εχθρούς. Γι᾽ αυτό, ή πρέπει να εγκαταλείψετε αυτές τις συνήθειες ή διαφορετικά θα πρέπει να μην κατηγορείτε κανέναν άλλον, για το ότι όλα βρίσκονται σε άσχημη κατάσταση, παρά τον ίδιο τον εαυτό σας.</span></p>
+        </div>
+        
+        </section>
+    </main>
+
+    <script>
+        // Layout and Theme controls
+        function toggleLayout() {
+            const body = document.body;
+            const btn = document.getElementById('toggle-layout-btn');
+            
+            if (body.classList.contains('hide-original')) {
+                body.classList.remove('hide-original');
+                btn.innerText = 'Hide Original';
+                localStorage.setItem('ebook-hide-original', 'false');
+            } else {
+                body.classList.add('hide-original');
+                btn.innerText = 'Show Original';
+                localStorage.setItem('ebook-hide-original', 'true');
+            }
+        }
+
+        function setTheme(theme, buttonElement) {
+            if (theme === 'light') {
+                document.documentElement.removeAttribute('data-theme');
+            } else {
+                document.documentElement.setAttribute('data-theme', theme);
+            }
+            
+            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+            buttonElement.classList.add('active');
+            
+            localStorage.setItem('ebook-theme', theme);
+        }
+
+        function toggleSidebar() {
+            const body = document.body;
+            const overlay = document.getElementById('mobile-overlay');
+            const isMobile = window.innerWidth <= 900;
+            
+            if (isMobile) {
+                if (body.classList.contains('sidebar-open')) {
+                    body.classList.remove('sidebar-open');
+                    overlay.classList.remove('open');
+                } else {
+                    body.classList.add('sidebar-open');
+                    overlay.classList.add('open');
+                    // Close right sidebar if open
+                    body.classList.remove('chat-sidebar-open');
+                }
+            } else {
+                if (body.classList.contains('sidebar-closed')) {
+                    body.classList.remove('sidebar-closed');
+                    localStorage.setItem('ebook-sidebar-closed', 'false');
+                } else {
+                    body.classList.add('sidebar-closed');
+                    localStorage.setItem('ebook-sidebar-closed', 'true');
+                }
+            }
+        }
+        
+        function closeSidebarOnMobile() {
+            if (window.innerWidth <= 900) {
+                document.body.classList.remove('sidebar-open');
+                document.getElementById('mobile-overlay').classList.remove('open');
+            }
+        }
+        
+        function toggleMobileOptions() {
+            const header = document.querySelector('header');
+            const btn = document.querySelector('.options-toggle');
+            
+            if (header.classList.contains('options-open')) {
+                header.classList.remove('options-open');
+                document.body.classList.remove('mobile-options-open');
+                btn.classList.remove('active');
+            } else {
+                header.classList.add('options-open');
+                document.body.classList.add('mobile-options-open');
+                btn.classList.add('active');
+            }
+        }
+
+        // Adjusts sidebar height dynamically to match mobile visual viewport when virtual keyboard is launched
+        function adjustSidebarHeightForKeyboard() {
+            if (window.visualViewport) {
+                const chatSidebar = document.getElementById('chat-sidebar');
+                const isMobile = window.innerWidth <= 900;
+                if (isMobile && document.body.classList.contains('chat-sidebar-open')) {
+                    chatSidebar.style.height = window.visualViewport.height + 'px';
+                } else {
+                    chatSidebar.style.height = ''; // Fallback to CSS rules
+                }
+            }
+        }
+
+        // Right AI Sidebar Toggles
+        function toggleChatSidebar() {
+            const body = document.body;
+            if (body.classList.contains('chat-sidebar-open')) {
+                body.classList.remove('chat-sidebar-open');
+                adjustSidebarHeightForKeyboard();
+            } else {
+                body.classList.add('chat-sidebar-open');
+                // Close Left Sidebar on Mobile
+                if (window.innerWidth <= 900) {
+                    body.classList.remove('sidebar-open');
+                    document.getElementById('mobile-overlay').classList.remove('open');
+                }
+                // Focus text area
+                setTimeout(() => {
+                    document.getElementById('chat-input').focus();
+                    adjustSidebarHeightForKeyboard();
+                }, 100);
+            }
+        }
+
+        // AI Configuration Modal controls
+        function openAiSettings() {
+            document.getElementById('ai-config-modal').classList.add('open');
+            loadSavedAiSettings();
+        }
+
+        function closeAiSettings() {
+            document.getElementById('ai-config-modal').classList.remove('open');
+        }
+
+        function handleProviderChange() {
+            const p = document.getElementById('ai-provider').value;
+            const customUrlGroup = document.getElementById('group-custom-url');
+            const modelInput = document.getElementById('ai-model');
+
+            if (p === 'custom') {
+                customUrlGroup.style.display = 'flex';
+            } else {
+                customUrlGroup.style.display = 'none';
+            }
+
+            // Suggest model placeholders and default values based on provider selection
+            if (p === 'openai') {
+                modelInput.placeholder = 'gpt-4o-mini';
+                if (modelInput.value === 'gemini-flash-latest' || modelInput.value === '' || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gemini')) {
+                    modelInput.value = 'gpt-4o-mini';
+                }
+            } else if (p === 'anthropic') {
+                modelInput.placeholder = 'claude-3-5-sonnet-20241022';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('gemini') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'claude-3-5-sonnet-20241022';
+                }
+            } else if (p === 'gemini') {
+                modelInput.placeholder = 'gemini-flash-latest';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'gemini-flash-latest';
+                }
+            } else if (p === 'openrouter') {
+                modelInput.placeholder = 'meta-llama/llama-3-8b-instruct:free';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('gemini') || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'meta-llama/llama-3-8b-instruct:free';
+                }
+            } else if (p === 'custom') {
+                modelInput.placeholder = 'model-name';
+            }
+        }
+
+        function loadSavedAiSettings() {
+            const provider = localStorage.getItem('ai-prov') || 'openai';
+            const apiKey = localStorage.getItem('ai-key') || '';
+            const model = localStorage.getItem('ai-mod') || '';
+            const customUrl = localStorage.getItem('ai-url') || '';
+
+            document.getElementById('ai-provider').value = provider;
+            document.getElementById('ai-key').value = apiKey;
+            document.getElementById('ai-model').value = model;
+            document.getElementById('ai-custom-url').value = customUrl;
+
+            handleProviderChange();
+        }
+
+        function saveAiSettings() {
+            const provider = document.getElementById('ai-provider').value;
+            const apiKey = document.getElementById('ai-key').value;
+            const model = document.getElementById('ai-model').value;
+            const customUrl = document.getElementById('ai-custom-url').value;
+
+            localStorage.setItem('ai-prov', provider);
+            localStorage.setItem('ai-key', apiKey);
+            localStorage.setItem('ai-mod', model);
+            localStorage.setItem('ai-url', customUrl);
+
+            closeAiSettings();
+        }
+
+        // Text Selection & Chat logic
+        let currentSelection = "";
+        let currentContext = null;
+        let chatHistory = [];
+
+        function getPageContext(node) {
+            let current = node.nodeType === Node.TEXT_NODE ? node.parentElement : node;
+            let col = current.closest('.column');
+            if (!col) return null;
+
+            // Find the preceding page-divider element
+            let sibling = col.previousElementSibling;
+            while (sibling && !sibling.classList.contains('page-divider')) {
+                sibling = sibling.previousElementSibling;
+            }
+            if (!sibling) return null;
+
+            const pageNum = sibling.id.replace('page-', '');
+
+            // Identify parallel original and translation sibling columns
+            let origCol = sibling.nextElementSibling;
+            while (origCol && !origCol.classList.contains('original-col')) {
+                origCol = origCol.nextElementSibling;
+            }
+            let transCol = sibling.nextElementSibling;
+            while (transCol && !transCol.classList.contains('translation-col')) {
+                transCol = transCol.nextElementSibling;
+            }
+
+            const isOriginal = col.classList.contains('original-col');
+
+            return {
+                pageNum: pageNum,
+                dividerText: sibling.textContent.trim(),
+                originalText: origCol ? origCol.innerText : "",
+                translationText: transCol ? transCol.innerText : "",
+                selectedColType: isOriginal ? "original" : "translation"
+            };
+        }
+
+        function handleTextSelection(e) {
+            setTimeout(() => {
+                const selection = window.getSelection();
+                const text = selection.toString().trim();
+                const popup = document.getElementById('ai-selection-popup');
+
+                if (!text) {
+                    if (e.target && e.target.id !== 'ai-selection-popup') {
+                        popup.style.display = 'none';
+                    }
+                    return;
+                }
+
+                const anchorNode = selection.anchorNode;
+                if (!anchorNode) return;
+
+                const context = getPageContext(anchorNode);
+                if (!context) {
+                    popup.style.display = 'none';
+                    return;
+                }
+
+                currentSelection = text;
+                currentContext = context;
+
+                const isMobile = window.innerWidth <= 900;
+                
+                if (isMobile) {
+                    // Position fixed at the bottom on mobile to avoid native Android contextual menu overlap
+                    popup.style.display = 'flex';
+                    popup.style.position = 'fixed';
+                    popup.style.bottom = '24px';
+                    popup.style.left = '50%';
+                    popup.style.transform = 'translateX(-50%)';
+                    popup.style.top = 'auto';
+                    popup.style.width = 'calc(100% - 40px)';
+                    popup.style.maxWidth = '340px';
+                    popup.style.justifyContent = 'center';
+                    popup.style.boxShadow = '0 8px 24px rgba(0,0,0,0.3)';
+                } else {
+                    // Position relative to selection on desktop
+                    const range = selection.getRangeAt(0);
+                    const rect = range.getBoundingClientRect();
+
+                    popup.style.display = 'flex';
+                    popup.style.position = 'fixed';
+                    popup.style.bottom = 'auto';
+                    popup.style.transform = 'none';
+                    popup.style.width = 'auto';
+                    popup.style.maxWidth = 'none';
+                    popup.style.left = Math.max(10, Math.min(window.innerWidth - popup.offsetWidth - 10, rect.left + (rect.width / 2) - 50)) + "px";
+                    popup.style.top = (rect.top - 45) + "px";
+                    popup.style.justifyContent = 'flex-start';
+                    popup.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+                }
+            }, 10);
+        }
+
+        function openChatWithSelection() {
+            document.getElementById('ai-selection-popup').style.display = 'none';
+            
+            // Populate context card
+            const contextTextNode = document.getElementById('chat-context-text');
+            const colLabel = currentContext.selectedColType === 'original' ? 'Αρχαία' : 'Μετάφραση';
+            contextTextNode.textContent = '"' + currentSelection + '" (' + colLabel + ' • Σελίδα ' + currentContext.pageNum + ')';
+            
+            // Clear prior conversation when selecting new text
+            clearChat();
+
+            // Open sidebar
+            document.body.classList.add('chat-sidebar-open');
+            setTimeout(() => {
+                document.getElementById('chat-input').focus();
+                adjustSidebarHeightForKeyboard();
+            }, 100);
+        }
+
+        function clearChat() {
+            chatHistory = [];
+            const msgsContainer = document.getElementById('chat-messages');
+            
+            // Keep the context card, wipe standard bubble divs
+            const contextCard = document.getElementById('chat-context-card');
+            msgsContainer.innerHTML = '';
+            msgsContainer.appendChild(contextCard);
+        }
+
+        function handleChatKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendChatMessage();
+            }
+        }
+
+        function appendMessage(sender, text, isError = false, historyIndex = null) {
+            const msgsContainer = document.getElementById('chat-messages');
+            const msgDiv = document.createElement('div');
+            
+            if (isError) {
+                msgDiv.className = 'chat-message system-error';
+            } else {
+                msgDiv.className = 'chat-message ' + sender;
+            }
+
+            // If it is a user message and linked to history, attach interactive attributes
+            if (sender === 'user' && historyIndex !== null) {
+                msgDiv.setAttribute('data-history-index', historyIndex);
+                msgDiv.setAttribute('title', 'Κλικ για εκ νέου εκτέλεση από αυτό το σημείο');
+                msgDiv.addEventListener('click', () => handleHistoryClick(historyIndex));
+            }
+            
+            msgDiv.innerHTML = formatMarkdown(text);
+            msgsContainer.appendChild(msgDiv);
+            msgsContainer.scrollTop = msgsContainer.scrollHeight;
+        }
+
+        // Truncate history and re-run on user dialog click
+        async function handleHistoryClick(historyIndex) {
+            // Prevent duplicate triggers if query is running
+            const inputEl = document.getElementById('chat-input');
+            if (inputEl.disabled) return;
+
+            // Slice history array up to and including the selected user query
+            chatHistory = chatHistory.slice(0, historyIndex + 1);
+
+            // Redraw UI container to match truncated array
+            rebuildChatUI();
+
+            // Re-fire query
+            await runQuery();
+        }
+
+        // Clean redraw of current stack
+        function rebuildChatUI() {
+            const msgsContainer = document.getElementById('chat-messages');
+            const contextCard = document.getElementById('chat-context-card');
+            
+            msgsContainer.innerHTML = '';
+            msgsContainer.appendChild(contextCard);
+            
+            chatHistory.forEach((msg, idx) => {
+                if (msg.role === 'user') {
+                    let displayContent = msg.content;
+                    // Extract original question portion from first structured input turn for a clean UI
+                    if (idx === 0 && msg.content.includes("Ερώτηση:\n")) {
+                        displayContent = msg.content.split("Ερώτηση:\n").slice(1).join("Ερώτηση:\n");
+                    }
+                    appendMessage('user', displayContent, false, idx);
+                } else if (msg.role === 'assistant') {
+                    appendMessage('assistant', msg.content);
+                }
+            });
+        }
+
+        // Native Markdown parser leveraging standard Marked.js library
+        function formatMarkdown(text) {
+            if (!text) return "";
+            try {
+                // Parse standard markdown strings to structural HTML
+                return marked.parse(text);
+            } catch (err) {
+                // Fallback to basic text escaping on parse failure
+                return text
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/\n/g, "<br>");
+            }
+        }
+
+        // Modular core query runner
+        async function runQuery() {
+            const inputEl = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('chat-send-btn');
+            
+            // Disable inputs during network transaction
+            inputEl.disabled = true;
+            sendBtn.disabled = true;
+            
+            // Append loading container
+            appendMessage('assistant', 'Thinking...');
+            const lastMsgDiv = document.getElementById('chat-messages').lastChild;
+
+            // Load credentials
+            const provider = localStorage.getItem('ai-prov') || 'openai';
+            const apiKey = localStorage.getItem('ai-key') || '';
+            const savedMod = localStorage.getItem('ai-mod') || '';
+            const customUrl = localStorage.getItem('ai-url') || '';
+
+            if (!apiKey && provider !== 'custom') {
+                lastMsgDiv.className = 'chat-message system-error';
+                lastMsgDiv.innerText = '⚠️ Παρακαλούμε ρυθμίστε το API Key στις ρυθμίσεις AI Config πρώτα.';
+                openAiSettings();
+                inputEl.disabled = false;
+                sendBtn.disabled = false;
+                return;
+            }
+
+            // Build the System Prompt Context dynamically on EVERY call
+            const isOriginal = currentContext.selectedColType === 'original';
+            const contextText = isOriginal ? currentContext.originalText : currentContext.translationText;
+            const contextLabel = isOriginal ? "Αρχαίο Κείμενο" : "Σύγχρονη Μετάφραση";
+			const pageTitle = document.title;
+
+            let systemInstruction = "Είσαι διακεκριμένος φιλόσοφος και γνώστης της φιλοσοφίας του Αριστοτέλη και Πλάτωνα και άλλων αρχαίων ελλήνων συγγραφέων.\n" +
+                "Ο χρήστης διαβάζει το βιβλίου του " + pageTitle + " και βάσει αυτού θα σου κάνει μερικές ερωτήσεις, περιλαμβάνοντας κάποιες φορές αποσπάσματα απο το βιβλίο αυτό πάνω στα οποία σχετίζονται οι ερωτήσεις. Ακολουθεί το ευρύτειο πλαίσιο της σελίδας/κεφαλαίου (Σελίδα " + currentContext.pageNum + ", " + currentContext.dividerText + ") για αναφορά:\n" +
+                "--- " + contextLabel + ":\n" + contextText + "\n\n" +
+                "Απάντησε στις ερωτήσεις του χρήστη σε σχέση με το πλαίσιο του κειμένου που παρέχεται. " +
+                "Δώσε τις απαντήσεις σου στα νέα ελληνικά χρησιμοποιώντας markdown μορφοποίηση.";
+
+            // Construct Payload Messages (Always prepending system prompt at index 0)
+            let payloadMessages = [{ role: "system", content: systemInstruction }];
+            payloadMessages = payloadMessages.concat(chatHistory);
+
+            try {
+                const answer = await requestAPI(provider, apiKey, savedMod, payloadMessages, customUrl);
+                lastMsgDiv.innerHTML = formatMarkdown(answer);
+                chatHistory.push({ role: "assistant", content: answer });
+            } catch (error) {
+                lastMsgDiv.className = 'chat-message system-error';
+                lastMsgDiv.innerText = "Error: " + error.message;
+                // If API failed, keep the user question on screen so they can click to retry it,
+                // do not silently clear the UI anymore.
+            } finally {
+                inputEl.disabled = false;
+                sendBtn.disabled = false;
+                document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+                inputEl.focus();
+                adjustSidebarHeightForKeyboard();
+            }
+        }
+
+        async function sendChatMessage() {
+            const inputEl = document.getElementById('chat-input');
+            const prompt = inputEl.value.trim();
+            if (!prompt) return;
+
+            // If the last message in history is a 'user' query (due to a previous failed turn),
+            // pop it before sending so that our conversational stack maintains alternating roles.
+            if (chatHistory.length > 0 && chatHistory[chatHistory.length - 1].role === 'user') {
+                chatHistory.pop();
+            }
+
+            // 1. Manage Chat History & Highlight Context
+            let histIdx;
+            if (chatHistory.length === 0) {
+                // Incorporate highlighted text directly into the first user turn, NOT the system prompt
+                const firstUserContent = "Επισημασμένο κείμενο:\n\"" + currentSelection + "\"\n\nΕρώτηση:\n" + prompt;
+                chatHistory.push({ role: "user", content: firstUserContent });
+                histIdx = 0;
+            } else {
+                // Subsequent turns: push the raw user follow-up prompt
+                chatHistory.push({ role: "user", content: prompt });
+                histIdx = chatHistory.length - 1;
+            }
+
+            // 2. Display user message in UI with history index
+            appendMessage('user', prompt, false, histIdx);
+            inputEl.value = '';
+
+            // 3. Trigger query execution
+            await runQuery();
+        }
+
+        async function requestAPI(provider, apiKey, model, messages, customUrl) {
+            let url = "";
+            let headers = { "Content-Type": "application/json" };
+            let body = {};
+
+            // Normalize models to defaults if unspecified
+            let activeModel = model;
+            if (!activeModel) {
+                if (provider === 'openai') activeModel = 'gpt-4o-mini';
+                else if (provider === 'anthropic') activeModel = 'claude-3-5-sonnet-20241022';
+                else if (provider === 'gemini') activeModel = 'gemini-flash-latest';
+                else if (provider === 'openrouter') activeModel = 'meta-llama/llama-3-8b-instruct:free';
+                else activeModel = 'local-model';
+            }
+
+            if (provider === 'openai') {
+                url = "https://api.openai.com/v1/chat/completions";
+                headers["Authorization"] = "Bearer " + apiKey;
+                body = { model: activeModel, messages: messages };
+            } else if (provider === 'openrouter') {
+                url = "https://openrouter.ai/api/v1/chat/completions";
+                headers["Authorization"] = "Bearer " + apiKey;
+                headers["HTTP-Referer"] = window.location.href;
+                headers["X-Title"] = "Ancient Greek Bilingual Reader";
+                body = { model: activeModel, messages: messages };
+            } else if (provider === 'gemini') {
+                url = "https://generativelanguage.googleapis.com/v1beta/models/" + activeModel + ":generateContent?key=" + apiKey;
+                
+                // Restructure typical OpenAI formats to Gemini's native API structure
+                const systemItem = messages.find(m => m.role === 'system');
+                const userItems = messages.filter(m => m.role !== 'system');
+                
+                const contents = userItems.map(m => ({
+                    role: m.role === 'assistant' ? 'model' : 'user',
+                    parts: [{ text: m.content }]
+                }));
+
+                body = { contents: contents };
+                if (systemItem) {
+                    body.systemInstruction = { parts: [{ text: systemItem.content }] };
+                }
+            } else if (provider === 'anthropic') {
+                url = "https://api.anthropic.com/v1/messages";
+                headers["x-api-key"] = apiKey;
+                headers["anthropic-version"] = "2023-06-01";
+                headers["dangerously-allow-browser"] = "true";
+
+                const systemItem = messages.find(m => m.role === 'system');
+                const userItems = messages.filter(m => m.role !== 'system');
+
+                body = {
+                    model: activeModel,
+                    messages: userItems.map(m => ({ role: m.role, content: m.content })),
+                    max_tokens: 1500
+                };
+                if (systemItem) {
+                    body.system = systemItem.content;
+                }
+            } else if (provider === 'custom') {
+                url = customUrl || "http://localhost:11434/v1/chat/completions";
+                if (apiKey) {
+                    headers["Authorization"] = "Bearer " + apiKey;
+                }
+                body = { model: activeModel, messages: messages };
+            }
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(body)
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error("API Error (" + response.status + "): " + (errText || response.statusText));
+            }
+
+            const responseData = await response.json();
+
+            // Extract content responses safely depending on the selected engine
+            if (provider === 'gemini') {
+                return responseData.candidates[0].content.parts[0].text;
+            } else if (provider === 'anthropic') {
+                return responseData.content[0].text;
+            } else {
+                // OpenAI / OpenRouter / Ollama
+                return responseData.choices[0].message.content;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('ebook-theme');
+            if (savedTheme) {
+                const targetBtn = document.getElementById('theme-' + savedTheme);
+                if (targetBtn) setTheme(savedTheme, targetBtn);
+            }
+
+            const hideOriginal = localStorage.getItem('ebook-hide-original');
+            if (hideOriginal === 'true') {
+                document.body.classList.add('hide-original');
+                document.getElementById('toggle-layout-btn').innerText = 'Show Original';
+            }
+            
+            if (window.innerWidth > 900) {
+                const sidebarClosed = localStorage.getItem('ebook-sidebar-closed');
+                if (sidebarClosed === 'true') {
+                    document.body.classList.add('sidebar-closed');
+                }
+            }
+
+            // Restore saved chat width on desktop
+            const chatSidebar = document.getElementById('chat-sidebar');
+            const savedChatWidth = localStorage.getItem('ebook-chat-width');
+            if (savedChatWidth && window.innerWidth > 900) {
+                chatSidebar.style.width = savedChatWidth;
+            }
+
+            // Setup Resizing for AI Chat Sidebar
+            const resizeHandle = document.getElementById('chat-resize-handle');
+            let isResizing = false;
+
+            resizeHandle.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                chatSidebar.classList.add('resizing');
+                document.body.style.userSelect = 'none';
+                document.body.style.cursor = 'ew-resize';
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isResizing) return;
+                const newWidth = window.innerWidth - e.clientX;
+                // Limit range between 280px and 85% of total screen width
+                if (newWidth > 280 && newWidth < window.innerWidth * 0.85) {
+                    chatSidebar.style.width = newWidth + 'px';
+                    localStorage.setItem('ebook-chat-width', newWidth + 'px');
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (isResizing) {
+                    isResizing = false;
+                    chatSidebar.classList.remove('resizing');
+                    document.body.style.userSelect = '';
+                    document.body.style.cursor = '';
+                }
+            });
+            
+            // Listen for selection events on layout columns (supports mouse and touch handles)
+            document.addEventListener('mouseup', handleTextSelection);
+            document.addEventListener('keyup', handleTextSelection);
+            document.addEventListener('selectionchange', handleTextSelection);
+
+            // Bind selection popup using both mousedown and touchstart with preventDefault.
+            // This guarantees instant tap execution on touch devices before selection focus is lost.
+            const popup = document.getElementById('ai-selection-popup');
+            const handleTriggerTap = (e) => {
+                e.preventDefault();
+                openChatWithSelection();
+            };
+            popup.addEventListener('mousedown', handleTriggerTap);
+            popup.addEventListener('touchstart', handleTriggerTap);
+
+            // Hide the popup trigger during scroll shifts (desktop only to prevent mobile touch glitches)
+            window.addEventListener('scroll', () => {
+                if (window.innerWidth > 900) {
+                    document.getElementById('ai-selection-popup').style.display = 'none';
+                }
+            }, { passive: true });
+
+            // VisualViewport resizing adjustments (Handles Android virtual keyboard overlap natively)
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', adjustSidebarHeightForKeyboard);
+                window.visualViewport.addEventListener('scroll', adjustSidebarHeightForKeyboard);
+            }
+
+            const chatInput = document.getElementById('chat-input');
+            if (chatInput) {
+                chatInput.addEventListener('focus', () => {
+                    setTimeout(adjustSidebarHeightForKeyboard, 150);
+                });
+                chatInput.addEventListener('blur', () => {
+                    setTimeout(adjustSidebarHeightForKeyboard, 150);
+                });
+            }
+            
+            let lastScrollTop = 0;
+            const header = document.querySelector('header');
+            const optBtn = document.querySelector('.options-toggle');
+            
+            window.addEventListener('scroll', () => {
+                let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                
+                if (scrollTop < 0) scrollTop = 0;
+                
+                if (scrollTop > 10) {
+                    document.body.classList.add('scrolled');
+                } else {
+                    document.body.classList.remove('scrolled');
+                }
+                
+                if (scrollTop > lastScrollTop && scrollTop > 120) {
+                    header.classList.add('header-hidden');
+                    header.classList.remove('options-open');
+                    document.body.classList.remove('mobile-options-open');
+                    optBtn.classList.remove('active');
+                } else {
+                    header.classList.remove('header-hidden');
+                }
+                
+                lastScrollTop = scrollTop;
+            }, { passive: true });
+            
+            const observerOptions = {
+                root: null,
+                rootMargin: "-100px 0px -60% 0px", 
+                threshold: 0
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const hash = entry.target.getAttribute('data-hash');
+                        if (hash && window.location.hash !== '#' + hash) {
+                            history.replaceState(null, null, '#' + hash);
+                        }
+                    }
+                });
+            }, observerOptions);
+            
+            document.querySelectorAll('.page-divider').forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>

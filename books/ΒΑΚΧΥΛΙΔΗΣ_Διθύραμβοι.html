@@ -1,0 +1,2166 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ΒΑΚΧΥΛΙΔΗΣ Διθύραμβοι</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Marked.js Markdown rendering library -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #faf8f5;
+            --text-color: #2c2520;
+            --accent-color: #8b263e;
+            --sidebar-bg: #f3efe9;
+            --border-color: #e3ded5;
+            --muted-text: #706357;
+            --font-serif: "Cardo", "Georgia", "Palatino", serif;
+        }
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --accent-color: #ff8a80;
+            --sidebar-bg: #2d2d2d;
+            --border-color: #404040;
+            --muted-text: #999999;
+        }
+        [data-theme="sepia"] {
+            --bg-color: #f4ecd8;
+            --text-color: #5b4636;
+            --accent-color: #a04000;
+            --sidebar-bg: #ebdcb9;
+            --border-color: #d7c59d;
+            --muted-text: #7c6857;
+        }
+        
+        body {
+            margin: 0;
+            font-family: var(--font-serif);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            transition: background-color 0.2s, color 0.2s;
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        #mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 90;
+        }
+        #mobile-overlay.open {
+            display: block;
+        }
+        
+        #expand-bar {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 24px;
+            height: 100vh;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            cursor: pointer;
+            z-index: 95;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+        #expand-bar:hover {
+            background-color: var(--border-color);
+        }
+        #expand-bar::after {
+            content: "›";
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        
+        #sidebar {
+            width: 340px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            height: 100vh;
+            position: fixed;
+            top: 0; left: 0;
+            overflow-y: auto;
+            padding: 24px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transform: translateX(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+        #sidebar h2 {
+            font-size: 1.25rem;
+            margin: 0;
+            color: var(--text-color);
+        }
+        .sidebar-close-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--accent-color);
+            font-size: 1.4rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            line-height: 1;
+        }
+        .sidebar-close-btn:hover {
+            background-color: var(--border-color);
+        }
+        
+        .toc-list-container { overflow-y: auto; flex-grow: 1; }
+        
+        details.book-group {
+            margin-bottom: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            background-color: var(--sidebar-bg);
+        }
+        details.book-group[open] { border-color: var(--accent-color); }
+        details.book-group summary {
+            font-weight: bold; font-size: 1.05rem; cursor: pointer; padding: 10px 14px;
+            background-color: var(--sidebar-bg); list-style: none; display: flex;
+            justify-content: space-between; align-items: center; user-select: none;
+        }
+        details.book-group summary::-webkit-details-marker { display: none; }
+        details.book-group summary::after { content: "▾"; font-size: 0.9rem; color: var(--accent-color); }
+        details.book-group[open] summary::after { transform: rotate(180deg); }
+        
+        .toc-sublist-container {
+            background-color: var(--bg-color);
+            border-top: 1px solid var(--border-color);
+        }
+        .toc-group-title {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            padding: 8px 14px 4px 14px;
+            line-height: 1.3;
+        }
+        .toc-sublist { list-style: none; padding: 4px 14px 8px 14px; margin: 0; }
+        .toc-sublist li { margin-bottom: 8px; font-size: 0.88rem; }
+        
+        .toc-sublist a { 
+            color: var(--text-color); 
+            text-decoration: none; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding: 4px; 
+        }
+        .toc-sublist a:hover { color: var(--accent-color); }
+        .toc-page {
+            color: var(--muted-text);
+            font-size: 0.8rem;
+            font-family: var(--font-serif);
+        }
+        
+        #main {
+            margin-left: 340px;
+            flex-grow: 1;
+            padding: 180px 40px 40px 40px;
+            box-sizing: border-box;
+            width: calc(100% - 340px);
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        padding-top 0.3s ease;
+        }
+        
+        header {
+            position: fixed;
+            top: 0;
+            left: 340px;
+            right: 0;
+            background-color: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px 40px;
+            z-index: 50;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transform: translateY(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        left 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        background-color 0.2s, 
+                        box-shadow 0.2s;
+        }
+        header.header-hidden {
+            transform: translateY(-100%);
+            box-shadow: none !important;
+        }
+        body.scrolled header {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        [data-theme="dark"] body.scrolled header {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .header-top { display: flex; align-items: center; gap: 20px; }
+        header h1 { margin: 0; font-size: 1.8rem; color: var(--accent-color); line-height: 1.2; }
+        
+        .controls-group {
+            display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+        }
+        .btn {
+            background-color: var(--sidebar-bg); color: var(--text-color);
+            border: 1px solid var(--border-color); padding: 8px 14px;
+            font-family: inherit; cursor: pointer; border-radius: 6px;
+            font-size: 0.9rem; font-weight: bold; transition: all 0.2s; white-space: nowrap;
+        }
+        .btn:hover { background-color: var(--border-color); }
+        .btn.active { background-color: var(--accent-color); color: white; border-color: var(--accent-color); }
+        .btn-layout { background-color: var(--bg-color); border: 2px solid var(--accent-color); color: var(--accent-color); }
+        
+        .menu-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+            white-space: nowrap;
+        }
+        .menu-toggle:hover {
+            background-color: var(--text-color);
+        }
+        
+        .options-toggle {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 6px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            width: 38px;
+            height: 38px;
+            transition: all 0.2s;
+        }
+        .options-toggle:hover {
+            background-color: var(--sidebar-bg);
+        }
+
+        #book-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            column-gap: 48px;
+            row-gap: 0;
+            margin: 0 auto;
+            max-width: 140ch;
+            width: 100%;
+        }
+        
+        body.sidebar-closed #expand-bar {
+            display: flex;
+        }
+        body.sidebar-closed #sidebar {
+            transform: translateX(-340px);
+        }
+        body.sidebar-closed #main {
+            margin-left: 24px;
+            width: calc(100% - 24px);
+        }
+        body.sidebar-closed header {
+            left: 24px;
+        }
+        
+        body.hide-original #book-content { 
+            grid-template-columns: 1fr; 
+            max-width: 140ch;
+        }
+        body.hide-original .original-col { display: none; }
+        body.hide-original .bilingual-header { grid-template-columns: 1fr; }
+        body.hide-original .original-title { display: none; }
+        body.hide-original .translation-col {
+            max-width: 100% !important;
+            justify-self: stretch !important;
+        }
+
+        .bilingual-header {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px; position: sticky; top: 0;
+            background-color: var(--bg-color); padding: 16px 0;
+            border-bottom: 2px solid var(--accent-color); z-index: 10;
+            font-weight: bold; text-transform: uppercase; font-size: 0.85rem;
+            letter-spacing: 0.05em; color: var(--muted-text);
+        }
+        
+        .chapter-anchor {
+            display: block;
+            scroll-margin-top: 180px;
+        }
+        
+        .page-divider {
+            grid-column: 1 / -1;
+            border-bottom: 1px solid var(--border-color);
+            padding-top: 48px; padding-bottom: 12px; margin-bottom: 24px;
+            font-size: 0.95rem; color: var(--accent-color); text-transform: uppercase;
+            letter-spacing: 0.05em; font-weight: bold; 
+            scroll-margin-top: 180px;
+        }
+        
+        .page-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--accent-color);
+            transition: color 0.2s, border-bottom-color 0.2s;
+        }
+        .page-link:hover {
+            color: var(--text-color);
+            border-bottom-color: var(--text-color);
+        }
+        
+        .column { 
+            box-sizing: border-box; 
+            padding-bottom: 24px; 
+            display: flex; 
+            flex-direction: column; 
+            max-width: 65ch;
+            width: fit-content;
+            min-width: 0;
+        }
+        
+        .original-col {
+            justify-self: end;
+        }
+        .translation-col {
+            justify-self: start;
+        }
+        
+        .passage { 
+            margin: 0 0 1.2em 0; 
+            font-size: 1.15rem; 
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 1.5rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .passage-text {
+            flex: 1;
+            min-width: 0;
+            text-align: justify;
+        }
+        .passage.indent .passage-text { text-indent: 2em; }
+        .marker { color: var(--accent-color); font-weight: bold; margin-right: 4px; }
+        .line-number { 
+            color: var(--muted-text); 
+            font-size: 0.85em; 
+            font-weight: normal; 
+            user-select: none;
+            margin-left: auto;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+        i { font-style: italic; }
+
+        /* Floating popover trigger styling */
+        #ai-selection-popup {
+            position: fixed;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 14px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1005;
+            display: none;
+            font-family: var(--font-serif);
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.1s ease;
+        }
+        #ai-selection-popup:hover {
+            transform: scale(1.05);
+        }
+
+        /* Resizable sliding Right Chat Sidebar */
+        #chat-sidebar {
+            width: 380px;
+            min-width: 280px;
+            max-width: 85vw;
+            background-color: var(--sidebar-bg);
+            border-left: 1px solid var(--border-color);
+            height: 100vh;
+            height: 100dvh;
+            position: fixed;
+            top: 0; right: 0;
+            transform: translateX(100%);
+            overflow: visible;
+            display: flex;
+            flex-direction: column;
+            z-index: 110;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-sizing: border-box;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.05);
+        }
+        body.chat-sidebar-open #chat-sidebar {
+            transform: translateX(0);
+        }
+        
+        /* Draggable Resize Handle */
+        #chat-resize-handle {
+            width: 8px;
+            height: 100%;
+            position: absolute;
+            left: -4px;
+            top: 0;
+            cursor: ew-resize;
+            z-index: 120;
+            background-color: transparent;
+            transition: background-color 0.2s;
+        }
+        #chat-resize-handle:hover,
+        #chat-sidebar.resizing #chat-resize-handle {
+            background-color: var(--accent-color);
+            opacity: 0.5;
+        }
+        
+        .chat-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-header h3 { margin: 0; font-size: 1.1rem; color: var(--accent-color); }
+        
+        .chat-header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .chat-context-card {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+        .chat-context-card h4 { margin: 0 0 6px 0; color: var(--accent-color); }
+        .chat-context-card p { 
+            margin: 0; 
+            font-style: italic; 
+            display: -webkit-box; 
+            -webkit-line-clamp: 3; 
+            -webkit-box-orient: vertical; 
+            overflow: hidden; 
+            line-height: 1.4;
+        }
+        
+        .chat-message {
+            max-width: 85%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        
+        /* Render styles for AI Markdown elements in chat boxes */
+        .chat-message p { margin: 0 0 8px 0; line-height: 1.5; }
+        .chat-message p:last-child { margin-bottom: 0; }
+        .chat-message strong { font-weight: bold; }
+        .chat-message em { font-style: italic; }
+        .chat-message ul, .chat-message ol { margin: 4px 0 8px 16px; padding: 0; }
+        .chat-message li { margin-bottom: 4px; font-size: 0.92rem; }
+        .chat-message h1, .chat-message h2, .chat-message h3, .chat-message h4, .chat-message h5 {
+            color: var(--accent-color);
+            margin: 12px 0 6px 0;
+            line-height: 1.3;
+        }
+        .chat-message h3 { font-size: 1.15rem; }
+        .chat-message h4 { font-size: 1.05rem; }
+        .chat-message h5 { font-size: 0.95rem; }
+        .chat-message blockquote {
+            border-left: 3px solid var(--accent-color);
+            margin: 8px 0;
+            padding-left: 10px;
+            color: var(--muted-text);
+            font-style: italic;
+        }
+        .chat-message pre {
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.85rem;
+            margin: 8px 0;
+        }
+        .chat-message code {
+            font-family: monospace;
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: var(--accent-color);
+        }
+        
+        .chat-message.user {
+            background-color: var(--accent-color);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .chat-message.user:hover {
+            filter: brightness(1.15);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        /* Override light-colored syntax highlights in dark bubbles */
+        .chat-message.user code {
+            color: #ff8a80;
+            background-color: rgba(0,0,0,0.2);
+            border-color: rgba(0,0,0,0.1);
+        }
+        .chat-message.user pre {
+            background-color: rgba(0,0,0,0.2);
+            border-color: rgba(0,0,0,0.1);
+            color: white;
+        }
+        
+        .chat-message.assistant {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .chat-message.system-error {
+            background-color: #fce8e6;
+            color: #c5221f;
+            border: 1px solid #fad2cf;
+            align-self: center;
+            max-width: 95%;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+        
+        [data-theme="dark"] .chat-message.system-error {
+            background-color: #371d1d;
+            color: #f28b82;
+            border-color: #5c2424;
+        }
+
+        .chat-input-area {
+            padding: 16px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 8px;
+            background-color: var(--sidebar-bg);
+            flex-shrink: 0;
+        }
+        .chat-input-area textarea {
+            flex-grow: 1;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 10px;
+            border-radius: 6px;
+            resize: none;
+            height: 42px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+        }
+        .chat-input-area button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .chat-input-area button:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* Modal Config Dialog */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-content {
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            padding: 24px;
+            box-sizing: border-box;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 12px;
+        }
+        .modal-header h3 { margin: 0; font-size: 1.25rem; color: var(--accent-color); }
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group label {
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        .form-control {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 14px;
+        }
+
+        @media (max-width: 900px) {
+            #sidebar { transform: translateX(-100%); width: 320px; }
+            body.sidebar-open #sidebar { transform: translateX(0); }
+            body.sidebar-closed #sidebar { transform: translateX(-100%); }
+            
+            #chat-sidebar {
+                width: 100% !important;
+                right: 0;
+                transform: translateX(100%);
+                height: 100vh;
+                height: 100dvh;
+            }
+            body.chat-sidebar-open #chat-sidebar {
+                transform: translateX(0);
+            }
+            #chat-resize-handle {
+                display: none;
+            }
+            
+            #main { 
+                margin-left: 0 !important; 
+                width: 100% !important; 
+                padding: 100px 20px 20px 20px !important;
+            }
+            body.mobile-options-open #main {
+                padding-top: 150px !important;
+            }
+            
+            header {
+                padding-bottom: 12px;
+                margin-bottom: 16px;
+                gap: 8px;
+            }
+            header h1 { 
+                font-size: 0.95rem !important;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                text-align: center;
+                flex-grow: 1;
+                margin: 0;
+            }
+            
+            header {
+                left: 0 !important;
+                padding: 12px 16px;
+            }
+            
+            .header-top { 
+                display: flex;
+                flex-direction: row !important;
+                align-items: center; 
+                justify-content: space-between; 
+                width: 100%;
+                gap: 12px; 
+            }
+            
+            .menu-toggle { 
+                width: auto !important; 
+                padding: 6px 12px;
+                font-size: 0.85rem;
+            }
+            
+            .options-toggle {
+                display: inline-flex;
+            }
+            
+            .controls-group {
+                display: none;
+                width: 100%;
+                justify-content: center;
+                padding-top: 12px;
+                border-top: 1px dashed var(--border-color);
+            }
+            header.options-open .controls-group {
+                display: flex;
+            }
+            
+            #book-content { grid-template-columns: 1fr; column-gap: 0; max-width: 100%; }
+            .column { max-width: 100% !important; width: 100% !important; }
+            .bilingual-header { display: none; }
+            .page-divider { padding-top: 32px; scroll-margin-top: 110px; }
+            .chapter-anchor { scroll-margin-top: 110px; }
+            .passage { font-size: 1.05rem; }
+        }
+        
+        @media (min-width: 901px) {
+            .menu-toggle {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="mobile-overlay" onclick="toggleSidebar()"></div>
+
+    <div id="expand-bar" onclick="toggleSidebar()" title="Ανάπτυξη Περιεχομένων"></div>
+
+    <aside id="sidebar">
+        <div class="sidebar-header">
+            <h2>Πίνακας Περιεχομένων</h2>
+            <button class="sidebar-close-btn" onclick="toggleSidebar()" title="Σύμπτυξη">‹</button>
+        </div>
+        <div class="toc-list-container">
+            <details class="book-group">
+    <summary>Διθύραμβος II - [Ἡρακλῆς ἢ Δηϊάνειρα εἰς Δελφούς]</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-1-chapter-1" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1</span> <span class="toc-page">#1</span></a></li>
+        </ul>
+    </div>
+</details>
+<details class="book-group">
+    <summary>Διθύραμβος III - Ἠίθεοι ἢ Θησεὺς ‹Κηΐοις εἰς Δῆλον›</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-2-chapter-1" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1</span> <span class="toc-page">#2</span></a></li>
+            <li><a href="#book-2-chapter-1-2" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.2</span> <span class="toc-page">#3</span></a></li>
+        </ul>
+    </div>
+</details>
+<details class="book-group">
+    <summary>Διθύραμβος IV - Θησεὺς ‹Ἀθηναίοις›</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-3-chapter-1" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1</span> <span class="toc-page">#4</span></a></li>
+            <li><a href="#book-3-chapter-1-2" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.2</span> <span class="toc-page">#5</span></a></li>
+        </ul>
+    </div>
+</details>
+        </div>
+    </aside>
+
+    <!-- AI Right Chat Sidebar -->
+    <aside id="chat-sidebar">
+        <div id="chat-resize-handle"></div>
+        <div class="chat-header">
+            <h3>AI Assistant</h3>
+            <div class="chat-header-actions">
+                <button class="btn" style="padding: 4px 8px; font-size: 0.8rem;" onclick="clearChat()">Clear</button>
+                <button class="sidebar-close-btn" style="width: 28px; height: 28px; font-size: 1.1rem;" onclick="toggleChatSidebar()" title="Κλείσιμο">›</button>
+            </div>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <!-- Active Context Card -->
+            <div class="chat-context-card" id="chat-context-card">
+                <h4>Επιλεγμένο Κείμενο</h4>
+                <p id="chat-context-text"></p>
+            </div>
+            <!-- Messages stream here -->
+        </div>
+        <div class="chat-input-area">
+            <textarea id="chat-input" placeholder="Ρωτήστε κάτι για το επιλεγμένο κείμενο..." onkeydown="handleChatKeyDown(event)"></textarea>
+            <button id="chat-send-btn" onclick="sendChatMessage()">Send</button>
+        </div>
+    </aside>
+
+    <!-- Floating Popover Trigger -->
+    <button id="ai-selection-popup"><span style="font-size: 1.1rem;">✨</span> Ask AI</button>
+
+    <!-- Settings Configuration Modal -->
+    <div id="ai-config-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Ρυθμίσεις LLM / AI</h3>
+                <button class="sidebar-close-btn" style="width: 28px; height: 28px; font-size: 1.1rem;" onclick="closeAiSettings()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="ai-provider">Πάροχος (Provider)</label>
+                    <select id="ai-provider" class="form-control" onchange="handleProviderChange()">
+                        <option value="openai">OpenAI (ChatGPT)</option>
+                        <option value="anthropic">Anthropic (Claude)</option>
+                        <option value="gemini">Google Gemini</option>
+                        <option value="openrouter">OpenRouter</option>
+                        <option value="custom">Custom Endpoint (Ollama / Local)</option>
+                    </select>
+                </div>
+                <div class="form-group" id="group-custom-url" style="display: none;">
+                    <label for="ai-custom-url">Base URL</label>
+                    <input type="text" id="ai-custom-url" class="form-control" placeholder="http://localhost:11434/v1/chat/completions">
+                </div>
+                <div class="form-group">
+                    <label for="ai-key">API Key</label>
+                    <input type="password" id="ai-key" class="form-control" placeholder="Εισάγετε το API Key">
+                </div>
+                <div class="form-group">
+                    <label for="ai-model">Μοντέλο (Model Name)</label>
+                    <input type="text" id="ai-model" class="form-control" placeholder="π.χ. gpt-4o-mini">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeAiSettings()">Άκυρο</button>
+                <button class="btn active" onclick="saveAiSettings()">Αποθήκευση</button>
+            </div>
+        </div>
+    </div>
+
+    <main id="main">
+        <header>
+            <div class="header-top">
+                <button class="btn menu-toggle" onclick="toggleSidebar()">☰ Περιεχόμενα</button>
+                <h1>ΒΑΚΧΥΛΙΔΗΣ Διθύραμβοι</h1>
+                <button class="btn options-toggle" onclick="toggleMobileOptions()" title="Ρυθμίσεις">⚙️</button>
+            </div>
+            
+            <div class="controls-group">
+                <button id="toggle-layout-btn" class="btn btn-layout" onclick="toggleLayout()">Hide Original</button>
+                <button class="btn" style="border-color: var(--accent-color);" onclick="openAiSettings()">⚙️ AI Config</button>
+                <button class="btn active theme-btn" id="theme-light" onclick="setTheme('light', this)">Light</button>
+                <button class="btn theme-btn" id="theme-sepia" onclick="setTheme('sepia', this)">Sepia</button>
+                <button class="btn theme-btn" id="theme-dark" onclick="setTheme('dark', this)">Dark</button>
+            </div>
+        </header>
+
+        <section id="book-content">
+            <div class="bilingual-header">
+                <div class="original-title">Αρχαία Ελληνικά (Original)</div>
+                <div class="translation-title">Νέα Ελληνικά (Translation)</div>
+            </div>
+
+            
+        <div id="book-1-chapter-1" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-1" data-hash="book-1-chapter-1">
+            Διθύραμβος II - [Ἡρακλῆς ἢ Δηϊάνειρα εἰς Δελφούς] • Κεφάλαιο 1 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=6&page=1" target="_blank" class="page-link">Page 1</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text"><h4><i>ΔΙΘΥΡΑΜΒΟΣ II</i></h4>[ΗΡΑΚΛΗΣ Ή ΔΗΙΑΝΕΙΡΑ ΕΙΣ ΔΕΛΦΟΥΣ]</span></p>
+<p class="passage"><span class="passage-text">. . .]ιου . ιο . . . ἐπεὶ [στρ.]</span></p>
+<p class="passage"><span class="passage-text">ὁλκ]άδ᾽ ἔπεμψε̣ν ἐμοὶ χρυσέαν</span></p>
+<p class="passage"><span class="passage-text">Πιερ]ίαθεν ἐ[ΰθ]ρονος <span class="marker">[Ο]</span>ὐρανία,</span></p>
+<p class="passage indent"><span class="passage-text">πολυφ]άτων γέμουσαν ὕμνων</span></p>
+<p class="passage"><span class="passage-text">. . . . .]νειτις ἐπ᾽ ἀνθεμόεντι Ἕβρῳ</span><span class="line-number">5</span></p>
+<p class="passage"><span class="passage-text">. . . . . ἀ]γάλλεται ἢ δολιχαύχενι κύ[κνῳ</span></p>
+<p class="passage"><span class="passage-text">. . . . .]δεϊαν φρένα τερπόμενος</span></p>
+<p class="passage indent"><span class="passage-text">. . . . . .]δ᾽ ἵκῃ παιηόνων</span></p>
+<p class="passage"><span class="passage-text">ἄνθεα πεδοιχνεῖν,</span></p>
+<p class="passage"><span class="passage-text">Πύθι᾽ Ἄπολλον,</span><span class="line-number">10</span></p>
+<p class="passage"><span class="passage-text">τόσα χοροὶ Δελφῶν</span></p>
+<p class="passage"><span class="passage-text">σὸν κελάδησαν παρ᾽ ἀγακλέα ναόν,</span></p>
+<p class="passage"><span class="passage-text">πρίν γε κλέομεν λιπεῖν [αντ.]</span></p>
+<p class="passage"><span class="passage-text">Οἰχαλίαν πυρὶ δαπτομέναν</span></p>
+<p class="passage"><span class="passage-text">Ἀμφιτρυωνιάδαν θρασυμηδέα φῶ-</span><span class="line-number">15</span></p>
+<p class="passage indent"><span class="passage-text">θ᾽, ἵκετο δ᾽ ἀμφικύμον᾽ ἀκτάν·</span></p>
+<p class="passage"><span class="passage-text">ἔνθ᾽ ἀπὸ λαΐδος εὐρυνεφεῖ Κηναίῳ</span></p>
+<p class="passage"><span class="passage-text">Ζηνὶ θύεν βαρυαχέας ἐννέα ταύρους</span></p>
+<p class="passage"><span class="passage-text">δύο τ᾽ ὀρσιάλῳ δαμασίχθονι μέ[λ-</span></p>
+<p class="passage indent"><span class="passage-text">λε κόρᾳ τ᾽ ὀβριμοδερκεῖ ἄζυγα</span><span class="line-number">20</span></p>
+<p class="passage"><span class="passage-text">παρθένῳ Ἀθάνᾳ</span></p>
+<p class="passage"><span class="passage-text">ὑψικέραν βοῦν.</span></p>
+<p class="passage"><span class="passage-text">τότ᾽ ἄμαχος δαίμων</span></p>
+<p class="passage"><span class="passage-text">Δαϊανείρᾳ πολύδακρυν ὕφα[νε</span></p>
+<p class="passage"><span class="passage-text">μῆτιν ἐπίφρον᾽ ἐπεὶ [επωδ.]</span><span class="line-number">25</span></p>
+<p class="passage indent"><span class="passage-text">πύθετ᾽ ἀγγελίαν ταλαπενθέα,</span></p>
+<p class="passage"><span class="passage-text">Ἰόλαν ὅτι λευκώλενον</span></p>
+<p class="passage"><span class="passage-text">Διὸς υἱὸς ἀταρβομάχας</span></p>
+<p class="passage indent"><span class="passage-text">ἄλοχον λιπαρὸ<span class="marker">[ν]</span> ποτὶ δόμον πέμ<span class="marker">[π]</span>οι.</span></p>
+<p class="passage"><span class="passage-text">ἆ δύσμορος, ἆ τάλ<span class="marker">[αι]</span>ν᾽, οἷον ἐμήσατ[ο·</span><span class="line-number">30</span></p>
+<p class="passage"><span class="passage-text">φθόνος εὐρυβίας νιν ἀπώλεσεν,</span></p>
+<p class="passage"><span class="passage-text">δνόφεόν τε κάλυμμα τῶν</span></p>
+<p class="passage indent"><span class="passage-text">ὕστερον ἐχομένων,</span></p>
+<p class="passage indent"><span class="passage-text">ὅτ᾽ ἐπὶ ῥοδόεντι Λυκόρμᾳ</span></p>
+<p class="passage"><span class="passage-text">δέξατο Νέσσου πάρα δαιμόνιον τέρ[ας.</span><span class="line-number">35</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text"><h4><i>ΔΙΘΥΡΑΜΒΟΣ II</i></h4>ΗΡΑΚΛΗΣ, ΙΟΛΗ ΚΑΙ ΔΙΗΑΝΕΙΡΑ</span></p>
+<p class="passage"><span class="passage-text">Κι αν η ομορφόθρονη Μούσα Ουρανία [στρ.]</span></p>
+<p class="passage"><span class="passage-text">απ᾽ την Πιερία χρυσό</span></p>
+<p class="passage"><span class="passage-text">ένα πλεούμενο μου ᾽στειλε τώρα</span></p>
+<p class="passage"><span class="passage-text">έξοχους ύμνους γεμάτο,</span></p>
+<p class="passage"><span class="passage-text">όμως για σένανε, Πύθιε Απόλλωνα,</span></p>
+<p class="passage"><span class="passage-text">ύμνο δεν πρέπει να πω, δεν είν᾽ ώρα· γιατί</span></p>
+<p class="passage"><span class="passage-text">ή τη χαρά θα σου δίνει, θεέ, το κυνήγι αγριμιών</span></p>
+<p class="passage"><span class="passage-text">πέρα στα μέρη που ο Έβρος</span></p>
+<p class="passage"><span class="passage-text">ρέει ο πολύανθος ή ίσως του κύκνου,</span></p>
+<p class="passage"><span class="passage-text">του μακρολαίμη του κύκνου, η λαλιά, η όλη γλύκα, σ᾽ ευφραίνει.</span></p>
+<p class="passage"><span class="passage-text">Ώσπου λοιπόν να ξανάρθεις, Απόλλωνα, εδώ</span><span class="line-number">10</span></p>
+<p class="passage"><span class="passage-text">αναζητώντας λουλούδια παιάνων</span></p>
+<p class="passage"><span class="passage-text">— πόσους παιάνες για σε τραγουδούνε [αντ.]</span></p>
+<p class="passage"><span class="passage-text">οι χορωδίες των Δελφών</span></p>
+<p class="passage"><span class="passage-text">στον κοσμοξάκουστο δίπλα ναό σου!—,</span></p>
+<p class="passage"><span class="passage-text">ένα τραγούδι θα πούμε</span></p>
+<p class="passage"><span class="passage-text">για του Αμφιτρύωνα το γιο τον ατρόμητο:</span></p>
+<p class="passage"><span class="passage-text">Την Οιχαλία μες στις φλόγες παράτησε αυτός</span></p>
+<p class="passage"><span class="passage-text">και στ᾽ ακρογιάλι κατέβηκε, ταύρους βαρύηχους εννιά</span></p>
+<p class="passage"><span class="passage-text">για να προσφέρει απ᾽ το κούρσος</span></p>
+<p class="passage"><span class="passage-text">στον πυκνοσύννεφο Δία τον Κηναίο,</span></p>
+<p class="passage"><span class="passage-text">δυο στο θεό που δαμάζει τη γη και το πέλαο ταράζει,</span></p>
+<p class="passage"><span class="passage-text">και στην παρθέν᾽ Αθηνά, που ᾽χει αψιές τις ματιές,</span><span class="line-number">20</span></p>
+<p class="passage"><span class="passage-text">άζευτη ακόμα ορθοκέρα δαμάλα.</span></p>
+<p class="passage"><span class="passage-text">Τότε μια ακαταμάχητη [επωδ.]</span></p>
+<p class="passage"><span class="passage-text">θεότητα ύφανε βουλή,</span></p>
+<p class="passage"><span class="passage-text">βαθιά βουλή, δακρύων πηγή,</span></p>
+<p class="passage"><span class="passage-text">μες της Δηιάνειρας το νου,</span></p>
+<p class="passage"><span class="passage-text">σαν έμαθε το θλιβερό</span></p>
+<p class="passage"><span class="passage-text">μαντάτο πως του Δία ο γιος, ο ατρόμητος στη μάχη,</span></p>
+<p class="passage"><span class="passage-text">την Ιόλη τη χιονόκορφη</span></p>
+<p class="passage"><span class="passage-text">για ταίρι του μες στο λαμπρό θα ᾽στελνε σπίτι. Οϊμένα,</span></p>
+<p class="passage"><span class="passage-text">τέτοια βουλή μέσα στο νου</span></p>
+<p class="passage"><span class="passage-text">της άμοιρης, της δύστυχης!</span><span class="line-number">30</span></p>
+<p class="passage"><span class="passage-text">Ζήλεια βαριά την έφαγε, και το σκουτί</span></p>
+<p class="passage"><span class="passage-text">που τα μελλούμενα έκρυβε μες στο σκοτάδι, απ᾽ τη στιγμή</span></p>
+<p class="passage"><span class="passage-text">που ολέθριο δώρο μαγικό</span></p>
+<p class="passage"><span class="passage-text">από το Νέσσο δέχτηκε</span></p>
+<p class="passage"><span class="passage-text">πλάι στου Λυκόρμα τα νερά, που είναι ζωσμένος ρόδα.</span></p>
+        </div>
+        
+
+        <div id="book-2-chapter-1" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-2" data-hash="book-2-chapter-1">
+            Διθύραμβος III - Ἠίθεοι ἢ Θησεὺς ‹Κηΐοις εἰς Δῆλον› • Κεφάλαιο 1 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=6&page=2" target="_blank" class="page-link">Page 2</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text"><h4><i>ΔΙΘΥΡΑΜΒΟΣ IΙI</i></h4>ΗΙΘΕΟΙ Ή ΘΗΣΕΥΣ‹ΚΗΙΟΙΣ ΕΙΣ ΔΗΛΟΝ›</span></p>
+<p class="passage"><span class="passage-text">Κυανόπρῳρα μὲν ναῦς μενέκτυ[πον [στρ. α]</span></p>
+<p class="passage indent"><span class="passage-text">Θησέα δὶς ἑπτ[ά] τ᾽ ἀγλαοὺς ἄγουσα</span></p>
+<p class="passage indent"><span class="passage-text">κούρους Ἰαόνω[ν</span></p>
+<p class="passage"><span class="passage-text">Κρητικὸν τάμνε πέλαγος·</span></p>
+<p class="passage"><span class="passage-text">τηλαυγέϊ γὰρ [ἐν] φάρεϊ</span><span class="line-number">5</span></p>
+<p class="passage indent"><span class="passage-text">βορήϊαι πίτνο<span class="marker">[ν]</span> αὖραι</span></p>
+<p class="passage indent"><span class="passage-text">κλυτᾶς ἕκατι π<span class="marker">[ε]</span>λεμαίγιδος Ἀθάν[ας·</span></p>
+<p class="passage"><span class="passage-text">κνίσεν τε Μίνωϊ κέαρ</span></p>
+<p class="passage indent"><span class="passage-text">ἱμεράμπυκος θεᾶς</span></p>
+<p class="passage"><span class="passage-text">Κύπριδος [ἁ]γνὰ δῶρα·</span><span class="line-number">10</span></p>
+<p class="passage indent"><span class="passage-text">χεῖρα δ᾽ οὐ[κέτι] παρθενικᾶς</span></p>
+<p class="passage indent"><span class="passage-text">ἄτερθ᾽ ἐράτυεν, θίγεν</span></p>
+<p class="passage indent"><span class="passage-text">δὲ λευκᾶν παρηΐδων·</span></p>
+<p class="passage indent"><span class="passage-text">βόασέ τ᾽ Ἐρίβοια χαλκο-</span></p>
+<p class="passage indent"><span class="passage-text">θώρα[κα Π]ανδίονος</span><span class="line-number">15</span></p>
+<p class="passage"><span class="passage-text">ἔκγ<span class="marker">[ο]</span>νον· ἴδεν δὲ Θησεύς,</span></p>
+<p class="passage indent"><span class="passage-text">μέλαν δ᾽ ὑπ᾽ ὀφρύων</span></p>
+<p class="passage"><span class="passage-text">δίνα<span class="marker">[σ]</span>εν ὄμμα, καρδίαν τέ οἱ</span></p>
+<p class="passage indent"><span class="passage-text">σχέτλιον ἄμυξεν ἄλγος,</span></p>
+<p class="passage"><span class="passage-text">εἶρέν τε· «Διὸς υἱὲ φερτάτου,</span><span class="line-number">20</span></p>
+<p class="passage"><span class="passage-text">ὅσιον οὐκέτι τεᾶν</span></p>
+<p class="passage indent"><span class="passage-text">ἔσω κυβερνᾷς φρενῶν</span></p>
+<p class="passage"><span class="passage-text">θυμ[όν]· ἴσχε μεγάλαυχον ἥρως βίαν.</span></p>
+<p class="passage"><span class="passage-text">ὅ τι μ[ὲ]ν ἐκ θεῶν μοῖρα παγκρατὴς [αντ. α]</span></p>
+<p class="passage indent"><span class="passage-text">ἄμμι κατένευσε καὶ Δίκας ῥέπει τά-</span><span class="line-number">25</span></p>
+<p class="passage indent"><span class="passage-text">λαντον, πεπρωμέν<span class="marker">[α]</span>ν</span></p>
+<p class="passage"><span class="passage-text">αἶσαν [ἐ]κπλήσομεν, ὅτ<span class="marker">[α]</span>ν</span></p>
+<p class="passage"><span class="passage-text">ἔλθῃ· <span class="marker">[σ]</span>ὺ δὲ βαρεῖαν κάτε-</span></p>
+<p class="passage indent"><span class="passage-text">χε μῆτιν. εἰ καί σε κεδνὰ</span></p>
+<p class="passage indent"><span class="passage-text">τέκεν λέχει Διὸς ὑπὸ κρόταφον Ἴδας</span><span class="line-number">30</span></p>
+<p class="passage"><span class="passage-text">μιγεῖσα Φοίνικος ἐρα-</span></p>
+<p class="passage indent"><span class="passage-text">τώνυμος κόρα βροτῶν</span></p>
+<p class="passage"><span class="passage-text">φέρτατον, ἀλλὰ κἀμὲ</span></p>
+<p class="passage indent"><span class="passage-text">Πιτθ[έ]ος θυγάτηρ ἀφνεοῦ</span></p>
+<p class="passage indent"><span class="passage-text">πλαθεῖσα ποντίῳ τέκεν</span><span class="line-number">35</span></p>
+<p class="passage indent"><span class="passage-text">Ποσειδᾶνι, χρύσεόν</span></p>
+<p class="passage indent"><span class="passage-text">τέ οἱ δόσαν ἰόπλοκοι κά-</span></p>
+<p class="passage indent"><span class="passage-text">λυμμα† Νηρηΐδες.</span></p>
+<p class="passage"><span class="passage-text">τῶ σε, πολέμαρχε Κνωσίων,</span></p>
+<p class="passage indent"><span class="passage-text">κέλομαι πολύστονον</span><span class="line-number">40</span></p>
+<p class="passage"><span class="passage-text">ἐρύκεν ὕβριν· οὐ γὰρ ἂν θέλοι-</span></p>
+<p class="passage indent"><span class="passage-text">μ᾽ ἀμβρότοι᾽ ἐραννὸν Ἀο[ῦς</span></p>
+<p class="passage"><span class="passage-text">ἰδεῖν φάος, ἐπεί τιν᾽ ἠϊθέ[ων</span></p>
+<p class="passage"><span class="passage-text">σὺ δαμάσειας ἀέκον-</span></p>
+<p class="passage indent"><span class="passage-text">τα· πρόσθε χειρῶν βίαν</span><span class="line-number">45</span></p>
+<p class="passage"><span class="passage-text">δε[ί]ξομεν· τὰ δ᾽ ἐπιόντα δα[ίμω]ν κρινεῖ.»</span></p>
+<p class="passage"><span class="passage-text">τόσ᾽ εἶπεν ἀρέταιχμος ἥρως· [επωδ. α]</span></p>
+<p class="passage"><span class="passage-text">τ]άφον δὲ ναυβάται</span></p>
+<p class="passage"><span class="passage-text">φ]ωτὸς ὑπεράφανον</span></p>
+<p class="passage"><span class="passage-text">θ]άρσος· Ἁλίου τε γαμβρῷ χόλωσεν ἦτορ,</span><span class="line-number">50</span></p>
+<p class="passage"><span class="passage-text">ὕφαινέ τε ποταινίαν</span></p>
+<p class="passage"><span class="passage-text">μῆτιν, εἶπέν τε· «μεγαλοσθενὲς</span></p>
+<p class="passage"><span class="passage-text">Ζεῦ πάτερ, ἄκουσον· εἴ πέρ με νύμ[φα</span></p>
+<p class="passage"><span class="passage-text">Φοίνισσα λευκώλενος σοὶ τέκεν,</span></p>
+<p class="passage"><span class="passage-text">νῦν πρόπεμπ᾽ ἀπ᾽ οὐρανοῦ θοὰν</span><span class="line-number">55</span></p>
+<p class="passage"><span class="passage-text">πυριέθειραν ἀστραπὰν</span></p>
+<p class="passage"><span class="passage-text">σᾶμ᾽ ἀρίγνωτον· εἰ</span></p>
+<p class="passage indent"><span class="passage-text">δὲ καὶ σὲ Τροιζηνία σεισίχθονι</span></p>
+<p class="passage indent"><span class="passage-text">φύτευσεν Αἴθρα Ποσει-</span></p>
+<p class="passage indent"><span class="passage-text">δᾶνι τόνδε χρύσεον</span><span class="line-number">60</span></p>
+<p class="passage"><span class="passage-text">χειρὸς ἀγλαὸν</span></p>
+<p class="passage indent"><span class="passage-text">ἔνεγκε κόσμον ἐκ βαθείας ἁλός,</span></p>
+<p class="passage"><span class="passage-text">δικὼν θράσει σῶμα πατρὸς ἐς δόμους.</span></p>
+<p class="passage"><span class="passage-text">εἴσεαι δ᾽ αἴκ᾽ ἐμᾶς κλύῃ</span></p>
+<p class="passage indent"><span class="passage-text">Κρόνιος εὐχᾶς</span><span class="line-number">65</span></p>
+<p class="passage"><span class="passage-text">ἀναξιβρέντας ὁ πάντω[ν με]δ[έω]ν.»</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text"><h4><i>ΔΙΘΥΡΑΜΒΟΣ III</i></h4>ΝΕΟΙ ΚΑΙ ΝΕΕΣ Ή Ο ΘΗΣΕΑΣ</span></p>
+<p class="passage"><span class="passage-text">Έσκιζε ένα γαλαζόπλωρο καράβι [στρ. α]</span></p>
+<p class="passage"><span class="passage-text">τα νερά του κρητικού πελάγου· μέσα,</span></p>
+<p class="passage"><span class="passage-text">ήρωας άσκιαχτος σε αγώνες, ο Θησέας,</span></p>
+<p class="passage"><span class="passage-text">και μαζί του αγόρια εφτά και εφτά κοπέλες·</span></p>
+<p class="passage"><span class="passage-text">όλοι απ᾽ τη φυλή των Ιώνων·</span></p>
+<p class="passage"><span class="passage-text">στο πανί, που λαμποκόπαε πέρα, εφύσα</span></p>
+<p class="passage"><span class="passage-text">ο βοριάς, για να χαρεί και η Αθηνά,</span></p>
+<p class="passage"><span class="passage-text">η θεά που του πολέμου ορίζει ασπίδα.</span></p>
+<p class="passage"><span class="passage-text">Μα του Μίνωα την καρδιά μια αψιά κεντιά</span></p>
+<p class="passage"><span class="passage-text">κέντησε, σταλτή απ᾽ την Κύπρη,</span></p>
+<p class="passage"><span class="passage-text">τη θεά με το μαγνάδι των ερώτων·</span><span class="line-number">10</span></p>
+<p class="passage"><span class="passage-text">δε συγκράτησε το χέρι του, σε μια</span></p>
+<p class="passage"><span class="passage-text">τ᾽ άπλωσε από τις κοπέλες</span></p>
+<p class="passage"><span class="passage-text">και της άγγιξε τα ολόασπρα μάγουλά της·</span></p>
+<p class="passage"><span class="passage-text">τότες έμπηξε η Ερίβοια μια φωνή,</span></p>
+<p class="passage"><span class="passage-text">του Πανδίονα για ν᾽ ακούσει ο εγγονός</span></p>
+<p class="passage"><span class="passage-text">ο χαλκοθωρακισμένος· μόλις το ᾽δε</span></p>
+<p class="passage"><span class="passage-text">ο Θησέας, κάτω απ᾽ τα φρύδια σκοτεινές</span></p>
+<p class="passage"><span class="passage-text">άγριες παίξανε οι ματιές του· από τον πόνο</span></p>
+<p class="passage"><span class="passage-text">σπάραξε η καρδιά του και είπε:</span></p>
+<p class="passage"><span class="passage-text">«Γιε του υπέρτατου του Δία, στα στήθια μέσα</span><span class="line-number">20</span></p>
+<p class="passage"><span class="passage-text">την καρδιά σου ευλαβικά δεν κυβερνάς·</span></p>
+<p class="passage"><span class="passage-text">την αγέρωχη συγκράτησε, ήρωα, βία.</span></p>
+<p class="passage"><span class="passage-text">Κείνο που ᾽ναι απ᾽ τους θεούς, αυτό που η Μοίρα, [αντ. α]</span></p>
+<p class="passage"><span class="passage-text">παντοδύναμη, έχει γράψει, και της Δίκης</span></p>
+<p class="passage"><span class="passage-text">όπου γέρνει η ζυγαριά, σα φτάσει η ώρα,</span></p>
+<p class="passage"><span class="passage-text">θα το κάμουμε ώς την άκρη, εσύ όμως πάλι</span></p>
+<p class="passage"><span class="passage-text">τη βαριά βουλή συγκράτα.</span></p>
+<p class="passage"><span class="passage-text">Αν του Φοίνικα η τρισάξια, η παινεμένη</span></p>
+<p class="passage"><span class="passage-text">θυγατέρα σ᾽ έχει κάμει εσένα, αφού</span><span class="line-number">30</span></p>
+<p class="passage"><span class="passage-text">σε ψηλή πλαγιά της Ίδης είχε σμίξει</span></p>
+<p class="passage"><span class="passage-text">με το Δία, κι αν είσαι ασύγκριτος θνητός,</span></p>
+<p class="passage"><span class="passage-text">μα κι εμένα είναι γονιός μου</span></p>
+<p class="passage"><span class="passage-text">του πελάγου ο Ποσειδώνας, κι έχω μάνα</span></p>
+<p class="passage"><span class="passage-text">του Πιτθέα του πλούσιου κόρη, που χρυσό</span></p>
+<p class="passage"><span class="passage-text">οι μενεξεδομαλλούσες</span></p>
+<p class="passage"><span class="passage-text">θυγατέρες του Νηρέα τής δώσαν πέπλο.</span></p>
+<p class="passage"><span class="passage-text">Της Κνωσού πολέμαρχε, άκου με λοιπόν·</span></p>
+<p class="passage"><span class="passage-text">τόσο αυθαίρετος μην είσαι· αυτό μπορεί</span></p>
+<p class="passage"><span class="passage-text">συμφορές πολλές να φέρει· κάλιο το ᾽χω</span><span class="line-number">40</span></p>
+<p class="passage"><span class="passage-text">της αθάνατης Αυγής πια να μη δω</span></p>
+<p class="passage"><span class="passage-text">το γλυκό το φως ποτέ, παρά ν᾽ αφήσω</span></p>
+<p class="passage"><span class="passage-text">ένα νέο απ᾽ τους δικούς μου</span></p>
+<p class="passage"><span class="passage-text">να προσβάλεις άθελά του· πριν, θα δείξω</span></p>
+<p class="passage"><span class="passage-text">των χεριών μου εγώ τη δύναμη· ο θεός</span></p>
+<p class="passage"><span class="passage-text">πια θα κρίνει τί θα γίνει παραπέρα.»</span></p>
+<p class="passage"><span class="passage-text">Είπε ο Θησέας, ο δεινός [επωδ. α]</span></p>
+<p class="passage"><span class="passage-text">κονταρομάχος, κι οι ναύτες ξαφνιάστηκαν</span></p>
+<p class="passage"><span class="passage-text">για το περήφανο που έδειχνε θάρρος.</span></p>
+<p class="passage"><span class="passage-text">Χόλιασε του Ήλιου ο γαμπρός, και μια σκέψη βαθιά και πρωτάκουστη</span><span class="line-number">50</span></p>
+<p class="passage"><span class="passage-text">έβαλε αμέσως στο νου:</span></p>
+<p class="passage"><span class="passage-text">«Μεγαλοδύναμε Δία και πατέρα μας,</span></p>
+<p class="passage"><span class="passage-text">δέηση σου κάνω θερμή·</span></p>
+<p class="passage"><span class="passage-text">αν μ᾽ έχεις γιο σου στ᾽ αλήθεια απ᾽ του Φοίνικα</span></p>
+<p class="passage"><span class="passage-text">την κρουσταλλόκορφη κόρη,</span></p>
+<p class="passage"><span class="passage-text">στείλε ολοφάνερο αμέσως σημάδι</span></p>
+<p class="passage"><span class="passage-text">φλογομαλλούσα αστραπή· κι αν εσύ αληθινά,</span></p>
+<p class="passage"><span class="passage-text">που η Τροιζηνιώτισσα σ᾽ έκαμε η Αίθρα, Θησέα,</span></p>
+<p class="passage"><span class="passage-text">τον Ποσειδώνα έχεις κύρη σου</span></p>
+<p class="passage"><span class="passage-text">τον κοσμοσείστη, μπρος, ρίξου στη θάλασσα,</span></p>
+<p class="passage"><span class="passage-text">μες στο παλάτι του,</span></p>
+<p class="passage"><span class="passage-text">και το χρυσό δαχτυλίδι μου αυτό, που στολίζει το χέρι μου,</span><span class="line-number">60</span></p>
+<p class="passage"><span class="passage-text">φέρ᾽ το απ᾽ τα βάθη ξανά.</span></p>
+<p class="passage"><span class="passage-text">Κι έτσι θα δεις</span></p>
+<p class="passage"><span class="passage-text">αν ο τρανός γιος του Κρόνου μ᾽ ακούει, σαν του κάνω μια δέηση,</span></p>
+<p class="passage"><span class="passage-text">που όλα τα ορίζει, κι αυτός κυβερνά τη βροντή.»</span></p>
+        </div>
+        
+
+        <div id="book-2-chapter-1-2" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-3" data-hash="book-2-chapter-1-2">
+            Διθύραμβος III - Ἠίθεοι ἢ Θησεὺς ‹Κηΐοις εἰς Δῆλον› • Κεφάλαιο 1.2 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=6&page=3" target="_blank" class="page-link">Page 3</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">κλύε δ᾽ ἄμεμπτον εὐχὰν μεγασθενὴ[ς [στρ. β]</span></p>
+<p class="passage indent"><span class="passage-text">Ζεύς, ὑπέροχόν τε Μίνῳ φύτευσε</span></p>
+<p class="passage indent"><span class="passage-text">τιμὰν φίλῳ θέλων</span></p>
+<p class="passage"><span class="passage-text">παιδὶ πανδερκέα θέμεν,</span><span class="line-number">70</span></p>
+<p class="passage"><span class="passage-text">ἄστραψέ θ᾽· ὁ δὲ θυμάρμενον</span></p>
+<p class="passage indent"><span class="passage-text">ἰδὼν τέρας χέρας πέτασσε</span></p>
+<p class="passage indent"><span class="passage-text">κλυτὰν ἐς αἰθέρα μενεπτόλεμος ἥρως</span></p>
+<p class="passage"><span class="passage-text">εἶρέν τε· «Θησεῦ, τάδ᾽ ἐ‹μὰ›</span></p>
+<p class="passage indent"><span class="passage-text">μὲν βλέπεις σαφῆ Διὸς</span><span class="line-number">75</span></p>
+<p class="passage"><span class="passage-text">δῶρα· σὺ δ᾽ ὄρνυ᾽ ἐς βα-</span></p>
+<p class="passage indent"><span class="passage-text">ρύβρομον πέλαγος· Κρονί[δας</span></p>
+<p class="passage indent"><span class="passage-text">δέ τοι πατὴρ ἄναξ τελεῖ</span></p>
+<p class="passage indent"><span class="passage-text">Ποσειδὰν ὑπέρτατον</span></p>
+<p class="passage indent"><span class="passage-text">κλέος χθόνα κατ᾽ ἠΰδενδρον.»</span><span class="line-number">80</span></p>
+<p class="passage indent"><span class="passage-text">ὣς εἶπε· τῷ δ᾽ οὐ πάλιν</span></p>
+<p class="passage"><span class="passage-text">θυμὸς ἀνεκάμπτετ᾽, ἀλλ᾽ εὐ-</span></p>
+<p class="passage indent"><span class="passage-text">πάκτων ἐπ᾽ ἰκρίων</span></p>
+<p class="passage"><span class="passage-text">σταθεὶς ὄρουσε, πόντιόν τέ νιν</span></p>
+<p class="passage indent"><span class="passage-text">δέξατο θελημὸν ἄλσος.</span><span class="line-number">85</span></p>
+<p class="passage"><span class="passage-text">τάφεν δὲ Διὸς υἱὸς ἔνδοθεν</span></p>
+<p class="passage"><span class="passage-text">κέαρ, κέλευσέ τε κατ᾽ οὖ-</span></p>
+<p class="passage indent"><span class="passage-text">ρον ἴσχεν εὐδαίδαλον</span></p>
+<p class="passage"><span class="passage-text">νᾶα· μοῖρα δ᾽ ἑτέραν ἐπόρσυν᾽ ὁδόν.</span></p>
+<p class="passage"><span class="passage-text">ἵετο δ᾽ ὠκύπομπον δόρυ· σόει [αντ. β]</span><span class="line-number">90</span></p>
+<p class="passage indent"><span class="passage-text">νιν βορεὰς ἐξόπιν πνέουσ᾽ ἀήτα·</span></p>
+<p class="passage indent"><span class="passage-text">τρέσσαν δ᾽ Ἀθαναίων</span></p>
+<p class="passage"><span class="passage-text">ἠϊθέων ‹–› γένος, ἐπεὶ</span></p>
+<p class="passage"><span class="passage-text">ἥρως θόρεν πόντονδε, κα-</span></p>
+<p class="passage indent"><span class="passage-text">τὰ λειρίων τ᾽ ὀμμάτων δά-</span><span class="line-number">95</span></p>
+<p class="passage indent"><span class="passage-text">κρυ χέον, βαρεῖαν ἐπιδέγμενοι ἀνάγκαν.</span></p>
+<p class="passage"><span class="passage-text">φέρον δὲ δελφῖνες {ἐν} ἁλι-</span></p>
+<p class="passage indent"><span class="passage-text">ναιέται μέγαν θοῶς</span></p>
+<p class="passage"><span class="passage-text">Θησέα πατρὸς ἱππί-</span></p>
+<p class="passage indent"><span class="passage-text">ου δόμον· ἔμολέν τε θεῶν</span><span class="line-number">100</span></p>
+<p class="passage indent"><span class="passage-text">μέγαρον. τόθι κλυτὰς ἰδὼν</span></p>
+<p class="passage indent"><span class="passage-text">ἔδεισε‹ν› Νηρέος ὀλ-</span></p>
+<p class="passage indent"><span class="passage-text">βίου κόρας· ἀπὸ γὰρ ἀγλα-</span></p>
+<p class="passage indent"><span class="passage-text">ῶν λάμπε γυίων σέλας</span></p>
+<p class="passage"><span class="passage-text">ὧτε πυρός, ἀμφὶ χαίταις</span><span class="line-number">105</span></p>
+<p class="passage indent"><span class="passage-text">δὲ χρυσεόπλοκοι</span></p>
+<p class="passage"><span class="passage-text">δίνηντο ταινίαι· χορῷ δ᾽ ἔτερ-</span></p>
+<p class="passage indent"><span class="passage-text">πον κέαρ ὑγροῖσι ποσσίν.</span></p>
+<p class="passage"><span class="passage-text">εἶδέν τε πατρὸς ἄλοχον φίλαν</span></p>
+<p class="passage"><span class="passage-text">σεμνὰν βοῶπιν ἐρατοῖ-</span><span class="line-number">110</span></p>
+<p class="passage indent"><span class="passage-text">σιν Ἀμφιτρίταν δόμοις·</span></p>
+<p class="passage"><span class="passage-text">ἅ νιν ἀμφέβαλεν ἀϊόνα πορφυρέαν,</span></p>
+<p class="passage"><span class="passage-text">κόμαισί τ᾽ ἐπέθηκεν οὔλαις [επωδ. β]</span></p>
+<p class="passage"><span class="passage-text">ἀμεμφέα πλόκον,</span></p>
+<p class="passage"><span class="passage-text">τόν ποτέ οἱ ἐν γάμῳ</span><span class="line-number">115</span></p>
+<p class="passage"><span class="passage-text">δῶκε δόλιος Ἀφροδίτα ῥόδοις ἐρεμνόν.</span></p>
+<p class="passage"><span class="passage-text">ἄπιστον ὅ τι δαίμονες</span></p>
+<p class="passage"><span class="passage-text">θέλωσιν οὐδὲν φρενοάραις βροτοῖς·</span></p>
+<p class="passage"><span class="passage-text">νᾶα πάρα λεπτόπρυμνον φάνη· φεῦ,</span></p>
+<p class="passage"><span class="passage-text">οἵαισιν ἐν φροντίσι Κνώσιον</span><span class="line-number">120</span></p>
+<p class="passage"><span class="passage-text">ἔσχασεν στραταγέταν, ἐπεὶ</span></p>
+<p class="passage"><span class="passage-text">μόλ᾽ ἀδίαντος ἐξ ἁλὸς</span></p>
+<p class="passage"><span class="passage-text">θαῦμα πάντεσσι, λάμ-</span></p>
+<p class="passage indent"><span class="passage-text">πε δ᾽ ἀμφὶ γυίοις θεῶν δῶρ᾽, ἀγλαό-</span></p>
+<p class="passage indent"><span class="passage-text">θρονοί τε κοῦραι σὺν εὐ-</span><span class="line-number">125</span></p>
+<p class="passage indent"><span class="passage-text">θυμίᾳ νεοκτίτῳ</span></p>
+<p class="passage"><span class="passage-text">ὠλόλυξαν, ἔ-</span></p>
+<p class="passage indent"><span class="passage-text">κλαγεν δὲ πόντος· ἠίθεοι δ᾽ ἐγγύθεν</span></p>
+<p class="passage"><span class="passage-text">νέοι παιάνιξαν ἐρατᾷ ὀπί.</span></p>
+<p class="passage"><span class="passage-text">Δάλιε, χοροῖσι Κηΐων</span><span class="line-number">130</span></p>
+<p class="passage indent"><span class="passage-text">φρένα ἰανθεὶς</span></p>
+<p class="passage"><span class="passage-text">ὄπαζε θεόπομπον ἐσθλῶν τύχαν.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">Πρόθυμ᾽ άκουσε τη δέηση τούτη ο Δίας, [στρ. β]</span></p>
+<p class="passage"><span class="passage-text">που μεγάλη η δύναμή του· ένα σημάδι</span></p>
+<p class="passage"><span class="passage-text">δίνει εξαίσιο, φανερό σημάδι για όλους</span></p>
+<p class="passage"><span class="passage-text">πως πολύ τιμά το γιο του: ευθύς αστράφτει.</span><span class="line-number">70</span></p>
+<p class="passage"><span class="passage-text">Το σημάδι, που η καρδιά του</span></p>
+<p class="passage"><span class="passage-text">λαχταρούσε, μόλις είδε ο Μίνωας τότε,</span></p>
+<p class="passage"><span class="passage-text">του πολέμου αυτός ο βράχος, στο λαμπρό</span></p>
+<p class="passage"><span class="passage-text">ουρανό τα χέρια υψώνει και λέει:</span></p>
+<p class="passage"><span class="passage-text">«Ολοκάθαρο το δώρο βλέπεις, νά,</span></p>
+<p class="passage"><span class="passage-text">που μου κάνει ο Δίας, Θησέα·</span></p>
+<p class="passage"><span class="passage-text">στο βαρύβροντο εσύ τώρα πέλαο πήδα·</span></p>
+<p class="passage"><span class="passage-text">και μια δόξα τρισμεγάλη, που όλη η γη</span></p>
+<p class="passage"><span class="passage-text">η πολύδεντρη θ᾽ ακούσει,</span></p>
+<p class="passage"><span class="passage-text">θα σου δώσει ο γιος του Κρόνου ο Ποσειδώνας.»</span><span class="line-number">80</span></p>
+<p class="passage"><span class="passage-text">Έτσι μίλησε. Δε λύγισε η καρδιά</span></p>
+<p class="passage"><span class="passage-text">του Θησέα· ολόρθος στέκει στη γερτή</span></p>
+<p class="passage"><span class="passage-text">κουπαστή, κι ευθύς ορμά· καλοσυνάτη</span></p>
+<p class="passage"><span class="passage-text">του πελάου τον αγκαλιάζει η απλωσιά.</span></p>
+<p class="passage"><span class="passage-text">Όταν το ᾽δε ο γιος του Δία, μες στην ψυχή του</span></p>
+<p class="passage"><span class="passage-text">ξάφνιασμα ένιωσε μεγάλο</span></p>
+<p class="passage"><span class="passage-text">και προστάζει να κρατήσουν το καράβι</span></p>
+<p class="passage"><span class="passage-text">τ᾽ ωριοστόλιστο στον άνεμο αντικρύ.</span></p>
+<p class="passage"><span class="passage-text">Όμως άλλον τότε δρόμο ανοίγει η Μοίρα.</span></p>
+<p class="passage"><span class="passage-text">Δρόμο πήρε, γοργοκίνητο, το πλοίο· [αντ. β]</span><span class="line-number">90</span></p>
+<p class="passage"><span class="passage-text">απ᾽ την πρύμη πνέει βοριάς κι εμπρός το σπρώχνει·</span></p>
+<p class="passage"><span class="passage-text">οι Αθηναίοι εκείνοι, οι νέοι κι οι νέες, σαν είδαν</span></p>
+<p class="passage"><span class="passage-text">το Θησέα τους να βουτά στο πέλαο μέσα,</span></p>
+<p class="passage"><span class="passage-text">τρόμο νιώσανε μεγάλο,</span></p>
+<p class="passage"><span class="passage-text">στ᾽ απαλά τους μάτια ανάβρυσαν τα δάκρυα,</span></p>
+<p class="passage"><span class="passage-text">συμφορά πως θά ᾽ρθει πρόσμεναν βαριά.</span></p>
+<p class="passage"><span class="passage-text">Μα δελφίνια θαλασσόζωα το Θησέα</span></p>
+<p class="passage"><span class="passage-text">τον τρανό στο σπίτι οδήγησαν γοργά</span></p>
+<p class="passage"><span class="passage-text">του αλογόθεου, του γονιού του·</span></p>
+<p class="passage"><span class="passage-text">όταν μπήκε στο θεϊκό παλάτι εκείνο,</span><span class="line-number">100</span></p>
+<p class="passage"><span class="passage-text">ο ήρωας δείλιασε· είδε εκεί τις ξακουστές</span></p>
+<p class="passage"><span class="passage-text">κόρες του άρχοντα Νηρέα,</span></p>
+<p class="passage"><span class="passage-text">που απ᾽ τα μέλη τους τα υπέροχα μια λάμψη</span></p>
+<p class="passage"><span class="passage-text">ξεχυνόταν, ίδια φλόγα από φωτιά,</span></p>
+<p class="passage"><span class="passage-text">που τριγύρω απ᾽ τα μαλλιά τους λαμπερές</span></p>
+<p class="passage"><span class="passage-text">ανεμίζανε χρυσόπλεχτες κορδέλες</span></p>
+<p class="passage"><span class="passage-text">και με πόδια απαλοσάλευτα χορό</span></p>
+<p class="passage"><span class="passage-text">γύρω σέρνανε, αναγάλλια της ψυχής τους.</span></p>
+<p class="passage"><span class="passage-text">Και είδε στο θαυμάσιο σπίτι</span></p>
+<p class="passage"><span class="passage-text">τη σεβάσμια γελαδόματη Αμφιτρίτη,</span><span class="line-number">110</span></p>
+<p class="passage"><span class="passage-text">του πατέρα του γυναίκα αγαπητή.</span></p>
+<p class="passage"><span class="passage-text">Μ᾽ ένα ντύμα πορφυρό τον ντύνει εκείνη.</span></p>
+<p class="passage"><span class="passage-text">Και τα σγουρά του η θεά [επωδ. β]</span></p>
+<p class="passage"><span class="passage-text">μ᾽ ένα στεφάνι πανέμορφο στόλισε</span></p>
+<p class="passage"><span class="passage-text">μ᾽ ένα στεφάνι που το ίσκιωναν ρόδα·</span></p>
+<p class="passage"><span class="passage-text">η δολοπλέχτρα Αφροδίτη τής το ᾽καμε δώρο στο γάμο της.</span></p>
+<p class="passage"><span class="passage-text">Πράξη καμιά των θεών</span></p>
+<p class="passage"><span class="passage-text">δεν τη λογιάζουν για απίστευτη οι φρόνιμοι·</span></p>
+<p class="passage"><span class="passage-text">δίπλα στου πλοίου τη χυτή</span></p>
+<p class="passage"><span class="passage-text">πρύμη ο Θησέας απ᾽ το κύμα ξεπρόβαλε.</span></p>
+<p class="passage"><span class="passage-text">Ω, της Κνωσού το στρατάρχη!</span><span class="line-number">120</span></p>
+<p class="passage"><span class="passage-text">Μαύρες του νου που του τύλιξαν έγνοιες,</span></p>
+<p class="passage"><span class="passage-text">μέσ᾽ απ᾽ τα κύματα ο άλλος σα βγήκε στεγνός,</span></p>
+<p class="passage"><span class="passage-text">και τα θεϊκά στο κορμί του στραφτάλιζαν δώρα!</span></p>
+<p class="passage"><span class="passage-text">Από αναγάλλια πρωτόφαντη</span></p>
+<p class="passage"><span class="passage-text">οι λαμπερόθρονες κόρες ξεφώνισαν,</span></p>
+<p class="passage"><span class="passage-text">βούιξε το πέλαγο,</span></p>
+<p class="passage"><span class="passage-text">κι από κοντά οι κοπελιές και τ᾽ αγόρια παιάνα τραγούδησαν</span></p>
+<p class="passage"><span class="passage-text">με τις γλυκές τους φωνές.</span></p>
+<p class="passage"><span class="passage-text">Δήλιε θεέ,</span><span class="line-number">130</span></p>
+<p class="passage"><span class="passage-text">αν η καρδιά σου από τους τζιώτικους τούτους χορούς αναγάλλιασε,</span></p>
+<p class="passage"><span class="passage-text">δώσε, θεόσταλτα εμείς να χαρούμε αγαθά.</span></p>
+        </div>
+        
+
+        <div id="book-3-chapter-1" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-4" data-hash="book-3-chapter-1">
+            Διθύραμβος IV - Θησεὺς ‹Ἀθηναίοις› • Κεφάλαιο 1 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=6&page=4" target="_blank" class="page-link">Page 4</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text"><h4><i>ΔΙΘΥΡΑΜΒΟΣ IV</i></h4>ΘΗΣΕΥΣ ‹ΑΘΗΝΑΙΟΙΣ›</span></p>
+<p class="passage"><span class="passage-text">‹ΧΟΡΟΣ› Βασιλεῦ τᾶν ἱερᾶν Ἀθανᾶν, [στρ. α]</span></p>
+<p class="passage indent"><span class="passage-text">τῶν ἁβροβίων ἄναξ Ἰώνων,</span></p>
+<p class="passage"><span class="passage-text">τί νέον ἔκλαγε χαλκοκώδων</span></p>
+<p class="passage indent"><span class="passage-text">σάλπιγξ πολεμηΐαν ἀοιδάν;</span></p>
+<p class="passage"><span class="passage-text">ἦ τις ἁμετέρας χθονὸς</span><span class="line-number">5</span></p>
+<p class="passage indent"><span class="passage-text">δυσμενὴς ὅρι᾽ ἀμφιβάλλει</span></p>
+<p class="passage indent"><span class="passage-text">στραταγέτας ἀνήρ;</span></p>
+<p class="passage"><span class="passage-text">ἢ λῃσταὶ κακομάχανοι</span></p>
+<p class="passage"><span class="passage-text">ποιμένων ἀέκατι μήλων</span></p>
+<p class="passage indent"><span class="passage-text">σεύοντ᾽ ἀγέλας βίᾳ;</span><span class="line-number">10</span></p>
+<p class="passage"><span class="passage-text">ἢ τί τοι κραδίαν ἀμύσσει;</span></p>
+<p class="passage indent"><span class="passage-text">φθέγγευ· δοκέω γὰρ εἴ τινι βροτῶν</span></p>
+<p class="passage"><span class="passage-text">ἀλκίμων ἐπικουρίαν</span></p>
+<p class="passage indent"><span class="passage-text">καὶ τὶν ἔμμεναι νέων,</span></p>
+<p class="passage"><span class="passage-text">ὦ Πανδίονος υἱὲ καὶ Κρεούσας.</span><span class="line-number">15</span></p>
+<p class="passage"><span class="passage-text">‹ΑΙΓΕΥΣ› Νέον ἦλθε‹ν› δολιχὰν ἀμείψας [στρ. β]</span></p>
+<p class="passage indent"><span class="passage-text">κᾶρυξ ποσὶν Ἰσθμίαν κέλευθον·</span></p>
+<p class="passage"><span class="passage-text">ἄφατα δ᾽ ἔργα λέγει κραταιοῦ</span></p>
+<p class="passage indent"><span class="passage-text">φωτός· τὸν ὑπέρβιόν τ᾽ ἔπεφνεν</span></p>
+<p class="passage"><span class="passage-text">Σίνιν, ὃς ἰσχύϊ φέρτατος</span><span class="line-number">20</span></p>
+<p class="passage indent"><span class="passage-text">θνατῶν ἦν, Κρονίδα Λυταίου</span></p>
+<p class="passage indent"><span class="passage-text">σεισίχθονος τέκος·</span></p>
+<p class="passage"><span class="passage-text">σῦν τ᾽ ἀνδροκτόνον ἐν νάπαις</span></p>
+<p class="passage"><span class="passage-text">Κρεμμυῶνος ἀτάσθαλόν τε</span></p>
+<p class="passage indent"><span class="passage-text">Σκίρωνα κατέκτανεν·</span><span class="line-number">25</span></p>
+<p class="passage"><span class="passage-text">τάν τε Κερκυόνος παλαίστραν</span></p>
+<p class="passage indent"><span class="passage-text">ἔσχεν, Πολυπήμονός τε καρτερὰν</span></p>
+<p class="passage"><span class="passage-text">σφῦραν ἐξέβαλεν Προκό-</span></p>
+<p class="passage indent"><span class="passage-text">πτας, ἀρείονος τυχὼν</span></p>
+<p class="passage"><span class="passage-text">φωτός. ταῦτα δέδοιχ᾽ ὅπᾳ τελεῖται.</span><span class="line-number">30</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text"><h4><i>ΔΙΘΥΡΑΜΒΟΣ IV</i></h4>ΔΙΑΛΟΓΟΣ ΓΙΑ ΤΟ ΘΗΣΕΑ</span></p>
+<p class="passage"><span class="passage-text">―Ω, της ιερής Αθηνάς βασιλιά, [στρ. α]</span></p>
+<p class="passage"><span class="passage-text">των αβροδίαιτων κυβερνήτη Ιώνων,</span></p>
+<p class="passage"><span class="passage-text">τί ᾽ταν η πολεμόκραχτη φωνή</span></p>
+<p class="passage"><span class="passage-text">που η σάλπιγγα η χαλκόστομη, νά, τώρα δα, έχει βγάλει;</span></p>
+<p class="passage"><span class="passage-text">Της χώρας μας τα σύνορα</span></p>
+<p class="passage"><span class="passage-text">ξένου, εχθρικού στρατού αρχηγός</span></p>
+<p class="passage"><span class="passage-text">μην ήρθ᾽ εδώ και τα ᾽ζωσε;</span></p>
+<p class="passage"><span class="passage-text">Άγριοι μην πλάκωσαν ληστές</span></p>
+<p class="passage"><span class="passage-text">και βάζουν μπρος κοπάδια αρνιά</span></p>
+<p class="passage"><span class="passage-text">καταπονώντας τους βοσκούς;</span><span class="line-number">10</span></p>
+<p class="passage"><span class="passage-text">Ή την καρδιά σου τί άλλο την ταράζει;</span></p>
+<p class="passage"><span class="passage-text">Απ᾽ τον καθένα πιότερο, θαρρώ,</span></p>
+<p class="passage"><span class="passage-text">μπορείς εσύ, της Κρέουσας γιε και του Πανδίονα, να ᾽χεις</span></p>
+<p class="passage"><span class="passage-text">νιους αντρειωμένους για βοηθούς·</span></p>
+<p class="passage"><span class="passage-text">γι᾽ αυτό, μη στέκεις· έλα, μίλησέ μας.</span></p>
+<p class="passage"><span class="passage-text">― Μαντατοφόρος ήρθε απ᾽ τον Ισθμό, [στρ. β]</span></p>
+<p class="passage"><span class="passage-text">πεζός τον τόσο δρόμο, και για εξαίσια</span></p>
+<p class="passage"><span class="passage-text">έργα μάς είπε ενός παλικαριού·</span></p>
+<p class="passage"><span class="passage-text">το Σίνη, χεροδύναμον όσο θνητός κανένας,</span><span class="line-number">20</span></p>
+<p class="passage"><span class="passage-text">γιο του Λυταίου που σειεί τη γη,</span></p>
+<p class="passage"><span class="passage-text">τον σκότωσε· και στις λακκιές</span></p>
+<p class="passage"><span class="passage-text">του Κρεμμυώνα ξέκαμε</span></p>
+<p class="passage"><span class="passage-text">το φονικόν αγριόχοιρο·</span></p>
+<p class="passage"><span class="passage-text">έπειτα και το Σκίρωνα</span></p>
+<p class="passage"><span class="passage-text">τον άνομο· κι ανάγκασε</span></p>
+<p class="passage"><span class="passage-text">τον Κερκυόνα να πάψει να παλεύει·</span></p>
+<p class="passage"><span class="passage-text">μα και του Πολυπήμονα η βαριά</span></p>
+<p class="passage"><span class="passage-text">απ᾽ του Προκρούστη πια έπεσε, η ασήκωτη, τα χέρια·</span></p>
+<p class="passage"><span class="passage-text">βρήκε άλλον δυνατότερο.</span></p>
+<p class="passage"><span class="passage-text">Τί θά ᾽βγει απ᾽ όλα αυτά; Δεν ξέρω· τρέμω.</span><span class="line-number">30</span></p>
+        </div>
+        
+
+        <div id="book-3-chapter-1-2" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-5" data-hash="book-3-chapter-1-2">
+            Διθύραμβος IV - Θησεὺς ‹Ἀθηναίοις› • Κεφάλαιο 1.2 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=6&page=5" target="_blank" class="page-link">Page 5</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">‹ΧΟ.› Τίνα δ᾽ ἔμμεν πόθεν ἄνδρα τοῦτον [στρ. γ]</span></p>
+<p class="passage indent"><span class="passage-text">λέγει, τίνα τε στολὰν ἔχοντα;</span></p>
+<p class="passage"><span class="passage-text">πότερα σὺν πολεμηΐοις ὅ-</span></p>
+<p class="passage indent"><span class="passage-text">πλοισι στρατιὰν ἄγοντα πολλάν;</span></p>
+<p class="passage"><span class="passage-text">ἢ μοῦνον σὺν ὀπάοσιν</span><span class="line-number">35</span></p>
+<p class="passage indent"><span class="passage-text">στείχειν ἔμπορον οἷ᾽ ἀλάταν</span></p>
+<p class="passage indent"><span class="passage-text">ἐπ᾽ ἀλλοδαμίαν,</span></p>
+<p class="passage"><span class="passage-text">ἰσχυρόν τε καὶ ἄλκιμον</span></p>
+<p class="passage"><span class="passage-text">ὧδε καὶ θρασύν, ὃς τ‹οσ›ούτων</span></p>
+<p class="passage indent"><span class="passage-text">ἀνδρῶν κρατερὸν σθένος</span><span class="line-number">40</span></p>
+<p class="passage"><span class="passage-text">ἔσχεν; ἦ θεὸς αὐτὸν ὁρμᾷ,</span></p>
+<p class="passage indent"><span class="passage-text">δίκας ἀδίκοισιν ὄφρα μήσεται·</span></p>
+<p class="passage"><span class="passage-text">οὐ γὰρ ῥᾴδιον αἰὲν ἔρ-</span></p>
+<p class="passage indent"><span class="passage-text">δοντα μὴ ᾽ντυχεῖν κακῷ.</span></p>
+<p class="passage"><span class="passage-text">πάντ᾽ ἐν τῷ δολιχῷ χρόνῳ τελεῖται.</span><span class="line-number">45</span></p>
+<p class="passage"><span class="passage-text">‹ΑΙΓ.› Δύο οἱ φῶτε μόνους ἁμαρτεῖν [στρ. δ]</span></p>
+<p class="passage indent"><span class="passage-text">λέγει, περὶ φαιδίμοισι δ᾽ ὤμοις</span></p>
+<p class="passage"><span class="passage-text">ξίφος ἔχειν ‹ἐλεφαντόκωπον›</span></p>
+<p class="passage indent"><span class="passage-text">ξεστοὺς δὲ δύ᾽ ἐν χέρεσσ᾽ ἄκοντας</span></p>
+<p class="passage"><span class="passage-text">κηὔτυκτον κυνέαν Λάκαι-</span><span class="line-number">50</span></p>
+<p class="passage indent"><span class="passage-text">ναν κρατὸς πέρι πυρσοχαίτου·</span></p>
+<p class="passage indent"><span class="passage-text">χιτῶνα πορφύρεον</span></p>
+<p class="passage"><span class="passage-text">στέρνοις τ᾽ ἀμφί, καὶ οὔλιον</span></p>
+<p class="passage"><span class="passage-text">Θεσσαλὰν χλαμύδ᾽· ὀμμάτων δὲ</span></p>
+<p class="passage indent"><span class="passage-text">στίλβειν ἄπο Λαμνίαν</span><span class="line-number">55</span></p>
+<p class="passage"><span class="passage-text">φοίνισσαν φλόγα· παῖδα δ᾽ ἔμμεν</span></p>
+<p class="passage indent"><span class="passage-text">πρώθηβον, ἀρηΐων δ᾽ ἀθυρμάτων</span></p>
+<p class="passage"><span class="passage-text">μεμνᾶσθαι πολέμου τε καὶ</span></p>
+<p class="passage indent"><span class="passage-text">χαλκεοκτύπου μάχας·</span></p>
+<p class="passage"><span class="passage-text">δίζησθαι δὲ φιλαγλάους Ἀθάνας.</span><span class="line-number">60</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">―Ποιό παλικάρι να ᾽ναι κι από πού; [στρ. γ]</span></p>
+<p class="passage"><span class="passage-text">και τί στολή φορεί; τί λέει ο κράχτης;</span></p>
+<p class="passage"><span class="passage-text">Πολύ στρατό οπλισμένον οδηγεί</span></p>
+<p class="passage"><span class="passage-text">ή μόνος, μ᾽ ένα δυο οπαδούς, γυρνά στα ξένα μέρη</span></p>
+<p class="passage"><span class="passage-text">ταξιδευτής περαστικός;</span></p>
+<p class="passage"><span class="passage-text">Δύναμη θα ᾽χει κι αντοχή</span></p>
+<p class="passage"><span class="passage-text">και θα ᾽ναι απόκοτος πολύ,</span></p>
+<p class="passage"><span class="passage-text">για να μπορεί τόσων αντρών</span></p>
+<p class="passage"><span class="passage-text">τη γεροσύνη να νικά·</span><span class="line-number">40</span></p>
+<p class="passage"><span class="passage-text">ίσως ακόμα ένας θεός</span></p>
+<p class="passage"><span class="passage-text">να τον κεντά, για να παιδεύει εκείνους</span></p>
+<p class="passage"><span class="passage-text">που κάνουν το κακό· δεν είναι δα</span></p>
+<p class="passage"><span class="passage-text">κι εύκολο, σε άλλους συμφορές σα φέρνεις, να μην πάθεις</span></p>
+<p class="passage"><span class="passage-text">κάποια κι εσύ· με τον καιρό</span></p>
+<p class="passage"><span class="passage-text">τα πράγματα όλα βρίσκουν ένα τέλος.</span></p>
+<p class="passage"><span class="passage-text">―Έχει, έτσι λέει, δυο μόνο συνοδούς· [στρ. δ]</span></p>
+<p class="passage"><span class="passage-text">απ᾽ τους λαμπρούς τούς ώμους κρεμασμένο</span></p>
+<p class="passage"><span class="passage-text">σπαθί με φιλντισένια τη λαβή·</span></p>
+<p class="passage"><span class="passage-text">πελεκητά στα χέρια του κρατά δυο ακόντια· κράνος</span></p>
+<p class="passage"><span class="passage-text">καλόφτιαχτο, λακωνικό,</span><span class="line-number">50</span></p>
+<p class="passage"><span class="passage-text">σκέπει τα ρούσα του μαλλιά·</span></p>
+<p class="passage"><span class="passage-text">στο στήθος γύρω, πορφυρός</span></p>
+<p class="passage"><span class="passage-text">χιτώνας και θεσσαλική</span></p>
+<p class="passage"><span class="passage-text">σγουρή χλαμύδα· λάμπουνε</span></p>
+<p class="passage"><span class="passage-text">τα μάτια σαν από λημνιά</span></p>
+<p class="passage"><span class="passage-text">κόκκινη φλόγα· κι είναι, λένε, αγόρι</span></p>
+<p class="passage"><span class="passage-text">νιούτσικο ακόμα, αλλά πολεμικά</span></p>
+<p class="passage"><span class="passage-text">παιχνίδια πάντα μελετά, στους μπρούτζινους της μάχης</span></p>
+<p class="passage"><span class="passage-text">βρόντους ο νους του αδιάκοπα.</span></p>
+<p class="passage"><span class="passage-text">Και στη λαμπρή ζητά να φτάσει Αθήνα.</span><span class="line-number">60</span></p>
+        </div>
+        
+        </section>
+    </main>
+
+    <script>
+        // Layout and Theme controls
+        function toggleLayout() {
+            const body = document.body;
+            const btn = document.getElementById('toggle-layout-btn');
+            
+            if (body.classList.contains('hide-original')) {
+                body.classList.remove('hide-original');
+                btn.innerText = 'Hide Original';
+                localStorage.setItem('ebook-hide-original', 'false');
+            } else {
+                body.classList.add('hide-original');
+                btn.innerText = 'Show Original';
+                localStorage.setItem('ebook-hide-original', 'true');
+            }
+        }
+
+        function setTheme(theme, buttonElement) {
+            if (theme === 'light') {
+                document.documentElement.removeAttribute('data-theme');
+            } else {
+                document.documentElement.setAttribute('data-theme', theme);
+            }
+            
+            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+            buttonElement.classList.add('active');
+            
+            localStorage.setItem('ebook-theme', theme);
+        }
+
+        function toggleSidebar() {
+            const body = document.body;
+            const overlay = document.getElementById('mobile-overlay');
+            const isMobile = window.innerWidth <= 900;
+            
+            if (isMobile) {
+                if (body.classList.contains('sidebar-open')) {
+                    body.classList.remove('sidebar-open');
+                    overlay.classList.remove('open');
+                } else {
+                    body.classList.add('sidebar-open');
+                    overlay.classList.add('open');
+                    // Close right sidebar if open
+                    body.classList.remove('chat-sidebar-open');
+                }
+            } else {
+                if (body.classList.contains('sidebar-closed')) {
+                    body.classList.remove('sidebar-closed');
+                    localStorage.setItem('ebook-sidebar-closed', 'false');
+                } else {
+                    body.classList.add('sidebar-closed');
+                    localStorage.setItem('ebook-sidebar-closed', 'true');
+                }
+            }
+        }
+        
+        function closeSidebarOnMobile() {
+            if (window.innerWidth <= 900) {
+                document.body.classList.remove('sidebar-open');
+                document.getElementById('mobile-overlay').classList.remove('open');
+            }
+        }
+        
+        function toggleMobileOptions() {
+            const header = document.querySelector('header');
+            const btn = document.querySelector('.options-toggle');
+            
+            if (header.classList.contains('options-open')) {
+                header.classList.remove('options-open');
+                document.body.classList.remove('mobile-options-open');
+                btn.classList.remove('active');
+            } else {
+                header.classList.add('options-open');
+                document.body.classList.add('mobile-options-open');
+                btn.classList.add('active');
+            }
+        }
+
+        // Adjusts sidebar height dynamically to match mobile visual viewport when virtual keyboard is launched
+        function adjustSidebarHeightForKeyboard() {
+            if (window.visualViewport) {
+                const chatSidebar = document.getElementById('chat-sidebar');
+                const isMobile = window.innerWidth <= 900;
+                if (isMobile && document.body.classList.contains('chat-sidebar-open')) {
+                    chatSidebar.style.height = window.visualViewport.height + 'px';
+                } else {
+                    chatSidebar.style.height = ''; // Fallback to CSS rules
+                }
+            }
+        }
+
+        // Right AI Sidebar Toggles
+        function toggleChatSidebar() {
+            const body = document.body;
+            if (body.classList.contains('chat-sidebar-open')) {
+                body.classList.remove('chat-sidebar-open');
+                adjustSidebarHeightForKeyboard();
+            } else {
+                body.classList.add('chat-sidebar-open');
+                // Close Left Sidebar on Mobile
+                if (window.innerWidth <= 900) {
+                    body.classList.remove('sidebar-open');
+                    document.getElementById('mobile-overlay').classList.remove('open');
+                }
+                // Focus text area
+                setTimeout(() => {
+                    document.getElementById('chat-input').focus();
+                    adjustSidebarHeightForKeyboard();
+                }, 100);
+            }
+        }
+
+        // AI Configuration Modal controls
+        function openAiSettings() {
+            document.getElementById('ai-config-modal').classList.add('open');
+            loadSavedAiSettings();
+        }
+
+        function closeAiSettings() {
+            document.getElementById('ai-config-modal').classList.remove('open');
+        }
+
+        function handleProviderChange() {
+            const p = document.getElementById('ai-provider').value;
+            const customUrlGroup = document.getElementById('group-custom-url');
+            const modelInput = document.getElementById('ai-model');
+
+            if (p === 'custom') {
+                customUrlGroup.style.display = 'flex';
+            } else {
+                customUrlGroup.style.display = 'none';
+            }
+
+            // Suggest model placeholders and default values based on provider selection
+            if (p === 'openai') {
+                modelInput.placeholder = 'gpt-4o-mini';
+                if (modelInput.value === 'gemini-flash-latest' || modelInput.value === '' || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gemini')) {
+                    modelInput.value = 'gpt-4o-mini';
+                }
+            } else if (p === 'anthropic') {
+                modelInput.placeholder = 'claude-3-5-sonnet-20241022';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('gemini') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'claude-3-5-sonnet-20241022';
+                }
+            } else if (p === 'gemini') {
+                modelInput.placeholder = 'gemini-flash-latest';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'gemini-flash-latest';
+                }
+            } else if (p === 'openrouter') {
+                modelInput.placeholder = 'meta-llama/llama-3-8b-instruct:free';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('gemini') || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'meta-llama/llama-3-8b-instruct:free';
+                }
+            } else if (p === 'custom') {
+                modelInput.placeholder = 'model-name';
+            }
+        }
+
+        function loadSavedAiSettings() {
+            const provider = localStorage.getItem('ai-prov') || 'openai';
+            const apiKey = localStorage.getItem('ai-key') || '';
+            const model = localStorage.getItem('ai-mod') || '';
+            const customUrl = localStorage.getItem('ai-url') || '';
+
+            document.getElementById('ai-provider').value = provider;
+            document.getElementById('ai-key').value = apiKey;
+            document.getElementById('ai-model').value = model;
+            document.getElementById('ai-custom-url').value = customUrl;
+
+            handleProviderChange();
+        }
+
+        function saveAiSettings() {
+            const provider = document.getElementById('ai-provider').value;
+            const apiKey = document.getElementById('ai-key').value;
+            const model = document.getElementById('ai-model').value;
+            const customUrl = document.getElementById('ai-custom-url').value;
+
+            localStorage.setItem('ai-prov', provider);
+            localStorage.setItem('ai-key', apiKey);
+            localStorage.setItem('ai-mod', model);
+            localStorage.setItem('ai-url', customUrl);
+
+            closeAiSettings();
+        }
+
+        // Text Selection & Chat logic
+        let currentSelection = "";
+        let currentContext = null;
+        let chatHistory = [];
+
+        function getPageContext(node) {
+            let current = node.nodeType === Node.TEXT_NODE ? node.parentElement : node;
+            let col = current.closest('.column');
+            if (!col) return null;
+
+            // Find the preceding page-divider element
+            let sibling = col.previousElementSibling;
+            while (sibling && !sibling.classList.contains('page-divider')) {
+                sibling = sibling.previousElementSibling;
+            }
+            if (!sibling) return null;
+
+            const pageNum = sibling.id.replace('page-', '');
+
+            // Identify parallel original and translation sibling columns
+            let origCol = sibling.nextElementSibling;
+            while (origCol && !origCol.classList.contains('original-col')) {
+                origCol = origCol.nextElementSibling;
+            }
+            let transCol = sibling.nextElementSibling;
+            while (transCol && !transCol.classList.contains('translation-col')) {
+                transCol = transCol.nextElementSibling;
+            }
+
+            const isOriginal = col.classList.contains('original-col');
+
+            return {
+                pageNum: pageNum,
+                dividerText: sibling.textContent.trim(),
+                originalText: origCol ? origCol.innerText : "",
+                translationText: transCol ? transCol.innerText : "",
+                selectedColType: isOriginal ? "original" : "translation"
+            };
+        }
+
+        function handleTextSelection(e) {
+            setTimeout(() => {
+                const selection = window.getSelection();
+                const text = selection.toString().trim();
+                const popup = document.getElementById('ai-selection-popup');
+
+                if (!text) {
+                    if (e.target && e.target.id !== 'ai-selection-popup') {
+                        popup.style.display = 'none';
+                    }
+                    return;
+                }
+
+                const anchorNode = selection.anchorNode;
+                if (!anchorNode) return;
+
+                const context = getPageContext(anchorNode);
+                if (!context) {
+                    popup.style.display = 'none';
+                    return;
+                }
+
+                currentSelection = text;
+                currentContext = context;
+
+                const isMobile = window.innerWidth <= 900;
+                
+                if (isMobile) {
+                    // Position fixed at the bottom on mobile to avoid native Android contextual menu overlap
+                    popup.style.display = 'flex';
+                    popup.style.position = 'fixed';
+                    popup.style.bottom = '24px';
+                    popup.style.left = '50%';
+                    popup.style.transform = 'translateX(-50%)';
+                    popup.style.top = 'auto';
+                    popup.style.width = 'calc(100% - 40px)';
+                    popup.style.maxWidth = '340px';
+                    popup.style.justifyContent = 'center';
+                    popup.style.boxShadow = '0 8px 24px rgba(0,0,0,0.3)';
+                } else {
+                    // Position relative to selection on desktop
+                    const range = selection.getRangeAt(0);
+                    const rect = range.getBoundingClientRect();
+
+                    popup.style.display = 'flex';
+                    popup.style.position = 'fixed';
+                    popup.style.bottom = 'auto';
+                    popup.style.transform = 'none';
+                    popup.style.width = 'auto';
+                    popup.style.maxWidth = 'none';
+                    popup.style.left = Math.max(10, Math.min(window.innerWidth - popup.offsetWidth - 10, rect.left + (rect.width / 2) - 50)) + "px";
+                    popup.style.top = (rect.top - 45) + "px";
+                    popup.style.justifyContent = 'flex-start';
+                    popup.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+                }
+            }, 10);
+        }
+
+        function openChatWithSelection() {
+            document.getElementById('ai-selection-popup').style.display = 'none';
+            
+            // Populate context card
+            const contextTextNode = document.getElementById('chat-context-text');
+            const colLabel = currentContext.selectedColType === 'original' ? 'Αρχαία' : 'Μετάφραση';
+            contextTextNode.textContent = '"' + currentSelection + '" (' + colLabel + ' • Σελίδα ' + currentContext.pageNum + ')';
+            
+            // Clear prior conversation when selecting new text
+            clearChat();
+
+            // Open sidebar
+            document.body.classList.add('chat-sidebar-open');
+            setTimeout(() => {
+                document.getElementById('chat-input').focus();
+                adjustSidebarHeightForKeyboard();
+            }, 100);
+        }
+
+        function clearChat() {
+            chatHistory = [];
+            const msgsContainer = document.getElementById('chat-messages');
+            
+            // Keep the context card, wipe standard bubble divs
+            const contextCard = document.getElementById('chat-context-card');
+            msgsContainer.innerHTML = '';
+            msgsContainer.appendChild(contextCard);
+        }
+
+        function handleChatKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendChatMessage();
+            }
+        }
+
+        function appendMessage(sender, text, isError = false, historyIndex = null) {
+            const msgsContainer = document.getElementById('chat-messages');
+            const msgDiv = document.createElement('div');
+            
+            if (isError) {
+                msgDiv.className = 'chat-message system-error';
+            } else {
+                msgDiv.className = 'chat-message ' + sender;
+            }
+
+            // If it is a user message and linked to history, attach interactive attributes
+            if (sender === 'user' && historyIndex !== null) {
+                msgDiv.setAttribute('data-history-index', historyIndex);
+                msgDiv.setAttribute('title', 'Κλικ για εκ νέου εκτέλεση από αυτό το σημείο');
+                msgDiv.addEventListener('click', () => handleHistoryClick(historyIndex));
+            }
+            
+            msgDiv.innerHTML = formatMarkdown(text);
+            msgsContainer.appendChild(msgDiv);
+            msgsContainer.scrollTop = msgsContainer.scrollHeight;
+        }
+
+        // Truncate history and re-run on user dialog click
+        async function handleHistoryClick(historyIndex) {
+            // Prevent duplicate triggers if query is running
+            const inputEl = document.getElementById('chat-input');
+            if (inputEl.disabled) return;
+
+            // Slice history array up to and including the selected user query
+            chatHistory = chatHistory.slice(0, historyIndex + 1);
+
+            // Redraw UI container to match truncated array
+            rebuildChatUI();
+
+            // Re-fire query
+            await runQuery();
+        }
+
+        // Clean redraw of current stack
+        function rebuildChatUI() {
+            const msgsContainer = document.getElementById('chat-messages');
+            const contextCard = document.getElementById('chat-context-card');
+            
+            msgsContainer.innerHTML = '';
+            msgsContainer.appendChild(contextCard);
+            
+            chatHistory.forEach((msg, idx) => {
+                if (msg.role === 'user') {
+                    let displayContent = msg.content;
+                    // Extract original question portion from first structured input turn for a clean UI
+                    if (idx === 0 && msg.content.includes("Ερώτηση:\n")) {
+                        displayContent = msg.content.split("Ερώτηση:\n").slice(1).join("Ερώτηση:\n");
+                    }
+                    appendMessage('user', displayContent, false, idx);
+                } else if (msg.role === 'assistant') {
+                    appendMessage('assistant', msg.content);
+                }
+            });
+        }
+
+        // Native Markdown parser leveraging standard Marked.js library
+        function formatMarkdown(text) {
+            if (!text) return "";
+            try {
+                // Parse standard markdown strings to structural HTML
+                return marked.parse(text);
+            } catch (err) {
+                // Fallback to basic text escaping on parse failure
+                return text
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/\n/g, "<br>");
+            }
+        }
+
+        // Modular core query runner
+        async function runQuery() {
+            const inputEl = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('chat-send-btn');
+            
+            // Disable inputs during network transaction
+            inputEl.disabled = true;
+            sendBtn.disabled = true;
+            
+            // Append loading container
+            appendMessage('assistant', 'Thinking...');
+            const lastMsgDiv = document.getElementById('chat-messages').lastChild;
+
+            // Load credentials
+            const provider = localStorage.getItem('ai-prov') || 'openai';
+            const apiKey = localStorage.getItem('ai-key') || '';
+            const savedMod = localStorage.getItem('ai-mod') || '';
+            const customUrl = localStorage.getItem('ai-url') || '';
+
+            if (!apiKey && provider !== 'custom') {
+                lastMsgDiv.className = 'chat-message system-error';
+                lastMsgDiv.innerText = '⚠️ Παρακαλούμε ρυθμίστε το API Key στις ρυθμίσεις AI Config πρώτα.';
+                openAiSettings();
+                inputEl.disabled = false;
+                sendBtn.disabled = false;
+                return;
+            }
+
+            // Build the System Prompt Context dynamically on EVERY call
+            const isOriginal = currentContext.selectedColType === 'original';
+            const contextText = isOriginal ? currentContext.originalText : currentContext.translationText;
+            const contextLabel = isOriginal ? "Αρχαίο Κείμενο" : "Σύγχρονη Μετάφραση";
+			const pageTitle = document.title;
+
+            let systemInstruction = "Είσαι διακεκριμένος φιλόσοφος και γνώστης της φιλοσοφίας του Αριστοτέλη και Πλάτωνα και άλλων αρχαίων ελλήνων συγγραφέων.\n" +
+                "Ο χρήστης διαβάζει το βιβλίου του " + pageTitle + " και βάσει αυτού θα σου κάνει μερικές ερωτήσεις, περιλαμβάνοντας κάποιες φορές αποσπάσματα απο το βιβλίο αυτό πάνω στα οποία σχετίζονται οι ερωτήσεις. Ακολουθεί το ευρύτειο πλαίσιο της σελίδας/κεφαλαίου (Σελίδα " + currentContext.pageNum + ", " + currentContext.dividerText + ") για αναφορά:\n" +
+                "--- " + contextLabel + ":\n" + contextText + "\n\n" +
+                "Απάντησε στις ερωτήσεις του χρήστη σε σχέση με το πλαίσιο του κειμένου που παρέχεται. " +
+                "Δώσε τις απαντήσεις σου στα νέα ελληνικά χρησιμοποιώντας markdown μορφοποίηση.";
+
+            // Construct Payload Messages (Always prepending system prompt at index 0)
+            let payloadMessages = [{ role: "system", content: systemInstruction }];
+            payloadMessages = payloadMessages.concat(chatHistory);
+
+            try {
+                const answer = await requestAPI(provider, apiKey, savedMod, payloadMessages, customUrl);
+                lastMsgDiv.innerHTML = formatMarkdown(answer);
+                chatHistory.push({ role: "assistant", content: answer });
+            } catch (error) {
+                lastMsgDiv.className = 'chat-message system-error';
+                lastMsgDiv.innerText = "Error: " + error.message;
+                // If API failed, keep the user question on screen so they can click to retry it,
+                // do not silently clear the UI anymore.
+            } finally {
+                inputEl.disabled = false;
+                sendBtn.disabled = false;
+                document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+                inputEl.focus();
+                adjustSidebarHeightForKeyboard();
+            }
+        }
+
+        async function sendChatMessage() {
+            const inputEl = document.getElementById('chat-input');
+            const prompt = inputEl.value.trim();
+            if (!prompt) return;
+
+            // If the last message in history is a 'user' query (due to a previous failed turn),
+            // pop it before sending so that our conversational stack maintains alternating roles.
+            if (chatHistory.length > 0 && chatHistory[chatHistory.length - 1].role === 'user') {
+                chatHistory.pop();
+            }
+
+            // 1. Manage Chat History & Highlight Context
+            let histIdx;
+            if (chatHistory.length === 0) {
+                // Incorporate highlighted text directly into the first user turn, NOT the system prompt
+                const firstUserContent = "Επισημασμένο κείμενο:\n\"" + currentSelection + "\"\n\nΕρώτηση:\n" + prompt;
+                chatHistory.push({ role: "user", content: firstUserContent });
+                histIdx = 0;
+            } else {
+                // Subsequent turns: push the raw user follow-up prompt
+                chatHistory.push({ role: "user", content: prompt });
+                histIdx = chatHistory.length - 1;
+            }
+
+            // 2. Display user message in UI with history index
+            appendMessage('user', prompt, false, histIdx);
+            inputEl.value = '';
+
+            // 3. Trigger query execution
+            await runQuery();
+        }
+
+        async function requestAPI(provider, apiKey, model, messages, customUrl) {
+            let url = "";
+            let headers = { "Content-Type": "application/json" };
+            let body = {};
+
+            // Normalize models to defaults if unspecified
+            let activeModel = model;
+            if (!activeModel) {
+                if (provider === 'openai') activeModel = 'gpt-4o-mini';
+                else if (provider === 'anthropic') activeModel = 'claude-3-5-sonnet-20241022';
+                else if (provider === 'gemini') activeModel = 'gemini-flash-latest';
+                else if (provider === 'openrouter') activeModel = 'meta-llama/llama-3-8b-instruct:free';
+                else activeModel = 'local-model';
+            }
+
+            if (provider === 'openai') {
+                url = "https://api.openai.com/v1/chat/completions";
+                headers["Authorization"] = "Bearer " + apiKey;
+                body = { model: activeModel, messages: messages };
+            } else if (provider === 'openrouter') {
+                url = "https://openrouter.ai/api/v1/chat/completions";
+                headers["Authorization"] = "Bearer " + apiKey;
+                headers["HTTP-Referer"] = window.location.href;
+                headers["X-Title"] = "Ancient Greek Bilingual Reader";
+                body = { model: activeModel, messages: messages };
+            } else if (provider === 'gemini') {
+                url = "https://generativelanguage.googleapis.com/v1beta/models/" + activeModel + ":generateContent?key=" + apiKey;
+                
+                // Restructure typical OpenAI formats to Gemini's native API structure
+                const systemItem = messages.find(m => m.role === 'system');
+                const userItems = messages.filter(m => m.role !== 'system');
+                
+                const contents = userItems.map(m => ({
+                    role: m.role === 'assistant' ? 'model' : 'user',
+                    parts: [{ text: m.content }]
+                }));
+
+                body = { contents: contents };
+                if (systemItem) {
+                    body.systemInstruction = { parts: [{ text: systemItem.content }] };
+                }
+            } else if (provider === 'anthropic') {
+                url = "https://api.anthropic.com/v1/messages";
+                headers["x-api-key"] = apiKey;
+                headers["anthropic-version"] = "2023-06-01";
+                headers["dangerously-allow-browser"] = "true";
+
+                const systemItem = messages.find(m => m.role === 'system');
+                const userItems = messages.filter(m => m.role !== 'system');
+
+                body = {
+                    model: activeModel,
+                    messages: userItems.map(m => ({ role: m.role, content: m.content })),
+                    max_tokens: 1500
+                };
+                if (systemItem) {
+                    body.system = systemItem.content;
+                }
+            } else if (provider === 'custom') {
+                url = customUrl || "http://localhost:11434/v1/chat/completions";
+                if (apiKey) {
+                    headers["Authorization"] = "Bearer " + apiKey;
+                }
+                body = { model: activeModel, messages: messages };
+            }
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(body)
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error("API Error (" + response.status + "): " + (errText || response.statusText));
+            }
+
+            const responseData = await response.json();
+
+            // Extract content responses safely depending on the selected engine
+            if (provider === 'gemini') {
+                return responseData.candidates[0].content.parts[0].text;
+            } else if (provider === 'anthropic') {
+                return responseData.content[0].text;
+            } else {
+                // OpenAI / OpenRouter / Ollama
+                return responseData.choices[0].message.content;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('ebook-theme');
+            if (savedTheme) {
+                const targetBtn = document.getElementById('theme-' + savedTheme);
+                if (targetBtn) setTheme(savedTheme, targetBtn);
+            }
+
+            const hideOriginal = localStorage.getItem('ebook-hide-original');
+            if (hideOriginal === 'true') {
+                document.body.classList.add('hide-original');
+                document.getElementById('toggle-layout-btn').innerText = 'Show Original';
+            }
+            
+            if (window.innerWidth > 900) {
+                const sidebarClosed = localStorage.getItem('ebook-sidebar-closed');
+                if (sidebarClosed === 'true') {
+                    document.body.classList.add('sidebar-closed');
+                }
+            }
+
+            // Restore saved chat width on desktop
+            const chatSidebar = document.getElementById('chat-sidebar');
+            const savedChatWidth = localStorage.getItem('ebook-chat-width');
+            if (savedChatWidth && window.innerWidth > 900) {
+                chatSidebar.style.width = savedChatWidth;
+            }
+
+            // Setup Resizing for AI Chat Sidebar
+            const resizeHandle = document.getElementById('chat-resize-handle');
+            let isResizing = false;
+
+            resizeHandle.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                chatSidebar.classList.add('resizing');
+                document.body.style.userSelect = 'none';
+                document.body.style.cursor = 'ew-resize';
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isResizing) return;
+                const newWidth = window.innerWidth - e.clientX;
+                // Limit range between 280px and 85% of total screen width
+                if (newWidth > 280 && newWidth < window.innerWidth * 0.85) {
+                    chatSidebar.style.width = newWidth + 'px';
+                    localStorage.setItem('ebook-chat-width', newWidth + 'px');
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (isResizing) {
+                    isResizing = false;
+                    chatSidebar.classList.remove('resizing');
+                    document.body.style.userSelect = '';
+                    document.body.style.cursor = '';
+                }
+            });
+            
+            // Listen for selection events on layout columns (supports mouse and touch handles)
+            document.addEventListener('mouseup', handleTextSelection);
+            document.addEventListener('keyup', handleTextSelection);
+            document.addEventListener('selectionchange', handleTextSelection);
+
+            // Bind selection popup using both mousedown and touchstart with preventDefault.
+            // This guarantees instant tap execution on touch devices before selection focus is lost.
+            const popup = document.getElementById('ai-selection-popup');
+            const handleTriggerTap = (e) => {
+                e.preventDefault();
+                openChatWithSelection();
+            };
+            popup.addEventListener('mousedown', handleTriggerTap);
+            popup.addEventListener('touchstart', handleTriggerTap);
+
+            // Hide the popup trigger during scroll shifts (desktop only to prevent mobile touch glitches)
+            window.addEventListener('scroll', () => {
+                if (window.innerWidth > 900) {
+                    document.getElementById('ai-selection-popup').style.display = 'none';
+                }
+            }, { passive: true });
+
+            // VisualViewport resizing adjustments (Handles Android virtual keyboard overlap natively)
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', adjustSidebarHeightForKeyboard);
+                window.visualViewport.addEventListener('scroll', adjustSidebarHeightForKeyboard);
+            }
+
+            const chatInput = document.getElementById('chat-input');
+            if (chatInput) {
+                chatInput.addEventListener('focus', () => {
+                    setTimeout(adjustSidebarHeightForKeyboard, 150);
+                });
+                chatInput.addEventListener('blur', () => {
+                    setTimeout(adjustSidebarHeightForKeyboard, 150);
+                });
+            }
+            
+            let lastScrollTop = 0;
+            const header = document.querySelector('header');
+            const optBtn = document.querySelector('.options-toggle');
+            
+            window.addEventListener('scroll', () => {
+                let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                
+                if (scrollTop < 0) scrollTop = 0;
+                
+                if (scrollTop > 10) {
+                    document.body.classList.add('scrolled');
+                } else {
+                    document.body.classList.remove('scrolled');
+                }
+                
+                if (scrollTop > lastScrollTop && scrollTop > 120) {
+                    header.classList.add('header-hidden');
+                    header.classList.remove('options-open');
+                    document.body.classList.remove('mobile-options-open');
+                    optBtn.classList.remove('active');
+                } else {
+                    header.classList.remove('header-hidden');
+                }
+                
+                lastScrollTop = scrollTop;
+            }, { passive: true });
+            
+            const observerOptions = {
+                root: null,
+                rootMargin: "-100px 0px -60% 0px", 
+                threshold: 0
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const hash = entry.target.getAttribute('data-hash');
+                        if (hash && window.location.hash !== '#' + hash) {
+                            history.replaceState(null, null, '#' + hash);
+                        }
+                    }
+                });
+            }, observerOptions);
+            
+            document.querySelectorAll('.page-divider').forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>
