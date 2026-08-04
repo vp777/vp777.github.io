@@ -1,0 +1,1985 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ΠΛΑΤΩΝ Κρίτων</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Marked.js Markdown rendering library -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #faf8f5;
+            --text-color: #2c2520;
+            --accent-color: #8b263e;
+            --sidebar-bg: #f3efe9;
+            --border-color: #e3ded5;
+            --muted-text: #706357;
+            --font-serif: "Cardo", "Georgia", "Palatino", serif;
+        }
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --accent-color: #ff8a80;
+            --sidebar-bg: #2d2d2d;
+            --border-color: #404040;
+            --muted-text: #999999;
+        }
+        [data-theme="sepia"] {
+            --bg-color: #f4ecd8;
+            --text-color: #5b4636;
+            --accent-color: #a04000;
+            --sidebar-bg: #ebdcb9;
+            --border-color: #d7c59d;
+            --muted-text: #7c6857;
+        }
+        
+        body {
+            margin: 0;
+            font-family: var(--font-serif);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            transition: background-color 0.2s, color 0.2s;
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        #mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 90;
+        }
+        #mobile-overlay.open {
+            display: block;
+        }
+        
+        #expand-bar {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 24px;
+            height: 100vh;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            cursor: pointer;
+            z-index: 95;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+        #expand-bar:hover {
+            background-color: var(--border-color);
+        }
+        #expand-bar::after {
+            content: "›";
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        
+        #sidebar {
+            width: 340px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            height: 100vh;
+            position: fixed;
+            top: 0; left: 0;
+            overflow-y: auto;
+            padding: 24px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transform: translateX(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+        #sidebar h2 {
+            font-size: 1.25rem;
+            margin: 0;
+            color: var(--text-color);
+        }
+        .sidebar-close-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--accent-color);
+            font-size: 1.4rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            line-height: 1;
+        }
+        .sidebar-close-btn:hover {
+            background-color: var(--border-color);
+        }
+        
+        .toc-list-container { overflow-y: auto; flex-grow: 1; }
+        
+        details.book-group {
+            margin-bottom: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            background-color: var(--sidebar-bg);
+        }
+        details.book-group[open] { border-color: var(--accent-color); }
+        details.book-group summary {
+            font-weight: bold; font-size: 1.05rem; cursor: pointer; padding: 10px 14px;
+            background-color: var(--sidebar-bg); list-style: none; display: flex;
+            justify-content: space-between; align-items: center; user-select: none;
+        }
+        details.book-group summary::-webkit-details-marker { display: none; }
+        details.book-group summary::after { content: "▾"; font-size: 0.9rem; color: var(--accent-color); }
+        details.book-group[open] summary::after { transform: rotate(180deg); }
+        
+        .toc-sublist-container {
+            background-color: var(--bg-color);
+            border-top: 1px solid var(--border-color);
+        }
+        .toc-group-title {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            padding: 8px 14px 4px 14px;
+            line-height: 1.3;
+        }
+        .toc-sublist { list-style: none; padding: 4px 14px 8px 14px; margin: 0; }
+        .toc-sublist li { margin-bottom: 8px; font-size: 0.88rem; }
+        
+        .toc-sublist a { 
+            color: var(--text-color); 
+            text-decoration: none; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding: 4px; 
+        }
+        .toc-sublist a:hover { color: var(--accent-color); }
+        .toc-page {
+            color: var(--muted-text);
+            font-size: 0.8rem;
+            font-family: var(--font-serif);
+        }
+        
+        #main {
+            margin-left: 340px;
+            flex-grow: 1;
+            padding: 180px 40px 40px 40px;
+            box-sizing: border-box;
+            width: calc(100% - 340px);
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        padding-top 0.3s ease;
+        }
+        
+        header {
+            position: fixed;
+            top: 0;
+            left: 340px;
+            right: 0;
+            background-color: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px 40px;
+            z-index: 50;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transform: translateY(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        left 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        background-color 0.2s, 
+                        box-shadow 0.2s;
+        }
+        header.header-hidden {
+            transform: translateY(-100%);
+            box-shadow: none !important;
+        }
+        body.scrolled header {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        [data-theme="dark"] body.scrolled header {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .header-top { display: flex; align-items: center; gap: 20px; }
+        header h1 { margin: 0; font-size: 1.8rem; color: var(--accent-color); line-height: 1.2; }
+        
+        .controls-group {
+            display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+        }
+        .btn {
+            background-color: var(--sidebar-bg); color: var(--text-color);
+            border: 1px solid var(--border-color); padding: 8px 14px;
+            font-family: inherit; cursor: pointer; border-radius: 6px;
+            font-size: 0.9rem; font-weight: bold; transition: all 0.2s; white-space: nowrap;
+        }
+        .btn:hover { background-color: var(--border-color); }
+        .btn.active { background-color: var(--accent-color); color: white; border-color: var(--accent-color); }
+        .btn-layout { background-color: var(--bg-color); border: 2px solid var(--accent-color); color: var(--accent-color); }
+        
+        .menu-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+            white-space: nowrap;
+        }
+        .menu-toggle:hover {
+            background-color: var(--text-color);
+        }
+        
+        .options-toggle {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 6px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            width: 38px;
+            height: 38px;
+            transition: all 0.2s;
+        }
+        .options-toggle:hover {
+            background-color: var(--sidebar-bg);
+        }
+
+        #book-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            column-gap: 48px;
+            row-gap: 0;
+            margin: 0 auto;
+            max-width: 140ch;
+            width: 100%;
+        }
+        
+        body.sidebar-closed #expand-bar {
+            display: flex;
+        }
+        body.sidebar-closed #sidebar {
+            transform: translateX(-340px);
+        }
+        body.sidebar-closed #main {
+            margin-left: 24px;
+            width: calc(100% - 24px);
+        }
+        body.sidebar-closed header {
+            left: 24px;
+        }
+        
+        body.hide-original #book-content { 
+            grid-template-columns: 1fr; 
+            max-width: 140ch;
+        }
+        body.hide-original .original-col { display: none; }
+        body.hide-original .bilingual-header { grid-template-columns: 1fr; }
+        body.hide-original .original-title { display: none; }
+        body.hide-original .translation-col {
+            max-width: 100% !important;
+            justify-self: stretch !important;
+        }
+
+        .bilingual-header {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px; position: sticky; top: 0;
+            background-color: var(--bg-color); padding: 16px 0;
+            border-bottom: 2px solid var(--accent-color); z-index: 10;
+            font-weight: bold; text-transform: uppercase; font-size: 0.85rem;
+            letter-spacing: 0.05em; color: var(--muted-text);
+        }
+        
+        .chapter-anchor {
+            display: block;
+            scroll-margin-top: 180px;
+        }
+        
+        .page-divider {
+            grid-column: 1 / -1;
+            border-bottom: 1px solid var(--border-color);
+            padding-top: 48px; padding-bottom: 12px; margin-bottom: 24px;
+            font-size: 0.95rem; color: var(--accent-color); text-transform: uppercase;
+            letter-spacing: 0.05em; font-weight: bold; 
+            scroll-margin-top: 180px;
+        }
+        
+        .page-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--accent-color);
+            transition: color 0.2s, border-bottom-color 0.2s;
+        }
+        .page-link:hover {
+            color: var(--text-color);
+            border-bottom-color: var(--text-color);
+        }
+        
+        .column { 
+            box-sizing: border-box; 
+            padding-bottom: 24px; 
+            display: flex; 
+            flex-direction: column; 
+            max-width: 65ch;
+            width: fit-content;
+            min-width: 0;
+        }
+        
+        .original-col {
+            justify-self: end;
+        }
+        .translation-col {
+            justify-self: start;
+        }
+        
+        .passage { 
+            margin: 0 0 1.2em 0; 
+            font-size: 1.15rem; 
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 1.5rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .passage-text {
+            flex: 1;
+            min-width: 0;
+            text-align: justify;
+        }
+        .passage.indent .passage-text { text-indent: 2em; }
+        .marker { color: var(--accent-color); font-weight: bold; margin-right: 4px; }
+        .line-number { 
+            color: var(--muted-text); 
+            font-size: 0.85em; 
+            font-weight: normal; 
+            user-select: none;
+            margin-left: auto;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+        i { font-style: italic; }
+
+        /* Floating popover trigger styling */
+        #ai-selection-popup {
+            position: fixed;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 14px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1005;
+            display: none;
+            font-family: var(--font-serif);
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.1s ease;
+        }
+        #ai-selection-popup:hover {
+            transform: scale(1.05);
+        }
+
+        /* Resizable sliding Right Chat Sidebar */
+        #chat-sidebar {
+            width: 380px;
+            min-width: 280px;
+            max-width: 85vw;
+            background-color: var(--sidebar-bg);
+            border-left: 1px solid var(--border-color);
+            height: 100vh;
+            height: 100dvh;
+            position: fixed;
+            top: 0; right: 0;
+            transform: translateX(100%);
+            overflow: visible;
+            display: flex;
+            flex-direction: column;
+            z-index: 110;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-sizing: border-box;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.05);
+        }
+        body.chat-sidebar-open #chat-sidebar {
+            transform: translateX(0);
+        }
+        
+        /* Draggable Resize Handle */
+        #chat-resize-handle {
+            width: 8px;
+            height: 100%;
+            position: absolute;
+            left: -4px;
+            top: 0;
+            cursor: ew-resize;
+            z-index: 120;
+            background-color: transparent;
+            transition: background-color 0.2s;
+        }
+        #chat-resize-handle:hover,
+        #chat-sidebar.resizing #chat-resize-handle {
+            background-color: var(--accent-color);
+            opacity: 0.5;
+        }
+        
+        .chat-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-header h3 { margin: 0; font-size: 1.1rem; color: var(--accent-color); }
+        
+        .chat-header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .chat-context-card {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+        .chat-context-card h4 { margin: 0 0 6px 0; color: var(--accent-color); }
+        .chat-context-card p { 
+            margin: 0; 
+            font-style: italic; 
+            display: -webkit-box; 
+            -webkit-line-clamp: 3; 
+            -webkit-box-orient: vertical; 
+            overflow: hidden; 
+            line-height: 1.4;
+        }
+        
+        .chat-message {
+            max-width: 85%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        
+        /* Render styles for AI Markdown elements in chat boxes */
+        .chat-message p { margin: 0 0 8px 0; line-height: 1.5; }
+        .chat-message p:last-child { margin-bottom: 0; }
+        .chat-message strong { font-weight: bold; }
+        .chat-message em { font-style: italic; }
+        .chat-message ul, .chat-message ol { margin: 4px 0 8px 16px; padding: 0; }
+        .chat-message li { margin-bottom: 4px; font-size: 0.92rem; }
+        .chat-message h1, .chat-message h2, .chat-message h3, .chat-message h4, .chat-message h5 {
+            color: var(--accent-color);
+            margin: 12px 0 6px 0;
+            line-height: 1.3;
+        }
+        .chat-message h3 { font-size: 1.15rem; }
+        .chat-message h4 { font-size: 1.05rem; }
+        .chat-message h5 { font-size: 0.95rem; }
+        .chat-message blockquote {
+            border-left: 3px solid var(--accent-color);
+            margin: 8px 0;
+            padding-left: 10px;
+            color: var(--muted-text);
+            font-style: italic;
+        }
+        .chat-message pre {
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.85rem;
+            margin: 8px 0;
+        }
+        .chat-message code {
+            font-family: monospace;
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: var(--accent-color);
+        }
+        
+        .chat-message.user {
+            background-color: var(--accent-color);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .chat-message.user:hover {
+            filter: brightness(1.15);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        /* Override light-colored syntax highlights in dark bubbles */
+        .chat-message.user code {
+            color: #ff8a80;
+            background-color: rgba(0,0,0,0.2);
+            border-color: rgba(0,0,0,0.1);
+        }
+        .chat-message.user pre {
+            background-color: rgba(0,0,0,0.2);
+            border-color: rgba(0,0,0,0.1);
+            color: white;
+        }
+        
+        .chat-message.assistant {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .chat-message.system-error {
+            background-color: #fce8e6;
+            color: #c5221f;
+            border: 1px solid #fad2cf;
+            align-self: center;
+            max-width: 95%;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+        
+        [data-theme="dark"] .chat-message.system-error {
+            background-color: #371d1d;
+            color: #f28b82;
+            border-color: #5c2424;
+        }
+
+        .chat-input-area {
+            padding: 16px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 8px;
+            background-color: var(--sidebar-bg);
+            flex-shrink: 0;
+        }
+        .chat-input-area textarea {
+            flex-grow: 1;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 10px;
+            border-radius: 6px;
+            resize: none;
+            height: 42px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+        }
+        .chat-input-area button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .chat-input-area button:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* Modal Config Dialog */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-content {
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            padding: 24px;
+            box-sizing: border-box;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 12px;
+        }
+        .modal-header h3 { margin: 0; font-size: 1.25rem; color: var(--accent-color); }
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group label {
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        .form-control {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 14px;
+        }
+
+        @media (max-width: 900px) {
+            #sidebar { transform: translateX(-100%); width: 320px; }
+            body.sidebar-open #sidebar { transform: translateX(0); }
+            body.sidebar-closed #sidebar { transform: translateX(-100%); }
+            
+            #chat-sidebar {
+                width: 100% !important;
+                right: 0;
+                transform: translateX(100%);
+                height: 100vh;
+                height: 100dvh;
+            }
+            body.chat-sidebar-open #chat-sidebar {
+                transform: translateX(0);
+            }
+            #chat-resize-handle {
+                display: none;
+            }
+            
+            #main { 
+                margin-left: 0 !important; 
+                width: 100% !important; 
+                padding: 100px 20px 20px 20px !important;
+            }
+            body.mobile-options-open #main {
+                padding-top: 150px !important;
+            }
+            
+            header {
+                padding-bottom: 12px;
+                margin-bottom: 16px;
+                gap: 8px;
+            }
+            header h1 { 
+                font-size: 0.95rem !important;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                text-align: center;
+                flex-grow: 1;
+                margin: 0;
+            }
+            
+            header {
+                left: 0 !important;
+                padding: 12px 16px;
+            }
+            
+            .header-top { 
+                display: flex;
+                flex-direction: row !important;
+                align-items: center; 
+                justify-content: space-between; 
+                width: 100%;
+                gap: 12px; 
+            }
+            
+            .menu-toggle { 
+                width: auto !important; 
+                padding: 6px 12px;
+                font-size: 0.85rem;
+            }
+            
+            .options-toggle {
+                display: inline-flex;
+            }
+            
+            .controls-group {
+                display: none;
+                width: 100%;
+                justify-content: center;
+                padding-top: 12px;
+                border-top: 1px dashed var(--border-color);
+            }
+            header.options-open .controls-group {
+                display: flex;
+            }
+            
+            #book-content { grid-template-columns: 1fr; column-gap: 0; max-width: 100%; }
+            .column { max-width: 100% !important; width: 100% !important; }
+            .bilingual-header { display: none; }
+            .page-divider { padding-top: 32px; scroll-margin-top: 110px; }
+            .chapter-anchor { scroll-margin-top: 110px; }
+            .passage { font-size: 1.05rem; }
+        }
+        
+        @media (min-width: 901px) {
+            .menu-toggle {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="mobile-overlay" onclick="toggleSidebar()"></div>
+
+    <div id="expand-bar" onclick="toggleSidebar()" title="Ανάπτυξη Περιεχομένων"></div>
+
+    <aside id="sidebar">
+        <div class="sidebar-header">
+            <h2>Πίνακας Περιεχομένων</h2>
+            <button class="sidebar-close-btn" onclick="toggleSidebar()" title="Σύμπτυξη">‹</button>
+        </div>
+        <div class="toc-list-container">
+            <details class="book-group">
+    <summary>Εισαγωγή: Επίσκεψη του Κρίτωνα στον Σωκράτη στη φυλακή</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-1-chapter----" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΣΩΚΡΑΤΗΣ.-ΣΩ.</span> <span class="toc-page">#1</span></a></li>
+        </ul>
+    </div>
+</details>
+<details class="book-group">
+    <summary>Ο Κρίτων προτείνει στον Σωκράτη να δραπετεύσει</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-2-chapter----" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΚΡ.-ΣΩ.</span> <span class="toc-page">#2</span></a></li>
+            <li><a href="#book-2-chapter--" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΚΡ.</span> <span class="toc-page">#3</span></a></li>
+        </ul>
+    </div>
+</details>
+<details class="book-group">
+    <summary>Ο Σωκράτης επιχειρηματολογεί εναντίον της πρότασης του Κρίτωνα</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-3-chapter----" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΣΩ.-ΚΡ.</span> <span class="toc-page">#4</span></a></li>
+            <li><a href="#book-3-chapter-----2" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΣΩ.-ΚΡ..2</span> <span class="toc-page">#5</span></a></li>
+            <li><a href="#book-3-chapter-----3" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΣΩ.-ΚΡ..3</span> <span class="toc-page">#6</span></a></li>
+        </ul>
+    </div>
+</details>
+<details class="book-group">
+    <summary>Συνομιλία του Σωκράτη με τους Νόμους</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-4-chapter----" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΣΩ.-ΚΡ.</span> <span class="toc-page">#7</span></a></li>
+            <li><a href="#book-4-chapter-----2" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΣΩ.-ΚΡ..2</span> <span class="toc-page">#8</span></a></li>
+            <li><a href="#book-4-chapter--" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΣΩ.</span> <span class="toc-page">#9</span></a></li>
+            <li><a href="#book-4-chapter----" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΚΡ.-ΣΩ.</span> <span class="toc-page">#10</span></a></li>
+        </ul>
+    </div>
+</details>
+        </div>
+    </aside>
+
+    <!-- AI Right Chat Sidebar -->
+    <aside id="chat-sidebar">
+        <div id="chat-resize-handle"></div>
+        <div class="chat-header">
+            <h3>AI Assistant</h3>
+            <div class="chat-header-actions">
+                <button class="btn" style="padding: 4px 8px; font-size: 0.8rem;" onclick="clearChat()">Clear</button>
+                <button class="sidebar-close-btn" style="width: 28px; height: 28px; font-size: 1.1rem;" onclick="toggleChatSidebar()" title="Κλείσιμο">›</button>
+            </div>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <!-- Active Context Card -->
+            <div class="chat-context-card" id="chat-context-card">
+                <h4>Επιλεγμένο Κείμενο</h4>
+                <p id="chat-context-text"></p>
+            </div>
+            <!-- Messages stream here -->
+        </div>
+        <div class="chat-input-area">
+            <textarea id="chat-input" placeholder="Ρωτήστε κάτι για το επιλεγμένο κείμενο..." onkeydown="handleChatKeyDown(event)"></textarea>
+            <button id="chat-send-btn" onclick="sendChatMessage()">Send</button>
+        </div>
+    </aside>
+
+    <!-- Floating Popover Trigger -->
+    <button id="ai-selection-popup"><span style="font-size: 1.1rem;">✨</span> Ask AI</button>
+
+    <!-- Settings Configuration Modal -->
+    <div id="ai-config-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Ρυθμίσεις LLM / AI</h3>
+                <button class="sidebar-close-btn" style="width: 28px; height: 28px; font-size: 1.1rem;" onclick="closeAiSettings()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="ai-provider">Πάροχος (Provider)</label>
+                    <select id="ai-provider" class="form-control" onchange="handleProviderChange()">
+                        <option value="openai">OpenAI (ChatGPT)</option>
+                        <option value="anthropic">Anthropic (Claude)</option>
+                        <option value="gemini">Google Gemini</option>
+                        <option value="openrouter">OpenRouter</option>
+                        <option value="custom">Custom Endpoint (Ollama / Local)</option>
+                    </select>
+                </div>
+                <div class="form-group" id="group-custom-url" style="display: none;">
+                    <label for="ai-custom-url">Base URL</label>
+                    <input type="text" id="ai-custom-url" class="form-control" placeholder="http://localhost:11434/v1/chat/completions">
+                </div>
+                <div class="form-group">
+                    <label for="ai-key">API Key</label>
+                    <input type="password" id="ai-key" class="form-control" placeholder="Εισάγετε το API Key">
+                </div>
+                <div class="form-group">
+                    <label for="ai-model">Μοντέλο (Model Name)</label>
+                    <input type="text" id="ai-model" class="form-control" placeholder="π.χ. gpt-4o-mini">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeAiSettings()">Άκυρο</button>
+                <button class="btn active" onclick="saveAiSettings()">Αποθήκευση</button>
+            </div>
+        </div>
+    </div>
+
+    <main id="main">
+        <header>
+            <div class="header-top">
+                <button class="btn menu-toggle" onclick="toggleSidebar()">☰ Περιεχόμενα</button>
+                <h1>ΠΛΑΤΩΝ Κρίτων</h1>
+                <button class="btn options-toggle" onclick="toggleMobileOptions()" title="Ρυθμίσεις">⚙️</button>
+            </div>
+            
+            <div class="controls-group">
+                <button id="toggle-layout-btn" class="btn btn-layout" onclick="toggleLayout()">Hide Original</button>
+                <button class="btn" style="border-color: var(--accent-color);" onclick="openAiSettings()">⚙️ AI Config</button>
+                <button class="btn active theme-btn" id="theme-light" onclick="setTheme('light', this)">Light</button>
+                <button class="btn theme-btn" id="theme-sepia" onclick="setTheme('sepia', this)">Sepia</button>
+                <button class="btn theme-btn" id="theme-dark" onclick="setTheme('dark', this)">Dark</button>
+            </div>
+        </header>
+
+        <section id="book-content">
+            <div class="bilingual-header">
+                <div class="original-title">Αρχαία Ελληνικά (Original)</div>
+                <div class="translation-title">Νέα Ελληνικά (Translation)</div>
+            </div>
+
+            
+        <div id="book-1-chapter----" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-1" data-hash="book-1-chapter----">
+            Εισαγωγή: Επίσκεψη του Κρίτωνα στον Σωκράτη στη φυλακή • Κεφάλαιο ΣΩΚΡΑΤΗΣ.-ΣΩ. (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=105&page=1" target="_blank" class="page-link">Page 1</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[43a]</span> ΣΩΚΡΑΤΗΣ. Τί τηνικάδε ἀφῖξαι, ὦ Κρίτων; ἢ οὐ πρῲ ἔτι ἐστίν;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Πάνυ μὲν οὖν.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Πηνίκα μάλιστα;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Ὄρθρος βαθύς.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Θαυμάζω ὅπως ἠθέλησέ σοι ὁ τοῦ δεσμωτηρίου φύλαξ ὑπακοῦσαι.</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Συνήθης ἤδη μοί ἐστιν, ὦ Σώκρατες, διὰ τὸ πολλάκις δεῦρο φοιτᾶν, καί τι καὶ εὐεργέτηται ὑπ᾽ ἐμοῦ.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ἄρτι δὲ ἥκεις ἢ πάλαι;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Ἐπιεικῶς πάλαι.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[43b]</span> ΣΩΚΡΑΤΗΣ. Εἶτα πῶς οὐκ εὐθὺς ἐπήγειράς με, ἀλλὰ σιγῇ παρακάθησαι;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Οὐ μὰ τὸν Δία, ὦ Σώκρατες, οὐδ᾽ ἂν αὐτὸς ἤθελον ἐν τοσαύτῃ τε ἀγρυπνίᾳ καὶ λύπῃ εἶναι, ἀλλὰ καὶ σοῦ πάλαι θαυμάζω αἰσθανόμενος ὡς ἡδέως καθεύδεις· καὶ ἐπίτηδές σε οὐκ ἤγειρον ἵνα ὡς ἥδιστα διάγῃς. καὶ πολλάκις μὲν δή σε καὶ πρότερον ἐν παντὶ τῷ βίῳ ηὐδαιμόνισα τοῦ τρόπου, πολὺ δὲ μάλιστα ἐν τῇ νῦν παρεστώσῃ συμφορᾷ, ὡς ῥᾳδίως αὐτὴν καὶ πρᾴως φέρεις.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Καὶ γὰρ ἄν, ὦ Κρίτων, πλημμελὲς εἴη ἀγανακτεῖν τηλικοῦτον ὄντα εἰ δεῖ ἤδη τελευτᾶν.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[43c]</span> ΚΡΙΤΩΝ. Καὶ ἄλλοι, ὦ Σώκρατες, τηλικοῦτοι ἐν τοιαύταις συμφοραῖς ἁλίσκονται, ἀλλ᾽ οὐδὲν αὐτοὺς ἐπιλύεται ἡ ἡλικία τὸ μὴ οὐχὶ ἀγανακτεῖν τῇ παρούσῃ τύχῃ.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ἔστι ταῦτα. ἀλλὰ τί δὴ οὕτω πρῲ ἀφῖξαι;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Ἀγγελίαν, ὦ Σώκρατες, φέρων χαλεπήν, οὐ σοί, ὡς ἐμοὶ φαίνεται, ἀλλ᾽ ἐμοὶ καὶ τοῖς σοῖς ἐπιτηδείοις πᾶσιν καὶ χαλεπὴν καὶ βαρεῖαν, ἣν ἐγώ, ὡς ἐμοὶ δοκῶ, ἐν τοῖς βαρύτατ᾽ ἂν ἐνέγκαιμι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Τίνα ταύτην; ἢ τὸ πλοῖον ἀφῖκται ἐκ Δήλου, οὗ δεῖ <span class="marker">[43d]</span> ἀφικομένου τεθνάναι με;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Οὔτοι δὴ ἀφῖκται, ἀλλὰ δοκεῖν μέν μοι ἥξει τήμερον ἐξ ὧν ἀπαγγέλλουσιν ἥκοντές τινες ἀπὸ Σουνίου καὶ καταλιπόντες ἐκεῖ αὐτό. δῆλον οὖν ἐκ τούτων [τῶν ἀγγέλων] ὅτι ἥξει τήμερον, καὶ ἀνάγκη δὴ εἰς αὔριον ἔσται, ὦ Σώκρατες, τὸν βίον σε τελευτᾶν.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ἀλλ᾽, ὦ Κρίτων, τύχῃ ἀγαθῇ, εἰ ταύτῃ τοῖς θεοῖς φίλον, ταύτῃ ἔστω· οὐ μέντοι οἶμαι ἥξειν αὐτὸ τήμερον.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[44a]</span> ΚΡΙΤΩΝ. Πόθεν τοῦτο τεκμαίρῃ;</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ἐγώ σοι ἐρῶ. τῇ γάρ που ὑστεραίᾳ δεῖ με ἀποθνῄσκειν ἢ ᾗ ἂν ἔλθῃ τὸ πλοῖον.</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Φασί γέ τοι δὴ οἱ τούτων κύριοι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐ τοίνυν τῆς ἐπιούσης ἡμέρας οἶμαι αὐτὸ ἥξειν ἀλλὰ τῆς ἑτέρας. τεκμαίρομαι δὲ ἔκ τινος ἐνυπνίου ὃ ἑώρακα ὀλίγον πρότερον ταύτης τῆς νυκτός· καὶ κινδυνεύεις ἐν καιρῷ τινι οὐκ ἐγεῖραί με.</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Ἦν δὲ δὴ τί τὸ ἐνύπνιον;</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ἐδόκει τίς μοι γυνὴ προσελθοῦσα καλὴ καὶ εὐειδής, <span class="marker">[44b]</span> λευκὰ ἱμάτια ἔχουσα, καλέσαι με καὶ εἰπεῖν· «Ὦ Σώκρατες,</span></p>
+<p class="passage indent"><span class="passage-text">ἤματί κεν τριτάτῳ Φθίην ἐρίβωλον ἵκοιο.»</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Ἄτοπον τὸ ἐνύπνιον, ὦ Σώκρατες.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ἐναργὲς μὲν οὖν, ὥς γέ μοι δοκεῖ, ὦ Κρίτων.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text"><i>Ο ΚΡΙΤΩΝ ΕΠΙΣΚΕΠΤΕΤΑΙ ΤΟΝ ΣΩΚΡΑΤΗ ΣΤΗ ΦΥΛΑΚΗ</i></span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[43a]</span> ΣΩΚΡΑΤΗΣ. Γιατί έχεις έρθει τέτοια ώρα, Κρίτων; Μήπως δεν είναι πια πολύ πρωί;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Είναι πολύ πρωί ακόμη.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Τί ώρα πάνω-κάτω;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Βαθιά χαράματα.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Απορώ πώς θέλησε να σου ανοίξει ο φύλακας.</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Γνώριμος πια μου είναι, Σωκράτη, τόσο συχνά που έρχομαι εδώ· έπειτα έχει πάρει από μένα και κάποιο φιλοδώρημα.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Τώρα ήρθες ή έχεις πολλή ώρα εδώ;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Έχω πολλή ώρα.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[43b]</span> ΣΩ. Και πώς δεν με ξύπνησες αμέσως μόλις ήρθες, αλλά κάθεσαι κοντά μου χωρίς να μιλάς;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Μά τον Δία, Σωκράτη, ούτε κι εγώ ο ίδιος θα ήθελα να βρίσκομαι σε τόσο μεγάλη αγρύπνια και λύπη· αλλά και με σένα, ώρα πολλή τώρα, παραξενεύομαι βλέποντας πόσο γλυκιά κοιμάσαι· κι επίτηδες δεν ήθελα να σε ξυπνήσω, για να περνάς την ώρα σου, όσο γίνεται, πιο ευχάριστα. Κι αλήθεια, σ᾽ όλη σου τη ζωή πολλές φορές ως τώρα σε καλοτύχησα για τον χαρακτήρα σου· μα πιο πολύ σε καλοτυχίζω τώρα, σ᾽ αυτή εδώ τη συμφορά, που τόσο καρτερικά και ήρεμα την υπομένεις.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Μα θα ήταν πραγματικά ανάρμοστο, Κρίτων, ν᾽ αγανακτώ σε τόσο μεγάλη ηλικία, γιατί ήρθε τώρα η ώρα να πεθάνω.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[43c]</span> ΚΡ. Κι άλλοι, Σωκράτη, στην ηλικία σου πέφτουν σε τέτοιες συμφορές, όμως τα χρόνια δεν τους εμποδίζουν καθόλου ν᾽ αγανακτούν με την τύχη που τους βρίσκει.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Σωστά είν᾽ αυτά. Μα πες μου, γιατί έχεις έρθει τόσο πρωί;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Γιατί φέρνω είδηση, Σωκράτη, θλιβερή, όχι για σένα, το βλέπω καθαρά, αλλά για μένα και για όλους τους φίλους σου, θλιβερή και αβάσταχτη, τέτοια που, το ξέρω καλά, δεν θα μπορούσε να την αντέξει η ψυχή μου.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Και ποιά είναι αυτή η είδηση; Μήπως έχει φτάσει το πλοίο από τη Δήλο και <span class="marker">[43d]</span> μια κι έφτασε αυτό, εγώ πρέπει να πεθάνω;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Δεν έχει φτάσει βέβαια ακόμη, μου φαίνεται όμως πως θα έρθει σήμερα απ᾽ όσα είπαν μερικοί που ήρθαν από το Σούνιο και το άφησαν εκεί. Είναι λοιπόν φανερό απ᾽ αυτές τις ειδήσεις ότι θα φτάσει σήμερα και θα είναι ανάγκη βέβαια, Σωκράτη, αύριο να θανατωθείς.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Αλλά, Κρίτων, η ώρα η καλή. Αν έτσι το θέλουν οι θεοί, έτσι ας γίνει. Δεν νομίζω όμως ότι το πλοίο θα έρθει σήμερα.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[44a]</span> ΚΡ. Από πού το συμπεραίνεις;</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Θα σου ειπώ· νομίζω πως είναι ορισμένο να πεθάνω την άλλη μέρα από κείνη που θα έρθει το πλοίο.</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Έτσι βέβαια λένε εκείνοι που είναι αρμόδιοι γι᾽ αυτές τις υποθέσεις.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Λοιπόν, δεν νομίζω πως θα έρθει την ημέρα που ξημερώνει σε λίγο αλλά την άλλη. Κι αυτό το συμπεραίνω από κάποιο όνειρο που είδα εδώ και λίγη ώρα αυτή τη νύχτα. Και φαίνεται πως είναι ευτύχημα που εκείνη την ώρα δεν με ξύπνησες.</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Και ποιό ήταν τ᾽ όνειρό σου;</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Μου φάνηκε πως μια γυναίκα καλοπλασμένη κι όμορφη, <span class="marker">[44b]</span> λευκοφορεμένη, με πλησίασε, με φώναξε με τ᾽ όνομά μου και μου είπε: «Σωκράτη,</span></p>
+<p class="passage indent"><span class="passage-text">την τρίτη μέρα θα φτάσεις στην εύφορη Φθία».</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Παράξενο το όνειρό σου, Σωκράτη.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Κι όμως, ολοφάνερο, όπως μου φαίνεται, Κρίτων.</span></p>
+        </div>
+        
+
+        <div id="book-2-chapter----" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-2" data-hash="book-2-chapter----">
+            Ο Κρίτων προτείνει στον Σωκράτη να δραπετεύσει • Κεφάλαιο ΚΡ.-ΣΩ. (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=105&page=2" target="_blank" class="page-link">Page 2</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Λίαν γε, ὡς ἔοικεν. ἀλλ᾽, ὦ δαιμόνιε Σώκρατες, ἔτι καὶ νῦν ἐμοὶ πιθοῦ καὶ σώθητι· ὡς ἐμοί, ἐὰν σὺ ἀποθάνῃς, οὐ μία συμφορά ἐστιν, ἀλλὰ χωρὶς μὲν τοῦ ἐστερῆσθαι τοιούτου ἐπιτηδείου οἷον ἐγὼ οὐδένα μή ποτε εὑρήσω, ἔτι δὲ καὶ πολλοῖς δόξω, οἳ ἐμὲ καὶ σὲ μὴ σαφῶς ἴσασιν, <span class="marker">[44c]</span> ὡς οἷός τ᾽ ὤν σε σῴζειν εἰ ἤθελον ἀναλίσκειν χρήματα, ἀμελῆσαι. καίτοι τίς ἂν αἰσχίων εἴη ταύτης δόξα ἢ δοκεῖν χρήματα περὶ πλείονος ποιεῖσθαι ἢ φίλους; οὐ γὰρ πείσονται οἱ πολλοὶ ὡς σὺ αὐτὸς οὐκ ἠθέλησας ἀπιέναι ἐνθένδε ἡμῶν προθυμουμένων.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ἀλλὰ τί ἡμῖν, ὦ μακάριε Κρίτων, οὕτω τῆς τῶν πολλῶν δόξης μέλει; οἱ γὰρ ἐπιεικέστατοι, ὧν μᾶλλον ἄξιον φροντίζειν, ἡγήσονται αὐτὰ οὕτω πεπρᾶχθαι ὥσπερ ἂν πραχθῇ.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[44d]</span> ΚΡΙΤΩΝ. Ἀλλ᾽ ὁρᾷς δὴ ὅτι ἀνάγκη, ὦ Σώκρατες, καὶ τῆς τῶν πολλῶν δόξης μέλειν. αὐτὰ δὲ δῆλα τὰ παρόντα νυνὶ ὅτι οἷοί τ᾽ εἰσὶν οἱ πολλοὶ οὐ τὰ σμικρότατα τῶν κακῶν ἐξεργάζεσθαι ἀλλὰ τὰ μέγιστα σχεδόν, ἐάν τις ἐν αὐτοῖς διαβεβλημένος ᾖ.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Εἰ γὰρ ὤφελον, ὦ Κρίτων, οἷοί τ᾽ εἶναι οἱ πολλοὶ τὰ μέγιστα κακὰ ἐργάζεσθαι, ἵνα οἷοί τ᾽ ἦσαν καὶ ἀγαθὰ τὰ μέγιστα, καὶ καλῶς ἂν εἶχεν. νῦν δὲ οὐδέτερα οἷοί τε· οὔτε γὰρ φρόνιμον οὔτε ἄφρονα δυνατοὶ ποιῆσαι, ποιοῦσι δὲ τοῦτο ὅτι ἂν τύχωσι.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[44e]</span> ΚΡΙΤΩΝ. Ταῦτα μὲν δὴ οὕτως ἐχέτω· τάδε δέ, ὦ Σώκρατες, εἰπέ μοι. ἆρά γε μὴ ἐμοῦ προμηθῇ καὶ τῶν ἄλλων ἐπιτηδείων μή, ἐὰν σὺ ἐνθένδε ἐξέλθῃς, οἱ συκοφάνται ἡμῖν πράγματα παρέχωσιν ὡς σὲ ἐνθένδε ἐκκλέψασιν, καὶ ἀναγκασθῶμεν ἢ καὶ πᾶσαν τὴν οὐσίαν ἀποβαλεῖν ἢ συχνὰ χρήματα, ἢ καὶ ἄλλο τι πρὸς τούτοις παθεῖν; εἰ γάρ τι <span class="marker">[45a]</span> τοιοῦτον φοβῇ, ἔασον αὐτὸ χαίρειν· ἡμεῖς γάρ που δίκαιοί ἐσμεν σώσαντές σε κινδυνεύειν τοῦτον τὸν κίνδυνον καὶ ἐὰν δέῃ ἔτι τούτου μείζω. ἀλλ᾽ ἐμοὶ πείθου καὶ μὴ ἄλλως ποίει.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Καὶ ταῦτα προμηθοῦμαι, ὦ Κρίτων, καὶ ἄλλα πολλά.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text"><i>Ο ΚΡΙΤΩΝ ΠΡΟΤΕΙΝΕΙ ΣΤΟΝ ΣΩΚΡΑΤΗ ΝΑ ΔΡΑΠΕΤΕΥΣΕΙ ΑΠΟ ΤΗ ΦΥΛΑΚΗ</i></span></p>
+<p class="passage"><span class="passage-text"><i>ΤΑ ΕΠΙΧΕΙΡΗΜΑΤΑ ΤΟΥ ΚΡΙΤΩΝΑ</i></span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Αλήθεια, ολοφάνερο. Μα, ευλογημένε μου Σωκράτη, και τώρα ακόμη είναι καιρός να μ᾽ ακούσεις και να κοιτάξεις να σωθείς· γιατί ο θάνατός σου θα είναι για μένα διπλή συμφορά: Δεν θα χάσω μονάχα έναν τέτοιο φίλο, που όμοιό του εγώ ποτέ κανένα δεν θα εύρω· μα θα φανώ ακόμη στον πολύ τον κόσμο, που δεν ξέρει καλά ούτε μένα ούτε σένα, <span class="marker">[44c]</span> ότι τάχα αμέλησα, ενώ μπορούσα να σε σώσω αν ήθελα να ξοδέψω χρήματα. Κι αλήθεια, για έναν άνθρωπο ποιά γνώμη μπορεί να είναι χειρότερη, παρά να φαίνεται πως προτιμά το χρήμα από τους φίλους; Γιατί ο πολύς κόσμος ποτέ δεν θα πιστέψει ότι συ ο ίδιος δεν θέλησες να φύγεις από δω, ενώ εμείς ήμαστε πρόθυμοι γι᾽ αυτό.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Μα, καλότυχε Κρίτων, γιατί να νοιαζόμαστε μεις τόσο πολύ για τη γνώμη του κόσμου; Οι σώφρονες άνθρωποι, αυτοί που αξίζει να προσέχουμε τη γνώμη τους περισσότερο, θα κρίνουν πως αυτά έγιναν έτσι, όπως ακριβώς θα έχουν γίνει.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[44d]</span> ΚΡ. Όμως, το βλέπεις, Σωκράτη, είναι ανάγκη να νοιαζόμαστε και για τη γνώμη του κόσμου. Αυτά που μας βρήκανε τώρα το φανερώνουν μόνα τους, ότι ο πολύς ο κόσμος μπορεί να κάνει όχι τα πιο μικρά, μα τα πιο μεγάλα κακά· φτάνει να έχουν κάποιον συκοφαντήσει σ᾽ αυτόν.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Μακάρι, Κρίτων, να μπορούσε ο πολύς ο κόσμος να κάνει τα πιο μεγάλα κακά· θα μπορούσε τότε να κάνει και τα πιο μεγάλα καλά, κι όλα θα ήταν όμορφα έτσι. Τώρα όμως δεν είναι σε θέση να κάνει ούτε το ένα ούτε το άλλο. Γιατί δεν έχει τη δύναμη να κάνει έναν άνθρωπο ούτε σώφρονα ούτε άφρονα, αλλά κάνει ό,τι του φέρνει η τύχη.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[44e]</span> ΚΡ. Καλά αυτά, ας παραδεχτούμε πως είναι έτσι. Θέλω όμως, Σωκράτη, να μ᾽ απαντήσεις σε τούτο: άραγε μήπως νοιάζεσαι για μένα και για τους άλλους φίλους σου, μην τυχόν, αν συ βγεις από δω μέσα, μας δημιουργήσουν ιστορίες οι συκοφάντες, ότι σε βγάλαμε από δω κρυφά σαν κλέφτες, κι αναγκαστούμε έτσι να χάσουμε ή και όλη μας την περιουσία ή πολλά χρήματα ή να πάθουμε και τίποτ᾽ άλλο ακόμη; Αν πραγματικά <span class="marker">[45a]</span> φοβάσαι κάτι τέτοιο, άφησέ το να πάει στο καλό. Γιατί εμείς βέβαια έχουμε χρέος να σε σώσουμε, κι ας περάσουμε αυτό τον κίνδυνο, κι αν χρειαστεί ακόμη μεγαλύτερο απ᾽ αυτόν. Άκου λοιπόν εμένα και μην κάνεις διαφορετικά.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Και γι᾽ αυτά νοιάζομαι, Κρίτων, και γι᾽ άλλα πολλά.</span></p>
+        </div>
+        
+
+        <div id="book-2-chapter--" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-3" data-hash="book-2-chapter--">
+            Ο Κρίτων προτείνει στον Σωκράτη να δραπετεύσει • Κεφάλαιο ΚΡ. (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=105&page=3" target="_blank" class="page-link">Page 3</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Μήτε τοίνυν ταῦτα φοβοῦ — καὶ γὰρ οὐδὲ πολὺ τἀργύριόν ἐστιν ὃ θέλουσι λαβόντες τινὲς σῶσαί σε καὶ ἐξαγαγεῖν ἐνθένδε. ἔπειτα οὐχ ὁρᾷς τούτους τοὺς συκοφάντας ὡς εὐτελεῖς, καὶ οὐδὲν ἂν δέοι ἐπ᾽ αὐτοὺς πολλοῦ ἀργυρίου; <span class="marker">[45b]</span> σοὶ δὲ ὑπάρχει μὲν τὰ ἐμὰ χρήματα, ὡς ἐγὼ οἶμαι, ἱκανά· ἔπειτα καὶ εἴ τι ἐμοῦ κηδόμενος οὐκ οἴει δεῖν ἀναλίσκειν τἀμά, ξένοι οὗτοι ἐνθάδε ἕτοιμοι ἀναλίσκειν· εἷς δὲ καὶ κεκόμικεν ἐπ᾽ αὐτὸ τοῦτο ἀργύριον ἱκανόν, Σιμμίας ὁ Θηβαῖος, ἕτοιμος δὲ καὶ Κέβης καὶ ἄλλοι πολλοὶ πάνυ. ὥστε, ὅπερ λέγω, μήτε ταῦτα φοβούμενος ἀποκάμῃς σαυτὸν σῶσαι, μήτε, ὃ ἔλεγες ἐν τῷ δικαστηρίῳ, δυσχερές σοι γενέσθω ὅτι οὐκ ἂν ἔχοις ἐξελθὼν ὅτι χρῷο σαυτῷ· <span class="marker">[45c]</span> πολλαχοῦ μὲν γὰρ καὶ ἄλλοσε ὅποι ἂν ἀφίκῃ ἀγαπήσουσί σε· ἐὰν δὲ βούλῃ εἰς Θετταλίαν ἰέναι, εἰσὶν ἐμοὶ ἐκεῖ ξένοι οἵ σε περὶ πολλοῦ ποιήσονται καὶ ἀσφάλειάν σοι παρέξονται, ὥστε σε μηδένα λυπεῖν τῶν κατὰ Θετταλίαν.</span></p>
+<p class="passage indent"><span class="passage-text">Ἔτι δέ, ὦ Σώκρατες, οὐδὲ δίκαιόν μοι δοκεῖς ἐπιχειρεῖν πρᾶγμα, σαυτὸν προδοῦναι, ἐξὸν σωθῆναι, καὶ τοιαῦτα σπεύδεις περὶ σαυτὸν γενέσθαι ἅπερ ἂν καὶ οἱ ἐχθροί σου σπεύσαιέν τε καὶ ἔσπευσαν σὲ διαφθεῖραι βουλόμενοι. πρὸς δὲ τούτοις καὶ τοὺς ὑεῖς τοὺς σαυτοῦ ἔμοιγε δοκεῖς προδιδόναι, οὕς σοι <span class="marker">[45d]</span> ἐξὸν καὶ ἐκθρέψαι καὶ ἐκπαιδεῦσαι οἰχήσῃ καταλιπών, καὶ τὸ σὸν μέρος ὅτι ἂν τύχωσι τοῦτο πράξουσιν· τεύξονται δέ, ὡς τὸ εἰκός, τοιούτων οἷάπερ εἴωθεν γίγνεσθαι ἐν ταῖς ὀρφανίαις περὶ τοὺς ὀρφανούς. ἢ γὰρ οὐ χρὴ ποιεῖσθαι παῖδας ἢ συνδιαταλαιπωρεῖν καὶ τρέφοντα καὶ παιδεύοντα, σὺ δέ μοι δοκεῖς τὰ ῥᾳθυμότατα αἱρεῖσθαι. χρὴ δέ, ἅπερ ἂν ἀνὴρ ἀγαθὸς καὶ ἀνδρεῖος ἕλοιτο, ταῦτα αἱρεῖσθαι, φάσκοντά γε δὴ ἀρετῆς διὰ παντὸς τοῦ βίου ἐπιμελεῖσθαι· ὡς ἔγωγε καὶ <span class="marker">[45e]</span> ὑπὲρ σοῦ καὶ ὑπὲρ ἡμῶν τῶν σῶν ἐπιτηδείων αἰσχύνομαι μὴ δόξῃ ἅπαν τὸ πρᾶγμα τὸ περὶ σὲ ἀνανδρίᾳ τινὶ τῇ ἡμετέρᾳ πεπρᾶχθαι, καὶ ἡ εἴσοδος τῆς δίκης εἰς τὸ δικαστήριον ὡς εἰσῆλθεν ἐξὸν μὴ εἰσελθεῖν, καὶ αὐτὸς ὁ ἀγὼν τῆς δίκης ὡς ἐγένετο, καὶ τὸ τελευταῖον δὴ τουτί, ὥσπερ κατάγελως τῆς πράξεως, κακίᾳ τινὶ καὶ ἀνανδρίᾳ τῇ ἡμετέρᾳ <span class="marker">[46a]</span> διαπεφευγέναι ἡμᾶς δοκεῖν, οἵτινές σε οὐχὶ ἐσώσαμεν οὐδὲ σὺ σαυτόν, οἷόν τε ὂν καὶ δυνατὸν εἴ τι καὶ μικρὸν ἡμῶν ὄφελος ἦν. ταῦτα οὖν, ὦ Σώκρατες, ὅρα μὴ ἅμα τῷ κακῷ καὶ αἰσχρὰ ᾖ σοί τε καὶ ἡμῖν. ἀλλὰ βουλεύου —μᾶλλον δὲ οὐδὲ βουλεύεσθαι ἔτι ὥρα ἀλλὰ βεβουλεῦσθαι— μία δὲ βουλή· τῆς γὰρ ἐπιούσης νυκτὸς πάντα ταῦτα δεῖ πεπρᾶχθαι, εἰ δ᾽ ἔτι περιμενοῦμεν, ἀδύνατον καὶ οὐκέτι οἷόν τε. ἀλλὰ παντὶ τρόπῳ, ὦ Σώκρατες, πείθου μοι καὶ μηδαμῶς ἄλλως ποίει.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text">ΚΡ. Ε, λοιπόν, ούτε κι αυτά να φοβάσαι· γιατί ούτε και το χρήμα είναι πολύ, που ζητάνε κάποιοι να πάρουν για να σε βγάλουν από δω μέσα και να σε σώσουν. Έπειτα δεν βλέπεις πόσο φτηνοί είναι οι συκοφάντες κι έτσι δεν χρειάζονται γι᾽ αυτούς πολλά χρήματα; <span class="marker">[45b]</span> Και συ έχεις στη διάθεσή σου πρώτα τα δικά μου χρήματα, όπως νομίζω αρκετά· έπειτα αν νομίζεις, φροντίζοντας κάπως για μένα, πως δεν πρέπει να ξοδεύω τα δικά μου, νά, βρίσκονται δω στην πόλη μας φίλοι από ξένα μέρη, πρόθυμοι να ξοδέψουν. Ένας μάλιστα απ᾽ αυτούς, ο Σιμμίας ο Θηβαίος, γι᾽ αυτόν ακριβώς τον σκοπό έχει φέρει μαζί του χρήμα αρκετό· έτοιμος είναι ακόμη και ο Κέβης κι άλλοι πάρα πολλοί να προσφέρουν χρήματα. Ώστε, κι αυτό το ξαναλέω, δεν πρέπει να διστάσεις καθόλου για να σωθείς, με τη δικαιολογία πως φοβάσαι τις συνέπειες για μας· μήτε εκείνο που έλεγες στο δικαστήριο να σου γίνει εμπόδιο, ότι δηλαδή αν έφευγες από την πόλη μας δεν θα ήξερες πώς να φερθείς και τί να κάνεις. <span class="marker">[45c]</span> Γιατί σε πολλά βέβαια μέρη, όπου αλλού κι αν πας, θα σ᾽ αγαπήσουν. Αν όμως προτιμάς να πας στη Θεσσαλία, υπάρχουν εκεί δικοί μου φίλοι, που θα σε περιποιηθούν πολύ και θα σου παρέχουν ασφάλεια, ώστε να μη σ᾽ ενοχλεί κανείς απ᾽ όσους κατοικούν στη Θεσσαλία.</span></p>
+<p class="passage indent"><span class="passage-text">Ακόμη και κάτι άλλο, Σωκράτη· αυτό που πας να κάνεις τώρα έχω τη γνώμη πως δεν είναι ούτε δίκαιο, ν᾽ αφήσεις δηλαδή τον εαυτό σου να χαθεί, τη στιγμή που έχεις την ευκαιρία να σωθείς· και βιάζεσαι να σου συμβούν όσα ακριβώς θα έσπευδαν να κάνουν και οι ίδιοι οι εχθροί σου, και μάλιστα έσπευσαν να κάνουν θέλοντας να σ᾽ εξοντώσουν. Κοντά σ᾽ αυτά εγώ τουλάχιστον νομίζω πως προδίνεις και τα παιδιά σου ακόμη, γιατί <span class="marker">[45d]</span> ενώ μπορείς και να τ᾽ αναθρέψεις και να τα μορφώσεις πολύ καλά, ξαφνικά και πρόωρα θα τα εγκαταλείψεις και θα φύγεις και σε ό,τι εξαρτάται από σένα η ζωή τους θα μείνει στα χέρια της τύχης· και φυσικά η μοίρα τους θα είναι η συνηθισμένη μοίρα των ορφανών στην ορφάνια τους. Γιατί ή δεν πρέπει να κάνει κανείς παιδιά ή, αν κάνει, έχει χρέος να ταλαιπωρείται κι αυτός μαζί τους μέρα-νύχτα και ανατρέφοντας και μορφώνοντάς τα. Συ όμως, μου φαίνεται, προτιμάς την ευκολία σου. Πρέπει όμως να προτιμά κανείς εκείνα που θα προτιμούσε ένας άνθρωπος ενάρετος και ανδρείος και μάλιστα όταν ισχυρίζεται πως σ᾽ όλη του τη ζωή φροντίζει για την αρετή. Εγώ τουλάχιστον <span class="marker">[45e]</span> ντρέπομαι και για σένα και για μας τους φίλους σου, μήπως φανεί στον κόσμο πως όλα αυτά που γίνονται τώρα με σένα έχουν γίνει από κάποια δική μας ανανδρία: Και ότι έφτασε η υπόθεση στο δικαστήριο, ενώ μπορούσε να μη φτάσει ως εκεί, και ότι δικάστηκε με τον τρόπο που δικάστηκε· και τούτο δω το τελευταίο πάλι, σαν κωμικός επίλογος στην υπόθεση, θα δώσει στον κόσμο την εντύπωση πως επειδή σταθήκαμε ανίκανοι και άνανδροι <span class="marker">[46a]</span> μας ξέφυγε από τα χέρια, αφού ούτ᾽ εμείς προσπαθήσαμε να σώσουμε σένα ούτε συ τον εαυτό σου, ενώ αυτό ήταν και με το παραπάνω δυνατό, αν είχαμε και την παραμικρότερη αξία.</span></p>
+<p class="passage indent"><span class="passage-text">Όλ᾽ αυτά, Σωκράτη, στοχάσου μήπως δεν είναι μόνο κακά μα κι εξευτελιστικά και για σένα και για μας. Σκέψου λοιπόν ή, καλύτερα, δεν είναι πια καιρός ούτε να σκεφτείς, αλλά να ᾽χεις πάρει την απόφαση. Και μια απόφαση υπάρχει· τη νύχτα που μας έρχεται όλ᾽ αυτά πρέπει να ᾽χουν τελειώσει. Αν όμως περιμένουμε και λίγο, τίποτα πια δεν θα μπορεί να γίνει. Μα έλα, Σωκράτη, άκουσέ με με κάθε τρόπο και μην κάνεις καθόλου διαφορετικά.</span></p>
+        </div>
+        
+
+        <div id="book-3-chapter----" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-4" data-hash="book-3-chapter----">
+            Ο Σωκράτης επιχειρηματολογεί εναντίον της πρότασης του Κρίτωνα • Κεφάλαιο ΣΩ.-ΚΡ. (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=105&page=4" target="_blank" class="page-link">Page 4</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[46b]</span> ΣΩΚΡΑΤΗΣ. Ὦ φίλε Κρίτων, ἡ προθυμία σου πολλοῦ ἀξία εἰ μετά τινος ὀρθότητος εἴη· εἰ δὲ μή, ὅσῳ μείζων τοσούτῳ χαλεπωτέρα. σκοπεῖσθαι οὖν χρὴ ἡμᾶς εἴτε ταῦτα πρακτέον εἴτε μή· ὡς ἐγὼ οὐ νῦν πρῶτον ἀλλὰ καὶ ἀεὶ τοιοῦτος οἷος τῶν ἐμῶν μηδενὶ ἄλλῳ πείθεσθαι ἢ τῷ λόγῳ ὃς ἄν μοι λογιζομένῳ βέλτιστος φαίνηται. τοὺς δὴ λόγους οὓς ἐν τῷ ἔμπροσθεν ἔλεγον οὐ δύναμαι νῦν ἐκβαλεῖν, ἐπειδή μοι ἥδε ἡ τύχη γέγονεν, ἀλλὰ σχεδόν τι ὅμοιοι φαίνονταί μοι, <span class="marker">[46c]</span> καὶ τοὺς αὐτοὺς πρεσβεύω καὶ τιμῶ οὕσπερ καὶ πρότερον· ὧν ἐὰν μὴ βελτίω ἔχωμεν λέγειν ἐν τῷ παρόντι, εὖ ἴσθι ὅτι οὐ μή σοι συγχωρήσω, οὐδ᾽ ἂν πλείω τῶν νῦν παρόντων ἡ τῶν πολλῶν δύναμις ὥσπερ παῖδας ἡμᾶς μορμολύττηται, δεσμοὺς καὶ θανάτους ἐπιπέμπουσα καὶ χρημάτων ἀφαιρέσεις. πῶς οὖν ἂν μετριώτατα σκοποίμεθα αὐτά; εἰ πρῶτον μὲν τοῦτον τὸν λόγον ἀναλάβοιμεν, ὃν σὺ λέγεις περὶ τῶν δοξῶν. πότερον καλῶς ἐλέγετο ἑκάστοτε ἢ οὔ, <span class="marker">[46d]</span> ὅτι ταῖς μὲν δεῖ τῶν δοξῶν προσέχειν τὸν νοῦν, ταῖς δὲ οὔ; ἢ πρὶν μὲν ἐμὲ δεῖν ἀποθνῄσκειν καλῶς ἐλέγετο, νῦν δὲ κατάδηλος ἄρα ἐγένετο ὅτι ἄλλως ἕνεκα λόγου ἐλέγετο, ἦν δὲ παιδιὰ καὶ φλυαρία ὡς ἀληθῶς; ἐπιθυμῶ δ᾽ ἔγωγ᾽ ἐπισκέψασθαι, ὦ Κρίτων, κοινῇ μετὰ σοῦ εἴ τί μοι ἀλλοιότερος φανεῖται, ἐπειδὴ ὧδε ἔχω, ἢ ὁ αὐτός, καὶ ἐάσομεν χαίρειν ἢ πεισόμεθα αὐτῷ. ἐλέγετο δέ πως, ὡς ἐγᾦμαι, ἑκάστοτε ὧδε ὑπὸ τῶν οἰομένων τὶ λέγειν, ὥσπερ νυνδὴ ἐγὼ ἔλεγον, ὅτι τῶν δοξῶν ἃς οἱ ἄνθρωποι <span class="marker">[46e]</span> δοξάζουσιν δέοι τὰς μὲν περὶ πολλοῦ ποιεῖσθαι, τὰς δὲ μή. τοῦτο πρὸς θεῶν, ὦ Κρίτων, οὐ δοκεῖ καλῶς σοι λέγεσθαι; —σὺ γάρ, ὅσα γε τἀνθρώπεια, ἐκτὸς εἶ τοῦ μέλλειν <span class="marker">[47a]</span> ἀποθνῄσκειν αὔριον, καὶ οὐκ ἂν σὲ παρακρούοι ἡ παροῦσα συμφορά· σκόπει δή— οὐχ ἱκανῶς δοκεῖ σοι λέγεσθαι ὅτι οὐ πάσας χρὴ τὰς δόξας τῶν ἀνθρώπων τιμᾶν ἀλλὰ τὰς μέν, τὰς δ᾽ οὔ, οὐδὲ πάντων ἀλλὰ τῶν μέν, τῶν δ᾽ οὔ; τί φῄς; ταῦτα οὐχὶ καλῶς λέγεται;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Καλῶς.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐκοῦν τὰς μὲν χρηστὰς τιμᾶν, τὰς δὲ πονηρὰς μή;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Ναί.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Χρησταὶ δὲ οὐχ αἱ τῶν φρονίμων, πονηραὶ δὲ αἱ τῶν ἀφρόνων;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Πῶς δ᾽ οὔ;</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Φέρε δή, πῶς αὖ τὰ τοιαῦτα ἐλέγετο; γυμναζόμενος <span class="marker">[47b]</span> ἀνὴρ καὶ τοῦτο πράττων πότερον παντὸς ἀνδρὸς ἐπαίνῳ καὶ ψόγῳ καὶ δόξῃ τὸν νοῦν προσέχει, ἢ ἑνὸς μόνου ἐκείνου ὃς ἂν τυγχάνῃ ἰατρὸς ἢ παιδοτρίβης ὤν;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Ἑνὸς μόνου.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐκοῦν φοβεῖσθαι χρὴ τοὺς ψόγους καὶ ἀσπάζεσθαι τοὺς ἐπαίνους τοὺς τοῦ ἑνὸς ἐκείνου ἀλλὰ μὴ τοὺς τῶν πολλῶν.</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Δῆλα δή.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ταύτῃ ἄρα αὐτῷ πρακτέον καὶ γυμναστέον καὶ ἐδεστέον γε καὶ ποτέον, ᾗ ἂν τῷ ἑνὶ δοκῇ, τῷ ἐπιστάτῃ καὶ ἐπαΐοντι, μᾶλλον ἢ ᾗ σύμπασι τοῖς ἄλλοις.</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Ἔστι ταῦτα.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[47c]</span> ΣΩΚΡΑΤΗΣ. Εἶεν. ἀπειθήσας δὲ τῷ ἑνὶ καὶ ἀτιμάσας αὐτοῦ τὴν δόξαν καὶ τοὺς ἐπαίνους, τιμήσας δὲ τοὺς τῶν πολλῶν [λόγους] καὶ μηδὲν ἐπαϊόντων, ἆρα οὐδὲν κακὸν πείσεται;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Πῶς γὰρ οὔ;</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Τί δ᾽ ἔστι τὸ κακὸν τοῦτο, καὶ ποῖ τείνει, καὶ εἰς τί τῶν τοῦ ἀπειθοῦντος;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Δῆλον ὅτι εἰς τὸ σῶμα· τοῦτο γὰρ διόλλυσι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Καλῶς λέγεις. οὐκοῦν καὶ τἆλλα, ὦ Κρίτων, οὕτως, ἵνα μὴ πάντα διΐωμεν, καὶ δὴ καὶ περὶ τῶν δικαίων καὶ ἀδίκων καὶ αἰσχρῶν καὶ καλῶν καὶ ἀγαθῶν καὶ κακῶν, περὶ ὧν νῦν ἡ βουλὴ ἡμῖν ἐστιν, πότερον τῇ τῶν πολλῶν δόξῃ <span class="marker">[47d]</span> δεῖ ἡμᾶς ἕπεσθαι καὶ φοβεῖσθαι αὐτὴν ἢ τῇ τοῦ ἑνός, εἴ τίς ἐστιν ἐπαΐων, ὃν δεῖ καὶ αἰσχύνεσθαι καὶ φοβεῖσθαι μᾶλλον ἢ σύμπαντας τοὺς ἄλλους; ᾧ εἰ μὴ ἀκολουθήσομεν, διαφθεροῦμεν ἐκεῖνο καὶ λωβησόμεθα, ὃ τῷ μὲν δικαίῳ βέλτιον ἐγίγνετο τῷ δὲ ἀδίκῳ ἀπώλλυτο. ἢ οὐδέν ἐστι τοῦτο;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Οἶμαι ἔγωγε, ὦ Σώκρατες.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text"><i>Ο ΣΩΚΡΑΤΗΣ ΕΛΕΓΧΕΙ ΤΗΝ ΠΡΟΤΑΣΗ ΚΑΙ</i></span></p>
+<p class="passage"><span class="passage-text"><i>ΤΑ ΕΠΙΧΕΙΡΗΜΑΤΑ ΤΟΥ ΚΡΙΤΩΝΑ</i></span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[46b]</span> ΣΩ. Αγαπητέ μου Κρίτων, η προθυμία σου να με σώσεις είναι πολύ αξιόλογη, αν είχε ίσως κάποια βάση λογική· διαφορετικά, όσο μεγαλύτερη τόσο ενοχλητικότερη. Είναι ανάγκη λοιπόν να εξετάσουμε αν πρέπει να κάνουμε αυτά που προτείνεις ή όχι. Γιατί εγώ, όχι μόνο τώρα μα και πάντοτε, τέτοιος ήμουνα: δεν πείθομαι σε τίποτ᾽ άλλο από τον εσωτερικό μου κόσμο, παρά μονάχα στη λογική σκέψη, όποια μου φαίνεται η καλύτερη κάθε φορά που συλλογίζομαι. Τις αρχές λοιπόν που υποστήριζα χτες δεν μπορώ να τις απαρνηθώ σήμερα, επειδή με βρήκε τούτο δω το περιστατικό, αλλά και τώρα μου φαίνονται σχεδόν ίδιες: <span class="marker">[46c]</span> Όσα σεβόμουν κι εκτιμούσα χτες, τα ίδια ακριβώς σέβομαι κι εκτιμώ και σήμερα. Κι αν δεν έχουμε σ᾽ αυτή την περίσταση να συζητήσουμε κάτι καλύτερο απ᾽ αυτά, να ξέρεις καλά, δεν θα συμφωνήσω μαζί σου με κανέναν τρόπο, ούτε κι αν η δύναμη που έχει ο πολύς ο κόσμος μάς φοβερίζει, σαν να είμαστε μικρά παιδιά, με μεγαλύτερα από τα τωρινά κακά, στέλνοντας καταπάνω μας φυλακίσεις και θανάτους και δημεύσεις περιουσιών.</span></p>
+<p class="passage indent"><span class="passage-text">Πώς όμως θα μπορούσαμε να εξετάσουμε αυτά τα ζητήματα όσο γίνεται πιο σωστά; Αν πρώτα πάρουμε και συζητήσουμε πάλι αυτό το επιχείρημα, που συ λες για τις γνώμες των ανθρώπων: Ποιό από τα δύο, στις συζητήσεις μας υποστηρίζαμε κάθε φορά σωστά ή όχι <span class="marker">[46d]</span> ότι σε άλλες γνώμες πρέπει να δίνουμε προσοχή και σε άλλες να μη δίνουμε; Ή πριν βέβαια παρουσιαστεί η ανάγκη να πεθάνω αυτός ο λόγος λεγόταν σωστά, τώρα όμως έγινε ολοφάνερο ότι λεγόταν απλώς και μόνο για να γίνεται κουβέντα, ενώ στ᾽ αλήθεια ήταν ένα παιχνίδι, λόγια του αέρα; Έχω λοιπόν την επιθυμία, Κρίτων, να εξετάσω μαζί με σένα αν αυτός ο λόγος θα μου φανεί κάπως διαφορετικός, επειδή βρίσκομαι τώρα σ᾽ αυτή την κατάσταση, ή ο ίδιος, κι αν θα τον αφήσουμε να πάει στο καλό ή αν θα τον παραδεχτούμε.</span></p>
+<p class="passage indent"><span class="passage-text">Όσοι λοιπόν νομίζουν πως λένε κάτι σοβαρό, κάθε φορά που συζητούσαμε, αν καλοθυμάμαι, έλεγαν πάνω-κάτω αυτό που έλεγα κι εγώ πριν από λίγο, ότι από τις γνώμες που έχουν οι άνθρωποι <span class="marker">[46e]</span> σε άλλες πρέπει να δίνουμε μεγάλη σημασία και σε άλλες να μη δίνουμε. Τούτο, για όνομα των θεών, Κρίτων, δεν νομίζεις πως είναι σωστό; Φυσικά συ, όσο βέβαια μπορεί να προβλέψει ο άνθρωπος, δεν κινδυνεύεις <span class="marker">[47a]</span> να θανατωθείς αύριο και γι᾽ αυτό η τωρινή συμφορά δεν μπορεί να θολώνει τη σκέψη σου. Σκέψου λοιπόν, δεν νομίζεις ότι έχουμε δίκαιο, όταν υποστηρίζουμε πως δεν πρέπει να εκτιμάμε όλες τις γνώμες των ανθρώπων αλλά άλλες ναι κι άλλες όχι, κι ούτε όλων των ανθρώπων αλλά μόνο μερικών και των άλλων όχι; Τί λες; Αυτά δεν είναι σωστά;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Σωστά.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Ώστε πρέπει να παραδεχόμαστε τις σωστές γνώμες και να μην παραδεχόμαστε τις λαθεμένες;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Ναι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Σωστές λοιπόν δεν είναι οι γνώμες των γνωστικών ανθρώπων και λαθεμένες των ανθρώπων που δεν έχουν φρόνηση;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Πώς όχι;</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Ας δούμε λοιπόν τώρα τί παραδεχόμαστε άλλοτε, όταν συζητούσαμε για ζητήματα σαν αυτά: ένας άντρας που καταγίνεται με τον αθλητισμό <span class="marker">[47b]</span> και έχει μάλιστα τούτο κύριο έργο του, σε ποιό από τα δύο νομίζεις πως δίνει προσοχή, στον έπαινο, στην κατηγόρια και γενικά στη γνώμη κάθε ανθρώπου ή ενός μονάχα, εκείνου που τυχαίνει να είναι γιατρός ή γυμναστής;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Ενός μονάχα.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Πρέπει λοιπόν να φοβάται τις κατηγόριες και να θέλει τους επαίνους εκείνου του ενός και όχι του άλλου κόσμου.</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Αυτό βέβαια είναι φανερό.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Πρέπει λοιπόν αυτός ο άνθρωπος να ασκείται και να γυμνάζεται και να τρώει, φυσικά, και να πίνει έτσι, όπως φαίνεται καλό στον έναν, στον επιστήμονα και στον ειδικό πιο πολύ, παρά όπως νομίζουν όλοι οι άλλοι.</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Σωστό είν᾽ αυτό.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[47c]</span> ΣΩ. Πολύ καλά, ως εδώ. Αν τώρα δεν υπακούσει σ᾽ αυτόν τον έναν κι αν περιφρονήσει τη γνώμη του και τις συμβουλές του και δώσει σημασία στα λόγια των άλλων ανθρώπων που δεν έχουν ιδέα από γυμναστική, άραγε δεν θα πάθει κανένα κακό;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Πώς είναι δυνατό να μην πάθει;</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Και τί μπορεί να είναι αυτό το κακό; Μέχρι πού φτάνει και σε ποιό μέρος του απείθαρχου ξεσπάει;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Είναι φανερό πως ξεσπάει στο σώμα· γιατί το σώμα αφανίζει.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Καλά λες. Λοιπόν, Κρίτων, και για τα άλλα το ίδιο ισχύει, για να μην τα εξετάζουμε όλα ένα-ένα. Και για το δίκαιο και για το άδικο, για το άσχημο και για το όμορφο, για το καλό και για το κακό, που γι᾽ αυτά συζητάμε τώρα εμείς στοχαστικά, τίνος τη γνώμη πρέπει ν᾽ ακολουθούμε και να σεβόμαστε; Τη γνώμη των πολλών <span class="marker">[47d]</span> που είναι ανίδεοι ή τη γνώμη του ενός και ειδικού, αν υπάρχει κάποιος που καταλαβαίνει απ᾽ αυτά, τον οποίο πρέπει και να τον ντρεπόμαστε και να τον σεβόμαστε περισσότερο από όλους τους άλλους μαζί; Γιατί, αν δεν ακολουθήσουμε τη γνώμη του, θα βλάψουμε και θα καταστρέψουμε εκείνο που με τη δικαιοσύνη γίνεται καλύτερο και με την αδικία αφανίζεται ολότελα. Ή μήπως δεν υπάρχει τίποτα τέτοιο;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Εγώ τουλάχιστον, Σωκράτη, νομίζω πως υπάρχει κάτι τέτοιο.</span></p>
+        </div>
+        
+
+        <div id="book-3-chapter-----2" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-5" data-hash="book-3-chapter-----2">
+            Ο Σωκράτης επιχειρηματολογεί εναντίον της πρότασης του Κρίτωνα • Κεφάλαιο ΣΩ.-ΚΡ..2 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=105&page=5" target="_blank" class="page-link">Page 5</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Φέρε δή, ἐὰν τὸ ὑπὸ τοῦ ὑγιεινοῦ μὲν βέλτιον γιγνόμενον, ὑπὸ τοῦ νοσώδους δὲ διαφθειρόμενον διολέσωμεν πειθόμενοι μὴ τῇ τῶν ἐπαϊόντων δόξῃ, ἆρα βιωτὸν ἡμῖν ἐστιν <span class="marker">[47e]</span> διεφθαρμένου αὐτοῦ; ἔστι δέ που τοῦτο σῶμα· ἢ οὐχί;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Ναί.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ἆρ᾽ οὖν βιωτὸν ἡμῖν ἐστιν μετὰ μοχθηροῦ καὶ διεφθαρμένου σώματος;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Οὐδαμῶς.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ἀλλὰ μετ᾽ ἐκείνου ἄρ᾽ ἡμῖν βιωτὸν διεφθαρμένου, ᾧ τὸ ἄδικον μὲν λωβᾶται, τὸ δὲ δίκαιον ὀνίνησιν; ἢ φαυλότερον ἡγούμεθα εἶναι τοῦ σώματος ἐκεῖνο, ὅτι ποτ᾽ ἐστὶ τῶν <span class="marker">[48a]</span> ἡμετέρων, περὶ ὃ ἥ τε ἀδικία καὶ ἡ δικαιοσύνη ἐστίν;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Οὐδαμῶς.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ἀλλὰ τιμιώτερον;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Πολύ γε.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐκ ἄρα, ὦ βέλτιστε, πάνυ ἡμῖν οὕτω φροντιστέον τί ἐροῦσιν οἱ πολλοὶ ἡμᾶς, ἀλλ᾽ ὅτι ὁ ἐπαΐων περὶ τῶν δικαίων καὶ ἀδίκων, ὁ εἷς καὶ αὐτὴ ἡ ἀλήθεια. ὥστε πρῶτον μὲν ταύτῃ οὐκ ὀρθῶς εἰσηγῇ, εἰσηγούμενος τῆς τῶν πολλῶν δόξης δεῖν ἡμᾶς φροντίζειν περὶ τῶν δικαίων καὶ καλῶν καὶ ἀγαθῶν καὶ τῶν ἐναντίων. «Ἀλλὰ μὲν δή,» φαίη γ᾽ ἄν τις, «οἷοί τέ εἰσιν ἡμᾶς οἱ πολλοὶ ἀποκτεινύναι.»</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[48b]</span> ΚΡΙΤΩΝ. Δῆλα δὴ καὶ ταῦτα· φαίη γὰρ ἄν, ὦ Σώκρατες. ἀληθῆ λέγεις.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ἀλλ᾽, ὦ θαυμάσιε, οὗτός τε ὁ λόγος ὃν διεληλύθαμεν ἔμοιγε δοκεῖ ἔτι ὅμοιος εἶναι καὶ πρότερον· καὶ τόνδε δὲ αὖ σκόπει εἰ ἔτι μένει ἡμῖν ἢ οὔ, ὅτι οὐ τὸ ζῆν περὶ πλείστου ποιητέον ἀλλὰ τὸ εὖ ζῆν.</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Ἀλλὰ μένει.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Τὸ δὲ εὖ καὶ καλῶς καὶ δικαίως ὅτι ταὐτόν ἐστιν, μένει ἢ οὐ μένει;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Μένει.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐκοῦν ἐκ τῶν ὁμολογουμένων τοῦτο σκεπτέον, πότερον δίκαιον ἐμὲ ἐνθένδε πειρᾶσθαι ἐξιέναι μὴ ἀφιέντων <span class="marker">[48c]</span> Ἀθηναίων ἢ οὐ δίκαιον· καὶ ἐὰν μὲν φαίνηται δίκαιον, πειρώμεθα, εἰ δὲ μή, ἐῶμεν. ἃς δὲ σὺ λέγεις τὰς σκέψεις περί τε ἀναλώσεως χρημάτων καὶ δόξης καὶ παίδων τροφῆς, μὴ ὡς ἀληθῶς ταῦτα, ὦ Κρίτων, σκέμματα ᾖ τῶν ῥᾳδίως ἀποκτεινύντων καὶ ἀναβιωσκομένων γ᾽ ἄν, εἰ οἷοί τ᾽ ἦσαν, οὐδενὶ ξὺν νῷ, τούτων τῶν πολλῶν. ἡμῖν δ᾽, ἐπειδὴ ὁ λόγος οὕτως αἱρεῖ, μὴ οὐδὲν ἄλλο σκεπτέον ᾖ ἢ ὅπερ νυνδὴ ἐλέγομεν, πότερον δίκαια πράξομεν καὶ χρήματα τελοῦντες τούτοις <span class="marker">[48d]</span> τοῖς ἐμὲ ἐνθένδε ἐξάξουσιν καὶ χάριτας, καὶ αὐτοὶ ἐξάγοντές τε καὶ ἐξαγόμενοι, ἢ τῇ ἀληθείᾳ ἀδικήσομεν πάντα ταῦτα ποιοῦντες· κἂν φαινώμεθα ἄδικα αὐτὰ ἐργαζόμενοι, μὴ οὐ δέῃ ὑπολογίζεσθαι οὔτ᾽ εἰ ἀποθνῄσκειν δεῖ παραμένοντας καὶ ἡσυχίαν ἄγοντας, οὔτε ἄλλο ὁτιοῦν πάσχειν πρὸ τοῦ ἀδικεῖν.</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Καλῶς μέν μοι δοκεῖς λέγειν, ὦ Σώκρατες, ὅρα δὲ τί δρῶμεν.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Σκοπῶμεν, ὦ ἀγαθέ, κοινῇ, καὶ εἴ πῃ ἔχεις <span class="marker">[48e]</span> ἀντιλέγειν ἐμοῦ λέγοντος, ἀντίλεγε καί σοι πείσομαι· εἰ δὲ μή, παῦσαι ἤδη, ὦ μακάριε, πολλάκις μοι λέγων τὸν αὐτὸν λόγον, ὡς χρὴ ἐνθένδε ἀκόντων Ἀθηναίων ἐμὲ ἀπιέναι· ὡς ἐγὼ περὶ πολλοῦ ποιοῦμαι πείσας σε ταῦτα πράττειν, ἀλλὰ μὴ ἄκοντος. ὅρα δὲ δὴ τῆς σκέψεως τὴν ἀρχὴν ἐάν σοι <span class="marker">[49a]</span> ἱκανῶς λέγηται, καὶ πειρῶ ἀποκρίνεσθαι τὸ ἐρωτώμενον ᾗ ἂν μάλιστα οἴῃ.</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Ἀλλὰ πειράσομαι.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text">ΣΩ. Βάλε τώρα με τον νου σου ότι, ακολουθώντας τη γνώμη των ανίδεων, καταστρέφουμε εκείνο που με την υγεία γίνεται καλύτερο και με την αρρώστια φθείρεται. Αξίζει άραγε να ζούμε, <span class="marker">[47e]</span> αν αυτό έχει γίνει ερείπιο; Και είναι τούτο, βέβαια, το σώμα· ή όχι;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Ναι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Αξίζει λοιπόν να ζούμε μεις με αρρωστημένο και κατεστραμμένο σώμα;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Καθόλου δεν αξίζει.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Μα τότε αξίζει να ζούμε μεις με κατεστραμμένο εκείνο που η αδικία το βλάπτει και η δικαιοσύνη το ωφελεί; Ή νομίζεις πως έχει μικρότερη αξία από το σώμα εκείνο, οτιδήποτε κι αν είναι <span class="marker">[48a]</span> από τον εαυτό μας, που μ᾽ αυτό έχει σχέση και η αδικία και η δικαιοσύνη;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Σε καμιά περίπτωση.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Τότε μήπως νομίζουμε πως αυτό είναι πολυτιμότερο από το σώμα;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Και βέβαια· το πιο πολύτιμο.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Δεν πρέπει λοιπόν, αγαπητέ μου, να νοιαζόμαστε τόσο πολύ τί θα ειπεί για μας ο πολύς ο κόσμος, αλλά τί θα ειπεί εκείνος που γνωρίζει για τα δίκαια και τα άδικα, ο ένας, στην ουσία η ίδια η αλήθεια. Ώστε πρώτα-πρώτα δεν συμβουλεύεις σωστά μ᾽ αυτή την πρότασή σου, λέγοντας πως πρέπει να προσέχουμε στη γνώμη που έχει ο πολύς ο κόσμος για το δίκαιο και για το ωραίο και για το αγαθό και για τα αντίθετά τους. Θα μπορούσε βέβαια να ισχυριστεί κανείς: «Κι όμως, ο πολύς ο κόσμος έχει τη δύναμη ακόμη και να μας θανατώσει».</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[48b]</span> ΚΡ. Είναι κι αυτό φανερό· θα μπορούσε κανείς να το υποστηρίξει, Σωκράτη.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Αλήθεια λες. Ωστόσο, φίλε μου, κι αυτή εδώ η γνώμη που τώρα εξετάσαμε λεπτομερώς σ᾽ εμένα τουλάχιστον φαίνεται πως είναι ακόμη η ίδια μ᾽ εκείνη που είχαμε πριν.</span></p>
+<p class="passage indent"><span class="passage-text">Προσπάθησε τώρα να εξετάσεις προσεχτικά από την αρχή κι αυτή τη γνώμη, αν δηλαδή εμείς παραδεχόμαστε ή όχι, ακόμη και τώρα, ότι ο άνθρωπος πρέπει να δίνει πολύ μεγάλη σημασία όχι απλώς στη ζωή, αλλά στην έντιμη ζωή.</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Χωρίς αμφιβολία, αυτό το παραδεχόμαστε ακόμη.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Παραδεχόμαστε και τώρα ή δεν παραδεχόμαστε ότι η έντιμη, η ηθική και η δίκαιη ζωή είναι το ίδιο πράγμα;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Το παραδεχόμαστε και τώρα.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Ας πάρουμε λοιπόν τώρα για βάση αυτά που για την ώρα παραδεχόμαστε κι ας εξετάσουμε ένα άλλο ζήτημα: Ποιό από τα δύο, είναι δίκαιο να προσπαθήσω εγώ να φύγω από τη φυλακή δίχως να το θέλουν <span class="marker">[48c]</span> οι Αθηναίοι ή δεν είναι δίκαιο; Κι αν βρούμε πως είναι δίκαιο, ας το επιχειρήσουμε· αν όχι, ας το αφήσουμε. Όσο για τα επιχειρήματα που φέρνεις, να ξοδέψουμε χρήματα ή τί εντύπωση θα σχηματίσει ο κόσμος ή πώς θ᾽ ανατραφούν τα παιδιά μου, πρόσεξε, Κρίτων, μήπως όλ᾽ αυτά είναι στ᾽ αλήθεια λαθεμένες σκέψεις του κόσμου, που εύκολα καταδικάζει σε θάνατο ανθρώπους, μα κι εύκολα, χωρίς καμιά περίσκεψη, θα τους έφερνε πάλι στη ζωή, αν βέβαια μπορούσε. Εμείς όμως, αφού η λογική αυτό επιβάλλει, θαρρώ πως δεν πρέπει να σκεφτούμε τίποτ᾽ άλλο, παρά αυτό που λέγαμε πριν από λίγο: Ποιό από τα δύο, θα κάνουμε δίκαιη πράξη αν εξαγοράσουμε με χρήματα αυτούς <span class="marker">[48d]</span> που θα με βγάλουν από δω κι αν θα τους χρωστάμε κι ευγνωμοσύνη και σεις που θα βοηθήσετε στη δραπέτευση και εγώ που θα δραπετεύσω, ή αντίθετα, κάνοντας όλ᾽ αυτά, θα κάνουμε πραγματικά μια πράξη άδικη; Κι αν αποδειχτεί πως όλ᾽ αυτά που πάμε να κάνουμε είναι άδικα, σκέψου μήπως πρέπει να προτιμήσουμε ακόμη και τον θάνατο, μένοντας ήσυχα εδώ, κι όποιο άλλο κακό να πάθουμε, φτάνει να μην κάνουμε άδικο.</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Τα λόγια σου, Σωκράτη, μου φαίνονται σωστά· κοίταξε όμως τί πρέπει να κάνουμε.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Ας εξετάσουμε, καλέ μου φίλε, το ζήτημα και οι δυο μαζί· κι όταν θα μιλάω εγώ, αν σε κάποιο σημείο <span class="marker">[48e]</span> έχεις αντίρρηση, λέγε την και θα σ᾽ ακούσω. Ειδάλλως, πάψε πια, ευλογημένε, να μου λες πολλές φορές τον ίδιο λόγο, πως πρέπει εγώ να δραπετεύσω από δω, κι ας μην το θέλουν οι Αθηναίοι. Γιατί εγώ θεωρώ πολύ σπουδαίο να σε πείσω και να κάνω ό,τι κάνω, όχι όμως και χωρίς τη θέλησή σου. Πρόσεξε λοιπόν καλά τη βασική μου σκέψη, αν <span class="marker">[49a]</span> είναι ορθή κατά την κρίση σου, και προσπάθησε να απαντάς στις ερωτήσεις μου, όπως νομίζεις καλύτερα.</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Σύμφωνοι· θα προσπαθήσω.</span></p>
+        </div>
+        
+
+        <div id="book-3-chapter-----3" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-6" data-hash="book-3-chapter-----3">
+            Ο Σωκράτης επιχειρηματολογεί εναντίον της πρότασης του Κρίτωνα • Κεφάλαιο ΣΩ.-ΚΡ..3 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=105&page=6" target="_blank" class="page-link">Page 6</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐδενὶ τρόπῳ φαμὲν ἑκόντας ἀδικητέον εἶναι, ἢ τινὶ μὲν ἀδικητέον τρόπῳ τινὶ δὲ οὔ; ἢ οὐδαμῶς τό γε ἀδικεῖν οὔτε ἀγαθὸν οὔτε καλόν, ὡς πολλάκις ἡμῖν καὶ ἐν τῷ ἔμπροσθεν χρόνῳ ὡμολογήθη; [ὅπερ καὶ ἄρτι ἐλέγετο] ἢ πᾶσαι ἡμῖν ἐκεῖναι αἱ πρόσθεν ὁμολογίαι ἐν ταῖσδε ταῖς ὀλίγαις ἡμέραις ἐκκεχυμέναι εἰσίν, καὶ πάλαι, ὦ Κρίτων, ἄρα τηλικοίδε [γέροντες] ἄνδρες πρὸς ἀλλήλους σπουδῇ <span class="marker">[49b]</span> διαλεγόμενοι ἐλάθομεν ἡμᾶς αὐτοὺς παίδων οὐδὲν διαφέροντες; ἢ παντὸς μᾶλλον οὕτως ἔχει ὥσπερ τότε ἐλέγετο ἡμῖν· εἴτε φασὶν οἱ πολλοὶ εἴτε μή, καὶ εἴτε δεῖ ἡμᾶς ἔτι τῶνδε χαλεπώτερα πάσχειν εἴτε καὶ πρᾳότερα, ὅμως τό γε ἀδικεῖν τῷ ἀδικοῦντι καὶ κακὸν καὶ αἰσχρὸν τυγχάνει ὂν παντὶ τρόπῳ; φαμὲν ἢ οὔ;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Φαμέν.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐδαμῶς ἄρα δεῖ ἀδικεῖν.</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Οὐ δῆτα.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐδὲ ἀδικούμενον ἄρα ἀνταδικεῖν, ὡς οἱ πολλοὶ οἴονται, ἐπειδή γε οὐδαμῶς δεῖ ἀδικεῖν.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[49c]</span> ΚΡΙΤΩΝ. Οὐ φαίνεται.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Τί δὲ δή; κακουργεῖν δεῖ, ὦ Κρίτων, ἢ οὔ;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Οὐ δεῖ δήπου, ὦ Σώκρατες.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Τί δέ; ἀντικακουργεῖν κακῶς πάσχοντα, ὡς οἱ πολλοί φασιν, δίκαιον ἢ οὐ δίκαιον;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Οὐδαμῶς.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Τὸ γάρ που κακῶς ποιεῖν ἀνθρώπους τοῦ ἀδικεῖν οὐδὲν διαφέρει.</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Ἀληθῆ λέγεις.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὔτε ἄρα ἀνταδικεῖν δεῖ οὔτε κακῶς ποιεῖν οὐδένα ἀνθρώπων, οὐδ᾽ ἂν ὁτιοῦν πάσχῃ ὑπ᾽ αὐτῶν. καὶ ὅρα, ὦ <span class="marker">[49d]</span> Κρίτων, ταῦτα καθομολογῶν, ὅπως μὴ παρὰ δόξαν ὁμολογῇς· οἶδα γὰρ ὅτι ὀλίγοις τισὶ ταῦτα καὶ δοκεῖ καὶ δόξει. οἷς οὖν οὕτω δέδοκται καὶ οἷς μή, τούτοις οὐκ ἔστι κοινὴ βουλή, ἀλλὰ ἀνάγκη τούτους ἀλλήλων καταφρονεῖν ὁρῶντας ἀλλήλων τὰ βουλεύματα. σκόπει δὴ οὖν καὶ σὺ εὖ μάλα πότερον κοινωνεῖς καὶ συνδοκεῖ σοι καὶ ἀρχώμεθα ἐντεῦθεν βουλευόμενοι, ὡς οὐδέποτε ὀρθῶς ἔχοντος οὔτε τοῦ ἀδικεῖν οὔτε τοῦ ἀνταδικεῖν οὔτε κακῶς πάσχοντα ἀμύνεσθαι ἀντιδρῶντα κακῶς, ἢ ἀφίστασαι καὶ οὐ κοινωνεῖς τῆς ἀρχῆς; <span class="marker">[49e]</span> ἐμοὶ μὲν γὰρ καὶ πάλαι οὕτω καὶ νῦν ἔτι δοκεῖ, σοὶ δὲ εἴ πῃ ἄλλῃ δέδοκται, λέγε καὶ δίδασκε. εἰ δ᾽ ἐμμένεις τοῖς πρόσθε, τὸ μετὰ τοῦτο ἄκουε.</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Ἀλλ᾽ ἐμμένω τε καὶ συνδοκεῖ μοι· ἀλλὰ λέγε.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Λέγω δὴ αὖ τὸ μετὰ τοῦτο, μᾶλλον δ᾽ ἐρωτῶ· πότερον ἃ ἄν τις ὁμολογήσῃ τῳ δίκαια ὄντα ποιητέον ἢ ἐξαπατητέον;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Ποιητέον.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text">ΣΩ. Παραδεχόμαστε πως με κανέναν τρόπο δεν πρέπει ν᾽ αδικούμε με τη θέλησή μας ή σε μερικές περιπτώσεις μπορούμε ν᾽ αδικούμε και σε άλλες όχι; Ή παραδεχόμαστε πως η αδικία σε καμιά περίπτωση δεν είναι τίμιο μα ούτε και ηθικό πράγμα, όπως συμφωνήσαμε πολλές φορές στα περασμένα χρόνια; Το ίδιο είπαμε και πριν από λίγο. Ή μήπως όλα εκείνα που είχαμε τότε συμφωνήσει τα έχουμε ξεχάσει τώρα σ᾽ αυτές εδώ τις λίγες μέρες, κι όπως φαίνεται, Κρίτων, χρόνια τώρα συζητώντας σοβαρά μεταξύ μας, γέροι άνθρωποι σ᾽ αυτή την ηλικία, <span class="marker">[49b]</span> δεν πήραμε είδηση πως δεν διαφέρουμε καθόλου από τα παιδιά; Ή μήπως αναντίρρητα έτσι είναι, όπως ακριβώς το δεχόμαστε τότε, είτε συμφωνεί είτε δεν συμφωνεί ο πολύς ο κόσμος; Και είτε παρουσιαστεί ανάγκη να πάθουμε εμείς ακόμη χειρότερα απ᾽ αυτά είτε και ελαφρότερα, όμως πραγματικά η αδικία γι᾽ αυτόν που την κάνει δεν είναι πάντοτε και κακό και άσχημο πράγμα; Το παραδεχόμαστε αυτό ή όχι;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Το παραδεχόμαστε.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Δεν πρέπει λοιπόν να αδικούμε ποτέ και με κανέναν τρόπο.</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Ποτέ, βέβαια.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Άρα, ακόμη και όταν αδικείται κανείς, δεν πρέπει να ανταποδίδει την αδικία, όπως νομίζει ο πολύς ο κόσμος, αφού βέβαια δεν πρέπει να αδικούμε ποτέ και με κανέναν τρόπο.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[49c]</span> ΚΡ. Όπως φαίνεται, δεν πρέπει.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Τότε λοιπόν, τί λες, Κρίτων; Πρέπει κανείς να κάνει κακό στον άλλο ή δεν πρέπει;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Δεν πρέπει βέβαια, Σωκράτη.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Μα τί λοιπόν; Είναι δίκαιο να ανταποδίδει κανείς το κακό σ᾽ εκείνους που τον έβλαψαν, όπως υποστηρίζει ο πολύς ο κόσμος, ή δεν είναι δίκαιο;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Δεν είναι καθόλου δίκαιο.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Εγώ βέβαια πιστεύω πως είτε κακό κάνεις στους ανθρώπους είτε τους αδικείς είναι το ίδιο πράγμα.</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Αλήθεια λες.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Δεν πρέπει λοιπόν ο άνθρωπος να ανταποδίδει την αδικία ούτε να κάνει κακό σε κανέναν, ακόμη κι αν του κάνουν οι άλλοι ό,τι θέλουν. Πρόσεξε όμως, <span class="marker">[49d]</span> Κρίτων, μήπως, ενώ συμφωνείς σ᾽ αυτά μαζί μου, τα παραδέχεσαι δίχως να τα πιστεύεις· γιατί το ξέρω καλά πως αυτά πολύ λίγοι θα τα βρουν σωστά και τώρα και στο μέλλον. Όμως κι αυτοί που τα παραδέχονται κι αυτοί που δεν τα παραδέχονται δεν σκέπτονται με τον ίδιο τρόπο, μόνο περιφρονούνται μεταξύ τους αναγκαστικά, σαν βλέπουν πόσο διαφορετικές είναι οι σκέψεις και οι πράξεις τους. Γι᾽ αυτό λοιπόν σκέψου και συ τώρα πολύ καλά: Ποιό από τα δύο, τα παραδέχεσαι αυτά και συμφωνείς μαζί μου κι ας αρχίσουμε την εξέταση με βάση αυτή την αρχή, ότι δηλαδή ποτέ δεν είναι σωστό ούτε να αδικούμε ούτε να ανταποδίδουμε την αδικία, ούτε πάλι όταν μας κάνουν κακό να υπερασπιζόμαστε τον εαυτό μας ανταποδίδοντας το κακό; Ή αλλάζεις γνώμη και δεν συμφωνείς πια μ᾽ αυτή τη βασική αρχή; <span class="marker">[49e]</span> Εγώ βέβαια και πριν, από πολύν καιρό, αλλά και τώρα ακόμη αυτή τη γνώμη έχω. Αν όμως συ έχεις σχηματίσει κάποια άλλη γνώμη, λέγε την, ανάπτυξέ την να την καταλάβω. Αν πάλι μένεις σταθερός σε όσα είχαμε παραδεχτεί άλλοτε, άκου τί έχω να προσθέσω.</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Και μένω σταθερός και έχω την ίδια γνώμη με σένα· λέγε λοιπόν.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Λέω τότε τη συνέχεια ή καλύτερα ρωτάω: Ποιό από τα δύο, αν ένας άνθρωπος συμφωνήσει με κάποιον άλλο σε κάτι που είναι δίκαιο, πρέπει να τηρήσει τη συμφωνία ή πρέπει να τον εξαπατήσει;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Πρέπει να την τηρήσει.</span></p>
+        </div>
+        
+
+        <div id="book-4-chapter----" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-7" data-hash="book-4-chapter----">
+            Συνομιλία του Σωκράτη με τους Νόμους • Κεφάλαιο ΣΩ.-ΚΡ. (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=105&page=7" target="_blank" class="page-link">Page 7</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ἐκ τούτων δὴ ἄθρει. ἀπιόντες ἐνθένδε ἡμεῖς μὴ <span class="marker">[50a]</span> πείσαντες τὴν πόλιν πότερον κακῶς τινας ποιοῦμεν, καὶ ταῦτα οὓς ἥκιστα δεῖ, ἢ οὔ; καὶ ἐμμένομεν οἷς ὡμολογήσαμεν δικαίοις οὖσιν ἢ οὔ;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Οὐκ ἔχω, ὦ Σώκρατες, ἀποκρίνασθαι πρὸς ὃ ἐρωτᾷς· οὐ γὰρ ἐννοῶ.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ἀλλ᾽ ὧδε σκόπει. εἰ μέλλουσιν ἡμῖν ἐνθένδε εἴτε ἀποδιδράσκειν, εἴθ᾽ ὅπως δεῖ ὀνομάσαι τοῦτο, ἐλθόντες οἱ νόμοι καὶ τὸ κοινὸν τῆς πόλεως ἐπιστάντες ἔροιντο· «Εἰπέ μοι, ὦ Σώκρατες, τί ἐν νῷ ἔχεις ποιεῖν; ἄλλο τι ἢ τούτῳ <span class="marker">[50b]</span> τῷ ἔργῳ ᾧ ἐπιχειρεῖς διανοῇ τούς τε νόμους ἡμᾶς ἀπολέσαι καὶ σύμπασαν τὴν πόλιν τὸ σὸν μέρος; ἢ δοκεῖ σοι οἷόν τε ἔτι ἐκείνην τὴν πόλιν εἶναι καὶ μὴ ἀνατετράφθαι, ἐν ᾗ ἂν αἱ γενόμεναι δίκαι μηδὲν ἰσχύωσιν ἀλλὰ ὑπὸ ἰδιωτῶν ἄκυροί τε γίγνωνται καὶ διαφθείρωνται;» τί ἐροῦμεν, ὦ Κρίτων, πρὸς ταῦτα καὶ ἄλλα τοιαῦτα; πολλὰ γὰρ ἄν τις ἔχοι, ἄλλως τε καὶ ῥήτωρ, εἰπεῖν ὑπὲρ τούτου τοῦ νόμου ἀπολλυμένου ὃς τὰς δίκας τὰς δικασθείσας προστάττει κυρίας εἶναι. <span class="marker">[50c]</span> ἢ ἐροῦμεν πρὸς αὐτοὺς ὅτι «Ἠδίκει γὰρ ἡμᾶς ἡ πόλις καὶ οὐκ ὀρθῶς τὴν δίκην ἔκρινεν;» ταῦτα ἢ τί ἐροῦμεν;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Ταῦτα νὴ Δία, ὦ Σώκρατες.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Τί οὖν ἂν εἴπωσιν οἱ νόμοι· «Ὦ Σώκρατες, ἦ καὶ ταῦτα ὡμολόγητο ἡμῖν τε καὶ σοί, ἢ ἐμμενεῖν ταῖς δίκαις αἷς ἂν ἡ πόλις δικάζῃ;» εἰ οὖν αὐτῶν θαυμάζοιμεν λεγόντων, ἴσως ἂν εἴποιεν ὅτι «Ὦ Σώκρατες, μὴ θαύμαζε τὰ λεγόμενα ἀλλ᾽ ἀποκρίνου, ἐπειδὴ καὶ εἴωθας χρῆσθαι τῷ ἐρωτᾶν τε καὶ ἀποκρίνεσθαι. φέρε γάρ, τί ἐγκαλῶν <span class="marker">[50d]</span> ἡμῖν καὶ τῇ πόλει ἐπιχειρεῖς ἡμᾶς ἀπολλύναι; οὐ πρῶτον μέν σε ἐγεννήσαμεν ἡμεῖς, καὶ δι᾽ ἡμῶν ἔλαβε τὴν μητέρα σου ὁ πατὴρ καὶ ἐφύτευσέν σε; φράσον οὖν, τούτοις ἡμῶν, τοῖς νόμοις τοῖς περὶ τοὺς γάμους, μέμφῃ τι ὡς οὐ καλῶς ἔχουσιν;» «Οὐ μέμφομαι,» φαίην ἄν. «Ἀλλὰ τοῖς περὶ τὴν τοῦ γενομένου τροφήν τε καὶ παιδείαν ἐν ᾗ καὶ σὺ ἐπαιδεύθης; ἢ οὐ καλῶς προσέταττον ἡμῶν οἱ ἐπὶ τούτῳ τεταγμένοι νόμοι, παραγγέλλοντες τῷ πατρὶ τῷ σῷ σε ἐν <span class="marker">[50e]</span> μουσικῇ καὶ γυμναστικῇ παιδεύειν;» «Καλῶς,» φαίην ἄν. «Εἶεν. ἐπειδὴ δὲ ἐγένου τε καὶ ἐξετράφης καὶ ἐπαιδεύθης, ἔχοις ἂν εἰπεῖν πρῶτον μὲν ὡς οὐχὶ ἡμέτερος ἦσθα καὶ ἔκγονος καὶ δοῦλος, αὐτός τε καὶ οἱ σοὶ πρόγονοι; καὶ εἰ τοῦθ᾽ οὕτως ἔχει, ἆρ᾽ ἐξ ἴσου οἴει εἶναι σοὶ τὸ δίκαιον καὶ ἡμῖν, καὶ ἅττ᾽ ἂν ἡμεῖς σε ἐπιχειρῶμεν ποιεῖν, καὶ σοὶ ταῦτα ἀντιποιεῖν οἴει δίκαιον εἶναι; ἢ πρὸς μὲν ἄρα σοι τὸν πατέρα οὐκ ἐξ ἴσου ἦν τὸ δίκαιον καὶ πρὸς δεσπότην, εἴ σοι ὢν ἐτύγχανεν, ὥστε ἅπερ πάσχοις ταῦτα καὶ ἀντιποιεῖν, οὔτε κακῶς <span class="marker">[51a]</span> ἀκούοντα ἀντιλέγειν οὔτε τυπτόμενον ἀντιτύπτειν οὔτε ἄλλα τοιαῦτα πολλά· πρὸς δὲ τὴν πατρίδα ἄρα καὶ τοὺς νόμους ἐξέσται σοι, ὥστε, ἐάν σε ἐπιχειρῶμεν ἡμεῖς ἀπολλύναι δίκαιον ἡγούμενοι εἶναι, καὶ σὺ δὲ ἡμᾶς τοὺς νόμους καὶ τὴν πατρίδα καθ᾽ ὅσον δύνασαι ἐπιχειρήσεις ἀνταπολλύναι, καὶ φήσεις ταῦτα ποιῶν δίκαια πράττειν, ὁ τῇ ἀληθείᾳ τῆς ἀρετῆς ἐπιμελόμενος; ἢ οὕτως εἶ σοφὸς ὥστε λέληθέν σε ὅτι μητρός τε καὶ πατρὸς καὶ τῶν ἄλλων προγόνων ἁπάντων τιμιώτερόν ἐστιν πατρὶς καὶ σεμνότερον καὶ ἁγιώτερον <span class="marker">[51b]</span> καὶ ἐν μείζονι μοίρᾳ καὶ παρὰ θεοῖς καὶ παρ᾽ ἀνθρώποις τοῖς νοῦν ἔχουσι, καὶ σέβεσθαι δεῖ καὶ μᾶλλον ὑπείκειν καὶ θωπεύειν πατρίδα χαλεπαίνουσαν ἢ πατέρα, καὶ ἢ πείθειν ἢ ποιεῖν ἃ ἂν κελεύῃ, καὶ πάσχειν ἐάν τι προστάττῃ παθεῖν ἡσυχίαν ἄγοντα, ἐάντε τύπτεσθαι ἐάντε δεῖσθαι, ἐάντε εἰς πόλεμον ἄγῃ τρωθησόμενον ἢ ἀποθανούμενον, ποιητέον ταῦτα, καὶ τὸ δίκαιον οὕτως ἔχει, καὶ οὐχὶ ὑπεικτέον οὐδὲ ἀναχωρητέον οὐδὲ λειπτέον τὴν τάξιν, ἀλλὰ καὶ ἐν πολέμῳ καὶ ἐν δικαστηρίῳ καὶ πανταχοῦ ποιητέον ἃ ἂν κελεύῃ ἡ <span class="marker">[51c]</span> πόλις καὶ ἡ πατρίς, ἢ πείθειν αὐτὴν ᾗ τὸ δίκαιον πέφυκε· βιάζεσθαι δὲ οὐχ ὅσιον οὔτε μητέρα οὔτε πατέρα, πολὺ δὲ τούτων ἔτι ἧττον τὴν πατρίδα;» τί φήσομεν πρὸς ταῦτα, ὦ Κρίτων; ἀληθῆ λέγειν τοὺς νόμους ἢ οὔ;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Ἔμοιγε δοκεῖ.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text"><i>Ο ΣΕΒΑΣΜΟΣ ΚΑΙ Η ΠΕΙΘΑΡΧΙΑ ΣΤΟΥΣ ΝΟΜΟΥΣ</i></span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Σύμφωνα λοιπόν μ᾽ αυτά, δώσε τώρα προσοχή. Αν εμείς φύγουμε από δω χωρίς <span class="marker">[50a]</span> να πείσουμε την Πολιτεία, βλάπτουμε κάποιους, και μάλιστα εκείνους που δεν πρέπει να βλάψουμε καθόλου, ή όχι; Και μένουμε έτσι σταθεροί σ᾽ αυτά που συμφωνήσαμε πως είναι δίκαια, ή δεν μένουμε;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Δεν μπορώ, Σωκράτη, να απαντήσω σ᾽ αυτό που με ρωτάς. Δεν καταλαβαίνω τί θέλεις να ειπείς.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Νά πώς πρέπει να σκεφτείς για να καταλάβεις: Την ώρα που εμείς ετοιμαζόμαστε να δραπετεύσουμε από δω, ή πες την όπως θέλεις μια τέτοια πράξη, αν έρθουν οι Νόμοι και η Πολιτεία, σταθούν ξαφνικά μπροστά μας και μας ρωτήσουν: «Για πες μας, Σωκράτη, τί έχεις στον νου σου να κάνεις; Άλλο τίποτα ή σκέπτεσαι μ᾽ αυτό <span class="marker">[50b]</span> το έργο που αποτολμάς να αφανίσεις και μας τους Νόμους κι ολόκληρη την Πολιτεία, όσο σου περνάει από το χέρι; Ή φαντάζεσαι πως είναι δυνατόν να στέκεται όρθια και να μην έχει αναποδογυριστεί εκείνη η Πολιτεία, όπου οι αποφάσεις των δικαστηρίων δεν ισχύουν καθόλου, αλλά ακυρώνονται και καταργούνται από οποιονδήποτε πολίτη;» Τί θα απαντήσουμε, Κρίτων, σ᾽ αυτά και σ᾽ άλλα παρόμοια ερωτήματα; Γιατί πολλά θα μπορούσε να ειπεί κανείς, και μάλιστα ένας ρήτορας, για να υπερασπιστεί τούτο τον νόμο που πάμε μεις να καταλύσουμε και που ορίζει να έχουν κύρος οι αποφάσεις των δικαστηρίων. <span class="marker">[50c]</span> Ή μήπως θ᾽ αποκριθούμε σ᾽ αυτούς: «Μάλιστα, θέλουμε να καταλύσουμε αυτό τον νόμο, γιατί η Πολιτεία δεν έκρινε δίκαια την υπόθεση στο δικαστήριο, όταν μας καταδίκαζε, και μας αδίκησε». Αυτά θα πούμε ή τίποτ᾽ άλλο;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Αυτά, μά τον Δία, Σωκράτη.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Και τί θα απαντήσουμε τότε, αν μας πουν οι Νόμοι: «Αλήθεια, Σωκράτη, είχαμε και αυτά συμφωνήσει μεταξύ μας ή μονάχα πως θα πειθαρχείς στις αποφάσεις που θα βγάζουν τα δικαστήρια της Πολιτείας, οποιεσδήποτε κι αν είναι αυτές;» Κι αν εμείς απορούσαμε που θα μας μιλούσαν έτσι, ίσως θα λέγαν: «Σωκράτη, μην παραξενεύεσαι μ᾽ αυτά που λέμε, αποκρίσου μας μόνο, αφού μάλιστα έχεις συνήθεια να χρησιμοποιείς την ερώτηση και την απόκριση. Πες μας λοιπόν τί παράπονο έχεις <span class="marker">[50d]</span> από μας κι από την Πολιτεία και πας να μας καταστρέψεις; Πρώτα-πρώτα εμείς δεν σε γεννήσαμε και με τη δική μας προστασία δεν παντρεύτηκε ο πατέρας σου τη μητέρα σου και σ᾽ έφερε στη ζωή; Πες μας λοιπόν, έχεις να κατηγορήσεις για κάτι αυτούς από μας τους Νόμους που κανονίζουν τα ζητήματα των γάμων, τάχα πως δεν είναι καλοί;» ―«Δεν έχω γι᾽ αυτούς καμιά κατηγορία», θ᾽ απαντούσα. ―«Μήπως λοιπόν έχεις καμιά κατηγορία για τους νόμους εκείνους που κανονίζουν την ανατροφή και τη μόρφωση των παιδιών, αυτή που δόθηκε και σε σένα; Ή δεν πρόσταζαν ορθά εκείνοι από μας οι Νόμοι που είναι ορισμένοι γι᾽ αυτά, παραγγέλνοντας στον πατέρα σου να σε μορφώσει με <span class="marker">[50e]</span> μουσική και γυμναστική;» ―«Ορθά πρόσταζαν», θα έλεγα. ―«Πολύ καλά. Τότε αφού γεννήθηκες και ανατράφηκες και μορφώθηκες με την προστασία μας, θα μπορούσες να ειπείς πρώτα πως δεν ήσουνα δικός μας και παιδί μας και δούλος μας και συ ο ίδιος και οι πρόγονοί σου; Κι αν τούτο είναι έτσι, μήπως σου περνάει από τον νου πως εμείς και συ έχουμε τα ίδια δικαιώματα και όσα κι αν επιχειρούμε να σου κάνουμε μεις νομίζεις πως έχεις το δικαίωμα τα ίδια να κάνεις και σε μας; Ή δεν έχεις βέβαια τα ίδια δικαιώματα απέναντι στον πατέρα σου ούτε απέναντι στον αφέντη σου, αν τύχαινε να έχεις αφέντη, ώστε όσα σου κάνουν αυτοί, τα ίδια να μπορείς να τους κάνεις και συ, ούτε αν σ᾽ έβριζαν <span class="marker">[51a]</span> αυτοί να τους βρίζεις και συ, ούτε αν σε χτυπούσαν να τους χτυπάς, ούτε άλλα τέτοια πολλά. Απέναντι όμως στην πατρίδα και στους νόμους φαντάζεσαι πως έχεις τέτοια δικαιώματα ώστε, αν εμείς θέλουμε να σε θανατώσουμε ―γιατί νομίζουμε πως είναι δίκαιο― να προσπαθήσεις και συ από τ᾽ άλλο μέρος να καταστρέψεις εμάς τους Νόμους και την Πατρίδα, όσο φυσικά σου περνάει από το χέρι; Και κάνοντας αυτά θα ισχυριστείς πως κάνεις δίκαιες πράξεις, συ που αληθινά φροντίζεις για την αρετή;</span></p>
+<p class="passage indent"><span class="passage-text">Αλήθεια, τόση είναι η σοφία σου, ώστε δεν έχεις καταλάβει ότι και από τη μητέρα και από τον πατέρα κι απ᾽ όλους τους άλλους προγόνους το πιο πολύτιμο, το πιο σεβαστό, το πιο ιερό, το ανώτερο αγαθό είναι η Πατρίδα, <span class="marker">[51b]</span> σύμφωνα με την κρίση των θεών και των γνωστικών ανθρώπων; Δεν έχεις ακόμη καταλάβει πως έχουμε χρέος να σεβόμαστε και να υποτασσόμαστε και να καλοπιάνουμε, όταν οργίζεται, περισσότερο την Πατρίδα παρά τον πατέρα, και αν τυχόν δεν βρίσκουμε σωστές τις εντολές της ή να προσπαθούμε να την πείθουμε ή να εκτελούμε όσα προστάζει; Ξεχνάς ακόμη πως πρέπει να υποφέρουμε χωρίς διαμαρτυρίες αν μας υποχρεώνει να πάθουμε κάτι, είτε προστάζει να μας δέρνουν, είτε να μας ρίχνουν δεμένους στη φυλακή, είτε να μας στέλνουν στον πόλεμο για να πληγωθούμε ή και να σκοτωθούμε; Δεν έχεις λοιπόν καταλάβει ότι οφείλουμε όλα αυτά να τα κάνουμε, και το δίκαιο έτσι είναι, και όχι να αποφεύγουμε τη στράτευση ούτε να οπισθοχωρούμε από δειλία την ώρα της μάχης ούτε να λιποτακτούμε, αλλά και στον πόλεμο και στο δικαστήριο και παντού έχουμε χρέος να εκτελούμε όσα προστάζει η <span class="marker">[51c]</span> Πολιτεία και η Πατρίδα, ή, αν έχουμε άλλη γνώμη, να την πείθουμε ποιό είναι πραγματικά το δίκαιο; Και ότι δεν είναι σύμφωνο με τον θείο νόμο να φέρνεται ο άνθρωπος με βία ούτε στη μητέρα ούτε στον πατέρα κι απ᾽ αυτούς πολύ λιγότερο ακόμη στην Πατρίδα, δεν το έχεις καταλάβει;» –Τί θα απαντήσουμε σε όλα αυτά, Κρίτων; Ότι οι Νόμοι λένε την αλήθεια ή όχι;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Ότι λένε την αλήθεια.</span></p>
+        </div>
+        
+
+        <div id="book-4-chapter-----2" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-8" data-hash="book-4-chapter-----2">
+            Συνομιλία του Σωκράτη με τους Νόμους • Κεφάλαιο ΣΩ.-ΚΡ..2 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=105&page=8" target="_blank" class="page-link">Page 8</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. «Σκόπει τοίνυν, ὦ Σώκρατες,» φαῖεν ἂν ἴσως οἱ νόμοι, «εἰ ἡμεῖς ταῦτα ἀληθῆ λέγομεν, ὅτι οὐ δίκαια ἡμᾶς ἐπιχειρεῖς δρᾶν ἃ νῦν ἐπιχειρεῖς. ἡμεῖς γάρ σε γεννήσαντες, ἐκθρέψαντες, παιδεύσαντες, μεταδόντες ἁπάντων ὧν οἷοί τ᾽ <span class="marker">[51d]</span> ἦμεν καλῶν σοὶ καὶ τοῖς ἄλλοις πᾶσιν πολίταις, ὅμως προαγορεύομεν τῷ ἐξουσίαν πεποιηκέναι Ἀθηναίων τῷ βουλομένῳ, ἐπειδὰν δοκιμασθῇ καὶ ἴδῃ τὰ ἐν τῇ πόλει πράγματα καὶ ἡμᾶς τοὺς νόμους, ᾧ ἂν μὴ ἀρέσκωμεν ἡμεῖς, ἐξεῖναι λαβόντα τὰ αὑτοῦ ἀπιέναι ὅποι ἂν βούληται. καὶ οὐδεὶς ἡμῶν τῶν νόμων ἐμποδών ἐστιν οὐδ᾽ ἀπαγορεύει, ἐάντε τις βούληται ὑμῶν εἰς ἀποικίαν ἰέναι, εἰ μὴ ἀρέσκοιμεν ἡμεῖς τε καὶ ἡ πόλις, ἐάντε μετοικεῖν ἄλλοσέ ποι ἐλθών, ἰέναι ἐκεῖσε ὅποι <span class="marker">[51e]</span> ἂν βούληται, ἔχοντα τὰ αὑτοῦ. ὃς δ᾽ ἂν ὑμῶν παραμείνῃ, ὁρῶν ὃν τρόπον ἡμεῖς τάς τε δίκας δικάζομεν καὶ τἆλλα τὴν πόλιν διοικοῦμεν, ἤδη φαμὲν τοῦτον ὡμολογηκέναι ἔργῳ ἡμῖν ἃ ἂν ἡμεῖς κελεύωμεν ποιήσειν ταῦτα, καὶ τὸν μὴ πειθόμενον τριχῇ φαμεν ἀδικεῖν, ὅτι τε γεννηταῖς οὖσιν ἡμῖν οὐ πείθεται, καὶ ὅτι τροφεῦσι, καὶ ὅτι ὁμολογήσας ἡμῖν πείσεσθαι οὔτε πείθεται οὔτε πείθει ἡμᾶς, εἰ μὴ καλῶς τι ποιοῦμεν, <span class="marker">[52a]</span> προτιθέντων ἡμῶν καὶ οὐκ ἀγρίως ἐπιταττόντων ποιεῖν ἃ ἂν κελεύωμεν, ἀλλὰ ἐφιέντων δυοῖν θάτερα, ἢ πείθειν ἡμᾶς ἢ ποιεῖν, τούτων οὐδέτερα ποιεῖ. ταύταις δή φαμεν καὶ σέ, ὦ Σώκρατες, ταῖς αἰτίαις ἐνέξεσθαι, εἴπερ ποιήσεις ἃ ἐπινοεῖς, καὶ οὐχ ἥκιστα Ἀθηναίων σέ, ἀλλ᾽ ἐν τοῖς μάλιστα.» εἰ οὖν ἐγὼ εἴποιμι· «Διὰ τί δή;» ἴσως ἄν μου δικαίως καθάπτοιντο λέγοντες ὅτι ἐν τοῖς μάλιστα Ἀθηναίων ἐγὼ αὐτοῖς ὡμολογηκὼς τυγχάνω ταύτην τὴν ὁμολογίαν. φαῖεν γὰρ ἂν ὅτι <span class="marker">[52b]</span> «Ὦ Σώκρατες, μεγάλα ἡμῖν τούτων τεκμήριά ἐστιν, ὅτι σοι καὶ ἡμεῖς ἠρέσκομεν καὶ ἡ πόλις· οὐ γὰρ ἄν ποτε τῶν ἄλλων Ἀθηναίων ἁπάντων διαφερόντως ἐν αὐτῇ ἐπεδήμεις εἰ μή σοι διαφερόντως ἤρεσκεν, καὶ οὔτ᾽ ἐπὶ θεωρίαν πώποτ᾽ ἐκ τῆς πόλεως ἐξῆλθες, ὅτι μὴ ἅπαξ εἰς Ἰσθμόν, οὔτε ἄλλοσε οὐδαμόσε, εἰ μή ποι στρατευσόμενος, οὔτε ἄλλην ἀποδημίαν ἐποιήσω πώποτε ὥσπερ οἱ ἄλλοι ἄνθρωποι, οὐδ᾽ ἐπιθυμία σε ἄλλης πόλεως οὐδὲ ἄλλων νόμων ἔλαβεν εἰδέναι, ἀλλὰ ἡμεῖς <span class="marker">[52c]</span> σοι ἱκανοὶ ἦμεν καὶ ἡ ἡμετέρα πόλις· οὕτω σφόδρα ἡμᾶς ᾑροῦ καὶ ὡμολόγεις καθ᾽ ἡμᾶς πολιτεύσεσθαι, τά τε ἄλλα καὶ παῖδας ἐν αὐτῇ ἐποιήσω, ὡς ἀρεσκούσης σοι τῆς πόλεως. ἔτι τοίνυν ἐν αὐτῇ τῇ δίκῃ ἐξῆν σοι φυγῆς τιμήσασθαι εἰ ἐβούλου, καὶ ὅπερ νῦν ἀκούσης τῆς πόλεως ἐπιχειρεῖς, τότε ἑκούσης ποιῆσαι. σὺ δὲ τότε μὲν ἐκαλλωπίζου ὡς οὐκ ἀγανακτῶν εἰ δέοι τεθνάναι σε, ἀλλὰ ᾑροῦ, ὡς ἔφησθα, πρὸ τῆς φυγῆς θάνατον· νῦν δὲ οὔτ᾽ ἐκείνους τοὺς λόγους αἰσχύνῃ, οὔτε ἡμῶν τῶν νόμων ἐντρέπῃ, ἐπιχειρῶν διαφθεῖραι, <span class="marker">[52d]</span> πράττεις τε ἅπερ ἂν δοῦλος ὁ φαυλότατος πράξειεν, ἀποδιδράσκειν ἐπιχειρῶν παρὰ τὰς συνθήκας τε καὶ τὰς ὁμολογίας καθ᾽ ἃς ἡμῖν συνέθου πολιτεύεσθαι. πρῶτον μὲν οὖν ἡμῖν τοῦτ᾽ αὐτὸ ἀπόκριναι, εἰ ἀληθῆ λέγομεν φάσκοντές σε ὡμολογηκέναι πολιτεύσεσθαι καθ᾽ ἡμᾶς ἔργῳ ἀλλ᾽ οὐ λόγῳ, ἢ οὐκ ἀληθῆ.» τί φῶμεν πρὸς ταῦτα, ὦ Κρίτων; ἄλλο τι ἢ ὁμολογῶμεν;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Ἀνάγκη, ὦ Σώκρατες.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text">ΣΩ. «Σκέψου λοιπόν, Σωκράτη», θα συνέχιζαν ίσως οι Νόμοι, «αν εμείς έχουμε δίκιο να υποστηρίζουμε πως δεν είναι τίμια πράγματα όσα λογαριάζεις τώρα να μας κάνεις. Εμείς βέβαια σε φέραμε στον κόσμο, σε αναθρέψαμε, σε μορφώσαμε, σου μεταδώσαμε απ᾽ όλα τα αγαθά <span class="marker">[51d]</span> που μπορούσαμε και σε σένα και σε όλους τους άλλους πολίτες· όμως δεν σε κρατάμε εδώ στην πόλη με τη βία, όπως δεν κρατάμε και κανέναν άλλο πολίτη. Απεναντίας, δίνουμε το δικαίωμα και το διαλαλούμε, όποιος Αθηναίος θέλει, μόλις μεγαλώσει και αποκτήσει πολιτικά δικαιώματα και μελετήσει την κατάσταση της Πολιτείας κι εμάς τους Νόμους, αν δεν του αρέσουμε, είναι ελεύθερος να πάρει τα πράγματά του και να πάει όπου θέλει. Και κανείς από μας τους Νόμους δεν εμποδίζει ούτε απαγορεύει σε κανέναν πολίτη, αν θέλει, να πάρει τα πράγματά του και να πάει να ζήσει σε καμιά αποικία είτε να πάει να κατοικήσει σε κάποια ξένη πόλη ή όπου <span class="marker">[51e]</span> αλλού θέλει, αν δεν του αρέσουμε εμείς και η Πολιτεία.</span></p>
+<p class="passage indent"><span class="passage-text">Όποιος όμως από σας παραμείνει εδώ, ενώ βλέπει με ποιόν τρόπο εμείς δικάζουμε τις δίκες και γενικά κυβερνάμε την Πολιτεία, τότε πια πιστεύουμε πως αυτός έχει συμφωνήσει μαζί μας με έργα να εκτελεί αυτά που εμείς προστάζουμε. Κι όποιος πάλι δεν πείθεται σε μας, λέμε πως μας αδικεί τριπλά: Τον φέραμε στη ζωή και δεν μας υπακούει, τον αναθρέψαμε και πάλι δεν μας υπακούει, υποσχέθηκε να πείθεται σε μας κι αυτός ούτε πείθεται ούτε προσπαθεί να μας πείσει, αν κάτι δεν το κάνουμε καλά. <span class="marker">[52a]</span> Κι όμως, εμείς προβάλλουμε τους ορισμούς μας να εκλέξει ελεύθερα, και δεν επιβάλλουμε με άγριο τρόπο να κάνει όσα προστάζουμε· κι ενώ επιτρέπουμε το ένα από τα δύο, ή να μας πείθει ή να εκτελεί όσα ορίζουμε, αυτός ούτε το ένα κάνει ούτε το άλλο.</span></p>
+<p class="passage indent"><span class="passage-text">Γι᾽ αυτές λοιπόν τις κατηγορίες λέμε ότι και συ, Σωκράτη, θα θεωρηθείς ένοχος, αν βέβαια θα κάνεις αυτά που έχεις στον νου σου· και μάλιστα καθόλου λιγότερο συ από τους άλλους Αθηναίους αλλά πολύ περισσότερο! Κι αν ρωτούσα τότε: «Γιατί περισσότερο εγώ;», με το δίκιο τους ίσως θα μ᾽ απόπαιρναν λέγοντας ότι πιο πολύ από τους άλλους Αθηναίους εγώ τυχαίνει να έχω κάνει μαζί τους αυτή τη συμφωνία. Θα ᾽λεγαν δηλαδή: <span class="marker">[52b]</span> «Σωκράτη, έχουμε μεγάλες αποδείξεις ότι και εμείς σου αρέσαμε και η πόλη. Αν η πόλη μας δεν σου άρεσε τόσο πολύ, δεν θα έμενες εδώ ποτέ περισσότερο από κάθε άλλον Αθηναίο, αφού ούτε απομακρύνθηκες ποτέ ως τώρα από την πόλη για να παρακολουθήσεις τους αγώνες, παρά μια φορά μονάχα που πήγες στον Ισθμό, ούτε σε άλλο μέρος πήγες πουθενά παρά μόνο όπου σε στείλαμε στρατιώτη για να πολεμήσεις.</span></p>
+<p class="passage indent"><span class="passage-text">Μα ούτε άλλη αποδημία έκανες ποτέ ως τώρα, όπως κάνουν οι άλλοι άνθρωποι, ούτε πεθύμησες ποτέ να γνωρίσεις άλλη Πολιτεία ούτε άλλους νόμους, αλλά <span class="marker">[52c]</span> έμενες ικανοποιημένος από μας κι από την Πολιτεία μας. Τόσο πολύ μας προτιμούσες και έδινες την υπόσχεση πως θα ζήσεις σαν πολίτης σύμφωνα με τους ορισμούς μας και μάλιστα έκανες και παιδιά στην πόλη μας, γιατί σου άρεσε.</span></p>
+<p class="passage indent"><span class="passage-text">Και κάτι άλλο ακόμη: την ώρα της δίκης σου, αν ήθελες, είχες το δικαίωμα να προτείνεις για ποινή σου την εξορία, κι έτσι αυτό ακριβώς που πας να κάνεις τώρα χωρίς τη θέληση της Πολιτείας μπορούσες να το κάνεις τότε με τη θέλησή της. Συ όμως τότε καμάρωνες τάχα πως δεν αγανακτούσες, αν θα ήταν ανάγκη να πεθάνεις, αλλά, όπως έλεγες, προτιμούσες τον θάνατο από την εξορία. Και τώρα ούτε για κείνα τα μεγάλα λόγια ντρέπεσαι ούτε για μας τους νόμους νοιάζεσαι, μόνο πας να μας καταλύσεις· <span class="marker">[52d]</span> και είσαι έτοιμος να κάνεις ό,τι ακριβώς θα έκανε κι ένας τιποτένιος δούλος επιχειρώντας να δραπετεύσεις, παρά τις συμφωνίες και τις υποσχέσεις με τις οποίες συμφώνησες με μας πως θα ζήσεις σαν πολίτης. Πρώτα-πρώτα λοιπόν, απάντησέ μας σε τούτο: Λέμε ή δεν λέμε την αλήθεια, όταν βεβαιώνουμε πως έχεις δώσει υπόσχεση ότι θα ζεις σαν πολίτης σύμφωνα με μας με έργα και όχι με λόγια;» Τί θ᾽ αποκριθούμε σ᾽ αυτά, Κρίτων; Άλλο τίποτα ή θα συμφωνήσουμε;</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Είναι ανάγκη να συμφωνήσουμε, Σωκράτη.</span></p>
+        </div>
+        
+
+        <div id="book-4-chapter--" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-9" data-hash="book-4-chapter--">
+            Συνομιλία του Σωκράτη με τους Νόμους • Κεφάλαιο ΣΩ. (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=105&page=9" target="_blank" class="page-link">Page 9</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. «Ἄλλο τι οὖν,» ἂν φαῖεν, «ἢ συνθήκας τὰς πρὸς <span class="marker">[52e]</span> ἡμᾶς αὐτοὺς καὶ ὁμολογίας παραβαίνεις, οὐχ ὑπὸ ἀνάγκης ὁμολογήσας οὐδὲ ἀπατηθεὶς οὐδὲ ἐν ὀλίγῳ χρόνῳ ἀναγκασθεὶς βουλεύσασθαι, ἀλλ᾽ ἐν ἔτεσιν ἑβδομήκοντα, ἐν οἷς ἐξῆν σοι ἀπιέναι, εἰ μὴ ἠρέσκομεν ἡμεῖς μηδὲ δίκαιαι ἐφαίνοντό σοι αἱ ὁμολογίαι εἶναι. σὺ δὲ οὔτε Λακεδαίμονα προῃροῦ οὔτε Κρήτην, ἃς δὴ ἑκάστοτε φῂς εὐνομεῖσθαι, οὔτε ἄλλην <span class="marker">[53a]</span> οὐδεμίαν τῶν Ἑλληνίδων πόλεων οὐδὲ τῶν βαρβαρικῶν, ἀλλὰ ἐλάττω ἐξ αὐτῆς ἀπεδήμησας ἢ οἱ χωλοί τε καὶ τυφλοὶ καὶ οἱ ἄλλοι ἀνάπηροι· οὕτω σοι διαφερόντως τῶν ἄλλων Ἀθηναίων ἤρεσκεν ἡ πόλις τε καὶ ἡμεῖς οἱ νόμοι δῆλον ὅτι· τίνι γὰρ ἂν πόλις ἀρέσκοι ἄνευ νόμων; νῦν δὲ δὴ οὐκ ἐμμενεῖς τοῖς ὡμολογημένοις; ἐὰν ἡμῖν γε πείθῃ, ὦ Σώκρατες· καὶ οὐ καταγέλαστός γε ἔσῃ ἐκ τῆς πόλεως ἐξελθών.</span></p>
+<p class="passage indent"><span class="passage-text">Σκόπει γὰρ δή, ταῦτα παραβὰς καὶ ἐξαμαρτάνων τι τούτων τί ἀγαθὸν ἐργάσῃ σαυτὸν ἢ τοὺς ἐπιτηδείους τοὺς <span class="marker">[53b]</span> σαυτοῦ. ὅτι μὲν γὰρ κινδυνεύσουσί γέ σου οἱ ἐπιτήδειοι καὶ αὐτοὶ φεύγειν καὶ στερηθῆναι τῆς πόλεως ἢ τὴν οὐσίαν ἀπολέσαι, σχεδόν τι δῆλον· αὐτὸς δὲ πρῶτον μὲν ἐὰν εἰς τῶν ἐγγύτατά τινα πόλεων ἔλθῃς, ἢ Θήβαζε ἢ Μέγαράδε —εὐνομοῦνται γὰρ ἀμφότεραι— πολέμιος ἥξεις, ὦ Σώκρατες, τῇ τούτων πολιτείᾳ, καὶ ὅσοιπερ κήδονται τῶν αὑτῶν πόλεων ὑποβλέψονταί σε διαφθορέα ἡγούμενοι τῶν νόμων, καὶ βεβαιώσεις τοῖς δικασταῖς τὴν δόξαν, ὥστε δοκεῖν ὀρθῶς τὴν <span class="marker">[53c]</span> δίκην δικάσαι· ὅστις γὰρ νόμων διαφθορεύς ἐστιν σφόδρα που δόξειεν ἂν νέων γε καὶ ἀνοήτων ἀνθρώπων διαφθορεὺς εἶναι. πότερον οὖν φεύξῃ τάς τε εὐνομουμένας πόλεις καὶ τῶν ἀνδρῶν τοὺς κοσμιωτάτους; καὶ τοῦτο ποιοῦντι ἆρα ἄξιόν σοι ζῆν ἔσται; ἢ πλησιάσεις τούτοις καὶ ἀναισχυντήσεις διαλεγόμενος — τίνας λόγους, ὦ Σώκρατες; ἢ οὕσπερ ἐνθάδε, ὡς ἡ ἀρετὴ καὶ ἡ δικαιοσύνη πλείστου ἄξιον τοῖς ἀνθρώποις καὶ τὰ νόμιμα καὶ οἱ νόμοι; καὶ οὐκ οἴει ἄσχημον [ἂν] <span class="marker">[53d]</span> φανεῖσθαι τὸ τοῦ Σωκράτους πρᾶγμα; οἴεσθαί γε χρή. ἀλλ᾽ ἐκ μὲν τούτων τῶν τόπων ἀπαρεῖς, ἥξεις δὲ εἰς Θετταλίαν παρὰ τοὺς ξένους τοὺς Κρίτωνος; ἐκεῖ γὰρ δὴ πλείστη ἀταξία καὶ ἀκολασία, καὶ ἴσως ἂν ἡδέως σου ἀκούοιεν ὡς γελοίως ἐκ τοῦ δεσμωτηρίου ἀπεδίδρασκες σκευήν τέ τινα περιθέμενος, ἢ διφθέραν λαβὼν ἢ ἄλλα οἷα δὴ εἰώθασιν ἐνσκευάζεσθαι οἱ ἀποδιδράσκοντες, καὶ τὸ σχῆμα τὸ σαυτοῦ μεταλλάξας· ὅτι δὲ γέρων ἀνήρ, σμικροῦ χρόνου τῷ βίῳ λοιποῦ ὄντος ὡς τὸ <span class="marker">[53e]</span> εἰκός, ἐτόλμησας οὕτω γλίσχρως ἐπιθυμεῖν ζῆν, νόμους τοὺς μεγίστους παραβάς, οὐδεὶς ὃς ἐρεῖ; ἴσως, ἂν μή τινα λυπῇς· εἰ δὲ μή, ἀκούσῃ, ὦ Σώκρατες, πολλὰ καὶ ἀνάξια σαυτοῦ. ὑπερχόμενος δὴ βιώσῃ πάντας ἀνθρώπους καὶ δουλεύων — τί ποιῶν ἢ εὐωχούμενος ἐν Θετταλίᾳ, ὥσπερ ἐπὶ δεῖπνον ἀποδεδημηκὼς εἰς Θετταλίαν; λόγοι δὲ ἐκεῖνοι οἱ περὶ <span class="marker">[54a]</span> δικαιοσύνης τε καὶ τῆς ἄλλης ἀρετῆς ποῦ ἡμῖν ἔσονται; ἀλλὰ δὴ τῶν παίδων ἕνεκα βούλει ζῆν, ἵνα αὐτοὺς ἐκθρέψῃς καὶ παιδεύσῃς; τί δέ; εἰς Θετταλίαν αὐτοὺς ἀγαγὼν θρέψεις τε καὶ παιδεύσεις, ξένους ποιήσας, ἵνα καὶ τοῦτο ἀπολαύσωσιν; ἢ τοῦτο μὲν οὔ, αὐτοῦ δὲ τρεφόμενοι σοῦ ζῶντος βέλτιον θρέψονται καὶ παιδεύσονται μὴ συνόντος σοῦ αὐτοῖς; οἱ γὰρ ἐπιτήδειοι οἱ σοὶ ἐπιμελήσονται αὐτῶν. πότερον ἐὰν μὲν εἰς Θετταλίαν ἀποδημήσῃς, ἐπιμελήσονται, ἐὰν δὲ εἰς Ἅιδου ἀποδημήσῃς, οὐχὶ ἐπιμελήσονται; εἴπερ γέ τι ὄφελος αὐτῶν <span class="marker">[54b]</span> ἐστιν τῶν σοι φασκόντων ἐπιτηδείων εἶναι, οἴεσθαί γε χρή.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text">ΣΩ. Και ακόμη θα λέγαν οι Νόμοι: «Τί άλλο λοιπόν πας να κάνεις παρά να παραβείς τις συμφωνίες <span class="marker">[52e]</span> που έκανες με μας τους ίδιους και τις υποσχέσεις που μας έδωσες; Και δεν σ᾽ επίεσε κανείς να τις δεχτείς, ούτε σε απάτησαν ούτε σε ανάγκασαν να αποφασίσεις μέσα σε λίγο καιρό αλλά μέσα σε εβδομήντα ολόκληρα χρόνια· και είχες σ᾽ αυτά τα χρόνια το δικαίωμα να φύγεις αν δεν σου αρέσαμε εμείς κι αν δεν σου φαίνονταν πως ήταν δίκαιες οι συμφωνίες μας. Συ όμως ούτε τη Λακεδαίμονα προτίμησες ούτε την Κρήτη, κι ας λες κάθε φορά πως έχουν καλούς νόμους· ούτε <span class="marker">[53a]</span> προτίμησες καμιά άλλη από τις ελληνικές πόλεις ούτε από τις βαρβαρικές, αλλά αποδήμησες από την πόλη μας λιγότερο απ᾽ όσο οι κουτσοί και οι τυφλοί και οι άλλοι ανάπηροι. Τόσο πιο πολύ από κάθε άλλο Αθηναίο σου άρεσαν και η Αθήνα και, φυσικά, εμείς οι Νόμοι της. Γιατί σε ποιόν μπορεί να αρέσει μια Πολιτεία που δεν έχει νόμους; Και τώρα λοιπόν, δεν θέλεις να μείνεις πιστός στις συμφωνίες μας; Θα μείνεις, Σωκράτη, αν βέβαια πεισθείς σε μας. Κι έτσι δεν θα γίνεις γελοίος φεύγοντας από την πατρίδα σου.</span></p>
+<p class="passage"><span class="passage-text"><i>ΠΟΙΕΣ ΣΥΝΕΠΕΙΕΣ ΘΑ ΕΙΧΕ Η ΔΡΑΠΕΤΕΥΣΗ ΤΟΥ ΣΩΚΡΑΤΗ</i></span></p>
+<p class="passage indent"><span class="passage-text">Γιατί πραγματικά, αν παραβείς τις υποχρεώσεις σου αυτές και πέσεις σε κανένα τέτοιο σφάλμα, στοχάσου τί καλό θα κάνεις στον εαυτό σου ή στους φίλους <span class="marker">[53b]</span> σου. Ότι φυσικά θα κινδυνέψουν οι φίλοι σου να πάνε κι αυτοί εξορία και να στερηθούν έτσι την πατρίδα τους ή να χάσουν την περιουσία τους είναι σχεδόν φανερό. Πρώτα-πρώτα και συ ο ίδιος, Σωκράτη, αν πας σε καμιά από τις πιο κοντινές Πολιτείες, στη Θήβα ή στα Μέγαρα ―γιατί και οι δύο έχουν καλούς νόμους― θα φτάσεις εκεί ως εχθρός στο πολίτευμά τους· όσοι λοιπόν ενδιαφέρονται για την πατρίδα τους θα σε λοξοκοιτάζουν, γιατί θα σε νομίζουν διαφθορέα των νόμων. Κι έτσι θα ενισχύσεις τη γνώμη των ανθρώπων για τους δικαστές σου, ώστε να πιστεύουν ότι σωστά <span class="marker">[53c]</span> έκριναν τη δίκη. Γιατί όποιος είναι διαφθορέας των νόμων πιο πολύ, νομίζω, θα μπορούσε να φανεί ότι είναι διαφθορέας νέων και άμυαλων ακόμη ανθρώπων. Ποιό λοιπόν από τα δύο, θα αποφύγεις και τις Πολιτείες που έχουν καλούς νόμους, και τους πιο χρηστούς ανθρώπους; Κάνοντας όμως αυτό, θα έχει πια για σένα καμιά αξία η ζωή; Ή θα τους πλησιάσεις και χωρίς να ντρέπεσαι θα συζητάς μαζί τους, για να τους λες τί, Σωκράτη; Μήπως τα ίδια λόγια που έλεγες και δω, ότι η αρετή και η δικαιοσύνη και η νομιμότητα και οι νόμοι είναι τα πιο πολύτιμα πράγματα για τον άνθρωπο; Και δεν νομίζεις ότι θα κάνει κακή <span class="marker">[53d]</span> εντύπωση μια τέτοια διαγωγή του Σωκράτη; Πρέπει να το περιμένεις, βέβαια.</span></p>
+<p class="passage indent"><span class="passage-text">Όμως κι απ᾽ αυτούς τους τόπους θα σηκωθείς ίσως μια μέρα και θα φύγεις και θα πας στη Θεσσαλία, κοντά στους φίλους του Κρίτωνα. Γιατί εκεί, είναι γνωστό, βασιλεύει πολύ μεγάλη αταξία και ακολασία και ίσως με μεγάλη ευχαρίστηση θα σε άκουγαν να τους λες την ιστορία σου: Με πόσο γελοίο τρόπο δραπέτευσες από τη φυλακή φορώντας κάποια ξένα ρούχα ή κανένα δέρμα ζώου ή οτιδήποτε άλλο, σαν αυτά με τα οποία συνηθίζουν να μεταμφιέζονται όσοι δραπετεύουν, και αλλάζοντας τη δική σου μορφή με τη μορφή κάποιου άλλου. Όμως φαντάζεσαι πως δεν θα βρεθεί κανείς να σου ειπεί ότι συ, γέρος άνθρωπος, ενώ σου μένει λίγος χρόνος από τη ζωή σου, όπως είναι το <span class="marker">[53e]</span> φυσικό, τόλμησες να λαχταράς τη ζωή τόσο αισχρά, παραβαίνοντας τους πιο μεγάλους νόμους; Ίσως να μη σου το ειπούν, αν δεν ενοχλείς κανέναν· ειδάλλως, θα ακούσεις, Σωκράτη, πολλά και ανάξια για το πρόσωπό σου.</span></p>
+<p class="passage indent"><span class="passage-text">Θα ζήσεις λοιπόν στη Θεσσαλία κολακεύοντας τον καθένα και δείχνοντας δουλοφροσύνη, δίχως να κάνεις τίποτ᾽ άλλο παρά να γλεντοκοπάς, σαν να είχες πάει στη Θεσσαλία καλεσμένος σε ξεφάντωμα; Και κείνα που λέγαμε για <span class="marker">[54a]</span> τη δικαιοσύνη και για κάθε άλλη αρετή, τί θα γίνουν τότε;</span></p>
+<p class="passage indent"><span class="passage-text">Αλλά θέλεις, λες, να ζήσεις για τα παιδιά σου, για να τα αναθρέψεις και να τα μορφώσεις. Μα τί; Θα τα πάρεις κι αυτά μαζί σου στη Θεσσαλία κι εκεί θα τα αναθρέψεις και θα τα μορφώσεις κάνοντάς τα κατοίκους ξένης χώρας, για να απολαύσουν και τούτο το καλό από σένα; Ή δεν θα το κάνεις αυτό, αλλά τα παιδιά σου θα ανατραφούν και θα μορφωθούν καλύτερα μένοντας εδώ στην Αθήνα, φτάνει να ζεις εσύ, κι ας μην είσαι κοντά τους; Γιατί οι φίλοι σου, σκέπτεσαι, θα φροντίσουνε γι᾽ αυτά. Ποιό όμως από τα δύο, αν αποδημήσεις στη Θεσσαλία θα φροντίσουν, κι αν αποδημήσεις στον Άδη δεν θα φροντίσουν; Αν βέβαια μπορείς να περιμένεις κάτι καλό απ᾽ αυτούς <span class="marker">[54b]</span> που ισχυρίζονται πως είναι φίλοι σου, πρέπει να πιστεύεις ότι θα φροντίσουν.</span></p>
+<p class="passage indent"><span class="passage-text">Λοιπόν, Σωκράτη, είναι καιρός πια να πεισθείς σε μας που σε αναθρέψαμε και μπροστά στο δίκαιο μήτε παιδιά να προτιμήσεις, μήτε τη ζωή, μήτε τίποτε άλλο, για να μπορείς, όταν θα πας στον Άδη, να προβάλεις όλα αυτά στην απολογία σου στους άρχοντες που είναι εκεί. Γιατί, αν κάνεις αυτά που σκέπτεσαι, είναι φανερό πως ούτε εδώ, στον απάνω κόσμο, θα είναι αυτό καλύτερο ούτε δικαιότερο ούτε οσιότερο για σένα ή για άλλον κανένα από τους δικούς σου, ούτε εκεί, στον κάτω κόσμο, όταν θα φτάσεις θα είναι καλύτερο.</span></p>
+        </div>
+        
+
+        
+        <div class="page-divider" id="page-10" data-hash="book-4-chapter----">
+            Συνομιλία του Σωκράτη με τους Νόμους • Κεφάλαιο ΚΡ.-ΣΩ. (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=105&page=10" target="_blank" class="page-link">Page 10</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text">Ἀλλ᾽, ὦ Σώκρατες, πειθόμενος ἡμῖν τοῖς σοῖς τροφεῦσι μήτε παῖδας περὶ πλείονος ποιοῦ μήτε τὸ ζῆν μήτε ἄλλο μηδὲν πρὸ τοῦ δικαίου, ἵνα εἰς Ἅιδου ἐλθὼν ἔχῃς πάντα ταῦτα ἀπολογήσασθαι τοῖς ἐκεῖ ἄρχουσιν· οὔτε γὰρ ἐνθάδε σοι φαίνεται ταῦτα πράττοντι ἄμεινον εἶναι οὐδὲ δικαιότερον οὐδὲ ὁσιώτερον, οὐδὲ ἄλλῳ τῶν σῶν οὐδενί, οὔτε ἐκεῖσε ἀφικομένῳ ἄμεινον ἔσται. ἀλλὰ νῦν μὲν ἠδικημένος ἄπει, <span class="marker">[54c]</span> ἐὰν ἀπίῃς, οὐχ ὑφ᾽ ἡμῶν τῶν νόμων ἀλλὰ ὑπ᾽ ἀνθρώπων· ἐὰν δὲ ἐξέλθῃς οὕτως αἰσχρῶς ἀνταδικήσας τε καὶ ἀντικακουργήσας, τὰς σαυτοῦ ὁμολογίας τε καὶ συνθήκας τὰς πρὸς ἡμᾶς παραβὰς καὶ κακὰ ἐργασάμενος τούτους οὓς ἥκιστα ἔδει, σαυτόν τε καὶ φίλους καὶ πατρίδα καὶ ἡμᾶς, ἡμεῖς τέ σοι χαλεπανοῦμεν ζῶντι, καὶ ἐκεῖ οἱ ἡμέτεροι ἀδελφοὶ οἱ ἐν Ἅιδου νόμοι οὐκ εὐμενῶς σε ὑποδέξονται, εἰδότες ὅτι καὶ ἡμᾶς ἐπεχείρησας ἀπολέσαι τὸ σὸν μέρος. ἀλλὰ μή σε <span class="marker">[54d]</span> πείσῃ Κρίτων ποιεῖν ἃ λέγει μᾶλλον ἢ ἡμεῖς.»</span></p>
+<p class="passage indent"><span class="passage-text">Ταῦτα, ὦ φίλε ἑταῖρε Κρίτων, εὖ ἴσθι ὅτι ἐγὼ δοκῶ ἀκούειν, ὥσπερ οἱ κορυβαντιῶντες τῶν αὐλῶν δοκοῦσιν ἀκούειν, καὶ ἐν ἐμοὶ αὕτη ἡ ἠχὴ τούτων τῶν λόγων βομβεῖ καὶ ποιεῖ μὴ δύνασθαι τῶν ἄλλων ἀκούειν· ἀλλὰ ἴσθι, ὅσα γε τὰ νῦν ἐμοὶ δοκοῦντα, ἐὰν λέγῃς παρὰ ταῦτα, μάτην ἐρεῖς. ὅμως μέντοι εἴ τι οἴει πλέον ποιήσειν, λέγε.</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡΙΤΩΝ. Ἀλλ᾽, ὦ Σώκρατες, οὐκ ἔχω λέγειν.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[54e]</span> ΣΩΚΡΑΤΗΣ. Ἔα τοίνυν, ὦ Κρίτων, καὶ πράττωμεν ταύτῃ, ἐπειδὴ ταύτῃ ὁ θεὸς ὑφηγεῖται.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text">Τώρα βέβαια θα φύγεις από τον κόσμο τούτο, <span class="marker">[54c]</span> αν φύγεις, αδικημένος, όχι από μας τους Νόμους αλλά από τους ανθρώπους. Αν όμως δραπετεύσεις από δω, ανταποδίδοντας τόσο αδιάντροπα το άδικο με το άδικο και το κακό με το κακό, θα καταπατήσεις τις υποσχέσεις σου και τις συμφωνίες που έκανες μαζί μας και θα βλάψεις εκείνους που καθόλου δεν έπρεπε να βλάψεις: και τον εαυτό σου και τους φίλους σου και την πατρίδα σου και μας τους Νόμους. Τότε και μεις θα είμαστε θυμωμένοι μαζί σου όσο θα ζεις, κι όταν θα πας στον άλλο κόσμο τ᾽ αδέλφια μας, οι Νόμοι του Άδη, δεν θα σε καλοδεχτούν, επειδή θα ξέρουν πως θέλησες να καταστρέψεις και μας εδώ, όσο σου περνούσε από το χέρι. Πρόσεξε λοιπόν καλά, Σωκράτη, μη σε <span class="marker">[54d]</span> πείσει ο Κρίτων να κάνεις ό,τι σου λέει αυτός και όχι ό,τι σου λέμε μεις.</span></p>
+<p class="passage"><span class="passage-text"><i>Η ΑΠΟΦΑΣΗ ΤΟΥ ΣΩΚΡΑΤΗ. Ο ΔΡΟΜΟΣ ΤΟΥ ΘΕΟΥ</i></span></p>
+<p class="passage indent"><span class="passage-text">Αυτά τα λόγια, αγαπητέ μου φίλε Κρίτων, νιώσε το καλά, εγώ νομίζω πως τα ακούω, όπως ακριβώς πιστεύουν πως ακούνε τους αυλούς όσοι κατηχούνται στα μυστήρια των Κορυβάντων· και μέσα μου αυτός ο ήχος τους βουίζει ασταμάτητα και με κάνει να μην μπορώ να ακούω τίποτ᾽ άλλο. Να το ξέρεις λοιπόν, κι αυτή βέβαια είναι η γνώμη που έχω τώρα, αν θελήσεις να μου ειπείς λόγια αντίθετα απ᾽ αυτά, μάταια θα τα ειπείς. Μα και πάλι, αν νομίζεις ότι κάτι μπορείς να πετύχεις, λέγε.</span></p>
+<p class="passage indent"><span class="passage-text">ΚΡ. Αλλά, Σωκράτη, δεν έχω τίποτα να ειπώ.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[54e]</span> ΣΩ. Τότε, ας τα αφήσουμε όλα, Κρίτων, κι ας κάνουμε έτσι που λέω, αφού ο θεός αυτό τον δρόμο μάς δείχνει να ακολουθήσουμε.</span></p>
+        </div>
+        
+        </section>
+    </main>
+
+    <script>
+        // Layout and Theme controls
+        function toggleLayout() {
+            const body = document.body;
+            const btn = document.getElementById('toggle-layout-btn');
+            
+            if (body.classList.contains('hide-original')) {
+                body.classList.remove('hide-original');
+                btn.innerText = 'Hide Original';
+                localStorage.setItem('ebook-hide-original', 'false');
+            } else {
+                body.classList.add('hide-original');
+                btn.innerText = 'Show Original';
+                localStorage.setItem('ebook-hide-original', 'true');
+            }
+        }
+
+        function setTheme(theme, buttonElement) {
+            if (theme === 'light') {
+                document.documentElement.removeAttribute('data-theme');
+            } else {
+                document.documentElement.setAttribute('data-theme', theme);
+            }
+            
+            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+            buttonElement.classList.add('active');
+            
+            localStorage.setItem('ebook-theme', theme);
+        }
+
+        function toggleSidebar() {
+            const body = document.body;
+            const overlay = document.getElementById('mobile-overlay');
+            const isMobile = window.innerWidth <= 900;
+            
+            if (isMobile) {
+                if (body.classList.contains('sidebar-open')) {
+                    body.classList.remove('sidebar-open');
+                    overlay.classList.remove('open');
+                } else {
+                    body.classList.add('sidebar-open');
+                    overlay.classList.add('open');
+                    // Close right sidebar if open
+                    body.classList.remove('chat-sidebar-open');
+                }
+            } else {
+                if (body.classList.contains('sidebar-closed')) {
+                    body.classList.remove('sidebar-closed');
+                    localStorage.setItem('ebook-sidebar-closed', 'false');
+                } else {
+                    body.classList.add('sidebar-closed');
+                    localStorage.setItem('ebook-sidebar-closed', 'true');
+                }
+            }
+        }
+        
+        function closeSidebarOnMobile() {
+            if (window.innerWidth <= 900) {
+                document.body.classList.remove('sidebar-open');
+                document.getElementById('mobile-overlay').classList.remove('open');
+            }
+        }
+        
+        function toggleMobileOptions() {
+            const header = document.querySelector('header');
+            const btn = document.querySelector('.options-toggle');
+            
+            if (header.classList.contains('options-open')) {
+                header.classList.remove('options-open');
+                document.body.classList.remove('mobile-options-open');
+                btn.classList.remove('active');
+            } else {
+                header.classList.add('options-open');
+                document.body.classList.add('mobile-options-open');
+                btn.classList.add('active');
+            }
+        }
+
+        // Adjusts sidebar height dynamically to match mobile visual viewport when virtual keyboard is launched
+        function adjustSidebarHeightForKeyboard() {
+            if (window.visualViewport) {
+                const chatSidebar = document.getElementById('chat-sidebar');
+                const isMobile = window.innerWidth <= 900;
+                if (isMobile && document.body.classList.contains('chat-sidebar-open')) {
+                    chatSidebar.style.height = window.visualViewport.height + 'px';
+                } else {
+                    chatSidebar.style.height = ''; // Fallback to CSS rules
+                }
+            }
+        }
+
+        // Right AI Sidebar Toggles
+        function toggleChatSidebar() {
+            const body = document.body;
+            if (body.classList.contains('chat-sidebar-open')) {
+                body.classList.remove('chat-sidebar-open');
+                adjustSidebarHeightForKeyboard();
+            } else {
+                body.classList.add('chat-sidebar-open');
+                // Close Left Sidebar on Mobile
+                if (window.innerWidth <= 900) {
+                    body.classList.remove('sidebar-open');
+                    document.getElementById('mobile-overlay').classList.remove('open');
+                }
+                // Focus text area
+                setTimeout(() => {
+                    document.getElementById('chat-input').focus();
+                    adjustSidebarHeightForKeyboard();
+                }, 100);
+            }
+        }
+
+        // AI Configuration Modal controls
+        function openAiSettings() {
+            document.getElementById('ai-config-modal').classList.add('open');
+            loadSavedAiSettings();
+        }
+
+        function closeAiSettings() {
+            document.getElementById('ai-config-modal').classList.remove('open');
+        }
+
+        function handleProviderChange() {
+            const p = document.getElementById('ai-provider').value;
+            const customUrlGroup = document.getElementById('group-custom-url');
+            const modelInput = document.getElementById('ai-model');
+
+            if (p === 'custom') {
+                customUrlGroup.style.display = 'flex';
+            } else {
+                customUrlGroup.style.display = 'none';
+            }
+
+            // Suggest model placeholders and default values based on provider selection
+            if (p === 'openai') {
+                modelInput.placeholder = 'gpt-4o-mini';
+                if (modelInput.value === 'gemini-flash-latest' || modelInput.value === '' || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gemini')) {
+                    modelInput.value = 'gpt-4o-mini';
+                }
+            } else if (p === 'anthropic') {
+                modelInput.placeholder = 'claude-3-5-sonnet-20241022';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('gemini') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'claude-3-5-sonnet-20241022';
+                }
+            } else if (p === 'gemini') {
+                modelInput.placeholder = 'gemini-flash-latest';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'gemini-flash-latest';
+                }
+            } else if (p === 'openrouter') {
+                modelInput.placeholder = 'meta-llama/llama-3-8b-instruct:free';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('gemini') || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'meta-llama/llama-3-8b-instruct:free';
+                }
+            } else if (p === 'custom') {
+                modelInput.placeholder = 'model-name';
+            }
+        }
+
+        function loadSavedAiSettings() {
+            const provider = localStorage.getItem('ai-prov') || 'openai';
+            const apiKey = localStorage.getItem('ai-key') || '';
+            const model = localStorage.getItem('ai-mod') || '';
+            const customUrl = localStorage.getItem('ai-url') || '';
+
+            document.getElementById('ai-provider').value = provider;
+            document.getElementById('ai-key').value = apiKey;
+            document.getElementById('ai-model').value = model;
+            document.getElementById('ai-custom-url').value = customUrl;
+
+            handleProviderChange();
+        }
+
+        function saveAiSettings() {
+            const provider = document.getElementById('ai-provider').value;
+            const apiKey = document.getElementById('ai-key').value;
+            const model = document.getElementById('ai-model').value;
+            const customUrl = document.getElementById('ai-custom-url').value;
+
+            localStorage.setItem('ai-prov', provider);
+            localStorage.setItem('ai-key', apiKey);
+            localStorage.setItem('ai-mod', model);
+            localStorage.setItem('ai-url', customUrl);
+
+            closeAiSettings();
+        }
+
+        // Text Selection & Chat logic
+        let currentSelection = "";
+        let currentContext = null;
+        let chatHistory = [];
+
+        function getPageContext(node) {
+            let current = node.nodeType === Node.TEXT_NODE ? node.parentElement : node;
+            let col = current.closest('.column');
+            if (!col) return null;
+
+            // Find the preceding page-divider element
+            let sibling = col.previousElementSibling;
+            while (sibling && !sibling.classList.contains('page-divider')) {
+                sibling = sibling.previousElementSibling;
+            }
+            if (!sibling) return null;
+
+            const pageNum = sibling.id.replace('page-', '');
+
+            // Identify parallel original and translation sibling columns
+            let origCol = sibling.nextElementSibling;
+            while (origCol && !origCol.classList.contains('original-col')) {
+                origCol = origCol.nextElementSibling;
+            }
+            let transCol = sibling.nextElementSibling;
+            while (transCol && !transCol.classList.contains('translation-col')) {
+                transCol = transCol.nextElementSibling;
+            }
+
+            const isOriginal = col.classList.contains('original-col');
+
+            return {
+                pageNum: pageNum,
+                dividerText: sibling.textContent.trim(),
+                originalText: origCol ? origCol.innerText : "",
+                translationText: transCol ? transCol.innerText : "",
+                selectedColType: isOriginal ? "original" : "translation"
+            };
+        }
+
+        function handleTextSelection(e) {
+            setTimeout(() => {
+                const selection = window.getSelection();
+                const text = selection.toString().trim();
+                const popup = document.getElementById('ai-selection-popup');
+
+                if (!text) {
+                    if (e.target && e.target.id !== 'ai-selection-popup') {
+                        popup.style.display = 'none';
+                    }
+                    return;
+                }
+
+                const anchorNode = selection.anchorNode;
+                if (!anchorNode) return;
+
+                const context = getPageContext(anchorNode);
+                if (!context) {
+                    popup.style.display = 'none';
+                    return;
+                }
+
+                currentSelection = text;
+                currentContext = context;
+
+                const isMobile = window.innerWidth <= 900;
+                
+                if (isMobile) {
+                    // Position fixed at the bottom on mobile to avoid native Android contextual menu overlap
+                    popup.style.display = 'flex';
+                    popup.style.position = 'fixed';
+                    popup.style.bottom = '24px';
+                    popup.style.left = '50%';
+                    popup.style.transform = 'translateX(-50%)';
+                    popup.style.top = 'auto';
+                    popup.style.width = 'calc(100% - 40px)';
+                    popup.style.maxWidth = '340px';
+                    popup.style.justifyContent = 'center';
+                    popup.style.boxShadow = '0 8px 24px rgba(0,0,0,0.3)';
+                } else {
+                    // Position relative to selection on desktop
+                    const range = selection.getRangeAt(0);
+                    const rect = range.getBoundingClientRect();
+
+                    popup.style.display = 'flex';
+                    popup.style.position = 'fixed';
+                    popup.style.bottom = 'auto';
+                    popup.style.transform = 'none';
+                    popup.style.width = 'auto';
+                    popup.style.maxWidth = 'none';
+                    popup.style.left = Math.max(10, Math.min(window.innerWidth - popup.offsetWidth - 10, rect.left + (rect.width / 2) - 50)) + "px";
+                    popup.style.top = (rect.top - 45) + "px";
+                    popup.style.justifyContent = 'flex-start';
+                    popup.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+                }
+            }, 10);
+        }
+
+        function openChatWithSelection() {
+            document.getElementById('ai-selection-popup').style.display = 'none';
+            
+            // Populate context card
+            const contextTextNode = document.getElementById('chat-context-text');
+            const colLabel = currentContext.selectedColType === 'original' ? 'Αρχαία' : 'Μετάφραση';
+            contextTextNode.textContent = '"' + currentSelection + '" (' + colLabel + ' • Σελίδα ' + currentContext.pageNum + ')';
+            
+            // Clear prior conversation when selecting new text
+            clearChat();
+
+            // Open sidebar
+            document.body.classList.add('chat-sidebar-open');
+            setTimeout(() => {
+                document.getElementById('chat-input').focus();
+                adjustSidebarHeightForKeyboard();
+            }, 100);
+        }
+
+        function clearChat() {
+            chatHistory = [];
+            const msgsContainer = document.getElementById('chat-messages');
+            
+            // Keep the context card, wipe standard bubble divs
+            const contextCard = document.getElementById('chat-context-card');
+            msgsContainer.innerHTML = '';
+            msgsContainer.appendChild(contextCard);
+        }
+
+        function handleChatKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendChatMessage();
+            }
+        }
+
+        function appendMessage(sender, text, isError = false, historyIndex = null) {
+            const msgsContainer = document.getElementById('chat-messages');
+            const msgDiv = document.createElement('div');
+            
+            if (isError) {
+                msgDiv.className = 'chat-message system-error';
+            } else {
+                msgDiv.className = 'chat-message ' + sender;
+            }
+
+            // If it is a user message and linked to history, attach interactive attributes
+            if (sender === 'user' && historyIndex !== null) {
+                msgDiv.setAttribute('data-history-index', historyIndex);
+                msgDiv.setAttribute('title', 'Κλικ για εκ νέου εκτέλεση από αυτό το σημείο');
+                msgDiv.addEventListener('click', () => handleHistoryClick(historyIndex));
+            }
+            
+            msgDiv.innerHTML = formatMarkdown(text);
+            msgsContainer.appendChild(msgDiv);
+            msgsContainer.scrollTop = msgsContainer.scrollHeight;
+        }
+
+        // Truncate history and re-run on user dialog click
+        async function handleHistoryClick(historyIndex) {
+            // Prevent duplicate triggers if query is running
+            const inputEl = document.getElementById('chat-input');
+            if (inputEl.disabled) return;
+
+            // Slice history array up to and including the selected user query
+            chatHistory = chatHistory.slice(0, historyIndex + 1);
+
+            // Redraw UI container to match truncated array
+            rebuildChatUI();
+
+            // Re-fire query
+            await runQuery();
+        }
+
+        // Clean redraw of current stack
+        function rebuildChatUI() {
+            const msgsContainer = document.getElementById('chat-messages');
+            const contextCard = document.getElementById('chat-context-card');
+            
+            msgsContainer.innerHTML = '';
+            msgsContainer.appendChild(contextCard);
+            
+            chatHistory.forEach((msg, idx) => {
+                if (msg.role === 'user') {
+                    let displayContent = msg.content;
+                    // Extract original question portion from first structured input turn for a clean UI
+                    if (idx === 0 && msg.content.includes("Ερώτηση:\n")) {
+                        displayContent = msg.content.split("Ερώτηση:\n").slice(1).join("Ερώτηση:\n");
+                    }
+                    appendMessage('user', displayContent, false, idx);
+                } else if (msg.role === 'assistant') {
+                    appendMessage('assistant', msg.content);
+                }
+            });
+        }
+
+        // Native Markdown parser leveraging standard Marked.js library
+        function formatMarkdown(text) {
+            if (!text) return "";
+            try {
+                // Parse standard markdown strings to structural HTML
+                return marked.parse(text);
+            } catch (err) {
+                // Fallback to basic text escaping on parse failure
+                return text
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/\n/g, "<br>");
+            }
+        }
+
+        // Modular core query runner
+        async function runQuery() {
+            const inputEl = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('chat-send-btn');
+            
+            // Disable inputs during network transaction
+            inputEl.disabled = true;
+            sendBtn.disabled = true;
+            
+            // Append loading container
+            appendMessage('assistant', 'Thinking...');
+            const lastMsgDiv = document.getElementById('chat-messages').lastChild;
+
+            // Load credentials
+            const provider = localStorage.getItem('ai-prov') || 'openai';
+            const apiKey = localStorage.getItem('ai-key') || '';
+            const savedMod = localStorage.getItem('ai-mod') || '';
+            const customUrl = localStorage.getItem('ai-url') || '';
+
+            if (!apiKey && provider !== 'custom') {
+                lastMsgDiv.className = 'chat-message system-error';
+                lastMsgDiv.innerText = '⚠️ Παρακαλούμε ρυθμίστε το API Key στις ρυθμίσεις AI Config πρώτα.';
+                openAiSettings();
+                inputEl.disabled = false;
+                sendBtn.disabled = false;
+                return;
+            }
+
+            // Build the System Prompt Context dynamically on EVERY call
+            const isOriginal = currentContext.selectedColType === 'original';
+            const contextText = isOriginal ? currentContext.originalText : currentContext.translationText;
+            const contextLabel = isOriginal ? "Αρχαίο Κείμενο" : "Σύγχρονη Μετάφραση";
+			const pageTitle = document.title;
+
+            let systemInstruction = "Είσαι διακεκριμένος φιλόσοφος και γνώστης της φιλοσοφίας του Αριστοτέλη και Πλάτωνα και άλλων αρχαίων ελλήνων συγγραφέων.\n" +
+                "Ο χρήστης διαβάζει το βιβλίου του " + pageTitle + " και βάσει αυτού θα σου κάνει μερικές ερωτήσεις, περιλαμβάνοντας κάποιες φορές αποσπάσματα απο το βιβλίο αυτό πάνω στα οποία σχετίζονται οι ερωτήσεις. Ακολουθεί το ευρύτειο πλαίσιο της σελίδας/κεφαλαίου (Σελίδα " + currentContext.pageNum + ", " + currentContext.dividerText + ") για αναφορά:\n" +
+                "--- " + contextLabel + ":\n" + contextText + "\n\n" +
+                "Απάντησε στις ερωτήσεις του χρήστη σε σχέση με το πλαίσιο του κειμένου που παρέχεται. " +
+                "Δώσε τις απαντήσεις σου στα νέα ελληνικά χρησιμοποιώντας markdown μορφοποίηση.";
+
+            // Construct Payload Messages (Always prepending system prompt at index 0)
+            let payloadMessages = [{ role: "system", content: systemInstruction }];
+            payloadMessages = payloadMessages.concat(chatHistory);
+
+            try {
+                const answer = await requestAPI(provider, apiKey, savedMod, payloadMessages, customUrl);
+                lastMsgDiv.innerHTML = formatMarkdown(answer);
+                chatHistory.push({ role: "assistant", content: answer });
+            } catch (error) {
+                lastMsgDiv.className = 'chat-message system-error';
+                lastMsgDiv.innerText = "Error: " + error.message;
+                // If API failed, keep the user question on screen so they can click to retry it,
+                // do not silently clear the UI anymore.
+            } finally {
+                inputEl.disabled = false;
+                sendBtn.disabled = false;
+                document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+                inputEl.focus();
+                adjustSidebarHeightForKeyboard();
+            }
+        }
+
+        async function sendChatMessage() {
+            const inputEl = document.getElementById('chat-input');
+            const prompt = inputEl.value.trim();
+            if (!prompt) return;
+
+            // If the last message in history is a 'user' query (due to a previous failed turn),
+            // pop it before sending so that our conversational stack maintains alternating roles.
+            if (chatHistory.length > 0 && chatHistory[chatHistory.length - 1].role === 'user') {
+                chatHistory.pop();
+            }
+
+            // 1. Manage Chat History & Highlight Context
+            let histIdx;
+            if (chatHistory.length === 0) {
+                // Incorporate highlighted text directly into the first user turn, NOT the system prompt
+                const firstUserContent = "Επισημασμένο κείμενο:\n\"" + currentSelection + "\"\n\nΕρώτηση:\n" + prompt;
+                chatHistory.push({ role: "user", content: firstUserContent });
+                histIdx = 0;
+            } else {
+                // Subsequent turns: push the raw user follow-up prompt
+                chatHistory.push({ role: "user", content: prompt });
+                histIdx = chatHistory.length - 1;
+            }
+
+            // 2. Display user message in UI with history index
+            appendMessage('user', prompt, false, histIdx);
+            inputEl.value = '';
+
+            // 3. Trigger query execution
+            await runQuery();
+        }
+
+        async function requestAPI(provider, apiKey, model, messages, customUrl) {
+            let url = "";
+            let headers = { "Content-Type": "application/json" };
+            let body = {};
+
+            // Normalize models to defaults if unspecified
+            let activeModel = model;
+            if (!activeModel) {
+                if (provider === 'openai') activeModel = 'gpt-4o-mini';
+                else if (provider === 'anthropic') activeModel = 'claude-3-5-sonnet-20241022';
+                else if (provider === 'gemini') activeModel = 'gemini-flash-latest';
+                else if (provider === 'openrouter') activeModel = 'meta-llama/llama-3-8b-instruct:free';
+                else activeModel = 'local-model';
+            }
+
+            if (provider === 'openai') {
+                url = "https://api.openai.com/v1/chat/completions";
+                headers["Authorization"] = "Bearer " + apiKey;
+                body = { model: activeModel, messages: messages };
+            } else if (provider === 'openrouter') {
+                url = "https://openrouter.ai/api/v1/chat/completions";
+                headers["Authorization"] = "Bearer " + apiKey;
+                headers["HTTP-Referer"] = window.location.href;
+                headers["X-Title"] = "Ancient Greek Bilingual Reader";
+                body = { model: activeModel, messages: messages };
+            } else if (provider === 'gemini') {
+                url = "https://generativelanguage.googleapis.com/v1beta/models/" + activeModel + ":generateContent?key=" + apiKey;
+                
+                // Restructure typical OpenAI formats to Gemini's native API structure
+                const systemItem = messages.find(m => m.role === 'system');
+                const userItems = messages.filter(m => m.role !== 'system');
+                
+                const contents = userItems.map(m => ({
+                    role: m.role === 'assistant' ? 'model' : 'user',
+                    parts: [{ text: m.content }]
+                }));
+
+                body = { contents: contents };
+                if (systemItem) {
+                    body.systemInstruction = { parts: [{ text: systemItem.content }] };
+                }
+            } else if (provider === 'anthropic') {
+                url = "https://api.anthropic.com/v1/messages";
+                headers["x-api-key"] = apiKey;
+                headers["anthropic-version"] = "2023-06-01";
+                headers["dangerously-allow-browser"] = "true";
+
+                const systemItem = messages.find(m => m.role === 'system');
+                const userItems = messages.filter(m => m.role !== 'system');
+
+                body = {
+                    model: activeModel,
+                    messages: userItems.map(m => ({ role: m.role, content: m.content })),
+                    max_tokens: 1500
+                };
+                if (systemItem) {
+                    body.system = systemItem.content;
+                }
+            } else if (provider === 'custom') {
+                url = customUrl || "http://localhost:11434/v1/chat/completions";
+                if (apiKey) {
+                    headers["Authorization"] = "Bearer " + apiKey;
+                }
+                body = { model: activeModel, messages: messages };
+            }
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(body)
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error("API Error (" + response.status + "): " + (errText || response.statusText));
+            }
+
+            const responseData = await response.json();
+
+            // Extract content responses safely depending on the selected engine
+            if (provider === 'gemini') {
+                return responseData.candidates[0].content.parts[0].text;
+            } else if (provider === 'anthropic') {
+                return responseData.content[0].text;
+            } else {
+                // OpenAI / OpenRouter / Ollama
+                return responseData.choices[0].message.content;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('ebook-theme');
+            if (savedTheme) {
+                const targetBtn = document.getElementById('theme-' + savedTheme);
+                if (targetBtn) setTheme(savedTheme, targetBtn);
+            }
+
+            const hideOriginal = localStorage.getItem('ebook-hide-original');
+            if (hideOriginal === 'true') {
+                document.body.classList.add('hide-original');
+                document.getElementById('toggle-layout-btn').innerText = 'Show Original';
+            }
+            
+            if (window.innerWidth > 900) {
+                const sidebarClosed = localStorage.getItem('ebook-sidebar-closed');
+                if (sidebarClosed === 'true') {
+                    document.body.classList.add('sidebar-closed');
+                }
+            }
+
+            // Restore saved chat width on desktop
+            const chatSidebar = document.getElementById('chat-sidebar');
+            const savedChatWidth = localStorage.getItem('ebook-chat-width');
+            if (savedChatWidth && window.innerWidth > 900) {
+                chatSidebar.style.width = savedChatWidth;
+            }
+
+            // Setup Resizing for AI Chat Sidebar
+            const resizeHandle = document.getElementById('chat-resize-handle');
+            let isResizing = false;
+
+            resizeHandle.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                chatSidebar.classList.add('resizing');
+                document.body.style.userSelect = 'none';
+                document.body.style.cursor = 'ew-resize';
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isResizing) return;
+                const newWidth = window.innerWidth - e.clientX;
+                // Limit range between 280px and 85% of total screen width
+                if (newWidth > 280 && newWidth < window.innerWidth * 0.85) {
+                    chatSidebar.style.width = newWidth + 'px';
+                    localStorage.setItem('ebook-chat-width', newWidth + 'px');
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (isResizing) {
+                    isResizing = false;
+                    chatSidebar.classList.remove('resizing');
+                    document.body.style.userSelect = '';
+                    document.body.style.cursor = '';
+                }
+            });
+            
+            // Listen for selection events on layout columns (supports mouse and touch handles)
+            document.addEventListener('mouseup', handleTextSelection);
+            document.addEventListener('keyup', handleTextSelection);
+            document.addEventListener('selectionchange', handleTextSelection);
+
+            // Bind selection popup using both mousedown and touchstart with preventDefault.
+            // This guarantees instant tap execution on touch devices before selection focus is lost.
+            const popup = document.getElementById('ai-selection-popup');
+            const handleTriggerTap = (e) => {
+                e.preventDefault();
+                openChatWithSelection();
+            };
+            popup.addEventListener('mousedown', handleTriggerTap);
+            popup.addEventListener('touchstart', handleTriggerTap);
+
+            // Hide the popup trigger during scroll shifts (desktop only to prevent mobile touch glitches)
+            window.addEventListener('scroll', () => {
+                if (window.innerWidth > 900) {
+                    document.getElementById('ai-selection-popup').style.display = 'none';
+                }
+            }, { passive: true });
+
+            // VisualViewport resizing adjustments (Handles Android virtual keyboard overlap natively)
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', adjustSidebarHeightForKeyboard);
+                window.visualViewport.addEventListener('scroll', adjustSidebarHeightForKeyboard);
+            }
+
+            const chatInput = document.getElementById('chat-input');
+            if (chatInput) {
+                chatInput.addEventListener('focus', () => {
+                    setTimeout(adjustSidebarHeightForKeyboard, 150);
+                });
+                chatInput.addEventListener('blur', () => {
+                    setTimeout(adjustSidebarHeightForKeyboard, 150);
+                });
+            }
+            
+            let lastScrollTop = 0;
+            const header = document.querySelector('header');
+            const optBtn = document.querySelector('.options-toggle');
+            
+            window.addEventListener('scroll', () => {
+                let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                
+                if (scrollTop < 0) scrollTop = 0;
+                
+                if (scrollTop > 10) {
+                    document.body.classList.add('scrolled');
+                } else {
+                    document.body.classList.remove('scrolled');
+                }
+                
+                if (scrollTop > lastScrollTop && scrollTop > 120) {
+                    header.classList.add('header-hidden');
+                    header.classList.remove('options-open');
+                    document.body.classList.remove('mobile-options-open');
+                    optBtn.classList.remove('active');
+                } else {
+                    header.classList.remove('header-hidden');
+                }
+                
+                lastScrollTop = scrollTop;
+            }, { passive: true });
+            
+            const observerOptions = {
+                root: null,
+                rootMargin: "-100px 0px -60% 0px", 
+                threshold: 0
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const hash = entry.target.getAttribute('data-hash');
+                        if (hash && window.location.hash !== '#' + hash) {
+                            history.replaceState(null, null, '#' + hash);
+                        }
+                    }
+                });
+            }, observerOptions);
+            
+            document.querySelectorAll('.page-divider').forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,2829 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ΛΟΥΚΙΑΝΟΣ Βίων πρᾶσις</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Marked.js Markdown rendering library -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #faf8f5;
+            --text-color: #2c2520;
+            --accent-color: #8b263e;
+            --sidebar-bg: #f3efe9;
+            --border-color: #e3ded5;
+            --muted-text: #706357;
+            --font-serif: "Cardo", "Georgia", "Palatino", serif;
+        }
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --accent-color: #ff8a80;
+            --sidebar-bg: #2d2d2d;
+            --border-color: #404040;
+            --muted-text: #999999;
+        }
+        [data-theme="sepia"] {
+            --bg-color: #f4ecd8;
+            --text-color: #5b4636;
+            --accent-color: #a04000;
+            --sidebar-bg: #ebdcb9;
+            --border-color: #d7c59d;
+            --muted-text: #7c6857;
+        }
+        
+        body {
+            margin: 0;
+            font-family: var(--font-serif);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            transition: background-color 0.2s, color 0.2s;
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        #mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 90;
+        }
+        #mobile-overlay.open {
+            display: block;
+        }
+        
+        #expand-bar {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 24px;
+            height: 100vh;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            cursor: pointer;
+            z-index: 95;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+        #expand-bar:hover {
+            background-color: var(--border-color);
+        }
+        #expand-bar::after {
+            content: "›";
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        
+        #sidebar {
+            width: 340px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            height: 100vh;
+            position: fixed;
+            top: 0; left: 0;
+            overflow-y: auto;
+            padding: 24px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transform: translateX(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+        #sidebar h2 {
+            font-size: 1.25rem;
+            margin: 0;
+            color: var(--text-color);
+        }
+        .sidebar-close-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--accent-color);
+            font-size: 1.4rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            line-height: 1;
+        }
+        .sidebar-close-btn:hover {
+            background-color: var(--border-color);
+        }
+        
+        .toc-list-container { overflow-y: auto; flex-grow: 1; }
+        
+        details.book-group {
+            margin-bottom: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            background-color: var(--sidebar-bg);
+        }
+        details.book-group[open] { border-color: var(--accent-color); }
+        details.book-group summary {
+            font-weight: bold; font-size: 1.05rem; cursor: pointer; padding: 10px 14px;
+            background-color: var(--sidebar-bg); list-style: none; display: flex;
+            justify-content: space-between; align-items: center; user-select: none;
+        }
+        details.book-group summary::-webkit-details-marker { display: none; }
+        details.book-group summary::after { content: "▾"; font-size: 0.9rem; color: var(--accent-color); }
+        details.book-group[open] summary::after { transform: rotate(180deg); }
+        
+        .toc-sublist-container {
+            background-color: var(--bg-color);
+            border-top: 1px solid var(--border-color);
+        }
+        .toc-group-title {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            padding: 8px 14px 4px 14px;
+            line-height: 1.3;
+        }
+        .toc-sublist { list-style: none; padding: 4px 14px 8px 14px; margin: 0; }
+        .toc-sublist li { margin-bottom: 8px; font-size: 0.88rem; }
+        
+        .toc-sublist a { 
+            color: var(--text-color); 
+            text-decoration: none; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding: 4px; 
+        }
+        .toc-sublist a:hover { color: var(--accent-color); }
+        .toc-page {
+            color: var(--muted-text);
+            font-size: 0.8rem;
+            font-family: var(--font-serif);
+        }
+        
+        #main {
+            margin-left: 340px;
+            flex-grow: 1;
+            padding: 180px 40px 40px 40px;
+            box-sizing: border-box;
+            width: calc(100% - 340px);
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        padding-top 0.3s ease;
+        }
+        
+        header {
+            position: fixed;
+            top: 0;
+            left: 340px;
+            right: 0;
+            background-color: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px 40px;
+            z-index: 50;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transform: translateY(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        left 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        background-color 0.2s, 
+                        box-shadow 0.2s;
+        }
+        header.header-hidden {
+            transform: translateY(-100%);
+            box-shadow: none !important;
+        }
+        body.scrolled header {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        [data-theme="dark"] body.scrolled header {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .header-top { display: flex; align-items: center; gap: 20px; }
+        header h1 { margin: 0; font-size: 1.8rem; color: var(--accent-color); line-height: 1.2; }
+        
+        .controls-group {
+            display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+        }
+        .btn {
+            background-color: var(--sidebar-bg); color: var(--text-color);
+            border: 1px solid var(--border-color); padding: 8px 14px;
+            font-family: inherit; cursor: pointer; border-radius: 6px;
+            font-size: 0.9rem; font-weight: bold; transition: all 0.2s; white-space: nowrap;
+        }
+        .btn:hover { background-color: var(--border-color); }
+        .btn.active { background-color: var(--accent-color); color: white; border-color: var(--accent-color); }
+        .btn-layout { background-color: var(--bg-color); border: 2px solid var(--accent-color); color: var(--accent-color); }
+        
+        .menu-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+            white-space: nowrap;
+        }
+        .menu-toggle:hover {
+            background-color: var(--text-color);
+        }
+        
+        .options-toggle {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 6px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            width: 38px;
+            height: 38px;
+            transition: all 0.2s;
+        }
+        .options-toggle:hover {
+            background-color: var(--sidebar-bg);
+        }
+
+        #book-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            column-gap: 48px;
+            row-gap: 0;
+            margin: 0 auto;
+            max-width: 140ch;
+            width: 100%;
+        }
+        
+        body.sidebar-closed #expand-bar {
+            display: flex;
+        }
+        body.sidebar-closed #sidebar {
+            transform: translateX(-340px);
+        }
+        body.sidebar-closed #main {
+            margin-left: 24px;
+            width: calc(100% - 24px);
+        }
+        body.sidebar-closed header {
+            left: 24px;
+        }
+        
+        body.hide-original #book-content { 
+            grid-template-columns: 1fr; 
+            max-width: 140ch;
+        }
+        body.hide-original .original-col { display: none; }
+        body.hide-original .bilingual-header { grid-template-columns: 1fr; }
+        body.hide-original .original-title { display: none; }
+        body.hide-original .translation-col {
+            max-width: 100% !important;
+            justify-self: stretch !important;
+        }
+
+        .bilingual-header {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px; position: sticky; top: 0;
+            background-color: var(--bg-color); padding: 16px 0;
+            border-bottom: 2px solid var(--accent-color); z-index: 10;
+            font-weight: bold; text-transform: uppercase; font-size: 0.85rem;
+            letter-spacing: 0.05em; color: var(--muted-text);
+        }
+        
+        .chapter-anchor {
+            display: block;
+            scroll-margin-top: 180px;
+        }
+        
+        .page-divider {
+            grid-column: 1 / -1;
+            border-bottom: 1px solid var(--border-color);
+            padding-top: 48px; padding-bottom: 12px; margin-bottom: 24px;
+            font-size: 0.95rem; color: var(--accent-color); text-transform: uppercase;
+            letter-spacing: 0.05em; font-weight: bold; 
+            scroll-margin-top: 180px;
+        }
+        
+        .page-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--accent-color);
+            transition: color 0.2s, border-bottom-color 0.2s;
+        }
+        .page-link:hover {
+            color: var(--text-color);
+            border-bottom-color: var(--text-color);
+        }
+        
+        .column { 
+            box-sizing: border-box; 
+            padding-bottom: 24px; 
+            display: flex; 
+            flex-direction: column; 
+            max-width: 65ch;
+            width: fit-content;
+            min-width: 0;
+        }
+        
+        .original-col {
+            justify-self: end;
+        }
+        .translation-col {
+            justify-self: start;
+        }
+        
+        .passage { 
+            margin: 0 0 1.2em 0; 
+            font-size: 1.15rem; 
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 1.5rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .passage-text {
+            flex: 1;
+            min-width: 0;
+            text-align: justify;
+        }
+        .passage.indent .passage-text { text-indent: 2em; }
+        .marker { color: var(--accent-color); font-weight: bold; margin-right: 4px; }
+        .line-number { 
+            color: var(--muted-text); 
+            font-size: 0.85em; 
+            font-weight: normal; 
+            user-select: none;
+            margin-left: auto;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+        i { font-style: italic; }
+
+        /* Floating popover trigger styling */
+        #ai-selection-popup {
+            position: fixed;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 14px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1005;
+            display: none;
+            font-family: var(--font-serif);
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.1s ease;
+        }
+        #ai-selection-popup:hover {
+            transform: scale(1.05);
+        }
+
+        /* Resizable sliding Right Chat Sidebar */
+        #chat-sidebar {
+            width: 380px;
+            min-width: 280px;
+            max-width: 85vw;
+            background-color: var(--sidebar-bg);
+            border-left: 1px solid var(--border-color);
+            height: 100vh;
+            height: 100dvh;
+            position: fixed;
+            top: 0; right: 0;
+            transform: translateX(100%);
+            overflow: visible;
+            display: flex;
+            flex-direction: column;
+            z-index: 110;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-sizing: border-box;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.05);
+        }
+        body.chat-sidebar-open #chat-sidebar {
+            transform: translateX(0);
+        }
+        
+        /* Draggable Resize Handle */
+        #chat-resize-handle {
+            width: 8px;
+            height: 100%;
+            position: absolute;
+            left: -4px;
+            top: 0;
+            cursor: ew-resize;
+            z-index: 120;
+            background-color: transparent;
+            transition: background-color 0.2s;
+        }
+        #chat-resize-handle:hover,
+        #chat-sidebar.resizing #chat-resize-handle {
+            background-color: var(--accent-color);
+            opacity: 0.5;
+        }
+        
+        .chat-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-header h3 { margin: 0; font-size: 1.1rem; color: var(--accent-color); }
+        
+        .chat-header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .chat-context-card {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+        .chat-context-card h4 { margin: 0 0 6px 0; color: var(--accent-color); }
+        .chat-context-card p { 
+            margin: 0; 
+            font-style: italic; 
+            display: -webkit-box; 
+            -webkit-line-clamp: 3; 
+            -webkit-box-orient: vertical; 
+            overflow: hidden; 
+            line-height: 1.4;
+        }
+        
+        .chat-message {
+            max-width: 85%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        
+        /* Render styles for AI Markdown elements in chat boxes */
+        .chat-message p { margin: 0 0 8px 0; line-height: 1.5; }
+        .chat-message p:last-child { margin-bottom: 0; }
+        .chat-message strong { font-weight: bold; }
+        .chat-message em { font-style: italic; }
+        .chat-message ul, .chat-message ol { margin: 4px 0 8px 16px; padding: 0; }
+        .chat-message li { margin-bottom: 4px; font-size: 0.92rem; }
+        .chat-message h1, .chat-message h2, .chat-message h3, .chat-message h4, .chat-message h5 {
+            color: var(--accent-color);
+            margin: 12px 0 6px 0;
+            line-height: 1.3;
+        }
+        .chat-message h3 { font-size: 1.15rem; }
+        .chat-message h4 { font-size: 1.05rem; }
+        .chat-message h5 { font-size: 0.95rem; }
+        .chat-message blockquote {
+            border-left: 3px solid var(--accent-color);
+            margin: 8px 0;
+            padding-left: 10px;
+            color: var(--muted-text);
+            font-style: italic;
+        }
+        .chat-message pre {
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.85rem;
+            margin: 8px 0;
+        }
+        .chat-message code {
+            font-family: monospace;
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: var(--accent-color);
+        }
+        
+        .chat-message.user {
+            background-color: var(--accent-color);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .chat-message.user:hover {
+            filter: brightness(1.15);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        /* Override light-colored syntax highlights in dark bubbles */
+        .chat-message.user code {
+            color: #ff8a80;
+            background-color: rgba(0,0,0,0.2);
+            border-color: rgba(0,0,0,0.1);
+        }
+        .chat-message.user pre {
+            background-color: rgba(0,0,0,0.2);
+            border-color: rgba(0,0,0,0.1);
+            color: white;
+        }
+        
+        .chat-message.assistant {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .chat-message.system-error {
+            background-color: #fce8e6;
+            color: #c5221f;
+            border: 1px solid #fad2cf;
+            align-self: center;
+            max-width: 95%;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+        
+        [data-theme="dark"] .chat-message.system-error {
+            background-color: #371d1d;
+            color: #f28b82;
+            border-color: #5c2424;
+        }
+
+        .chat-input-area {
+            padding: 16px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 8px;
+            background-color: var(--sidebar-bg);
+            flex-shrink: 0;
+        }
+        .chat-input-area textarea {
+            flex-grow: 1;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 10px;
+            border-radius: 6px;
+            resize: none;
+            height: 42px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+        }
+        .chat-input-area button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .chat-input-area button:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* Modal Config Dialog */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-content {
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            padding: 24px;
+            box-sizing: border-box;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 12px;
+        }
+        .modal-header h3 { margin: 0; font-size: 1.25rem; color: var(--accent-color); }
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group label {
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        .form-control {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 14px;
+        }
+
+        @media (max-width: 900px) {
+            #sidebar { transform: translateX(-100%); width: 320px; }
+            body.sidebar-open #sidebar { transform: translateX(0); }
+            body.sidebar-closed #sidebar { transform: translateX(-100%); }
+            
+            #chat-sidebar {
+                width: 100% !important;
+                right: 0;
+                transform: translateX(100%);
+                height: 100vh;
+                height: 100dvh;
+            }
+            body.chat-sidebar-open #chat-sidebar {
+                transform: translateX(0);
+            }
+            #chat-resize-handle {
+                display: none;
+            }
+            
+            #main { 
+                margin-left: 0 !important; 
+                width: 100% !important; 
+                padding: 100px 20px 20px 20px !important;
+            }
+            body.mobile-options-open #main {
+                padding-top: 150px !important;
+            }
+            
+            header {
+                padding-bottom: 12px;
+                margin-bottom: 16px;
+                gap: 8px;
+            }
+            header h1 { 
+                font-size: 0.95rem !important;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                text-align: center;
+                flex-grow: 1;
+                margin: 0;
+            }
+            
+            header {
+                left: 0 !important;
+                padding: 12px 16px;
+            }
+            
+            .header-top { 
+                display: flex;
+                flex-direction: row !important;
+                align-items: center; 
+                justify-content: space-between; 
+                width: 100%;
+                gap: 12px; 
+            }
+            
+            .menu-toggle { 
+                width: auto !important; 
+                padding: 6px 12px;
+                font-size: 0.85rem;
+            }
+            
+            .options-toggle {
+                display: inline-flex;
+            }
+            
+            .controls-group {
+                display: none;
+                width: 100%;
+                justify-content: center;
+                padding-top: 12px;
+                border-top: 1px dashed var(--border-color);
+            }
+            header.options-open .controls-group {
+                display: flex;
+            }
+            
+            #book-content { grid-template-columns: 1fr; column-gap: 0; max-width: 100%; }
+            .column { max-width: 100% !important; width: 100% !important; }
+            .bilingual-header { display: none; }
+            .page-divider { padding-top: 32px; scroll-margin-top: 110px; }
+            .chapter-anchor { scroll-margin-top: 110px; }
+            .passage { font-size: 1.05rem; }
+        }
+        
+        @media (min-width: 901px) {
+            .menu-toggle {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="mobile-overlay" onclick="toggleSidebar()"></div>
+
+    <div id="expand-bar" onclick="toggleSidebar()" title="Ανάπτυξη Περιεχομένων"></div>
+
+    <aside id="sidebar">
+        <div class="sidebar-header">
+            <h2>Πίνακας Περιεχομένων</h2>
+            <button class="sidebar-close-btn" onclick="toggleSidebar()" title="Σύμπτυξη">‹</button>
+        </div>
+        <div class="toc-list-container">
+            <details class="book-group">
+    <summary>Πώληση του βίου του Πυθαγόρα</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-1-chapter--" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΔΙΑΣ-ΑΓΟΡΑΣΤΗΣ</span> <span class="toc-page">#1</span></a></li>
+            <li><a href="#book-1-chapter--" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΠΥΘΑΓΟΡΑΣ-ΔΙΑΣ</span> <span class="toc-page">#2</span></a></li>
+        </ul>
+    </div>
+</details>
+<details class="book-group">
+    <summary>Πώληση του  βίου του Διογένη</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-2-chapter--" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΕΡΜΗΣ-ΔΙΟΓΕΝΗΣ</span> <span class="toc-page">#3</span></a></li>
+            <li><a href="#book-2-chapter--" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΑΓΟΡΑΣΤΗΣ-ΕΡΜΗΣ</span> <span class="toc-page">#4</span></a></li>
+        </ul>
+    </div>
+</details>
+<details class="book-group">
+    <summary>Πώληση του  βίου του Αρίστιππου, του Δημόκριτου και του Ηράκλειτου</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-3-chapter--" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΔΙΑΣ-ΔΙΑΣ</span> <span class="toc-page">#5</span></a></li>
+        </ul>
+    </div>
+</details>
+<details class="book-group">
+    <summary>Πώληση του  βίου του Σωκράτη και του Επίκουρου</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-4-chapter--" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΕΡΜΗΣ-ΣΩΚΡΑΤΗΣ</span> <span class="toc-page">#6</span></a></li>
+            <li><a href="#book-4-chapter--" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΑΓΟΡΑΣΤΗΣ-ΑΓΟΡΑΣΤΗΣ</span> <span class="toc-page">#7</span></a></li>
+        </ul>
+    </div>
+</details>
+<details class="book-group">
+    <summary>Πώληση του  βίου του Χρύσιππου</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-5-chapter--" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΔΙΑΣ-ΧΡΥΣΙΠΠΟΣ</span> <span class="toc-page">#8</span></a></li>
+            <li><a href="#book-5-chapter--" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΑΓΟΡΑΣΤΗΣ-ΧΡΥΣΙΠΠΟΣ</span> <span class="toc-page">#9</span></a></li>
+            <li><a href="#book-5-chapter--" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΑΓΟΡΑΣΤΗΣ-ΕΡΜΗΣ</span> <span class="toc-page">#10</span></a></li>
+        </ul>
+    </div>
+</details>
+<details class="book-group">
+    <summary>Πώληση του  βίου του Αριστοτέλη και του Πύρρωνα</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-6-chapter--" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΔΙΑΣ-ΕΡΜΗΣ</span> <span class="toc-page">#11</span></a></li>
+        </ul>
+    </div>
+</details>
+        </div>
+    </aside>
+
+    <!-- AI Right Chat Sidebar -->
+    <aside id="chat-sidebar">
+        <div id="chat-resize-handle"></div>
+        <div class="chat-header">
+            <h3>AI Assistant</h3>
+            <div class="chat-header-actions">
+                <button class="btn" style="padding: 4px 8px; font-size: 0.8rem;" onclick="clearChat()">Clear</button>
+                <button class="sidebar-close-btn" style="width: 28px; height: 28px; font-size: 1.1rem;" onclick="toggleChatSidebar()" title="Κλείσιμο">›</button>
+            </div>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <!-- Active Context Card -->
+            <div class="chat-context-card" id="chat-context-card">
+                <h4>Επιλεγμένο Κείμενο</h4>
+                <p id="chat-context-text"></p>
+            </div>
+            <!-- Messages stream here -->
+        </div>
+        <div class="chat-input-area">
+            <textarea id="chat-input" placeholder="Ρωτήστε κάτι για το επιλεγμένο κείμενο..." onkeydown="handleChatKeyDown(event)"></textarea>
+            <button id="chat-send-btn" onclick="sendChatMessage()">Send</button>
+        </div>
+    </aside>
+
+    <!-- Floating Popover Trigger -->
+    <button id="ai-selection-popup"><span style="font-size: 1.1rem;">✨</span> Ask AI</button>
+
+    <!-- Settings Configuration Modal -->
+    <div id="ai-config-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Ρυθμίσεις LLM / AI</h3>
+                <button class="sidebar-close-btn" style="width: 28px; height: 28px; font-size: 1.1rem;" onclick="closeAiSettings()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="ai-provider">Πάροχος (Provider)</label>
+                    <select id="ai-provider" class="form-control" onchange="handleProviderChange()">
+                        <option value="openai">OpenAI (ChatGPT)</option>
+                        <option value="anthropic">Anthropic (Claude)</option>
+                        <option value="gemini">Google Gemini</option>
+                        <option value="openrouter">OpenRouter</option>
+                        <option value="custom">Custom Endpoint (Ollama / Local)</option>
+                    </select>
+                </div>
+                <div class="form-group" id="group-custom-url" style="display: none;">
+                    <label for="ai-custom-url">Base URL</label>
+                    <input type="text" id="ai-custom-url" class="form-control" placeholder="http://localhost:11434/v1/chat/completions">
+                </div>
+                <div class="form-group">
+                    <label for="ai-key">API Key</label>
+                    <input type="password" id="ai-key" class="form-control" placeholder="Εισάγετε το API Key">
+                </div>
+                <div class="form-group">
+                    <label for="ai-model">Μοντέλο (Model Name)</label>
+                    <input type="text" id="ai-model" class="form-control" placeholder="π.χ. gpt-4o-mini">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeAiSettings()">Άκυρο</button>
+                <button class="btn active" onclick="saveAiSettings()">Αποθήκευση</button>
+            </div>
+        </div>
+    </div>
+
+    <main id="main">
+        <header>
+            <div class="header-top">
+                <button class="btn menu-toggle" onclick="toggleSidebar()">☰ Περιεχόμενα</button>
+                <h1>ΛΟΥΚΙΑΝΟΣ Βίων πρᾶσις</h1>
+                <button class="btn options-toggle" onclick="toggleMobileOptions()" title="Ρυθμίσεις">⚙️</button>
+            </div>
+            
+            <div class="controls-group">
+                <button id="toggle-layout-btn" class="btn btn-layout" onclick="toggleLayout()">Hide Original</button>
+                <button class="btn" style="border-color: var(--accent-color);" onclick="openAiSettings()">⚙️ AI Config</button>
+                <button class="btn active theme-btn" id="theme-light" onclick="setTheme('light', this)">Light</button>
+                <button class="btn theme-btn" id="theme-sepia" onclick="setTheme('sepia', this)">Sepia</button>
+                <button class="btn theme-btn" id="theme-dark" onclick="setTheme('dark', this)">Dark</button>
+            </div>
+        </header>
+
+        <section id="book-content">
+            <div class="bilingual-header">
+                <div class="original-title">Αρχαία Ελληνικά (Original)</div>
+                <div class="translation-title">Νέα Ελληνικά (Translation)</div>
+            </div>
+
+            
+        <div id="book-1-chapter--" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-1" data-hash="book-1-chapter--">
+            Πώληση του βίου του Πυθαγόρα • Κεφάλαιο ΔΙΑΣ-ΑΓΟΡΑΣΤΗΣ (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=94&page=1" target="_blank" class="page-link">Page 1</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ΖΕΥΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[1]</span> Σὺ μὲν διατίθει τὰ βάθρα καὶ παρασκεύαζε τὸν τόπον τοῖς ἀφικνουμένοις, σὺ δὲ στῆσον ἑξῆς παραγαγὼν τοὺς βίους, ἀλλὰ κοσμήσας πρότερον, ὡς εὐπρόσωποι φανοῦνται καὶ ὅτι πλείστους ἐπάξονται· σὺ δέ, ὦ Ἑρμῆ, κήρυττε καὶ συγκάλει.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἀγαθῇ τύχῃ τοὺς ὠνητὰς ἤδη παρεῖναι πρὸς τὸ πωλητήριον. ἀποκηρύξομεν δὲ βίους φιλοσόφους παντὸς εἴδους καὶ προαιρέσεων ποικίλων. εἰ δέ τις τὸ παραυτίκα μὴ ἔχει τἀργύριον καταβαλέσθαι, εἰς νέωτα ἐκτίσει καταστήσας ἐγγυητήν.</span></p>
+<p class="passage"><span class="passage-text">ΖΕΥΣ</span></p>
+<p class="passage"><span class="passage-text">Πολλοὶ συνίασιν· ὥστε χρὴ μὴ διατρίβειν μηδὲ κατέχειν αὐτούς. πωλῶμεν οὖν.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[2]</span> Τίνα πρῶτον ἐθέλεις παραγάγωμεν;</span></p>
+<p class="passage"><span class="passage-text">ΖΕΥΣ</span></p>
+<p class="passage"><span class="passage-text">Τουτονὶ τὸν κομήτην, τὸν Ἰωνικόν, ἐπεὶ καὶ σεμνός τις εἶναι φαίνεται.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Οὗτος ὁ Πυθαγορικὸς κατάβηθι καὶ πάρεχε σεαυτὸν ἀναθεωρεῖσθαι τοῖς συνειλεγμένοις.</span></p>
+<p class="passage"><span class="passage-text">ΖΕΥΣ</span></p>
+<p class="passage"><span class="passage-text">Κήρυττε δή.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τὸν ἄριστον βίον πωλῶ, τὸν σεμνότατον. τίς ὠνήσεται; τίς ὑπὲρ ἄνθρωπον εἶναι βούλεται; τίς εἰδέναι τὴν τοῦ παντὸς ἁρμονίαν καὶ ἀναβιῶναι πάλιν;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τὸ μὲν εἶδος οὐκ ἀγεννής. τί δὲ μάλιστα οἶδεν;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἀριθμητικήν, ἀστρονομίαν, τερατείαν, γεωμετρίαν, μουσικήν, γοητείαν. μάντιν ἄκρον βλέπεις.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἔξεστιν αὐτὸν ἀνακρίνειν;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἀνάκρινε ἀγαθῇ τύχῃ.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[3]</span> Ποδαπὸς εἶ σύ;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΘΑΓΟΡΑΣ</span></p>
+<p class="passage"><span class="passage-text">Σάμιος.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ποῦ δὲ ἐπαιδεύθης;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΘΑΓΟΡΑΣ</span></p>
+<p class="passage"><span class="passage-text">Ἐν Αἰγύπτῳ παρὰ τοῖς ἐκεῖ σοφοῖσι.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Φέρε δέ, ἢν πρίωμαί σε, τί με διδάξει;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΘΑΓΟΡΑΣ</span></p>
+<p class="passage"><span class="passage-text">Διδάξομαι μὲν οὐδέν, ἀναμνήσω δέ.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πῶς ἀναμνήσεις;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΘΑΓΟΡΑΣ</span></p>
+<p class="passage"><span class="passage-text">Καθαρὴν πρότερον τὴν ψυχὴν ἐργασάμενος καὶ τὸν ἐπ᾽ αὐτῇ ῥύπον ἐκκλύσας.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Καὶ δὴ νόμισον ἤδη ἐκκεκαθάρθαι με, τις ὁ τρόπος τῆς ἀναμνήσεως;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΘΑΓΟΡΑΣ</span></p>
+<p class="passage"><span class="passage-text">Τὸ μὲν πρῶτον ἡσυχίη μακρὴ καὶ ἀφωνίη καὶ πέντε ὅλων ἐτέων λαλέειν μηδέν.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ὥρα σοι, ὦ βέλτιστε, τὸν Κροίσου παῖδα παιδεύειν· ἐγὼ γὰρ λάλος, οὐκ ἀνδριὰς εἶναι βούλομαι. τί δὲ μετὰ τὴν σιωπὴν ὅμως καὶ τὴν πενταετίαν;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΘΑΓΟΡΑΣ</span></p>
+<p class="passage"><span class="passage-text">Μουσουργίῃ καὶ γεωμετρίῃ ἐνασκήσεαι.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Χάριεν λέγεις, εἰ πρῶτόν με κιθαρῳδὸν γενόμενον κᾆτα εἶναι σοφὸν χρή.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">ΔΙΑΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[1]</span> Εσύ, τακτοποίησε την εξέδρα και ετοίμασε τον τόπο γι᾽ αυτούς που καταφτάνουν· εσύ, στήσε τους βίους τοποθετώντας τους με τη σειρά, αφού όμως πρώτα τους καλλωπίσεις, για να φαίνονται ευπαρουσίαστοι και να προσελκύουν όσο το δυνατό περισσότερους. Κι εσύ, Ερμή, άρχισε να διαλαλείς και να προσκαλείς στη συγκέντρωση.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Άντε και με το καλό, οι αγοραστές μπορείτε τώρα να πλησιάσετε στον χώρο της δημοπρασίας. Θα φέρουμε για πούλημα βίους φιλοσόφων από κάθε είδος και από διάφορες φιλοσοφικές επιλογές. Κι αν κάποιος δεν έχει τα χρήματα για να πληρώσει αμέσως, μπορεί να εξοφλήσει του χρόνου, ορίζοντας έναν εγγυητή.</span></p>
+<p class="passage"><span class="passage-text">ΔΙΑΣ</span></p>
+<p class="passage"><span class="passage-text">Πολλοί συγκεντρώνονται· γι᾽ αυτό δεν πρέπει να καθυστερούμε και να τους κρατάμε σε αναμονή. Ας αρχίσουμε λοιπόν να πουλάμε.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[2]</span> Ποιόν θέλεις να παρουσιάσουμε πρώτα;</span></p>
+<p class="passage"><span class="passage-text">ΔΙΑΣ</span></p>
+<p class="passage"><span class="passage-text">Αυτόν εκεί με τα μακριά μαλλιά, από την Ιωνία, επειδή φαίνεται να είναι και αξιοσέβαστος.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Εσύ ο Πυθαγορικός, κατέβα από την εξέδρα και άφησε τον εαυτό σου στη διάθεση των συγκεντρωμένων, για να σε εξετάσουν.</span></p>
+<p class="passage"><span class="passage-text">ΔΙΑΣ</span></p>
+<p class="passage"><span class="passage-text">Διαλάλησε λοιπόν.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πουλάω τον άριστο βίο, τον πιο αξιοσέβαστο. Ποιός θα τον αγοράσει; Ποιός θέλει να είναι ανώτερος από άνθρωπο; Ποιός θέλει να γνωρίσει την αρμονία του σύμπαντος και να αναστηθεί και πάλι;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ως προς την εμφάνιση δεν φαίνεται να έχει ταπεινή καταγωγή. Τί όμως γνωρίζει καλύτερα;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Αριθμητική, αστρονομία, γεωμετρία, θαυματολογία, μουσική, μαγεία. Έχεις μπροστά σου έναν εξαίρετο μάντη.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Μου επιτρέπεις να του υποβάλω ερωτήσεις;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ρώτα τον· και καλή επιτυχία.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[3]</span> Από πού κατάγεσαι;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΘΑΓΟΡΑΣ</span></p>
+<p class="passage"><span class="passage-text">Από τη Σάμο.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Και πού εκπαιδεύτηκες;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΘΑΓΟΡΑΣ</span></p>
+<p class="passage"><span class="passage-text">Στην Αίγυπτο, κοντά στους εκεί σοφούς.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Γιά πες μου λοιπόν· αν σε αγοράσω, τί θα με διδάξεις;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΘΑΓΟΡΑΣ</span></p>
+<p class="passage"><span class="passage-text">Δεν θα σε διδάξω τίποτε, απλώς θα σου θυμίσω.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πώς θα μου θυμίσεις;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΘΑΓΟΡΑΣ</span></p>
+<p class="passage"><span class="passage-text">Αφού πρώτα καταφέρω να καθαρίσω την ψυχή σου και να ξεπλύνω τη βρομιά που υπάρχει επάνω της.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πες λοιπόν πως ήδη καθαρίστηκα εντελώς. Ποιός είναι ο τρόπος της υπενθύμισης;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΘΑΓΟΡΑΣ</span></p>
+<p class="passage"><span class="passage-text">Πρώτα απ᾽ όλα μακρόχρονη ησυχία και αφωνία, και να μη μιλάς καθόλου για πέντε ολόκληρα χρόνια.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Είναι ώρα, λεβέντη μου, να αρχίσεις να εκπαιδεύεις το παιδί του Κροίσου· γιατί εγώ θέλω να είμαι ομιλητικός, όχι άγαλμα. Τί όμως θα γίνει μετά τη σιωπή και την πενταετία;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΘΑΓΟΡΑΣ</span></p>
+<p class="passage"><span class="passage-text">Θα εξασκηθείς στη μελοποιία και στη γεωμετρία.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Χαριτωμένα τα λες, αν πρέπει πρώτα να γίνω κιθαρωδός, και έπειτα να είμαι σοφός.</span></p>
+        </div>
+        
+
+        
+        <div class="page-divider" id="page-2" data-hash="book-1-chapter--">
+            Πώληση του βίου του Πυθαγόρα • Κεφάλαιο ΠΥΘΑΓΟΡΑΣ-ΔΙΑΣ (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=94&page=2" target="_blank" class="page-link">Page 2</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ΠΥΘΑΓΟΡΑΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[4]</span> Εἶτ᾽ ἐπὶ τουτέοισιν ἀριθμέειν.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Οἶδα καὶ νῦν ἀριθμεῖν.</span></p>
+<p class="passage"><span class="passage-text">ΠΥΘΑΓΟΡΑΣ</span></p>
+<p class="passage"><span class="passage-text">Πῶς ἀριθμέεις;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἕν, δύο, τρία, τέτταρα.</span></p>
+<p class="passage"><span class="passage-text">ΠΥΘΑΓΟΡΑΣ</span></p>
+<p class="passage"><span class="passage-text">Ὁρᾷς; ἃ σὺ δοκέεις τέσσαρα, ταῦτα δέκα ἐστὶ καὶ τρίγωνον ἐντελὲς καὶ ἡμέτερον ὅρκιον.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Οὐ μὰ τὸν μέγιστον τοίνυν ὅρκον τὰ τέτταρα, οὔποτε θειοτέρους λόγους ἤκουσα οὐδὲ μᾶλλον ἱερούς.</span></p>
+<p class="passage"><span class="passage-text">ΠΥΘΑΓΟΡΑΣ</span></p>
+<p class="passage"><span class="passage-text">Μετὰ δέ, ὦ ξεῖνε, εἴσεαι γῆς τε πέρι καὶ ἠέρος καὶ ὕδατος καὶ πυρὸς ἥτις αὐτέοισιν ἡ φορὴ καὶ ὁκοῖα ἐόντα μορφὴν ὅκως κινέονται.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Μορφὴν γὰρ ἔχει τὸ πῦρ ἢ ἀὴρ ἢ ὕδωρ;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΘΑΓΟΡΑΣ</span></p>
+<p class="passage"><span class="passage-text">Καὶ μάλα ἐμφανέα· οὐ γὰρ οἷά τε ἀμορφίῃ καὶ ἀσχημοσύνῃ κινέεσθαι. καὶ ἐπὶ τουτέοισι δὲ γνώσεαι τὸν θεὸν ἀριθμὸν ἐόντα καὶ νόον καὶ ἁρμονίην.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Θαυμάσια λέγεις.</span></p>
+<p class="passage"><span class="passage-text">ΠΥΘΑΓΟΡΑΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[5]</span> Πρὸς δὲ τοῖσδεσι τοῖσιν εἰρημένοισι καὶ σεωυτὸν ἕνα δοκέοντα ἄλλον ὁρεόμενον καὶ ἄλλον ἐόντα εἴσεαι.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τί φής; ἄλλος εἰμὶ καὶ οὐχ οὗτος ὅσπερ νῦν πρὸς σὲ διαλέγομαι;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΘΑΓΟΡΑΣ</span></p>
+<p class="passage"><span class="passage-text">Νῦν μὲν οὗτος, πάλαι δὲ ἐν ἄλλῳ σώματι καὶ ἐν ἄλλῳ οὐνόματι ἐφαντάζεο· χρόνῳ δὲ αὖτις ἐς ἄλλον μεταβήσεαι.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τοῦτο φής, ἀθάνατον ἔσεσθαί με ἀλλαττόμενον ἐς μορφὰς πλείονας; <span class="marker">[6]</span> ἀλλὰ τάδε μὲν ἱκανῶς. τὰ δ᾽ ἀμφὶ δίαιταν ὁποῖός τις εἶ;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΘΑΓΟΡΑΣ</span></p>
+<p class="passage"><span class="passage-text">Ἐμψυχήϊον μὲν οὐδὲ ἓν σιτέομαι, τὰ δὲ ἄλλα πλὴν κυάμων.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τίνος ἕνεκα; ἢ μυσάττῃ τοὺς κυάμους;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΘΑΓΟΡΑΣ</span></p>
+<p class="passage"><span class="passage-text">Οὔκ, ἀλλὰ ἱροί εἰσι καὶ θωυμαστὴ αὐτέων ἡ φύσις· πρῶτον μὲν γὰρ τὸ πᾶν γονή εἰσι, καὶ ἢν ἀποδύσῃς κύαμον ἔτι χλωρὸν ἐόντα, ὄψεαι τοῖσιν ἀνδρείοισι μορίοισιν ἐμφερέα τὴν φυήν· ἑψηθέντα δὲ ἢν ἀφῇς ἐς τὴν σεληναίην νυξὶ μεμετρημένῃσιν, αἷμα ποιήσεις. τὸ δὲ μέζον, Ἀθηναίοισι νόμος κυάμοισι τὰς ἀρχὰς αἱρέεσθαι.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Καλῶς πάντα ἔφης καὶ ἱεροπρεπῶς. ἀλλὰ ἀπόδυθι, καὶ γυμνὸν γάρ σε ἰδεῖν βούλομαι. ὦ Ἡράκλεις, χρυσοῦς αὐτῷ ὁ μηρός ἐστι. θεός, οὐ βροτός τις εἶναι φαίνεται· ὥστε ὠνήσομαι πάντως αὐτόν. πόσου τοῦτον ἀποκηρύττεις;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Δέκα μνῶν.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἔχω τοσούτου λαβών.</span></p>
+<p class="passage"><span class="passage-text">ΖΕΥΣ</span></p>
+<p class="passage"><span class="passage-text">Γράφε τοῦ ὠνησαμένου τοὔνομα καὶ ὅθεν ἐστίν.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἰταλιώτης, ὦ Ζεῦ, δοκεῖ τις εἶναι τῶν ἀμφὶ Κρότωνα καὶ Τάραντα καὶ τὴν ταύτῃ Ἑλλάδα· καίτοι οὐχ εἷς, ἀλλὰ τριακόσιοι σχεδὸν ἐώνηνται κατὰ κοινὸν αὐτόν.</span></p>
+<p class="passage"><span class="passage-text">ΖΕΥΣ</span></p>
+<p class="passage"><span class="passage-text">Ἀπαγέτωσαν· ἄλλον παράγωμεν.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">ΠΥΘΑΓΟΡΑΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[4]</span> Έπειτα θα εξασκηθείς επιπλέον στη μέτρηση.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ξέρω και τώρα να μετράω.</span></p>
+<p class="passage"><span class="passage-text">ΠΥΘΑΓΟΡΑΣ</span></p>
+<p class="passage"><span class="passage-text">Πώς μετράς;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ένα, δύο, τρία, τέσσερα.</span></p>
+<p class="passage"><span class="passage-text">ΠΥΘΑΓΟΡΑΣ</span></p>
+<p class="passage"><span class="passage-text">Βλέπεις; Αυτά που εσύ νομίζεις τέσσερα, είναι στην πραγματικότητα δέκα, και ισόπλευρο τρίγωνο, και δικός μας όρκος.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ε, λοιπόν, μά τον μεγαλύτερο όρκο, το τέσσερα, ποτέ ως τώρα δεν άκουσα πιο θεϊκά λόγια ούτε πιο ιερά.</span></p>
+<p class="passage"><span class="passage-text">ΠΥΘΑΓΟΡΑΣ</span></p>
+<p class="passage"><span class="passage-text">Έπειτα, ξένε μου, θα γνωρίσεις για τη γη και τον αέρα και το νερό και τη φωτιά, ποιά είναι η κατεύθυνσή τους και τί λογής είναι η μορφή τους και πώς κινούνται.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Δηλαδή, έχει μορφή η φωτιά ή ο αέρας ή το νερό;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΘΑΓΟΡΑΣ</span></p>
+<p class="passage"><span class="passage-text">Και πολύ φανερή μάλιστα. Άλλωστε δεν θα μπορούσαν να κινηθούν χωρίς μορφή και σχήμα. Και επιπλέον θα γνωρίσεις ότι ο θεός είναι αριθμός και νους και αρμονία.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Λες αξιοθαύμαστα πράγματα.</span></p>
+<p class="passage"><span class="passage-text">ΠΥΘΑΓΟΡΑΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[5]</span> Κι εκτός από αυτά που ήδη είπαμε, θα γνωρίσεις ότι ο εαυτός σου, που τον θεωρείς έναν, άλλος φαίνεται και άλλος πραγματικά είναι.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τί λες; Είμαι άλλος, και όχι αυτός που τώρα συζητώ μ᾽ εσένα;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΘΑΓΟΡΑΣ</span></p>
+<p class="passage"><span class="passage-text">Τώρα είσαι αυτός, παλαιότερα όμως εμφανιζόσουν με άλλο σώμα και με άλλο όνομα. Και με τον καιρό θα εγκατασταθείς σε άλλον.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Αυτό δηλαδή εννοείς, ότι θα είμαι αθάνατος και θα αλλάζω όλο και περισσότερες μορφές; <span class="marker">[6]</span> Αρκετά όμως είπαμε γι᾽ αυτά. Ως προς τον τρόπο της ζωής σου τί λογής είσαι;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΘΑΓΟΡΑΣ</span></p>
+<p class="passage"><span class="passage-text">Τίποτε έμψυχο δεν τρώω, τα άλλα όμως όλα, εκτός απ᾽ τα κουκιά.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Για ποιόν λόγο; Ή μήπως τα κουκιά σού προκαλούν αηδία;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΘΑΓΟΡΑΣ</span></p>
+<p class="passage"><span class="passage-text">Όχι, αλλά είναι ιερά, και η φύση τους είναι αξιοθαύμαστη. Πρώτα απ᾽ όλα το σύνολο αποτελεί σπέρμα, κι αν ξεφλουδίσεις κουκί που είναι ακόμη χλωρό, θα δεις τη δομή του να μοιάζει με ανδρικά γεννητικά όργανα. Αν πάλι τα αφήσεις βρασμένα να τα βλέπει το φεγγάρι για καθορισμένο αριθμό νυκτών, θα δημιουργήσεις αίμα. Και το σημαντικότερο, ήταν καθιερωμένο οι Αθηναίοι να επιλέγουν τους άρχοντές τους με κουκιά.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Όλα τα είπες ωραία και με ιεροπρέπεια. Ξεντύσου όμως, γιατί θέλω να σε δω και γυμνό. Ηρακλή μου, ο μηρός του είναι από χρυσάφι. Θεός, κι όχι κάποιος θνητός φαίνεται να είναι. Συνεπώς θα τον αγοράσω οπωσδήποτε. Πόσο τον πουλάς αυτόν;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Δέκα μνες.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τον αγοράζω με αυτό το ποσό.</span></p>
+<p class="passage"><span class="passage-text">ΔΙΑΣ</span></p>
+<p class="passage"><span class="passage-text">Γράψε το όνομα του αγοραστή, και από πού είναι.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Κάποιος Έλληνας της Ιταλίας φαίνεται να είναι, Δία, από αυτούς που ζουν γύρω από τον Κρότωνα και τον Τάραντα και τις ελληνικές αποικίες εκείνης της περιοχής. Και μάλιστα δεν είναι ένας, αλλά σχεδόν τριακόσιοι τον έχουν αγοράσει, όλοι από κοινού.</span></p>
+<p class="passage"><span class="passage-text">ΔΙΑΣ</span></p>
+<p class="passage"><span class="passage-text">Να πάνε στο καλό. Ας παρουσιάσουμε κάποιον άλλο.</span></p>
+        </div>
+        
+
+        <div id="book-2-chapter--" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-3" data-hash="book-2-chapter--">
+            Πώληση του  βίου του Διογένη • Κεφάλαιο ΕΡΜΗΣ-ΔΙΟΓΕΝΗΣ (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=94&page=3" target="_blank" class="page-link">Page 3</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[7]</span> Βούλει τὸν αὐχμῶντα ἐκεῖνον, τὸν Ποντικόν;</span></p>
+<p class="passage"><span class="passage-text">ΖΕΥΣ</span></p>
+<p class="passage"><span class="passage-text">Πάνυ μὲν οὖν.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Οὗτος ὁ τὴν πήραν ἐξηρτημένος, ὁ ἐξωμίας, ἐλθὲ καὶ περίιθι ἐν κύκλῳ τὸ συνέδριον. βίον ἀνδρικὸν πωλῶ, βίον ἄριστον καὶ γεννικόν, βίον ἐλεύθερον· τίς ὠνήσεται;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ὁ κῆρυξ πῶς ἔφης σύ; πωλεῖς τὸν ἐλεύθερον;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἔγωγε.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Εἶτ᾽ οὐ δέδιας μή σοι δικάσηται ἀνδραποδισμοῦ ἢ καὶ προκαλέσηταί σε εἰς Ἄρειον πάγον;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Οὐδὲν αὐτῷ μέλει τῆς πράσεως· οἴεται γὰρ εἶναι παντάπασιν ἐλεύθερος.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τί δ᾽ ἄν τις αὐτῷ χρήσαιτο ῥυπῶντι καὶ οὕτω κακοδαιμόνως διακειμένῳ; πλὴν εἰ μὴ σκαπανέα γε καὶ ὑδροφόρον αὐτὸν ἀποδεικτέον.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Οὐ μόνον, ἀλλὰ καὶ ἢν θυρωρὸν αὐτὸν ἐπιστήσῃς, πολὺ πιστοτέρῳ χρήσῃ τῶν κυνῶν. ἀμέλει κύων αὐτῷ καὶ τὸ ὄνομα.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ποδαπὸς δέ ἐστιν ἢ τίνα τὴν ἄσκησιν ἐπαγγέλλεται;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Αὐτὸν ἐροῦ· κάλλιον γὰρ οὕτω ποιεῖν.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Δέδια τὸ σκυθρωπὸν αὐτοῦ καὶ κατηφές, μή με ὑλακτήσῃ προσελθόντα ἢ καὶ νὴ Δία δάκῃ γε. οὐχ ὁρᾷς ὡς διῆρται τὸ ξύλον καὶ συνέσπακε τὰς ὀφρῦς καὶ ἀπειλητικόν τι καὶ χολῶδες ὑποβλέπει;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Μὴ δέδιθι· τιθασὸς γάρ ἐστι.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[8]</span> Τὸ πρῶτον, ὦ βέλτιστε, ποδαπὸς εἶ;</span></p>
+<p class="passage"><span class="passage-text">ΔΙΟΓΕΝΗΣ</span></p>
+<p class="passage"><span class="passage-text">Παντοδαπός.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πῶς λέγεις;</span></p>
+<p class="passage"><span class="passage-text">ΔΙΟΓΕΝΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τοῦ κόσμου πολίτην ὁρᾷς.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ζηλοῖς δὲ δὴ τίνα;</span></p>
+<p class="passage"><span class="passage-text">ΔΙΟΓΕΝΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τὸν Ἡρακλέα.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τί οὖν οὐχὶ καὶ λεοντῆν ἀμπέχῃ; τὸ μὲν γὰρ ξύλον ἔοικας αὐτῷ.</span></p>
+<p class="passage"><span class="passage-text">ΔΙΟΓΕΝΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τουτί μοι λεοντῆ, τὸ τριβώνιον. στρατεύομαι δὲ ὥσπερ ἐκεῖνος ἐπὶ τὰς ἡδονάς, οὐ κελευστός, ἀλλὰ ἑκούσιος, ἐκκαθᾶραι τὸν βίον προαιρούμενος.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Εὖ γε τῆς προαιρέσεως. ἀλλὰ τί μάλιστα εἰδέναι σε φῶμεν; ἢ τίνα τὴν τέχνην ἔχεις;</span></p>
+<p class="passage"><span class="passage-text">ΔΙΟΓΕΝΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἐλευθερωτής εἰμι τῶν ἀνθρώπων καὶ ἰατρὸς τῶν παθῶν· τὸ δὲ ὅλον ἀληθείας καὶ παρρησίας προφήτης εἶναι βούλομαι.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[7]</span> Θέλεις εκείνον τον άλουστο, από τον Πόντο;</span></p>
+<p class="passage"><span class="passage-text">ΔΙΑΣ</span></p>
+<p class="passage"><span class="passage-text">Βεβαιότατα.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Εσύ με το κρεμασμένο σακούλι, με τον γυμνό ώμο, έλα και κάνε έναν κύκλο μπροστά στη σύναξη. Πουλάω έναν βίο ανδρικό, έναν βίο άριστο και ευγενή, έναν βίο ελεύθερο. Ποιός θα τον αγοράσει;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ε, εσύ, κήρυκα, πώς το είπες; Πουλάς τον ελεύθερο;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Και βέβαια.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Και δεν φοβάσαι μήπως σε πάει στο δικαστήριο για υποδούλωση ή μήπως προσφύγει στον Άρειο Πάγο εναντίον σου;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Δεν τον νοιάζει καθόλου που τον πουλάμε, γιατί νομίζει πως είναι απολύτως ελεύθερος.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Σε τί όμως θα μπορούσε κανείς να τον χρησιμοποιήσει με τέτοια βρομιά και σε τόσο ελεεινή κατάσταση; Εκτός βέβαια αν του αναθέσει να σκάβει και να κουβαλάει νερό.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Όχι μόνο αυτά, αλλά και θυρωρό αν τον βάλεις, θα τον έχεις πολύ πιο πιστό από τα σκυλιά. Άσε που και το όνομά του είναι «κυνικός».</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Από πού κατάγεται, και ποιά ειδικότητα λέει πως έχει;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ρώτα τον ίδιο. Είναι, νομίζω, καλύτερα να το μεθοδεύσουμε έτσι.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Φοβάμαι την κακόκεφη και κατσουφιασμένη όψη του, μήπως μου γαβγίσει, καθώς θα πλησιάσω, ή και, μά τον Δία, με δαγκώσει. Δεν βλέπεις πώς έχει υψώσει το ξύλο κι έχει σουφρώσει τα φρύδια και κοιτάζει με βλέμμα απειλητικό και θυμωμένο;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Μη φοβάσαι· είναι ήμερος.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[8]</span> Πρώτα απ᾽ όλα, λεβέντη μου, από πού κατάγεσαι;</span></p>
+<p class="passage"><span class="passage-text">ΔΙΟΓΕΝΗΣ</span></p>
+<p class="passage"><span class="passage-text">Από παντού.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πώς είναι δυνατό;</span></p>
+<p class="passage"><span class="passage-text">ΔΙΟΓΕΝΗΣ</span></p>
+<p class="passage"><span class="passage-text">Βλέπεις έναν πολίτη του κόσμου.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Και ποιόν έχεις πρότυπο;</span></p>
+<p class="passage"><span class="passage-text">ΔΙΟΓΕΝΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τον Ηρακλή.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Γιατί λοιπόν δεν φοράς και δέρμα λιονταριού; Γιατί ως προς το ξύλο τού μοιάζεις.</span></p>
+<p class="passage"><span class="passage-text">ΔΙΟΓΕΝΗΣ</span></p>
+<p class="passage"><span class="passage-text">Αυτό εδώ είναι για μένα το δέρμα του λιονταριού, το τριμμένο πανωφόρι μου. Αγωνίζομαι κι εγώ, όπως εκείνος, εναντίον των ηδονών, όχι στρατολογημένος, αλλά εθελοντής, έχοντας επιλέξει να εξαγνίσω εντελώς την ανθρώπινη ζωή.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Μπράβο για την επιλογή σου. Τί όμως μπορούμε να πούμε ότι γνωρίζεις καλύτερα; Ή ποιά ειδίκευση έχεις;</span></p>
+<p class="passage"><span class="passage-text">ΔΙΟΓΕΝΗΣ</span></p>
+<p class="passage"><span class="passage-text">Είμαι ελευθερωτής των ανθρώπων και θεραπευτής των παθών, και γενικά θέλω να είμαι κήρυκας της αλήθειας και της ελευθερίας του λόγου.</span></p>
+        </div>
+        
+
+        
+        <div class="page-divider" id="page-4" data-hash="book-2-chapter--">
+            Πώληση του  βίου του Διογένη • Κεφάλαιο ΑΓΟΡΑΣΤΗΣ-ΕΡΜΗΣ (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=94&page=4" target="_blank" class="page-link">Page 4</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[9]</span> Εὖ γε, ὦ προφῆτα· ἢν δὲ πρίωμαί σε, τίνα με τὸν τρόπον διασκήσεις;</span></p>
+<p class="passage"><span class="passage-text">ΔΙΟΓΕΝΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πρῶτον μὲν παραλαβών σε καὶ ἀποδύσας τὴν τρυφὴν καὶ ἀπορίᾳ συγκατακλείσας τριβώνιον περιβαλῶ, μετὰ δὲ πονεῖν καὶ κάμνειν καταναγκάσω χαμαὶ καθεύδοντα καὶ ὕδωρ πίνοντα καὶ ὧν ἔτυχεν ἐμπιμπλάμενον, τὰ δὲ χρήματα, ἢν ἔχῃς, ἐμοὶ πειθόμενος εἰς τὴν θάλατταν φέρων ἐμβαλεῖς, γάμου δὲ ἀμελήσεις καὶ παίδων καὶ πατρίδος, καὶ πάντα σοι ταῦτα λῆρος ἔσται, καὶ τὴν πατρῴαν οἰκίαν ἀπολιπὼν ἢ τάφον οἰκήσεις ἢ πυργίον ἔρημον ἢ καὶ πίθον· ἡ πήρα δέ σοι θέρμων ἔσται μεστὴ καὶ ὀπισθογράφων βιβλίων· καὶ οὕτως ἔχων εὐδαιμονέστερος εἶναι φήσεις τοῦ μεγάλου βασιλέως. ἢν μαστιγοῖ δέ τις ἢ στρεβλοῖ, τούτων οὐδὲν ἀνιαρὸν ἡγήσῃ.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πῶς τοῦτο φὴς τὸ μὴ ἀλγεῖν μαστιγούμενον; οὐ γὰρ χελώνης ἢ καράβου τὸ δέρμα περιβέβλημαι.</span></p>
+<p class="passage"><span class="passage-text">ΔΙΟΓΕΝΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τὸ Εὐριπίδειον ἐκεῖνο ζηλώσεις μικρὸν ἐναλλάξας.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τὸ ποῖον;</span></p>
+<p class="passage"><span class="passage-text">ΔΙΟΓΕΝΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἡ φρήν σοι ἀλγήσει, ἡ δὲ γλῶσσα ἔσται ἀνάλγητος. <span class="marker">[10]</span> ἃ δὲ μάλιστα δεῖ προσεῖναι, ταῦτά ἐστιν· ἰταμὸν χρὴ εἶναι καὶ θρασὺν καὶ λοιδορεῖσθαι πᾶσιν ἑξῆς καὶ βασιλεῦσι καὶ ἰδιώταις· οὕτω γὰρ ἀποβλέψονταί σε καὶ ἀνδρεῖον ὑπολήψονται. βάρβαρος δὲ ἡ φωνὴ ἔστω καὶ ἀπηχὲς τὸ φθέγμα καὶ ἀτεχνῶς ὅμοιον κυνί, καὶ πρόσωπον δὲ ἐντεταμένον καὶ βάδισμα τοιούτῳ προσώπῳ πρέπον, καὶ ὅλως θηριώδη τὰ πάντα καὶ ἄγρια. αἰδὼς δὲ καὶ ἐπιείκεια καὶ μετριότης ἀπέστω, καὶ τὸ ἐρυθριᾶν ἀπόξυσον τοῦ προσώπου παντελῶς. δίωκε δὲ τὰ πολυανθρωπότατα τῶν χωρίων, καὶ ἐν αὐτοῖς τούτοις μόνος καὶ ἀκοινώνητος εἶναι θέλε μὴ φίλον, μὴ ξένον προσιέμενος· κατάλυσις γὰρ τὰ τοιαῦτα τῆς ἀρχῆς. ἐν ὄψει δὲ πάντων, ἃ μηδὲ ἰδίᾳ ποιήσειεν ἄν τις, θαρρῶν ποίει, καὶ τῶν ἀφροδισίων αἱροῦ τὰ γελοιότερα, καὶ τέλος, ἤν σοι δοκῇ, πολύποδα ὠμὸν ἢ σηπίαν φαγὼν ἀπόθανε. ταύτην σοι τὴν εὐδαιμονίαν προξενοῦμεν.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[11]</span> Ἄπαγε· μιαρὰ γὰρ καὶ οὐκ ἀνθρώπινα λέγεις.</span></p>
+<p class="passage"><span class="passage-text">ΔΙΟΓΕΝΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἀλλὰ ῥᾷστά γε, ὦ οὗτος, καὶ πᾶσιν εὐχερῆ μετελθεῖν· οὐ γάρ σοι δεήσει παιδείας καὶ λόγων καὶ λήρων, ἀλλ᾽ ἐπίτομος αὕτη σοι πρὸς δόξαν ἡ ὁδός· κἂν ἰδιώτης ᾖς, ἤτοι σκυτοδέψης ἢ ταριχοπώλης ἢ τέκτων ἢ τραπεζίτης, οὐδέν σε κωλύσει θαυμαστὸν εἴναι, ἢν μόνον ἡ ἀναίδεια καὶ τὸ θράσος παρῇ καὶ λοιδορεῖσθαι καλῶς ἐκμάθῃς.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πρὸς ταῦτα μὲν οὐ δέομαί σου. ναύτης δ᾽ ἂν ἴσως ἢ κηπουρὸς ἐν καιρῷ γένοιο, καὶ ταῦτα, ἢν ἐθέλῃ σε ἀποδόσθαι οὑτοσὶ τὸ μέγιστον δύ᾽ ὀβολῶν.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἔχε λαβών· καὶ γὰρ ἄσμενοι ἀπαλλαξόμεθα ἐνοχλοῦντος αὐτοῦ καὶ βοῶντος καὶ ἅπαντας ἁπαξαπλῶς ὑβρίζοντος καὶ ἀγορεύοντος κακῶς.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[9]</span> Μπράβο, κήρυκα. Αν όμως σε αγοράσω, με ποιόν τρόπο θα με εκπαιδεύσεις;</span></p>
+<p class="passage"><span class="passage-text">ΔΙΟΓΕΝΗΣ</span></p>
+<p class="passage"><span class="passage-text">Όταν σε παραλάβω και σε ξεντύσω από την καλοπέραση και σε αναγκάσω να συμβιώσεις με τη στέρηση, πρώτα απ᾽ όλα θα σε ντύσω με ένα τριμμένο πανωφόρι, έπειτα θα σε εξαναγκάσω να κοπιάζεις και να ταλαιπωρείσαι, καθώς θα κοιμάσαι στο έδαφος και θα πίνεις μόνο νερό και θα γεμίζεις την κοιλιά σου με ό,τι βρίσκεις. Όσο για τα χρήματα, αν έχεις, θα τα πάρεις, ακολουθώντας τις οδηγίες μου, και θα τα ρίξεις στη θάλασσα. Θα αδιαφορήσεις για γάμο και παιδιά και πατρίδα, κι όλα αυτά θα τα θεωρήσεις ανοησίες· θα εγκαταλείψεις το πατρικό σου σπίτι, και θα κατοικήσεις ή σε τάφο ή σε έρημο πύργο ή και σε πιθάρι. Το σακούλι σου θα είναι γεμάτο με λούπινα και με παπύρινους κυλίνδρους, γραμμένους και από την πίσω τους πλευρά. Και σ᾽ αυτή την κατάσταση, θα υποστηρίζεις ότι είσαι πιο ευτυχισμένος και από τον μεγάλο βασιλιά των Περσών. Κι αν κάποιος σε μαστιγώνει ή σου συστρέφει τα μέλη, δεν θα θεωρείς δυσάρεστο τίποτε απ᾽ αυτά.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πώς είναι δυνατό αυτό που λες, να μην πονώ, ενώ με μαστιγώνουν; Δεν διαθέτω περιβολή από δέρμα χελώνας ή αγκαθωτού οστρακόδερμου.</span></p>
+<p class="passage"><span class="passage-text">ΔΙΟΓΕΝΗΣ</span></p>
+<p class="passage"><span class="passage-text">Θα υιοθετήσεις την περίφημη εκείνη φράση του Ευριπίδη, παραλλάζοντάς την κάπως.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ποιάν δηλαδή;</span></p>
+<p class="passage"><span class="passage-text">ΔΙΟΓΕΝΗΣ</span></p>
+<p class="passage"><span class="passage-text">Το μυαλό σου θα πονά, μα η γλώσσα σου θα μένει δίχως πόνο. <span class="marker">[10]</span> Αυτά όμως που είναι απολύτως απαραίτητο να έχεις είναι τα εξής: Πρέπει να είσαι αναίσχυντος και θρασύς, και να κακολογείς τους πάντες αδιακρίτως, και βασιλιάδες και απλούς πολίτες, γιατί έτσι θα σε κοιτάξουν με θαυμασμό και θα σε θεωρήσουν γενναίο. Ο λόγος σου να είναι ακαλλιέργητος και η φωνή σου δυσάρεστη και πραγματικά όμοια με φωνή σκύλου. Το πρόσωπό σου να είναι σφιγμένο, και το βάδισμα σου ταιριαστό με ένα τέτοιο πρόσωπο, και γενικά τα πάντα να είναι κτηνώδη και άγρια. Μακριά από σένα η ντροπή και η ευπρέπεια και η μετριοπάθεια, και να εξαλείψεις εντελώς το κοκκίνισμα από το πρόσωπο σου. Να συχνάζεις σε μέρη όπου υπάρχει πολυκοσμία, και εκεί ακριβώς να προσπαθείς να είσαι μόνος και ακοινώνητος, χωρίς να προσεγγίζεις ούτε φίλο ούτε ξένο, γιατί μια τέτοια συμπεριφορά αποτελεί απάρνηση των αρχών σου. Επίσης να κάνεις θαρραλέα, μπροστά στα μάτια όλων, αυτά που δεν θα έκανε κανείς ούτε μόνος του, και να επιλέγεις από τις ερωτικές επαφές τις πιο γελοίες, και στο τέλος, αν συμφωνείς, να πεθάνεις τρώγοντας ένα ωμό χταπόδι ή μια σουπιά. Αυτή την ευτυχία μπορούμε να σου εξασφαλίσουμε.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[11]</span> Μακριά από μένα. Αυτά που λες είναι απαίσια και απάνθρωπα.</span></p>
+<p class="passage"><span class="passage-text">ΔΙΟΓΕΝΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ευκολότατα όμως, φίλε μου, και ο καθένας μπορεί να τα αποκτήσει άνετα. Δεν θα χρειαστείς εκπαίδευση και λόγους και αερολογίες, αλλά αυτός θα είναι για σένα ένας σύντομος δρόμος προς τη δόξα. Ακόμη κι αν είσαι απαίδευτος, είτε βυρσοδέψης είτε έμπορος παστών ψαριών ή ξυλουργός ή τραπεζίτης, τίποτε δεν θα σε εμποδίσει να είσαι αξιοθαύμαστος, αρκεί μόνο να σε συνοδεύουν η αναίδεια και το θράσος, και να καταρτιστείς καλά στην κακολογία.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Γι᾽ αυτά βέβαια δεν σε χρειάζομαι. Ίσως όμως θα μπορούσες στην ανάγκη να γίνεις ναύτης ή κηπουρός· κι αυτό, μόνο αν θέλει αυτός εδώ να σε πουλήσει το πολύ πολύ για δύο οβολούς.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πάρ᾽ τον, δικός σου. Με χαρά θα απαλλαγούμε απ᾽ αυτόν, που ενοχλεί και κραυγάζει και τους προσβάλλει όλους ανεξαιρέτως και τους κακολογεί.</span></p>
+        </div>
+        
+
+        <div id="book-3-chapter--" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-5" data-hash="book-3-chapter--">
+            Πώληση του  βίου του Αρίστιππου, του Δημόκριτου και του Ηράκλειτου • Κεφάλαιο ΔΙΑΣ-ΔΙΑΣ (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=94&page=5" target="_blank" class="page-link">Page 5</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ΖΕΥΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[12]</span> Ἄλλον κάλει τὸν Κυρηναῖον, τὸν ἐν τῇ πορφυρίδι, τὸν ἐστεφανωμένον.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἄγε δή, πρόσεχε πᾶς· πολυτελὲς τὸ χρῆμα καὶ πλουσίων δεόμενον. βίος οὗτος ἥδιστος, βίος τρισμακάριστος. τίς ἐπιθυμεῖ τρυφῆς; τίς ὠνεῖται τὸν ἁβρότατον;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἐλθὲ σὺ καὶ λέγε ἅπερ εἰδὼς τυγχάνεις· ὠνήσομαι γάρ σε, ἢν ὠφέλιμος ᾖς.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Μὴ ἐνόχλει αὐτόν, ὦ βέλτιστε, μηδὲ ἀνάκρινε· μεθύει γάρ. ὥστε οὐκ ἂν ἀποκρίναιτό σοι, τὴν γλῶτταν, ὡς ὁρᾷς, διολισθάνων.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Καὶ τίς ἂν εὖ φρονῶν πρίαιτο διεφθαρμένον οὕτω καὶ ἀκόλαστον ἀνδράποδον; ὅσον δὲ καὶ ἀποπνεῖ μύρων, ὡς δὲ καὶ σφαλερὸν βαδίζει καὶ παράφορον. ἀλλὰ κἂν σύ γε, ὦ Ἑρμῆ, λέγε ὁποῖα πρόσεστιν αὐτῷ καὶ ἃ μετιὼν τυγχάνει.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τὸ μὲν ὅλον, συμβιῶναι δεξιὸς καὶ συμπιεῖν ἱκανὸς καὶ κωμάσαι μετὰ αὐλητρίδος ἐπιτήδειος ἐρῶντι καὶ ἀσώτῳ δεσπότῃ· τὰ ἄλλα δὲ πεμμάτων ἐπιστήμων καὶ ὀψοποιὸς ἐμπειρότατος, καὶ ὅλως σοφιστὴς ἡδυπαθείας. ἐπαιδεύθη μὲν οὖν Ἀθήνησιν, ἐδούλευσε δὲ καὶ περὶ Σικελίαν τοῖς τυράννοις καὶ σφόδρα εὐδοκίμει παρ᾽ αὐτοῖς. τὸ δὲ κεφάλαιον τῆς προαιρέσεως, ἁπάντων καταφρονεῖν, ἅπασι χρῆσθαι, πανταχόθεν ἐρανίζεσθαι τὴν ἡδονήν.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ὥρα σοι ἄλλον περιβλέπειν τῶν πλουσίων τούτων καὶ πολυχρημάτων· ἐγὼ μὲν γὰρ οὐκ ἐπιτήδειος ἱλαρὸν ὠνεῖσθαι βίον.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἄπρατος ἔοικεν ἡμῖν οὗτος, ὦ Ζεῦ, μένειν.</span></p>
+<p class="passage"><span class="passage-text">ΖΕΥΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[13]</span> Μετάστησον· ἄλλον παράγε· μᾶλλον δὲ τὼ δύο τούτω, τὸν γελῶντα τὸν Ἀβδηρόθεν καὶ τὸν κλάοντα τὸν ἐξ Ἐφέσου· ἅμα γὰρ αὐτὼ πεπρᾶσθαι βούλομαι.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Κατάβητον ἐς τὸ μέσον. τὼ ἀρίστω βίω πωλῶ, τὼ σοφωτάτω πάντων ἀποκηρύττομεν.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ὦ Ζεῦ τῆς ἐναντιότητος. ὁ μὲν οὐ διαλείπει γελῶν, ὁ δέ τινα ἔοικε πενθεῖν· δακρύει γοῦν τὸ παράπαν. τί ταῦτα, ὦ οὗτος; τί γελᾷς;</span></p>
+<p class="passage"><span class="passage-text">ΔΗΜΟΚΡΙΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Ἐρωτᾷς; ὅτι μοι γελοῖα πάντα δοκέει τὰ πρήγματα ὑμέων καὶ αὐτοὶ ὑμέες.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πῶς λέγεις; καταγελᾷς ἡμῶν ἁπάντων καὶ παρ᾽ οὐδὲν τίθεσαι τὰ ἡμέτερα πράγματα;</span></p>
+<p class="passage"><span class="passage-text">ΔΗΜΟΚΡΙΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Ὧδε ἔχει· σπουδαῖον γὰρ ἐν αὐτέοισιν οὐδέν, κενεὰ δὲ πάντα καὶ ἀτόμων φορὴ καὶ ἀπειρίη.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Οὐ μὲν οὖν, ἀλλὰ σὺ κενὸς ὡς ἀληθῶς καὶ ἄπειρος. ὢ τῆς ὕβρεως, οὐ παύσῃ γελῶν; <span class="marker">[14]</span> σὺ δὲ τί κλάεις, ὦ βέλτιστε; πολὺ γὰρ οἶμαι κάλλιον σοὶ προσλαλεῖν.</span></p>
+<p class="passage"><span class="passage-text">ΗΡΑΚΛΕΙΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Ἡγέομαι γάρ, ὦ ξεῖνε, τὰ ἀνθρωπήϊα πρήγματα ὀϊζυρὰ καὶ δακρυώδεα καὶ οὐδὲν αὐτέων ὅ τι μὴ ἐπικήριον· τὸ δὴ οἰκτείρω τε σφέας καὶ ὀδύρομαι, καὶ τὰ μὲν παρεόντα οὐ δοκέω μεγάλα, τὰ δὲ ὑστέρῳ χρόνῳ ἐσόμενα πάμπαν ἀνιηρά, λέγω δὲ τὰς ἐκπυρώσιας καὶ τὴν τοῦ ὅλου συμφορήν· ταῦτα ὀδύρομαι καὶ ὅτι ἔμπεδον οὐδέν, ἀλλ᾽ ὅκως ἐς κυκεῶνα τὰ πάντα συνειλέονται καί ἐστι τὠυτὸ τέρψις ἀτερψίη, γνῶσις ἀγνωσίη, μέγα μικρόν, ἄνω κάτω περιχωρέοντα καὶ ἀμειβόμενα ἐν τῇ τοῦ αἰῶνος παιδιῇ.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τί γὰρ ὁ αἰών ἐστι;</span></p>
+<p class="passage"><span class="passage-text">ΗΡΑΚΛΕΙΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Παῖς παίζων, πεσσεύων, διαφερόμενος, συμφερόμενος.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τί δὲ ἄνθρωποι;</span></p>
+<p class="passage"><span class="passage-text">ΗΡΑΚΛΕΙΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Θεοὶ θνητοί.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τί δὲ θεοί;</span></p>
+<p class="passage"><span class="passage-text">ΗΡΑΚΛΕΙΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Ἄνθρωποι ἀθάνατοι.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Αἰνίγματα λέγεις, ὦ οὗτος, ἢ γρίφους συντίθης; ἀτεχνῶς γὰρ ὥσπερ ὁ Λοξίας οὐδὲν ἀποσαφεῖς.</span></p>
+<p class="passage"><span class="passage-text">ΗΡΑΚΛΕΙΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Οὐδὲν γάρ μοι μέλει ὑμέων.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τοιγαροῦν οὐδὲ ὠνήσεταί σέ τις εὖ φρονῶν.</span></p>
+<p class="passage"><span class="passage-text">ΗΡΑΚΛΕΙΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Ἐγὼ δὲ κέλομαι πᾶσιν ἡβηδὸν οἰμώζειν, τοῖσιν ὠνεομένοισι καὶ τοῖσιν οὐκ ὠνεομένοισι.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τουτὶ τὸ κακὸν οὐ πόρρω μελαγχολίας ἐστίν· οὐδέτερον δὲ ὅμως αὐτῶν ἔγωγε ὠνήσομαι.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἄπρατοι καὶ οὗτοι μένουσιν.</span></p>
+<p class="passage"><span class="passage-text">ΖΕΥΣ</span></p>
+<p class="passage"><span class="passage-text">Ἄλλον ἀποκήρυττε.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">ΔΙΑΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[12]</span> Κάλεσε άλλον, αυτόν από την Κυρήνη, τον ντυμένο με το πορφυρό ρούχο, τον στεφανωμένο.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Εμπρός, λοιπόν, ας προσέξει ο καθένας. Το εμπόρευμα είναι πολύτιμο, και χρειάζεται να ενδιαφερθούν οι πλούσιοι. Αυτός εδώ είναι ένας βίος απολαυστικότατος, βίος τρισευτυχισμένος. Ποιός επιθυμεί καλοπέραση; Ποιός αγοράζει τον πιο εκλεπτυσμένο;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Έλα δω εσύ, και πες μου αυτά που ξέρεις να κάνεις. Θα σε αγοράσω, αν μπορείς να μου είσαι χρήσιμος.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Μην τον ενοχλείς, λεβέντη μου, και μην του υποβάλλεις ερωτήσεις, γιατί είναι μεθυσμένος. Συνεπώς δεν θα μπορούσε να σου απαντήσει, μια και τραυλίζει, όπως βλέπεις, καθώς η γλώσσα του γλιστράει.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Και ποιός μυαλωμένος άνθρωπος θα αγόραζε έναν τόσο διεφθαρμένο και αχαλίνωτο δούλο; Πόσο πολύ μοσχοβολάει αρώματα, και με πόση αστάθεια βαδίζει και παραπατάει συνεχώς! Αλλά τουλάχιστον εσύ, Ερμή, πες τί προσόντα έχει και με τί μπορεί να ασχοληθεί.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Γενικά είναι βολικός για να ζήσεις μαζί του, ειδικός για να τα πίνετε μαζί, και κατάλληλος για να γλεντήσει με μια αυλητρίδα μαζί με ένα ερωτευμένο και ακόλαστο αφεντικό. Κατά τα άλλα είναι επιστήμονας στα γλυκίσματα και εμπειρότατος στην ετοιμασία του φαγητού, και γενικά καθηγητής στην καλοπέραση. Εκπαιδεύτηκε στην Αθήνα, αλλά υπηρέτησε στη Σικελία τους τυράννους, και πρόκοψε πολύ κοντά τους. Και η σύνοψη της φιλοσοφικής του επιλογής: να περιφρονείς τα πάντα, να χρησιμοποιείς τα πάντα, από παντού να απανθίζεις την ηδονή.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Καιρός να ψάξεις να βρεις κάποιον άλλο, από αυτούς εδώ τους πλουσίους, με τα πολλά λεφτά. Εγώ πάντως δεν έχω τη δυνατότητα να αγοράσω έναν εύθυμο βίο.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Μου φαίνεται, Δία, πως θα μας μείνει απούλητος αυτός εδώ.</span></p>
+<p class="passage"><span class="passage-text">ΔΙΑΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[13]</span> Απομάκρυνέ τον. Παρουσίασε κάποιον άλλο. Ή καλύτερα αυτούς εκεί τους δύο, αυτόν που γελάει, από τα Άβδηρα, κι αυτόν που κλαίει, από την Έφεσο. Θέλω αυτοί οι δύο να πουληθούν μαζί.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Εσείς οι δύο, κατεβείτε εδώ στη μέση. Πουλάω τους δύο άριστους βίους· φέρνουμε για πούλημα τους δύο πιο σοφούς απ᾽ όλους.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Δία μου, τί αντίθεση! Ο ένας δεν σταματάει να γελάει, ενώ ο άλλος μοιάζει να πενθεί για κάποιον· είναι συνεχώς γεμάτος δάκρυα. Ε, φίλε, τί συμβαίνει; Γιατί γελάς;</span></p>
+<p class="passage"><span class="passage-text">ΔΗΜΟΚΡΙΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Το ρωτάς; Γιατί μου φαίνονται γελοία όλα τα ζητήματά σας και εσείς οι ίδιοι.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τί λες; Μας περιγελάς όλους εμάς και θεωρείς τιποτένια τα δικά μας ζητήματα;</span></p>
+<p class="passage"><span class="passage-text">ΔΗΜΟΚΡΙΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Έτσι ακριβώς. Δεν υπάρχει τίποτε αξιόλογο σ᾽ αυτά, αλλά είναι όλα «κενό» και «κίνηση άπειρων ατόμων».</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Όχι βέβαια, αλλά εσύ είσαι πραγματικά «κενός» και «άπειρος». Τί αλαζονεία! Δεν θα πάψεις να γελάς; <span class="marker">[14]</span> Εσύ πάλι γιατί κλαις, λεβέντη μου; Πολύ προτιμότερο είναι, μου φαίνεται, να απευθύνω τον λόγο σ᾽ εσένα.</span></p>
+<p class="passage"><span class="passage-text">ΗΡΑΚΛΕΙΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Επειδή νομίζω, ξένε μου, πως τα ανθρώπινα ζητήματα είναι αξιολύπητα κι αξιοδάκρυτα, και δεν υπάρχει κανένα απ᾽ αυτά που να μην είναι προορισμένο να πεθάνει· γι᾽ αυτό λοιπόν τους λυπάμαι και θρηνώ. Και τις τωρινές συμφορές δεν τις θεωρώ μεγάλες, αυτά όμως που πρόκειται να συμβούν αργότερα είναι εξαιρετικά θλιβερά, εννοώ το παρανάλωμα της φωτιάς και τη συγχώνευση των πάντων. Γι᾽ αυτό θρηνώ, και γιατί τίποτε δεν είναι σταθερό, αλλά τα πάντα συμπεριστρέφονται μέσα σε ένα σύμφυρμα, και είναι το ίδιο ευχαρίστηση δυσαρέσκεια, γνώση αγνωσία, μεγάλο μικρό, καθώς πάνω κάτω στριφογυρίζουν και εναλλάσσονται στου αιώνα το παιχνίδι.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Και τί είναι ο αιώνας;</span></p>
+<p class="passage"><span class="passage-text">ΗΡΑΚΛΕΙΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Ένα παιδί που παίζει, ρίχνει τα ζάρια, περνάει την ώρα του.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Και τί είναι οι άνθρωποι;</span></p>
+<p class="passage"><span class="passage-text">ΗΡΑΚΛΕΙΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Θεοί θνητοί.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Και τί είναι οι θεοί;</span></p>
+<p class="passage"><span class="passage-text">ΗΡΑΚΛΕΙΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Άνθρωποι αθάνατοι.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Λες αινίγματα, φίλε, ή συνθέτεις γρίφους; Τελικά δεν ξεκαθαρίζεις τίποτε, ακριβώς όπως ο Λοξίας.</span></p>
+<p class="passage"><span class="passage-text">ΗΡΑΚΛΕΙΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Καθόλου δεν με νοιάζει για σας.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Συνεπώς ούτε και θα σε αγοράσει κανένας μυαλωμένος άνθρωπος.</span></p>
+<p class="passage"><span class="passage-text">ΗΡΑΚΛΕΙΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Κι εγώ σας λέω να πάτε όλοι οι ενήλικοι να κλάψετε, κι εσείς που αγοράζετε κι εσείς που δεν αγοράζετε.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Αυτή εδώ η πάθηση δεν απέχει πολύ από κατάθλιψη. Πάντως εγώ δεν πρόκειται να αγοράσω κανέναν απ᾽ αυτούς τους δύο.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Απούλητοι μένουν κι αυτοί.</span></p>
+<p class="passage"><span class="passage-text">ΔΙΑΣ</span></p>
+<p class="passage"><span class="passage-text">Φέρε άλλον για πούλημα.</span></p>
+        </div>
+        
+
+        <div id="book-4-chapter--" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-6" data-hash="book-4-chapter--">
+            Πώληση του  βίου του Σωκράτη και του Επίκουρου • Κεφάλαιο ΕΡΜΗΣ-ΣΩΚΡΑΤΗΣ (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=94&page=6" target="_blank" class="page-link">Page 6</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[15]</span> Βούλει τὸν Ἀθηναῖον ἐκεῖνον, τὸν στωμύλον;</span></p>
+<p class="passage"><span class="passage-text">ΖΕΥΣ</span></p>
+<p class="passage"><span class="passage-text">Πάνυ μὲν οὖν.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Δεῦρο ἐλθὲ σύ. βίον ἀγαθὸν καὶ συνετὸν ἀποκηρύττομεν. τίς ὠνεῖται τὸν ἱερώτατον;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Εἰπέ μοι, τί μάλιστα εἰδὼς τυγχάνεις;</span></p>
+<p class="passage"><span class="passage-text">ΣΩΚΡΑΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Παιδεραστής εἰμι καὶ σοφὸς τὰ ἐρωτικά.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πῶς οὖν ἐγὼ πρίωμαί σε; παιδαγωγοῦ γὰρ ἐδεόμην τῷ παιδὶ καλῷ ὄντι μοι.</span></p>
+<p class="passage"><span class="passage-text">ΣΩΚΡΑΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τίς δ᾽ ἂν ἐπιτηδειότερος ἐμοῦ γένοιτο συνεῖναι καλῷ; καὶ γὰρ οὐ τῶν σωμάτων ἐραστής εἰμι, τὴν ψυχὴν δὲ ἡγοῦμαι καλήν. ἀμέλει κἂν ὑπὸ ταὐτὸν ἱμάτιόν μοι κατακέωνται, ἀκούσει αὐτῶν λεγόντων μηδὲν ὑπ᾽ ἐμοῦ δεινὸν παθεῖν.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἄπιστα λέγεις, τὸ παιδεραστὴν ὄντα μὴ πέρα τῆς ψυχῆς πολυπραγμονεῖν, καὶ ταῦτα ἐπ᾽ ἐξουσίας, ὑπὸ τῷ αὐτῷ ἱματίῳ κατακείμενον.</span></p>
+<p class="passage"><span class="passage-text">ΣΩΚΡΑΤΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[16]</span> Καὶ μὴν ὀμνύω γέ σοι τὸν κύνα καὶ τὴν πλάτανον οὕτω ταῦτα ἔχειν.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἡράκλεις τῆς ἀτοπίας τῶν θεῶν.</span></p>
+<p class="passage"><span class="passage-text">ΣΩΚΡΑΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τί σὺ λέγεις; οὐ δοκεῖ σοι ὁ κύων εἶναι θεός; οὐχ ὁρᾷς τὸν Ἄνουβιν ἐν Αἰγύπτῳ ὅσος; καὶ τὸν ἐν οὐρανῷ Σείριον καὶ τὸν παρὰ τοῖς κάτω Κέρβερον;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[17]</span> Εὖ λέγεις, ἐγὼ δὲ διημάρτανον. ἀλλὰ τίνα βιοῖς τὸν τρόπον;</span></p>
+<p class="passage"><span class="passage-text">ΣΩΚΡΑΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Οἰκῶ μὲν ἐμαυτῷ τινα πόλιν ἀναπλάσας, χρῶμαι δὲ πολιτείᾳ ξένῃ καὶ νόμους νομίζω τοὺς ἐμούς.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἓν ἐβουλόμην ἀκοῦσαι τῶν δογμάτων.</span></p>
+<p class="passage"><span class="passage-text">ΣΩΚΡΑΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἄκουε δὴ τὸ μέγιστον, ὃ περὶ τῶν γυναικῶν μοι δοκεῖ· μηδεμίαν αὐτῶν μηδενὸς εἶναι μόνου, παντὶ δὲ μετεῖναι τῷ βουλομένῳ τοῦ γάμου.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τοῦτο φής, ἀνῃρῆσθαι τοὺς περὶ μοιχείας νόμους;</span></p>
+<p class="passage"><span class="passage-text">ΣΩΚΡΑΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Νὴ Δία, καὶ ἁπλῶς γε πᾶσαν τὴν περὶ τὰ τοιαῦτα μικρολογίαν.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τί δὲ περὶ τῶν ἐν ὥρᾳ παίδων σοι δοκεῖ;</span></p>
+<p class="passage"><span class="passage-text">ΣΩΚΡΑΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Καὶ οὗτοι ἔσονται τοῖς ἀρίστοις ἆθλον φιλῆσαι λαμπρόν τι καὶ νεανικὸν ἐργασαμένοις.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[15]</span> Θέλεις εκείνον από την Αθήνα, τον εύγλωττο;</span></p>
+<p class="passage"><span class="passage-text">ΔΙΑΣ</span></p>
+<p class="passage"><span class="passage-text">Βεβαιότατα.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Έλα δω εσύ. Πουλάμε έναν βίο ενάρετο και συνετό. Ποιός αγοράζει τον πιο ιερό βίο;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Γιά πες μου, τί γνωρίζεις καλύτερα;</span></p>
+<p class="passage"><span class="passage-text">ΣΩΚΡΑΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Είμαι εραστής αγοριών και σοφός στα ερωτικά.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πώς λοιπόν εγώ να σε αγοράσω; Χρειαζόμουν έναν παιδαγωγό για το παιδί μου, που είναι και όμορφο.</span></p>
+<p class="passage"><span class="passage-text">ΣΩΚΡΑΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Και ποιός θα ήταν καταλληλότερος από μένα να συναναστρέφεται με έναν όμορφο; Άλλωστε δεν είμαι εραστής των σωμάτων, αλλά την ψυχή θεωρώ όμορφη. Πραγματικά, ακόμη κι αν ξαπλώσουν κάτω από τον ίδιο μανδύα μαζί μου, θα τους ακούσεις να λένε πως δεν έπαθαν από μένα κανένα κακό.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Λες απίστευτα πράγματα: ενώ είσαι εραστής αγοριών, δεν ενδιαφέρεσαι για τίποτε πέρα από την ψυχή τους, και μάλιστα όταν έχεις τη δυνατότητα, καθώς είσαι ξαπλωμένος μαζί τους κάτω από τον ίδιο μανδύα.</span></p>
+<p class="passage"><span class="passage-text">ΣΩΚΡΑΤΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[16]</span> Κι όμως· σου ορκίζομαι, μά τον σκύλο και το πλατάνι, ότι έτσι έχουν τα πράγματα.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ηρακλή μου, τί παράξενοι θεοί!</span></p>
+<p class="passage"><span class="passage-text">ΣΩΚΡΑΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τί λες τώρα; Δεν συμφωνείς ότι ο σκύλος είναι θεός; Δεν βλέπεις τον Άνουβη στην Αίγυπτο πόσο σπουδαίος είναι, και τον Σείριο στον ουρανό και τον Κέρβερο στον κάτω κόσμο;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[17]</span> Καλά λες· εγώ είχα πέσει έξω. Αλλά με ποιόν τρόπο ζεις;</span></p>
+<p class="passage"><span class="passage-text">ΣΩΚΡΑΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Κατοικώ σε κάποια πόλη που έπλασα για τον εαυτό μου, ακολουθώ ένα παράξενο ξένο πολίτευμα και συμμορφώνομαι με δικούς μου νόμους.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Θα ήθελα να ακούσω ένα από αυτά που έχεις θεσπίσει.</span></p>
+<p class="passage"><span class="passage-text">ΣΩΚΡΑΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Άκου λοιπόν το σημαντικότερο, την άποψή μου για τις γυναίκες: Καμιά απ᾽ αυτές να μην ανήκει μόνο σε έναν άνδρα, αλλά ο καθένας που το επιθυμεί να μπορεί να συμμερίζεται τον γάμο.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Αυτό δηλαδή εννοείς, να ακυρωθούν οι νόμοι οι σχετικοί με τη μοιχεία;</span></p>
+<p class="passage"><span class="passage-text">ΣΩΚΡΑΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ναι, μά τον Δία, και γενικά όλη η μικροπρέπεια η σχετική με τέτοιου είδους ζητήματα.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Και ποιά είναι η άποψή σου για τα αγόρια στο άνθος της ηλικίας τους;</span></p>
+<p class="passage"><span class="passage-text">ΣΩΚΡΑΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Και αυτά θα αποτελούν έπαθλο των άριστων πολιτών, όταν κάνουν κάποια λαμπρή και τολμηρή πράξη: θα δικαιούνται να τα φιλήσουν.</span></p>
+        </div>
+        
+
+        
+        <div class="page-divider" id="page-7" data-hash="book-4-chapter--">
+            Πώληση του  βίου του Σωκράτη και του Επίκουρου • Κεφάλαιο ΑΓΟΡΑΣΤΗΣ-ΑΓΟΡΑΣΤΗΣ (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=94&page=7" target="_blank" class="page-link">Page 7</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[18]</span> Βαβαὶ τῆς φιλοδωρίας. τῆς δὲ σοφίας τί σοι τὸ κεφάλαιον;</span></p>
+<p class="passage"><span class="passage-text">ΣΩΚΡΑΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Αἱ ἰδέαι καὶ τὰ τῶν ὄντων παραδείγματα· ὁπόσα γὰρ δὴ ὁρᾷς, τὴν γῆν, τὰ ἐπὶ γῆς, τὸν οὐρανόν, τὴν θάλατταν, ἁπάντων τούτων εἰκόνες ἀφανεῖς ἑστᾶσιν ἔξω τῶν ὅλων.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ποῦ δὲ ἑστᾶσιν;</span></p>
+<p class="passage"><span class="passage-text">ΣΩΚΡΑΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Οὐδαμοῦ· εἰ γάρ που εἶεν, οὐκ ἂν εἶεν.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Οὐχ ὁρῶ ταῦθ᾽ ἅπερ λέγεις τὰ παραδείγματα.</span></p>
+<p class="passage"><span class="passage-text">ΣΩΚΡΑΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Εἰκότως· τυφλὸς γὰρ εἶ τῆς ψυχῆς τὸν ὀφθαλμόν. ἐγὼ δὲ πάντων ὁρῶ εἰκόνας καὶ σὲ ἀφανῆ κἀμὲ ἄλλον, καὶ ὅλως διπλᾶ πάντα.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τοιγαροῦν ὠνητέος εἶ σοφὸς καὶ ὀξυδερκής τις ὤν. φέρε ἴδω τί καὶ πράξεις με ὑπὲρ αὐτοῦ σύ;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Δὸς δύο τάλαντα.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ὠνησάμην ὅσου φής. τἀργύριον μέντοι εἰς αὖθις καταβαλῶ.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[19]</span> Τί σοι τοὔνομα;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Δίων Συρακούσιος.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἄγε λαβὼν ἀγαθῇ τύχῃ. τὸν Ἐπικούρειον σὲ ἤδη καλῶ. τίς ὠνήσεται τοῦτον; ἔστι μὲν τοῦ γελῶντος ἐκείνου μαθητὴς καὶ τοῦ μεθύοντος, οὓς μικρῷ πρόσθεν ἀπεκηρύττομεν. ἓν δὲ πλέον οἶδεν αὐτῶν, παρ᾽ ὅσον δυσσεβέστερος τυγχάνει· τὰ δὲ ἄλλα ἡδὺς καὶ λιχνείᾳ φίλος.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τίς ἡ τιμή;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Δύο μναῖ.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Λάμβανε· τὸ δεῖνα δέ, ὅπως εἰδῶ, τίσι χαίρει τῶν ἐδεσμάτων;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τὰ γλυκέα σιτεῖται καὶ τὰ μελιτώδη καὶ μάλιστά γε τὰς ἰσχάδας.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Χαλεπὸν οὐδέν· ὠνησόμεθα γὰρ αὐτῷ παλάθας τῶν Καρικῶν.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[18]</span> Πω πω, τί γενναιοδωρία! Και ποιό είναι το αποκορύφωμα της σοφίας σου;</span></p>
+<p class="passage"><span class="passage-text">ΣΩΚΡΑΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Οι «ιδέες» και τα «πρότυπα» των όντων. Δηλαδή για όλα όσα βλέπεις, τη γη, τα επίγεια, τον ουρανό, τη θάλασσα, για όλα αυτά υπάρχουν αόρατα ομοιώματα έξω από το σύμπαν.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Και πού υπάρχουν;</span></p>
+<p class="passage"><span class="passage-text">ΣΩΚΡΑΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πουθενά· γιατί αν υπήρχαν κάπου, δεν θα υπήρχαν.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Δεν τα βλέπω αυτά που λες, τα «πρότυπα».</span></p>
+<p class="passage"><span class="passage-text">ΣΩΚΡΑΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πολύ φυσικό· αφού είσαι τυφλός στα μάτια της ψυχής. Εγώ πάντως βλέπω ομοιώματα των πάντων, κι εσένα αόρατο, κι έναν άλλον εμένα, και γενικά όλα τα βλέπω διπλά.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Συνεπώς θα πρέπει να σε αγοράσω, μια που είσαι σοφός και έχεις οξύτατη όραση. Γιά να δω όμως, τί τιμή θα μου ορίσεις γι᾽ αυτόν εσύ;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Δώσε μου δύο τάλαντα.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τον αγοράζω όσο είπες. Τα χρήματα όμως θα τα καταβάλω αργότερα.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[19]</span> Πώς ονομάζεσαι;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Δίωνας ο Συρακούσιος.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πάρ᾽ τον και πήγαινε, και καλή τύχη. Καλώ τώρα εσένα τον Επικούρειο. Ποιός θα τον αγοράσει αυτόν; Είναι μαθητής εκείνου που γελούσε κι εκείνου που ήταν μεθυσμένος, τους οποίους είχαμε φέρει για πούλημα πριν από λίγο. Ένα πράγμα μόνο γνωρίζει περισσότερο από ᾽κείνους, το να είναι περισσότερο ασεβής. Κατά τα άλλα είναι ευχάριστος και του αρέσει η καλοφαγία.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ποιά είναι η τιμή του;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Δύο μνες.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πάρ᾽ τες. Και με την ευκαιρία, για να ξέρω, ποιά φαγητά τού αρέσουν;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τρώει τα γλυκά και τα μελωμένα, και ιδιαίτερα τα ξεραμένα σύκα.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Κανένα πρόβλημα. Θα του αγοράσουμε μια αρμαθιά ξερόσυκα από την Καρία.</span></p>
+        </div>
+        
+
+        <div id="book-5-chapter--" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-8" data-hash="book-5-chapter--">
+            Πώληση του  βίου του Χρύσιππου • Κεφάλαιο ΔΙΑΣ-ΧΡΥΣΙΠΠΟΣ (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=94&page=8" target="_blank" class="page-link">Page 8</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ΖΕΥΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[20]</span> Ἄλλον κάλει, τὸν ἐν χρῷ κουρίαν ἐκεῖνον, τὸν σκυθρωπόν, τὸν ἀπὸ τῆς στοᾶς.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Εὖ λέγεις· ἐοίκασι γὰρ πολύ τι πλῆθος αὐτὸν περιμένειν τῶν ἐπὶ τὴν ἀγορὰν ἀπηντηκότων. αὐτὴν τὴν ἀρετὴν πωλῶ, τῶν βίων τὸν τελειότατον. τίς ἅπαντα μόνος εἰδέναι θέλει;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πῶς τοῦτο φής;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ὅτι μόνος οὗτος σοφός, μόνος καλός, μόνος δίκαιος ἀνδρεῖος βασιλεὺς ῥήτωρ πλούσιος νομοθέτης καὶ τὰ ἄλλα ὁπόσα ἐστίν.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Οὐκοῦν καὶ μάγειρος μόνος, καὶ νὴ Δία γε σκυτοδέψης ἢ τέκτων καὶ τὰ τοιαῦτα;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἔοικεν.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[21]</span> Ἐλθέ, ὦγαθέ, καὶ λέγε πρὸς τὸν ὠνητὴν ἐμὲ ποῖός τις εἶ, καὶ πρῶτον εἰ οὐκ ἄχθῃ πιπρασκόμενος καὶ δοῦλος ὤν.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Οὐδαμῶς· οὐ γὰρ ἐφ᾽ ἡμῖν ταῦτά ἐστιν. ἃ δὲ οὐκ ἐφ᾽ ἡμῖν, ἀδιάφορα εἶναι συμβέβηκεν.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Οὐ μανθάνω ᾗ καὶ λέγεις.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Τί φής; οὐ μανθάνεις ὅτι τῶν τοιούτων τὰ μέν ἐστι προηγμένα, τὰ δ᾽ ἀνάπαλιν ἀποπροηγμένα;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Οὐδὲ νῦν μανθάνω.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Εἰκότως· οὐ γὰρ εἶ συνήθης τοῖς ἡμετέροις ὀνόμασιν οὐδὲ τὴν καταληπτικὴν φαντασίαν ἔχεις, ὁ δὲ σπουδαῖος ὁ τὴν λογικὴν θεωρίαν ἐκμαθὼν οὐ μόνον ταῦτα οἶδεν, ἀλλὰ καὶ σύμβαμα καὶ παρασύμβαμα ὁποῖα καὶ ὁπόσον ἀλλήλων διαφέρει.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πρὸς τῆς σοφίας, μὴ φθονήσῃς κἂν τοῦτο εἰπεῖν, τί τὸ σύμβαμα καὶ τὸ παρασύμβαμα· καὶ γὰρ οὐκ οἶδ᾽ ὅπως ἐπλήγην ὑπὸ τοῦ ῥυθμοῦ τῶν ὀνομάτων.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Ἀλλ᾽ οὐδεὶς φθόνος· ἢν γάρ τις χωλὸς ὢν αὐτῷ ἐκείνῳ τῷ χωλῷ ποδὶ προσπταίσας λίθῳ τραῦμα ἐξ ἀφανοῦς λάβῃ, ὁ τοιοῦτος εἶχε μὲν δήπου σύμβαμα τὴν χωλείαν, τὸ τραῦμα δὲ παρασύμβαμα προσέλαβεν.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">ΔΙΑΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[20]</span> Κάλεσε άλλον· εκείνον τον κουρεμένο σύρριζα, τον κατσουφιασμένο, αυτόν από τη Στοά.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Καλά λες. Φαίνεται να τον περιμένει ένα μεγάλο πλήθος από αυτούς που είναι συγκεντρωμένοι στον χώρο της αγοράς. Πουλάω την ίδια την αρετή, τον πιο τέλειο από όλους τους βίους. Ποιός θέλει να τα ξέρει όλα μόνο αυτός;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πώς γίνεται αυτό που λες;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Επειδή μόνο αυτός είναι σοφός, μόνο αυτός ωραίος, μόνο αυτός δίκαιος, γενναίος, βασιλιάς, ρήτορας, πλούσιος, νομοθέτης, και οτιδήποτε άλλο υπάρχει.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Είναι λοιπόν και ο μοναδικός μάγειρας και, μά τον Δία, ο μοναδικός βυρσοδέψης ή ξυλουργός, και τα παρόμοια;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Έτσι φαίνεται.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[21]</span> Έλα, αγαπητέ μου, πες σ᾽ εμένα τον αγοραστή τί λογής είσαι, και πρώτα απ᾽ όλα αν δεν στενοχωριέσαι που σε πουλάνε και που είσαι δούλος.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Καθόλου· γιατί αυτά δεν εξαρτώνται από εμάς. Κι αυτά που δεν εξαρτώνται από εμάς είναι «αδιάφορα».</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Δεν καταλαβαίνω τί ακριβώς λες.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Τί λες; Δεν καταλαβαίνεις ότι από τα πράγματα αυτού του είδους άλλα είναι «προτιμητέα», ενώ αντίθετα άλλα είναι «απορριπτέα»;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ούτε και τώρα καταλαβαίνω.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Πολύ φυσικό· δεν είσαι εξοικειωμένος με την ορολογία μας, ούτε έχεις την «αντιληπτική ικανότητα», ενώ ο «ενάρετος», που κατέχει καλά τη «θεωρία της λογικής», γνωρίζει όχι μόνο αυτά, αλλά και τί λογής είναι το «τυχαίο γεγονός» και το «επιπρόσθετο τυχαίο γεγονός», και πόσο διαφέρουν μεταξύ τους.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Για όνομα της σοφίας σου, μη διστάσεις να μου πεις τί είναι το «τυχαίο γεγονός» και το «επιπρόσθετο τυχαίο γεγονός»· γιατί κι εγώ δεν ξέρω πώς εντυπωσιάστηκα από τον ρυθμό αυτών των όρων.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Δεν έχω κανέναν δισταγμό. Αν κάποιος που είναι κουτσός σκοντάψει με το ίδιο εκείνο κουτσό πόδι σε μια πέτρα και τραυματιστεί αναπάντεχα, αυτός είχε ασφαλώς «τυχαίο γεγονός» την χωλότητα, και του προστέθηκε το τραύμα ως «επιπρόσθετο τυχαίο γεγονός».</span></p>
+        </div>
+        
+
+        
+        <div class="page-divider" id="page-9" data-hash="book-5-chapter--">
+            Πώληση του  βίου του Χρύσιππου • Κεφάλαιο ΑΓΟΡΑΣΤΗΣ-ΧΡΥΣΙΠΠΟΣ (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=94&page=9" target="_blank" class="page-link">Page 9</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[22]</span> Ὢ τῆς ἀγχινοίας· τί δὲ ἄλλο μάλιστα φὴς εἰδέναι;</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Τὰς τῶν λόγων πλεκτάνας αἷς συμποδίζω τοὺς προσομιλοῦντας καὶ ἀποφράττω καὶ σιωπᾶν ποιῶ, φιμὸν ἀτεχνῶς αὐτοῖς περιτιθείς· ὄνομα δὲ τῇ δυνάμει ταύτῃ ὁ ἀοίδιμος συλλογισμός.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἡράκλεις, ἄμαχόν τινα καὶ βίαιον λέγεις.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Σκόπει γοῦν· ἔστι σοι παιδίον;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τί μήν;</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Τοῦτο ἤν πως κροκόδειλος ἁρπάσῃ πλησίον τοῦ ποταμοῦ πλαζόμενον εὑρών, κᾆτά σοι ἀποδώσειν ὑπισχνῆται αὐτό, ἢν εἴπῃς τἀληθὲς ὅ τι δέδοκται αὐτῷ περὶ τῆς ἀποδόσεως τοῦ βρέφους, τί φήσεις αὐτὸν ἐγνωκέναι;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Δυσαπόκριτον ἐρωτᾷς. ἀπορῶ γὰρ ὁπότερον εἰπὼν ἀπολάβοιμι. ἀλλὰ σὺ πρὸς Διὸς ἀποκρινάμενος ἀνάσωσαί μοι τὸ παιδίον, μὴ καὶ φθάσῃ αὐτὸ καταπιών.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Θάρρει· καὶ ἄλλα γάρ σε διδάξομαι θαυμασιώτερα.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τὰ ποῖα;</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Τὸν θερίζοντα καὶ τὸν κυριεύοντα καὶ ἐπὶ πᾶσι τὴν Ἠλέκτραν καὶ τὸν ἐγκεκαλυμμένον.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τίνα τοῦτον τὸν ἐγκεκαλυμμένον ἢ τίνα τὴν Ἠλέκτραν λέγεις;</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Ἠλέκτραν μὲν ἐκείνην τὴν πάνυ, τὴν Ἀγαμέμνονος, ἣ τὰ αὐτὰ οἶδέ τε ἅμα καὶ οὐκ οἶδε· παρεστῶτος γὰρ αὐτῇ τοῦ Ὀρέστου ἔτι ἀγνῶτος οἶδε μὲν Ὀρέστην, ὅτι ἀδελφὸς αὐτῆς, ὅτι δὲ οὗτος Ὀρέστης ἀγνοεῖ. τὸν δ᾽ αὖ ἐγκεκαλυμμένον καὶ πάνυ θαυμαστὸν ἀκούσῃ λόγον· ἀπόκριναι γάρ μοι, τὸν πατέρα οἶσθα τὸν σεαυτοῦ;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ναί.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Τί οὖν; ἤν σοι παραστήσας τινὰ ἐγκεκαλυμμένον ἔρωμαι, τοῦτον οἶσθα; τί φήσεις;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Δηλαδὴ ἀγνοεῖν.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[23]</span> Ἀλλὰ μὴν αὐτὸς οὗτος ἦν ὁ πατὴρ ὁ σός· ὥστε εἰ τοῦτον ἀγνοεῖς, δῆλος εἶ τὸν πατέρα τὸν σὸν ἀγνοῶν.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Οὐ μὲν οὖν· ἀλλ᾽ ἀποκαλύψας αὐτὸν εἴσομαι τὴν ἀλήθειαν. ὅμως δ᾽ οὖν τί σοι τῆς σοφίας τὸ τέλος, ἢ τί πράξεις πρὸς τὸ ἀκρότατον τῆς ἀρετῆς ἀφικόμενος;</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Περὶ τὰ πρῶτα κατὰ φύσιν τότε γενήσομαι, λέγω δὲ πλοῦτον, ὑγίειαν καὶ τὰ τοιαῦτα. πρότερον δὲ ἀνάγκη πολλὰ προπονῆσαι λεπτογράφοις βιβλίοις παραθήγοντα τὴν ὄψιν καὶ σχόλια συναγείροντα καὶ σολοικισμῶν ἐμπιπλάμενον καὶ ἀτόπων ῥημάτων· καὶ τὸ κεφάλαιον, οὐ θέμις γενέσθαι σοφόν, ἢν μὴ τρὶς ἐφεξῆς τοῦ ἐλλεβόρου πίῃς.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Γενναῖά σου ταῦτα καὶ δεινῶς ἀνδρικά. τὸ δὲ Γνίφωνα εἶναι καὶ τοκογλύφον —καὶ γὰρ τάδε ὁρῶ σοι προσόντα— τί φῶμεν, ἀνδρὸς ἤδη πεπωκότος τὸν ἐλλέβορον καὶ τελείου πρὸς ἀρετήν;</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Ναί· μόνῳ γοῦν τὸ δανείζειν πρέποι ἂν τῷ σοφῷ· ἐπεὶ γὰρ ἴδιον αὐτοῦ συλλογίζεσθαι, τὸ δανείζειν δὲ καὶ λογίζεσθαι τοὺς τόκους πλησίον εἶναι δοκεῖ τῷ συλλογίζεσθαι, μόνου ἂν εἴη τοῦ σπουδαίου καθάπερ ἐκεῖνο καὶ τοῦτο, καὶ οὐ μόνον γε ἁπλοῦς, ὥσπερ οἱ ἄλλοι, τοὺς τόκους, ἀλλὰ καὶ τούτων ἑτέρους τόκους λαμβάνειν· ἢ γὰρ ἀγνοεῖς ὅτι τῶν τόκων οἱ μέν εἰσι πρῶτοί τινες, οἱ δὲ δεύτεροι, καθάπερ αὐτῶν ἐκείνων ἀπόγονοι; ὁρᾷς δὲ δὴ καὶ τὸν συλλογισμὸν ὁποῖά φησιν· εἰ τὸν πρῶτον τόκον λήψεται, λήψεται καὶ τὸν δεύτερον· ἀλλὰ μὴν τὸν πρῶτον λήψεται, λήψεται ἄρα καὶ τὸν δεύτερον.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[22]</span> Πω πω, τί εξυπνάδα! Και τί άλλο ισχυρίζεσαι πως γνωρίζεις καλύτερα;</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Τους περίπλοκους λόγους, με τους οποίους ακινητοποιώ τους συνομιλητές μου και τους αποστομώνω και τους κάνω να σωπάσουνε, βάζοντάς τους πραγματικά φίμωτρο. Και το όνομα της δύναμής μου αυτής είναι ο ξακουστός «συλλογισμός».</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ηρακλή μου, μιλάς για κάποιον ακαταμάχητο και βίαιο.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Δώσε λοιπόν προσοχή. Έχεις παιδί;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Και λοιπόν;</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Αυτό, αν το αρπάξει ένας κροκόδειλος, βρίσκοντάς το να τριγυρνάει κοντά στο ποτάμι, κι έπειτα υπόσχεται να σου το επιστρέψει, αν του πεις πραγματικά τί έχει αποφασίσει για την επιστροφή του μωρού, τί απόφαση θα του πεις πως έχει πάρει;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Δύσκολη η απάντηση στην ερώτησή σου. Αναρωτιέμαι με ποιά από τις δύο πιθανές απαντήσεις θα μπορούσα να το πάρω πίσω. Αλλά, για όνομα του Δία, απάντησε εσύ, και σώσε το παιδί μου, μήπως και προλάβει να το καταπιεί.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Μη φοβάσαι. Θα σε διδάξω και άλλα ακόμη πιο αξιοθαύμαστα.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τί λογής, δηλαδή;</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Αυτόν που «θερίζει» και αυτόν που «κυριεύει», και επιπλέον την «Ηλέκτρα» και τον «σκεπασμένο με κάλυμμα».</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ποιός είναι αυτός ο «σκεπασμένος με κάλυμμα» που λες, και ποιά η «Ηλέκτρα»;</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Η «Ηλέκτρα» είναι εκείνη η περίφημη, η κόρη του Αγαμέμνονα, η οποία τα ίδια πράγματα συγχρόνως και τα γνωρίζει και δεν τα γνωρίζει: Ενώ στέκεται μπροστά της ο Ορέστης, τον οποίο δεν έχει αναγνωρίσει ακόμη, και ο οποίος της φέρνει τάχα τα οστά του Ορέστη, από τη μια γνωρίζει τον Ορέστη, ότι είναι αδελφός της, από την άλλη όμως αγνοεί ότι εκείνος είναι ο Ορέστης. Όσο για τον «σκεπασμένο με κάλυμμα» θα ακούσεις έναν εξαιρετικά αξιοθαύμαστο λόγο. Απάντησέ μου, τον πατέρα τον δικό σου τον γνωρίζεις;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ναι.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Τί λοιπόν; Αν σου παρουσιάσω κάποιον σκεπασμένο με κάλυμμα και σε ρωτήσω «αυτόν τον γνωρίζεις;», τί θα μου πεις;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Φυσικά, ότι δεν τον γνωρίζω.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[23]</span> Κι όμως αυτός ο ίδιος ήταν ο πατέρας ο δικός σου. Συνεπώς, αν δεν γνωρίζεις αυτόν, είναι φανερό ότι δεν γνωρίζεις τον πατέρα σου.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Όχι βέβαια· αντίθετα, θα τον ξεσκεπάσω και θα μάθω την αλήθεια. Ποιά όμως είναι η τελική επιδίωξη της σοφίας σου, και τί θα κάνεις όταν φτάσεις στο αποκορύφωμα της αρετής;</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Θα ασχοληθώ τότε με τα πιο σημαντικά πράγματα που βρίσκονται σε αρμονία με τη φύση, εννοώ τον πλούτο, την υγεία και τα παρόμοια. Προηγουμένως όμως είναι ανάγκη να κοπιάσω πολύ, οξύνοντας την όρασή μου με πυκνογραμμένα βιβλία και συγκεντρώνοντας σχόλια και γεμίζοντας από σολοικισμούς και αλλόκοτες λέξεις. Και για να συνοψίσω, δεν είναι θεμιτό να γίνεις σοφός, αν δεν πιεις αλλεπάλληλα τρεις φορές τον ελλέβορο.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Αυτά που λες δείχνουν αρχοντιά και εξαιρετική ανδροπρέπεια. Για το γεγονός όμως ότι είσαι Γνίφωνας και τοκογλύφος —γιατί βλέπω πως έχεις κι αυτά τα χαρακτηριστικά— τί να πούμε, για έναν άνδρα που ήδη έχει πιει τον ελλέβορο κι έχει φτάσει στην τελειότητα της αρετής;</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Ναι· ασφαλώς μόνο στον σοφό θα ταίριαζε το να δανείζει. Δηλαδή, επειδή το ιδιαίτερο χαρακτηριστικό του είναι ο συλλογισμός, και ο δανεισμός και ο λογαριασμός των τόκων είναι παραπλήσια με τον συλλογισμό, μόνο ο «ενάρετος» θα ήταν κατάλληλος και για τον δεύτερο, όπως και για τον πρώτο, και θα μπορούσε να εισπράττει όχι μόνο απλούς τόκους, όπως οι άλλοι, αλλά επιπλέον και άλλους τόκους των τόκων. Ή μήπως δεν γνωρίζεις ότι από τους τόκους άλλοι είναι πρώτοι και άλλοι δεύτεροι, σαν να είναι γέννημα εκείνων ακριβώς των πρώτων; Βλέπεις επίσης τί λέει και ο συλλογισμός: «Αν πάρει τον πρώτο τόκο, θα πάρει και τον δεύτερο· ασφαλώς όμως θα πάρει τον πρώτο· συνεπώς και τον δεύτερο».</span></p>
+        </div>
+        
+
+        
+        <div class="page-divider" id="page-10" data-hash="book-5-chapter--">
+            Πώληση του  βίου του Χρύσιππου • Κεφάλαιο ΑΓΟΡΑΣΤΗΣ-ΕΡΜΗΣ (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=94&page=10" target="_blank" class="page-link">Page 10</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[24]</span> Οὐκοῦν καὶ μισθῶν πέρι τὰ αὐτὰ φῶμεν, οὓς σὺ λαμβάνεις ἐπὶ τῇ σοφίᾳ παρὰ τῶν νέων, καὶ δῆλον ὅτι μόνος ὁ σπουδαῖος μισθὸν ἐπὶ τῇ ἀρετῇ λήψεται;</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Μανθάνεις· οὐ γὰρ ἐμαυτοῦ ἕνεκα λαμβάνω, τοῦ δὲ διδόντος αὐτοῦ χάριν· ἐπεὶ γάρ ἐστιν ὁ μέν τις ἐκχύτης, ὁ δὲ περιεκτικός, ἐμαυτὸν μὲν ἀσκῶ εἶναι περιεκτικόν, τὸν δὲ μαθητὴν ἐκχύτην.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Καὶ μὴν τοὐναντίον ἐχρῆν τὸν νέον μὲν εἶναι περιεκτικόν, σὲ δὲ τὸν μόνον πλούσιον ἐκχύτην.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Σκώπτεις, ὦ οὗτος. ἀλλ᾽ ὅρα μή σε ἀποτοξεύσω τῷ ἀναποδείκτῳ συλλογισμῷ.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Καὶ τί δεινὸν ἀπὸ τοῦ βέλους;</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Ἀπορία καὶ σιωπὴ καὶ διαστραφῆναι τὴν διάνοιαν. <span class="marker">[25]</span> ὃ δὲ μέγιστον, ἢν ἐθέλω, τάχιστά σε ἀποδείξω λίθον.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πῶς λίθον; οὐ γὰρ Περσεὺς σύ, ὦ βέλτιστε, εἶναί μοι δοκεῖς.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Ὧδέ πως· ὁ λίθος σῶμά ἐστι;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ναί.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Τί δέ; τὸ ζῷον οὐ σῶμα;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ναί.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Σὺ δὲ ζῷον;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἔοικα γοῦν.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Λίθος ἄρα εἶ σῶμα ὤν.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Μηδαμῶς. ἀλλ᾽ ἀνάλυσόν με πρὸς τοῦ Διὸς καὶ ἐξ ὑπαρχῆς ποίησον ἄνθρωπον.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Οὐ χαλεπόν· ἀλλ᾽ ἔμπαλιν ἴσθι ἄνθρωπος. εἰπὲ γάρ μοι, πᾶν σῶμα ζῷον;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Οὔ.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Τί δέ; λίθος ζῷον;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Οὔ.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Σὺ δὲ σῶμα εἶ;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ναί.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Σῶμα δὲ ὢν ζῷον εἶ;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ναί.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Οὐκ ἄρα λίθος εἶ ζῷόν γε ὤν.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Εὖ γε ἐποίησας, ὡς ἤδη μου τὰ σκέλη καθάπερ τῆς Νιόβης ἀπεψύχετο καὶ πάγια ἦν. ἀλλὰ ὠνήσομαί γε σέ. πόσον ὑπὲρ αὐτοῦ καταβαλῶ;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Μνᾶς δώδεκα.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Λάμβανε.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Μόνος δὲ αὐτὸν ἐώνησαι;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Μὰ Δί᾽, ἀλλ᾽ οὗτοι πάντες οὓς ὁρᾷς.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πολλοί γε καὶ τοὺς ὤμους καρτεροὶ καὶ τοῦ θερίζοντος ἄξιοι.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[24]</span> Τα ίδια λοιπόν θα πούμε και για τις αμοιβές που εισπράττεις εσύ για τη σοφία σου από τους νέους; Είναι δηλαδή ολοφάνερο πως μόνο ο «ενάρετος» θα εισπράξει αμοιβή για την αρετή του;</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Καλά το κατάλαβες· δεν τα εισπράττω για τον εαυτό μου, αλλά για χάρη εκείνου του ίδιου που τα καταβάλλει. Δηλαδή, επειδή υπάρχουν αυτοί που είναι «μεταδοτικοί», σε αντιδιαστολή με αυτούς που είναι «αποδεκτικοί», εξασκώ τον εαυτό μου να είναι «αποδεκτικός» και τον μαθητή μου να είναι «μεταδοτικός».</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Κι όμως, θα έπρεπε αντίθετα ο νέος να είναι «αποδεκτικός», και εσύ, ο μόνος πλούσιος, να είσαι «μεταδοτικός».</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Με κοροϊδεύεις, φίλε. Πρόσεχε όμως να μη σε κατακεραυνώσω με τον αναπόδεικτο συλλογισμό.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Και τί φοβερό έχει η βολή αυτή;</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Αμηχανία και σιωπή και αποσυντονισμό του μυαλού. <span class="marker">[25]</span> Και το σημαντικότερο: αν θέλω, μπορώ ταχύτατα να σε μετατρέψω σε πέτρα.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πώς πέτρα; Δεν μου φαίνεται, λεβέντη μου, να είσαι ο Περσέας.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Νά πώς. Η πέτρα είναι σώμα;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ναι.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Λοιπόν, ο ζωντανός οργανισμός δεν είναι σώμα;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ναι.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Εσύ είσαι ζωντανός οργανισμός;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Έτσι φαίνεται τουλάχιστον.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Άρα είσαι πέτρα, αφού είσαι σώμα.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Κάθε άλλο. Αλλά αναδιάρθρωσέ με, για όνομα του Δία, και κάνε με και πάλι άνθρωπο.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Δεν είναι δύσκολο. Γίνε λοιπόν και πάλι άνθρωπος. Γιά πες μου, κάθε σώμα είναι ζωντανός οργανισμός;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Όχι.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Λοιπόν, η πέτρα είναι ζωντανός οργανισμός;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Όχι.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Κι εσύ είσαι σώμα;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ναι.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Καθώς λοιπόν είσαι σώμα, είσαι ζωντανός οργανισμός;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ναι.</span></p>
+<p class="passage"><span class="passage-text">ΧΡΥΣΙΠΠΟΣ</span></p>
+<p class="passage"><span class="passage-text">Άρα δεν είσαι πέτρα, αφού είσαι ζωντανός οργανισμός.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Καλά το έκανες, γατί τα πόδια μου είχαν ήδη αρχίσει να παγώνουν και να στερεοποιούνται, όπως της Νιόβης. Ε, λοιπόν, θα σε αγοράσω. Πόσο θα πρέπει να πληρώσω γι᾽ αυτόν;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Δώδεκα μνες.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πάρ᾽ τες.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Μόνος σου τον αγόρασες;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Όχι, μά τον Δία, αλλά όλοι αυτοί που βλέπεις.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Είναι πολλοί, και με δυνατούς ώμους, και άξιοι του λόγου που «θερίζει».</span></p>
+        </div>
+        
+
+        <div id="book-6-chapter--" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-11" data-hash="book-6-chapter--">
+            Πώληση του  βίου του Αριστοτέλη και του Πύρρωνα • Κεφάλαιο ΔΙΑΣ-ΕΡΜΗΣ (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=94&page=11" target="_blank" class="page-link">Page 11</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ΖΕΥΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[26]</span> Μὴ διάτριβε· ἄλλον κάλει τὸν Περιπατητικόν.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Σέ φημι, τὸν καλόν, τὸν πλούσιον. ἄγε δή, ὠνήσασθε τὸν συνετώτατον, τὸν ἅπαντα ὅλως ἐπιστάμενον.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ποῖος δέ τις ἐστί;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Μέτριος, ἐπιεικής, ἁρμόδιος τῷ βίῳ, τὸ δὲ μέγιστον, διπλοῦς.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πῶς λέγεις;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἄλλος μὲν ὁ ἔκτοσθεν φαινόμενος, ἄλλος δὲ ὁ ἔντοσθεν εἶναι δοκεῖ· ὥστε ἢν πρίῃ αὐτόν, μέμνησο τὸν μὲν ἐξωτερικόν, τὸν δὲ ἐσωτερικὸν καλεῖν.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τί δὲ γινώσκει μάλιστα;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τρία εἶναι τὰ ἀγαθά, ἐν ψυχῇ, ἐν σώματι, ἐν τοῖς ἐκτός.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἀνθρώπινα φρονεῖ. πόσου δέ ἐστιν;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Εἴκοσι μνῶν.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πολλοῦ λέγεις.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Οὔκ, ὦ μακάριε· καὶ γὰρ αὐτὸς ἔχειν τι ἀργύριον δοκεῖ, ὥστε οὐκ ἂν φθάνοις ὠνούμενος. ἔτι δὲ εἴσῃ αὐτίκα μάλα παρ᾽ αὐτοῦ πόσον μὲν ὁ κώνωψ βιοῖ τὸν χρόνον, ἐφ᾽ ὁπόσον δὲ βάθος ἡ θάλαττα ὑπὸ τοῦ ἡλίου καταλάμπεται, καὶ ὁποία τίς ἐστιν ἡ ψυχὴ τῶν ὀστρείων.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἡράκλεις τῆς ἀκριβολογίας.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τί δὲ εἰ ἀκούσειας ἄλλα πολλῷ τούτων ὀξυδερκέστερα, γονῆς τε πέρι καὶ γενέσεως καὶ τῆς ἐν ταῖς μήτραις τῶν ἐμβρύων πλαστικῆς, καὶ ὡς ἄνθρωπος μὲν γελαστικόν, ὄνος δὲ οὐ γελαστικὸν οὐδὲ τεκταινόμενον οὐδὲ πλωϊζόμενον;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πάνσεμνα φὴς καὶ ὀνησιφόρα τὰ μαθήματα, ὥστε ὠνοῦμαι αὐτὸν τῶν εἴκοσιν.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[27]</span> Εἶεν.</span></p>
+<p class="passage"><span class="passage-text">ΖΕΥΣ</span></p>
+<p class="passage"><span class="passage-text">Τίς λοιπὸς ἡμῖν;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Καταλείπεται ὁ Σκεπτικὸς οὗτος. σὺ ὁ Πυρρίας πρόσιθι καὶ ἀποκηρύττου κατὰ τάχος. ἤδη μὲν ὑπορρέουσιν οἱ πολλοὶ καὶ ἐν ὀλίγοις ἡ πρᾶσις ἔσται. ὅμως δὲ τίς καὶ τοῦτον ὠνήσεται;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἔγωγε. ἀλλὰ πρῶτον εἰπέ μοι, σὺ τί ἐπίστασαι;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΡΡΩΝ</span></p>
+<p class="passage"><span class="passage-text">Οὐδέν.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πῶς τοῦτο ἔφησθα;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΡΡΩΝ</span></p>
+<p class="passage"><span class="passage-text">Ὅτι οὐδὲν ὅλως εἶναί μοι δοκεῖ.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Οὐδὲ ἡμεῖς ἄρα ἐσμέν τινες;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΡΡΩΝ</span></p>
+<p class="passage"><span class="passage-text">Οὐδὲ τοῦτο οἶδα.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Οὐδὲ ὅτι σύ τις ὢν τυγχάνεις;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΡΡΩΝ</span></p>
+<p class="passage"><span class="passage-text">Πολὺ μᾶλλον ἔτι τοῦτο ἀγνοῶ.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ὢ τῆς ἀπορίας. τί δέ σοι τὰ σταθμία ταυτὶ βούλεται;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΡΡΩΝ</span></p>
+<p class="passage"><span class="passage-text">Ζυγοστατῶ ἐν αὐτοῖς τοὺς λόγους καὶ πρὸς τὸ ἴσον ἀπευθύνω, καὶ ἐπειδὰν ἀκριβῶς ὁμοίους τε καὶ ἰσοβαρεῖς ἴδω, τότε δὴ τότε ἀγνοῶ τὸν ἀληθέστερον.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τῶν ἄλλων δὲ τί ἂν πράττοις ἐμμελῶς;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΡΡΩΝ</span></p>
+<p class="passage"><span class="passage-text">Τὰ πάντα πλὴν δραπέτην μεταδιώκειν.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τί δὲ τοῦτό σοι ἀδύνατον;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΡΡΩΝ</span></p>
+<p class="passage"><span class="passage-text">Ὅτι, ὦγαθέ, οὐ καταλαμβάνω.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Εἰκότως· βραδὺς γὰρ καὶ νωθής τις εἶναι δοκεῖς. ἀλλὰ τί σοι τὸ τέλος τῆς ἐπιστάσεως;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΡΡΩΝ</span></p>
+<p class="passage"><span class="passage-text">Ἡ ἀμαθία καὶ τὸ μήτε ἀκούειν μήτε ὁρᾶν.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Οὐκοῦν καὶ τὸ τυφλὸς ἅμα καὶ κωφὸς εἶναι λέγεις;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΡΡΩΝ</span></p>
+<p class="passage"><span class="passage-text">Καὶ ἄκριτός γε προσέτι καὶ ἀναίσθητος καὶ ὅλως τοῦ σκώληκος οὐδὲν διαφέρων.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ὠνητέος εἶ διὰ ταῦτα. πόσου τοῦτον ἄξιον χρὴ φάναι;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Μνᾶς Ἀττικῆς·</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Λάμβανε. τί φής, ὦ οὗτος; ἐώνημαι σε;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΡΡΩΝ</span></p>
+<p class="passage"><span class="passage-text">Ἄδηλον.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Μηδαμῶς· ἐώνημαι γὰρ καὶ τἀργύριον κατέβαλον.</span></p>
+<p class="passage"><span class="passage-text">ΠΥΡΡΩΝ</span></p>
+<p class="passage"><span class="passage-text">Ἐπέχω περὶ τούτου καὶ διασκέπτομαι.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Καὶ μὴν ἀκολούθει μοι, καθάπερ χρὴ ἐμὸν οἰκέτην.</span></p>
+<p class="passage"><span class="passage-text">ΠΥΡΡΩΝ</span></p>
+<p class="passage"><span class="passage-text">Τίς οἶδεν εἰ ἀληθῆ ταῦτα φής;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ὁ κῆρυξ καὶ ἡ μνᾶ καὶ οἱ παρόντες.</span></p>
+<p class="passage"><span class="passage-text">ΠΥΡΡΩΝ</span></p>
+<p class="passage"><span class="passage-text">Πάρεισι γὰρ ἡμῖν τινες;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἀλλ᾽ ἔγωγέ σε ἤδη ἐμβαλὼν ἐς τὸν μυλῶνα πείσω εἶναι δεσπότης κατὰ τὸν χείρω λόγον.</span></p>
+<p class="passage"><span class="passage-text">ΠΥΡΡΩΝ</span></p>
+<p class="passage"><span class="passage-text">Ἔπεχε περὶ τούτου.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Μὰ Δί᾽, ἀλλ᾽ ἤδη γε ἀπεφηνάμην.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Σὺ μὲν παῦσαι ἀντιτείνων καὶ ἀκολούθει τῷ πριαμένῳ, ὑμᾶς δὲ εἰς αὔριον παρακαλοῦμεν· ἀποκηρύξειν γὰρ τοὺς ἰδιώτας καὶ βαναύσους καὶ ἀγοραίους βίους μέλλομεν.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">ΔΙΑΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[26]</span> Μην καθυστερείς. Κάλεσε άλλον.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Εσένα λέω, τον Περιπατητικό, τον όμορφο, τον πλούσιο. Εμπρός λοιπόν, αγοράστε τον πιο συνετό, αυτόν που γενικά γνωρίζει τα πάντα.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Και τί λογής είναι;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Μετριοπαθής, ευπρεπής, προσαρμοσμένος στη ζωή, και το σημαντικότερο, διπλός.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πώς είναι δυνατό;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Άλλος είναι αυτός που φαίνεται από έξω, και άλλος είναι αυτός που γνωρίζεις από μέσα. Συνεπώς, αν τον αγοράσεις, να θυμάσαι να ονομάζεις τον έναν «εξωτερικό», και τον άλλο «εσωτερικό».</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Και τί γνωρίζει καλύτερα;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ότι τα αγαθά είναι τριών ειδών: στην ψυχή, στο σώμα, στα εξωτερικά πράγματα.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ανθρώπινα σκέφτεται. Και πόσο κοστίζει;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Είκοσι μνες.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πολλά είναι.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Όχι, ευλογημένε. Άλλωστε κι αυτός φαίνεται να έχει κάποια χρήματα, ώστε ίσως να μην προλάβεις να τον αγοράσεις. Επίσης θα μάθεις αμέσως απ᾽ αυτόν πόσο χρόνο ζει το κουνούπι, σε ποιό βάθος φτάνει το φως του ήλιου μέσα στη θάλασσα, και τί λογής είναι η ψυχή των στρειδιών.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ηρακλή μου, τί ακριβολογία!</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πού και να ακούσεις για άλλα, που απαιτούν πολύ μεγαλύτερη παρατηρητικότητα απ᾽ ό,τι αυτά, για το σπέρμα και για τη σύλληψη και για τη διαμόρφωση των εμβρύων μέσα στις μήτρες, και ότι ο άνθρωπος έχει την ικανότητα να γελάει, ενώ ο γάιδαρος δεν έχει την ικανότητα ούτε να γελάει ούτε να κάνει ξύλινες κατασκευές ούτε να πλέει στη θάλασσα.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Μιλάς για μαθήματα πολύ σοβαρά και χρήσιμα. Θα τον αγοράσω λοιπόν για είκοσι μνες.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[27]</span> Ωραία.</span></p>
+<p class="passage"><span class="passage-text">ΔΙΑΣ</span></p>
+<p class="passage"><span class="passage-text">Ποιός μας έμεινε;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Έχει ξεμείνει αυτός εδώ ο Σκεπτικός. Εσύ, ο Πυρρίας, πλησίασε και έλα γρήγορα για πούλημα. Ήδη οι περισσότεροι άρχισαν να διασκορπίζονται, και η πώληση θα γίνει σε λίγους. Ας είναι· ποιός θα τον αγοράσει κι αυτόν;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Εγώ. Πρώτα όμως πες μου, εσύ τί γνωρίζεις;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΡΡΩΝΑΣ</span></p>
+<p class="passage"><span class="passage-text">Τίποτε.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πώς το λες αυτό;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΡΡΩΝΑΣ</span></p>
+<p class="passage"><span class="passage-text">Επειδή μου φαίνεται πως γενικά δεν υπάρχει τίποτε.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ούτε λοιπόν εμείς δεν είμαστε κάποιοι;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΡΡΩΝΑΣ</span></p>
+<p class="passage"><span class="passage-text">Ούτε κι αυτό το ξέρω.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ούτε ότι εσύ είσαι κάποιος;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΡΡΩΝΑΣ</span></p>
+<p class="passage"><span class="passage-text">Αυτό είναι που το αγνοώ ακόμη περισσότερο.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πω πω, τί αμηχανία! Κι αυτή εδώ η ζυγαριά τί σου χρειάζεται;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΡΡΩΝΑΣ</span></p>
+<p class="passage"><span class="passage-text">Ζυγίζω σ᾽ αυτήν τα λογικά επιχειρήματα, και αποκαθιστώ την ισορροπία στη ζυγαριά. Όταν λοιπόν τα βρίσκω ακριβώς όμοια και με το ίδιο βάρος, τότε ακριβώς είναι που δεν γνωρίζω ποιό είναι το πιο σωστό.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Κι από τα άλλα πράγματα τί θα μπορούσες να κάνεις σωστά;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΡΡΩΝΑΣ</span></p>
+<p class="passage"><span class="passage-text">Τα πάντα, εκτός από την καταδίωξη ενός δραπέτη δούλου.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Και γιατί αυτό σού είναι αδύνατο;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΡΡΩΝΑΣ</span></p>
+<p class="passage"><span class="passage-text">Επειδή, αγαπητέ μου, δεν καταφέρνω να τον συλλάβω.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πολύ φυσικό· φαίνεται πως είσαι αργός και νωθρός. Ποιός όμως είναι ο απώτερος σκοπός της σοφίας σου;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΡΡΩΝΑΣ</span></p>
+<p class="passage"><span class="passage-text">Η άγνοια, και το να μην ακούω και να μη βλέπω τίποτε.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Εννοείς δηλαδή πως είσαι συγχρόνως και τυφλός και κουφός;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΡΡΩΝΑΣ</span></p>
+<p class="passage"><span class="passage-text">Και επιπλέον χωρίς κρίση και συναισθήματα, και γενικά δεν διαφέρω καθόλου από το σκουλήκι.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Γι᾽ αυτό θα πρέπει να σε αγοράσω. Πόσο θα έλεγες ότι αξίζει αυτός;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Μία αττική μνα.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πάρ᾽ την. Τί λες, φίλε; Σε αγόρασα;</span></p>
+<p class="passage"><span class="passage-text">ΠΥΡΡΩΝΑΣ</span></p>
+<p class="passage"><span class="passage-text">Αβέβαιο.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Κάθε άλλο· σε αγόρασα, και πλήρωσα τα χρήματα.</span></p>
+<p class="passage"><span class="passage-text">ΠΥΡΡΩΝΑΣ</span></p>
+<p class="passage"><span class="passage-text">Αναβάλλω την κρίση μου γι᾽ αυτό, και το εξετάζω διεξοδικά.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Εμπρός, ακολούθα με, όπως είσαι υποχρεωμένος ως υπηρέτης μου.</span></p>
+<p class="passage"><span class="passage-text">ΠΥΡΡΩΝΑΣ</span></p>
+<p class="passage"><span class="passage-text">Ποιός ξέρει αν αυτά που λες είναι αλήθεια;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ο κήρυκας και η μνα και οι παρόντες.</span></p>
+<p class="passage"><span class="passage-text">ΠΥΡΡΩΝΑΣ</span></p>
+<p class="passage"><span class="passage-text">Είναι παρόντες κοντά μας κάποιοι;</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Εγώ πάντως θα σε πετάξω τώρα στη δουλειά του μύλου, και θα σε πείσω πως είμαι το αφεντικό σου με το χειρότερο λογικό επιχείρημα.</span></p>
+<p class="passage"><span class="passage-text">ΠΥΡΡΩΝΑΣ</span></p>
+<p class="passage"><span class="passage-text">Ανάβαλε την κρίση σου γι᾽ αυτό.</span></p>
+<p class="passage"><span class="passage-text">ΑΓΟΡΑΣΤΗΣ</span></p>
+<p class="passage"><span class="passage-text">Όχι, μά τον Δία, μια και ήδη έχω εκφράσει άποψη.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Εσύ πάψε να αντιστέκεσαι, και ακολούθα αυτόν που σε αγόρασε. Κι εσάς σας προσκαλούμε να έρθετε και πάλι αύριο. Σκοπεύουμε να φέρουμε για πούλημα τους βίους απαίδευτων και βιοπαλαιστών και ανθρώπων της αγοράς.</span></p>
+        </div>
+        
+        </section>
+    </main>
+
+    <script>
+        // Layout and Theme controls
+        function toggleLayout() {
+            const body = document.body;
+            const btn = document.getElementById('toggle-layout-btn');
+            
+            if (body.classList.contains('hide-original')) {
+                body.classList.remove('hide-original');
+                btn.innerText = 'Hide Original';
+                localStorage.setItem('ebook-hide-original', 'false');
+            } else {
+                body.classList.add('hide-original');
+                btn.innerText = 'Show Original';
+                localStorage.setItem('ebook-hide-original', 'true');
+            }
+        }
+
+        function setTheme(theme, buttonElement) {
+            if (theme === 'light') {
+                document.documentElement.removeAttribute('data-theme');
+            } else {
+                document.documentElement.setAttribute('data-theme', theme);
+            }
+            
+            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+            buttonElement.classList.add('active');
+            
+            localStorage.setItem('ebook-theme', theme);
+        }
+
+        function toggleSidebar() {
+            const body = document.body;
+            const overlay = document.getElementById('mobile-overlay');
+            const isMobile = window.innerWidth <= 900;
+            
+            if (isMobile) {
+                if (body.classList.contains('sidebar-open')) {
+                    body.classList.remove('sidebar-open');
+                    overlay.classList.remove('open');
+                } else {
+                    body.classList.add('sidebar-open');
+                    overlay.classList.add('open');
+                    // Close right sidebar if open
+                    body.classList.remove('chat-sidebar-open');
+                }
+            } else {
+                if (body.classList.contains('sidebar-closed')) {
+                    body.classList.remove('sidebar-closed');
+                    localStorage.setItem('ebook-sidebar-closed', 'false');
+                } else {
+                    body.classList.add('sidebar-closed');
+                    localStorage.setItem('ebook-sidebar-closed', 'true');
+                }
+            }
+        }
+        
+        function closeSidebarOnMobile() {
+            if (window.innerWidth <= 900) {
+                document.body.classList.remove('sidebar-open');
+                document.getElementById('mobile-overlay').classList.remove('open');
+            }
+        }
+        
+        function toggleMobileOptions() {
+            const header = document.querySelector('header');
+            const btn = document.querySelector('.options-toggle');
+            
+            if (header.classList.contains('options-open')) {
+                header.classList.remove('options-open');
+                document.body.classList.remove('mobile-options-open');
+                btn.classList.remove('active');
+            } else {
+                header.classList.add('options-open');
+                document.body.classList.add('mobile-options-open');
+                btn.classList.add('active');
+            }
+        }
+
+        // Adjusts sidebar height dynamically to match mobile visual viewport when virtual keyboard is launched
+        function adjustSidebarHeightForKeyboard() {
+            if (window.visualViewport) {
+                const chatSidebar = document.getElementById('chat-sidebar');
+                const isMobile = window.innerWidth <= 900;
+                if (isMobile && document.body.classList.contains('chat-sidebar-open')) {
+                    chatSidebar.style.height = window.visualViewport.height + 'px';
+                } else {
+                    chatSidebar.style.height = ''; // Fallback to CSS rules
+                }
+            }
+        }
+
+        // Right AI Sidebar Toggles
+        function toggleChatSidebar() {
+            const body = document.body;
+            if (body.classList.contains('chat-sidebar-open')) {
+                body.classList.remove('chat-sidebar-open');
+                adjustSidebarHeightForKeyboard();
+            } else {
+                body.classList.add('chat-sidebar-open');
+                // Close Left Sidebar on Mobile
+                if (window.innerWidth <= 900) {
+                    body.classList.remove('sidebar-open');
+                    document.getElementById('mobile-overlay').classList.remove('open');
+                }
+                // Focus text area
+                setTimeout(() => {
+                    document.getElementById('chat-input').focus();
+                    adjustSidebarHeightForKeyboard();
+                }, 100);
+            }
+        }
+
+        // AI Configuration Modal controls
+        function openAiSettings() {
+            document.getElementById('ai-config-modal').classList.add('open');
+            loadSavedAiSettings();
+        }
+
+        function closeAiSettings() {
+            document.getElementById('ai-config-modal').classList.remove('open');
+        }
+
+        function handleProviderChange() {
+            const p = document.getElementById('ai-provider').value;
+            const customUrlGroup = document.getElementById('group-custom-url');
+            const modelInput = document.getElementById('ai-model');
+
+            if (p === 'custom') {
+                customUrlGroup.style.display = 'flex';
+            } else {
+                customUrlGroup.style.display = 'none';
+            }
+
+            // Suggest model placeholders and default values based on provider selection
+            if (p === 'openai') {
+                modelInput.placeholder = 'gpt-4o-mini';
+                if (modelInput.value === 'gemini-flash-latest' || modelInput.value === '' || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gemini')) {
+                    modelInput.value = 'gpt-4o-mini';
+                }
+            } else if (p === 'anthropic') {
+                modelInput.placeholder = 'claude-3-5-sonnet-20241022';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('gemini') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'claude-3-5-sonnet-20241022';
+                }
+            } else if (p === 'gemini') {
+                modelInput.placeholder = 'gemini-flash-latest';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'gemini-flash-latest';
+                }
+            } else if (p === 'openrouter') {
+                modelInput.placeholder = 'meta-llama/llama-3-8b-instruct:free';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('gemini') || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'meta-llama/llama-3-8b-instruct:free';
+                }
+            } else if (p === 'custom') {
+                modelInput.placeholder = 'model-name';
+            }
+        }
+
+        function loadSavedAiSettings() {
+            const provider = localStorage.getItem('ai-prov') || 'openai';
+            const apiKey = localStorage.getItem('ai-key') || '';
+            const model = localStorage.getItem('ai-mod') || '';
+            const customUrl = localStorage.getItem('ai-url') || '';
+
+            document.getElementById('ai-provider').value = provider;
+            document.getElementById('ai-key').value = apiKey;
+            document.getElementById('ai-model').value = model;
+            document.getElementById('ai-custom-url').value = customUrl;
+
+            handleProviderChange();
+        }
+
+        function saveAiSettings() {
+            const provider = document.getElementById('ai-provider').value;
+            const apiKey = document.getElementById('ai-key').value;
+            const model = document.getElementById('ai-model').value;
+            const customUrl = document.getElementById('ai-custom-url').value;
+
+            localStorage.setItem('ai-prov', provider);
+            localStorage.setItem('ai-key', apiKey);
+            localStorage.setItem('ai-mod', model);
+            localStorage.setItem('ai-url', customUrl);
+
+            closeAiSettings();
+        }
+
+        // Text Selection & Chat logic
+        let currentSelection = "";
+        let currentContext = null;
+        let chatHistory = [];
+
+        function getPageContext(node) {
+            let current = node.nodeType === Node.TEXT_NODE ? node.parentElement : node;
+            let col = current.closest('.column');
+            if (!col) return null;
+
+            // Find the preceding page-divider element
+            let sibling = col.previousElementSibling;
+            while (sibling && !sibling.classList.contains('page-divider')) {
+                sibling = sibling.previousElementSibling;
+            }
+            if (!sibling) return null;
+
+            const pageNum = sibling.id.replace('page-', '');
+
+            // Identify parallel original and translation sibling columns
+            let origCol = sibling.nextElementSibling;
+            while (origCol && !origCol.classList.contains('original-col')) {
+                origCol = origCol.nextElementSibling;
+            }
+            let transCol = sibling.nextElementSibling;
+            while (transCol && !transCol.classList.contains('translation-col')) {
+                transCol = transCol.nextElementSibling;
+            }
+
+            const isOriginal = col.classList.contains('original-col');
+
+            return {
+                pageNum: pageNum,
+                dividerText: sibling.textContent.trim(),
+                originalText: origCol ? origCol.innerText : "",
+                translationText: transCol ? transCol.innerText : "",
+                selectedColType: isOriginal ? "original" : "translation"
+            };
+        }
+
+        function handleTextSelection(e) {
+            setTimeout(() => {
+                const selection = window.getSelection();
+                const text = selection.toString().trim();
+                const popup = document.getElementById('ai-selection-popup');
+
+                if (!text) {
+                    if (e.target && e.target.id !== 'ai-selection-popup') {
+                        popup.style.display = 'none';
+                    }
+                    return;
+                }
+
+                const anchorNode = selection.anchorNode;
+                if (!anchorNode) return;
+
+                const context = getPageContext(anchorNode);
+                if (!context) {
+                    popup.style.display = 'none';
+                    return;
+                }
+
+                currentSelection = text;
+                currentContext = context;
+
+                const isMobile = window.innerWidth <= 900;
+                
+                if (isMobile) {
+                    // Position fixed at the bottom on mobile to avoid native Android contextual menu overlap
+                    popup.style.display = 'flex';
+                    popup.style.position = 'fixed';
+                    popup.style.bottom = '24px';
+                    popup.style.left = '50%';
+                    popup.style.transform = 'translateX(-50%)';
+                    popup.style.top = 'auto';
+                    popup.style.width = 'calc(100% - 40px)';
+                    popup.style.maxWidth = '340px';
+                    popup.style.justifyContent = 'center';
+                    popup.style.boxShadow = '0 8px 24px rgba(0,0,0,0.3)';
+                } else {
+                    // Position relative to selection on desktop
+                    const range = selection.getRangeAt(0);
+                    const rect = range.getBoundingClientRect();
+
+                    popup.style.display = 'flex';
+                    popup.style.position = 'fixed';
+                    popup.style.bottom = 'auto';
+                    popup.style.transform = 'none';
+                    popup.style.width = 'auto';
+                    popup.style.maxWidth = 'none';
+                    popup.style.left = Math.max(10, Math.min(window.innerWidth - popup.offsetWidth - 10, rect.left + (rect.width / 2) - 50)) + "px";
+                    popup.style.top = (rect.top - 45) + "px";
+                    popup.style.justifyContent = 'flex-start';
+                    popup.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+                }
+            }, 10);
+        }
+
+        function openChatWithSelection() {
+            document.getElementById('ai-selection-popup').style.display = 'none';
+            
+            // Populate context card
+            const contextTextNode = document.getElementById('chat-context-text');
+            const colLabel = currentContext.selectedColType === 'original' ? 'Αρχαία' : 'Μετάφραση';
+            contextTextNode.textContent = '"' + currentSelection + '" (' + colLabel + ' • Σελίδα ' + currentContext.pageNum + ')';
+            
+            // Clear prior conversation when selecting new text
+            clearChat();
+
+            // Open sidebar
+            document.body.classList.add('chat-sidebar-open');
+            setTimeout(() => {
+                document.getElementById('chat-input').focus();
+                adjustSidebarHeightForKeyboard();
+            }, 100);
+        }
+
+        function clearChat() {
+            chatHistory = [];
+            const msgsContainer = document.getElementById('chat-messages');
+            
+            // Keep the context card, wipe standard bubble divs
+            const contextCard = document.getElementById('chat-context-card');
+            msgsContainer.innerHTML = '';
+            msgsContainer.appendChild(contextCard);
+        }
+
+        function handleChatKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendChatMessage();
+            }
+        }
+
+        function appendMessage(sender, text, isError = false, historyIndex = null) {
+            const msgsContainer = document.getElementById('chat-messages');
+            const msgDiv = document.createElement('div');
+            
+            if (isError) {
+                msgDiv.className = 'chat-message system-error';
+            } else {
+                msgDiv.className = 'chat-message ' + sender;
+            }
+
+            // If it is a user message and linked to history, attach interactive attributes
+            if (sender === 'user' && historyIndex !== null) {
+                msgDiv.setAttribute('data-history-index', historyIndex);
+                msgDiv.setAttribute('title', 'Κλικ για εκ νέου εκτέλεση από αυτό το σημείο');
+                msgDiv.addEventListener('click', () => handleHistoryClick(historyIndex));
+            }
+            
+            msgDiv.innerHTML = formatMarkdown(text);
+            msgsContainer.appendChild(msgDiv);
+            msgsContainer.scrollTop = msgsContainer.scrollHeight;
+        }
+
+        // Truncate history and re-run on user dialog click
+        async function handleHistoryClick(historyIndex) {
+            // Prevent duplicate triggers if query is running
+            const inputEl = document.getElementById('chat-input');
+            if (inputEl.disabled) return;
+
+            // Slice history array up to and including the selected user query
+            chatHistory = chatHistory.slice(0, historyIndex + 1);
+
+            // Redraw UI container to match truncated array
+            rebuildChatUI();
+
+            // Re-fire query
+            await runQuery();
+        }
+
+        // Clean redraw of current stack
+        function rebuildChatUI() {
+            const msgsContainer = document.getElementById('chat-messages');
+            const contextCard = document.getElementById('chat-context-card');
+            
+            msgsContainer.innerHTML = '';
+            msgsContainer.appendChild(contextCard);
+            
+            chatHistory.forEach((msg, idx) => {
+                if (msg.role === 'user') {
+                    let displayContent = msg.content;
+                    // Extract original question portion from first structured input turn for a clean UI
+                    if (idx === 0 && msg.content.includes("Ερώτηση:\n")) {
+                        displayContent = msg.content.split("Ερώτηση:\n").slice(1).join("Ερώτηση:\n");
+                    }
+                    appendMessage('user', displayContent, false, idx);
+                } else if (msg.role === 'assistant') {
+                    appendMessage('assistant', msg.content);
+                }
+            });
+        }
+
+        // Native Markdown parser leveraging standard Marked.js library
+        function formatMarkdown(text) {
+            if (!text) return "";
+            try {
+                // Parse standard markdown strings to structural HTML
+                return marked.parse(text);
+            } catch (err) {
+                // Fallback to basic text escaping on parse failure
+                return text
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/\n/g, "<br>");
+            }
+        }
+
+        // Modular core query runner
+        async function runQuery() {
+            const inputEl = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('chat-send-btn');
+            
+            // Disable inputs during network transaction
+            inputEl.disabled = true;
+            sendBtn.disabled = true;
+            
+            // Append loading container
+            appendMessage('assistant', 'Thinking...');
+            const lastMsgDiv = document.getElementById('chat-messages').lastChild;
+
+            // Load credentials
+            const provider = localStorage.getItem('ai-prov') || 'openai';
+            const apiKey = localStorage.getItem('ai-key') || '';
+            const savedMod = localStorage.getItem('ai-mod') || '';
+            const customUrl = localStorage.getItem('ai-url') || '';
+
+            if (!apiKey && provider !== 'custom') {
+                lastMsgDiv.className = 'chat-message system-error';
+                lastMsgDiv.innerText = '⚠️ Παρακαλούμε ρυθμίστε το API Key στις ρυθμίσεις AI Config πρώτα.';
+                openAiSettings();
+                inputEl.disabled = false;
+                sendBtn.disabled = false;
+                return;
+            }
+
+            // Build the System Prompt Context dynamically on EVERY call
+            const isOriginal = currentContext.selectedColType === 'original';
+            const contextText = isOriginal ? currentContext.originalText : currentContext.translationText;
+            const contextLabel = isOriginal ? "Αρχαίο Κείμενο" : "Σύγχρονη Μετάφραση";
+			const pageTitle = document.title;
+
+            let systemInstruction = "Είσαι διακεκριμένος φιλόσοφος και γνώστης της φιλοσοφίας του Αριστοτέλη και Πλάτωνα και άλλων αρχαίων ελλήνων συγγραφέων.\n" +
+                "Ο χρήστης διαβάζει το βιβλίου του " + pageTitle + " και βάσει αυτού θα σου κάνει μερικές ερωτήσεις, περιλαμβάνοντας κάποιες φορές αποσπάσματα απο το βιβλίο αυτό πάνω στα οποία σχετίζονται οι ερωτήσεις. Ακολουθεί το ευρύτειο πλαίσιο της σελίδας/κεφαλαίου (Σελίδα " + currentContext.pageNum + ", " + currentContext.dividerText + ") για αναφορά:\n" +
+                "--- " + contextLabel + ":\n" + contextText + "\n\n" +
+                "Απάντησε στις ερωτήσεις του χρήστη σε σχέση με το πλαίσιο του κειμένου που παρέχεται. " +
+                "Δώσε τις απαντήσεις σου στα νέα ελληνικά χρησιμοποιώντας markdown μορφοποίηση.";
+
+            // Construct Payload Messages (Always prepending system prompt at index 0)
+            let payloadMessages = [{ role: "system", content: systemInstruction }];
+            payloadMessages = payloadMessages.concat(chatHistory);
+
+            try {
+                const answer = await requestAPI(provider, apiKey, savedMod, payloadMessages, customUrl);
+                lastMsgDiv.innerHTML = formatMarkdown(answer);
+                chatHistory.push({ role: "assistant", content: answer });
+            } catch (error) {
+                lastMsgDiv.className = 'chat-message system-error';
+                lastMsgDiv.innerText = "Error: " + error.message;
+                // If API failed, keep the user question on screen so they can click to retry it,
+                // do not silently clear the UI anymore.
+            } finally {
+                inputEl.disabled = false;
+                sendBtn.disabled = false;
+                document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+                inputEl.focus();
+                adjustSidebarHeightForKeyboard();
+            }
+        }
+
+        async function sendChatMessage() {
+            const inputEl = document.getElementById('chat-input');
+            const prompt = inputEl.value.trim();
+            if (!prompt) return;
+
+            // If the last message in history is a 'user' query (due to a previous failed turn),
+            // pop it before sending so that our conversational stack maintains alternating roles.
+            if (chatHistory.length > 0 && chatHistory[chatHistory.length - 1].role === 'user') {
+                chatHistory.pop();
+            }
+
+            // 1. Manage Chat History & Highlight Context
+            let histIdx;
+            if (chatHistory.length === 0) {
+                // Incorporate highlighted text directly into the first user turn, NOT the system prompt
+                const firstUserContent = "Επισημασμένο κείμενο:\n\"" + currentSelection + "\"\n\nΕρώτηση:\n" + prompt;
+                chatHistory.push({ role: "user", content: firstUserContent });
+                histIdx = 0;
+            } else {
+                // Subsequent turns: push the raw user follow-up prompt
+                chatHistory.push({ role: "user", content: prompt });
+                histIdx = chatHistory.length - 1;
+            }
+
+            // 2. Display user message in UI with history index
+            appendMessage('user', prompt, false, histIdx);
+            inputEl.value = '';
+
+            // 3. Trigger query execution
+            await runQuery();
+        }
+
+        async function requestAPI(provider, apiKey, model, messages, customUrl) {
+            let url = "";
+            let headers = { "Content-Type": "application/json" };
+            let body = {};
+
+            // Normalize models to defaults if unspecified
+            let activeModel = model;
+            if (!activeModel) {
+                if (provider === 'openai') activeModel = 'gpt-4o-mini';
+                else if (provider === 'anthropic') activeModel = 'claude-3-5-sonnet-20241022';
+                else if (provider === 'gemini') activeModel = 'gemini-flash-latest';
+                else if (provider === 'openrouter') activeModel = 'meta-llama/llama-3-8b-instruct:free';
+                else activeModel = 'local-model';
+            }
+
+            if (provider === 'openai') {
+                url = "https://api.openai.com/v1/chat/completions";
+                headers["Authorization"] = "Bearer " + apiKey;
+                body = { model: activeModel, messages: messages };
+            } else if (provider === 'openrouter') {
+                url = "https://openrouter.ai/api/v1/chat/completions";
+                headers["Authorization"] = "Bearer " + apiKey;
+                headers["HTTP-Referer"] = window.location.href;
+                headers["X-Title"] = "Ancient Greek Bilingual Reader";
+                body = { model: activeModel, messages: messages };
+            } else if (provider === 'gemini') {
+                url = "https://generativelanguage.googleapis.com/v1beta/models/" + activeModel + ":generateContent?key=" + apiKey;
+                
+                // Restructure typical OpenAI formats to Gemini's native API structure
+                const systemItem = messages.find(m => m.role === 'system');
+                const userItems = messages.filter(m => m.role !== 'system');
+                
+                const contents = userItems.map(m => ({
+                    role: m.role === 'assistant' ? 'model' : 'user',
+                    parts: [{ text: m.content }]
+                }));
+
+                body = { contents: contents };
+                if (systemItem) {
+                    body.systemInstruction = { parts: [{ text: systemItem.content }] };
+                }
+            } else if (provider === 'anthropic') {
+                url = "https://api.anthropic.com/v1/messages";
+                headers["x-api-key"] = apiKey;
+                headers["anthropic-version"] = "2023-06-01";
+                headers["dangerously-allow-browser"] = "true";
+
+                const systemItem = messages.find(m => m.role === 'system');
+                const userItems = messages.filter(m => m.role !== 'system');
+
+                body = {
+                    model: activeModel,
+                    messages: userItems.map(m => ({ role: m.role, content: m.content })),
+                    max_tokens: 1500
+                };
+                if (systemItem) {
+                    body.system = systemItem.content;
+                }
+            } else if (provider === 'custom') {
+                url = customUrl || "http://localhost:11434/v1/chat/completions";
+                if (apiKey) {
+                    headers["Authorization"] = "Bearer " + apiKey;
+                }
+                body = { model: activeModel, messages: messages };
+            }
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(body)
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error("API Error (" + response.status + "): " + (errText || response.statusText));
+            }
+
+            const responseData = await response.json();
+
+            // Extract content responses safely depending on the selected engine
+            if (provider === 'gemini') {
+                return responseData.candidates[0].content.parts[0].text;
+            } else if (provider === 'anthropic') {
+                return responseData.content[0].text;
+            } else {
+                // OpenAI / OpenRouter / Ollama
+                return responseData.choices[0].message.content;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('ebook-theme');
+            if (savedTheme) {
+                const targetBtn = document.getElementById('theme-' + savedTheme);
+                if (targetBtn) setTheme(savedTheme, targetBtn);
+            }
+
+            const hideOriginal = localStorage.getItem('ebook-hide-original');
+            if (hideOriginal === 'true') {
+                document.body.classList.add('hide-original');
+                document.getElementById('toggle-layout-btn').innerText = 'Show Original';
+            }
+            
+            if (window.innerWidth > 900) {
+                const sidebarClosed = localStorage.getItem('ebook-sidebar-closed');
+                if (sidebarClosed === 'true') {
+                    document.body.classList.add('sidebar-closed');
+                }
+            }
+
+            // Restore saved chat width on desktop
+            const chatSidebar = document.getElementById('chat-sidebar');
+            const savedChatWidth = localStorage.getItem('ebook-chat-width');
+            if (savedChatWidth && window.innerWidth > 900) {
+                chatSidebar.style.width = savedChatWidth;
+            }
+
+            // Setup Resizing for AI Chat Sidebar
+            const resizeHandle = document.getElementById('chat-resize-handle');
+            let isResizing = false;
+
+            resizeHandle.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                chatSidebar.classList.add('resizing');
+                document.body.style.userSelect = 'none';
+                document.body.style.cursor = 'ew-resize';
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isResizing) return;
+                const newWidth = window.innerWidth - e.clientX;
+                // Limit range between 280px and 85% of total screen width
+                if (newWidth > 280 && newWidth < window.innerWidth * 0.85) {
+                    chatSidebar.style.width = newWidth + 'px';
+                    localStorage.setItem('ebook-chat-width', newWidth + 'px');
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (isResizing) {
+                    isResizing = false;
+                    chatSidebar.classList.remove('resizing');
+                    document.body.style.userSelect = '';
+                    document.body.style.cursor = '';
+                }
+            });
+            
+            // Listen for selection events on layout columns (supports mouse and touch handles)
+            document.addEventListener('mouseup', handleTextSelection);
+            document.addEventListener('keyup', handleTextSelection);
+            document.addEventListener('selectionchange', handleTextSelection);
+
+            // Bind selection popup using both mousedown and touchstart with preventDefault.
+            // This guarantees instant tap execution on touch devices before selection focus is lost.
+            const popup = document.getElementById('ai-selection-popup');
+            const handleTriggerTap = (e) => {
+                e.preventDefault();
+                openChatWithSelection();
+            };
+            popup.addEventListener('mousedown', handleTriggerTap);
+            popup.addEventListener('touchstart', handleTriggerTap);
+
+            // Hide the popup trigger during scroll shifts (desktop only to prevent mobile touch glitches)
+            window.addEventListener('scroll', () => {
+                if (window.innerWidth > 900) {
+                    document.getElementById('ai-selection-popup').style.display = 'none';
+                }
+            }, { passive: true });
+
+            // VisualViewport resizing adjustments (Handles Android virtual keyboard overlap natively)
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', adjustSidebarHeightForKeyboard);
+                window.visualViewport.addEventListener('scroll', adjustSidebarHeightForKeyboard);
+            }
+
+            const chatInput = document.getElementById('chat-input');
+            if (chatInput) {
+                chatInput.addEventListener('focus', () => {
+                    setTimeout(adjustSidebarHeightForKeyboard, 150);
+                });
+                chatInput.addEventListener('blur', () => {
+                    setTimeout(adjustSidebarHeightForKeyboard, 150);
+                });
+            }
+            
+            let lastScrollTop = 0;
+            const header = document.querySelector('header');
+            const optBtn = document.querySelector('.options-toggle');
+            
+            window.addEventListener('scroll', () => {
+                let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                
+                if (scrollTop < 0) scrollTop = 0;
+                
+                if (scrollTop > 10) {
+                    document.body.classList.add('scrolled');
+                } else {
+                    document.body.classList.remove('scrolled');
+                }
+                
+                if (scrollTop > lastScrollTop && scrollTop > 120) {
+                    header.classList.add('header-hidden');
+                    header.classList.remove('options-open');
+                    document.body.classList.remove('mobile-options-open');
+                    optBtn.classList.remove('active');
+                } else {
+                    header.classList.remove('header-hidden');
+                }
+                
+                lastScrollTop = scrollTop;
+            }, { passive: true });
+            
+            const observerOptions = {
+                root: null,
+                rootMargin: "-100px 0px -60% 0px", 
+                threshold: 0
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const hash = entry.target.getAttribute('data-hash');
+                        if (hash && window.location.hash !== '#' + hash) {
+                            history.replaceState(null, null, '#' + hash);
+                        }
+                    }
+                });
+            }, observerOptions);
+            
+            document.querySelectorAll('.page-divider').forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>

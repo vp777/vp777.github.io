@@ -1,0 +1,2333 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ΛΟΥΚΙΑΝΟΣ Τίμων ἢ Μισάνθρωπος</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Marked.js Markdown rendering library -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #faf8f5;
+            --text-color: #2c2520;
+            --accent-color: #8b263e;
+            --sidebar-bg: #f3efe9;
+            --border-color: #e3ded5;
+            --muted-text: #706357;
+            --font-serif: "Cardo", "Georgia", "Palatino", serif;
+        }
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --accent-color: #ff8a80;
+            --sidebar-bg: #2d2d2d;
+            --border-color: #404040;
+            --muted-text: #999999;
+        }
+        [data-theme="sepia"] {
+            --bg-color: #f4ecd8;
+            --text-color: #5b4636;
+            --accent-color: #a04000;
+            --sidebar-bg: #ebdcb9;
+            --border-color: #d7c59d;
+            --muted-text: #7c6857;
+        }
+        
+        body {
+            margin: 0;
+            font-family: var(--font-serif);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            transition: background-color 0.2s, color 0.2s;
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        #mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 90;
+        }
+        #mobile-overlay.open {
+            display: block;
+        }
+        
+        #expand-bar {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 24px;
+            height: 100vh;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            cursor: pointer;
+            z-index: 95;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+        #expand-bar:hover {
+            background-color: var(--border-color);
+        }
+        #expand-bar::after {
+            content: "›";
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        
+        #sidebar {
+            width: 340px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            height: 100vh;
+            position: fixed;
+            top: 0; left: 0;
+            overflow-y: auto;
+            padding: 24px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transform: translateX(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+        #sidebar h2 {
+            font-size: 1.25rem;
+            margin: 0;
+            color: var(--text-color);
+        }
+        .sidebar-close-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--accent-color);
+            font-size: 1.4rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            line-height: 1;
+        }
+        .sidebar-close-btn:hover {
+            background-color: var(--border-color);
+        }
+        
+        .toc-list-container { overflow-y: auto; flex-grow: 1; }
+        
+        details.book-group {
+            margin-bottom: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            background-color: var(--sidebar-bg);
+        }
+        details.book-group[open] { border-color: var(--accent-color); }
+        details.book-group summary {
+            font-weight: bold; font-size: 1.05rem; cursor: pointer; padding: 10px 14px;
+            background-color: var(--sidebar-bg); list-style: none; display: flex;
+            justify-content: space-between; align-items: center; user-select: none;
+        }
+        details.book-group summary::-webkit-details-marker { display: none; }
+        details.book-group summary::after { content: "▾"; font-size: 0.9rem; color: var(--accent-color); }
+        details.book-group[open] summary::after { transform: rotate(180deg); }
+        
+        .toc-sublist-container {
+            background-color: var(--bg-color);
+            border-top: 1px solid var(--border-color);
+        }
+        .toc-group-title {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            padding: 8px 14px 4px 14px;
+            line-height: 1.3;
+        }
+        .toc-sublist { list-style: none; padding: 4px 14px 8px 14px; margin: 0; }
+        .toc-sublist li { margin-bottom: 8px; font-size: 0.88rem; }
+        
+        .toc-sublist a { 
+            color: var(--text-color); 
+            text-decoration: none; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding: 4px; 
+        }
+        .toc-sublist a:hover { color: var(--accent-color); }
+        .toc-page {
+            color: var(--muted-text);
+            font-size: 0.8rem;
+            font-family: var(--font-serif);
+        }
+        
+        #main {
+            margin-left: 340px;
+            flex-grow: 1;
+            padding: 180px 40px 40px 40px;
+            box-sizing: border-box;
+            width: calc(100% - 340px);
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        padding-top 0.3s ease;
+        }
+        
+        header {
+            position: fixed;
+            top: 0;
+            left: 340px;
+            right: 0;
+            background-color: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px 40px;
+            z-index: 50;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transform: translateY(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        left 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        background-color 0.2s, 
+                        box-shadow 0.2s;
+        }
+        header.header-hidden {
+            transform: translateY(-100%);
+            box-shadow: none !important;
+        }
+        body.scrolled header {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        [data-theme="dark"] body.scrolled header {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .header-top { display: flex; align-items: center; gap: 20px; }
+        header h1 { margin: 0; font-size: 1.8rem; color: var(--accent-color); line-height: 1.2; }
+        
+        .controls-group {
+            display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+        }
+        .btn {
+            background-color: var(--sidebar-bg); color: var(--text-color);
+            border: 1px solid var(--border-color); padding: 8px 14px;
+            font-family: inherit; cursor: pointer; border-radius: 6px;
+            font-size: 0.9rem; font-weight: bold; transition: all 0.2s; white-space: nowrap;
+        }
+        .btn:hover { background-color: var(--border-color); }
+        .btn.active { background-color: var(--accent-color); color: white; border-color: var(--accent-color); }
+        .btn-layout { background-color: var(--bg-color); border: 2px solid var(--accent-color); color: var(--accent-color); }
+        
+        .menu-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+            white-space: nowrap;
+        }
+        .menu-toggle:hover {
+            background-color: var(--text-color);
+        }
+        
+        .options-toggle {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 6px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            width: 38px;
+            height: 38px;
+            transition: all 0.2s;
+        }
+        .options-toggle:hover {
+            background-color: var(--sidebar-bg);
+        }
+
+        #book-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            column-gap: 48px;
+            row-gap: 0;
+            margin: 0 auto;
+            max-width: 140ch;
+            width: 100%;
+        }
+        
+        body.sidebar-closed #expand-bar {
+            display: flex;
+        }
+        body.sidebar-closed #sidebar {
+            transform: translateX(-340px);
+        }
+        body.sidebar-closed #main {
+            margin-left: 24px;
+            width: calc(100% - 24px);
+        }
+        body.sidebar-closed header {
+            left: 24px;
+        }
+        
+        body.hide-original #book-content { 
+            grid-template-columns: 1fr; 
+            max-width: 140ch;
+        }
+        body.hide-original .original-col { display: none; }
+        body.hide-original .bilingual-header { grid-template-columns: 1fr; }
+        body.hide-original .original-title { display: none; }
+        body.hide-original .translation-col {
+            max-width: 100% !important;
+            justify-self: stretch !important;
+        }
+
+        .bilingual-header {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px; position: sticky; top: 0;
+            background-color: var(--bg-color); padding: 16px 0;
+            border-bottom: 2px solid var(--accent-color); z-index: 10;
+            font-weight: bold; text-transform: uppercase; font-size: 0.85rem;
+            letter-spacing: 0.05em; color: var(--muted-text);
+        }
+        
+        .chapter-anchor {
+            display: block;
+            scroll-margin-top: 180px;
+        }
+        
+        .page-divider {
+            grid-column: 1 / -1;
+            border-bottom: 1px solid var(--border-color);
+            padding-top: 48px; padding-bottom: 12px; margin-bottom: 24px;
+            font-size: 0.95rem; color: var(--accent-color); text-transform: uppercase;
+            letter-spacing: 0.05em; font-weight: bold; 
+            scroll-margin-top: 180px;
+        }
+        
+        .page-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--accent-color);
+            transition: color 0.2s, border-bottom-color 0.2s;
+        }
+        .page-link:hover {
+            color: var(--text-color);
+            border-bottom-color: var(--text-color);
+        }
+        
+        .column { 
+            box-sizing: border-box; 
+            padding-bottom: 24px; 
+            display: flex; 
+            flex-direction: column; 
+            max-width: 65ch;
+            width: fit-content;
+            min-width: 0;
+        }
+        
+        .original-col {
+            justify-self: end;
+        }
+        .translation-col {
+            justify-self: start;
+        }
+        
+        .passage { 
+            margin: 0 0 1.2em 0; 
+            font-size: 1.15rem; 
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 1.5rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .passage-text {
+            flex: 1;
+            min-width: 0;
+            text-align: justify;
+        }
+        .passage.indent .passage-text { text-indent: 2em; }
+        .marker { color: var(--accent-color); font-weight: bold; margin-right: 4px; }
+        .line-number { 
+            color: var(--muted-text); 
+            font-size: 0.85em; 
+            font-weight: normal; 
+            user-select: none;
+            margin-left: auto;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+        i { font-style: italic; }
+
+        /* Floating popover trigger styling */
+        #ai-selection-popup {
+            position: fixed;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 14px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1005;
+            display: none;
+            font-family: var(--font-serif);
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.1s ease;
+        }
+        #ai-selection-popup:hover {
+            transform: scale(1.05);
+        }
+
+        /* Resizable sliding Right Chat Sidebar */
+        #chat-sidebar {
+            width: 380px;
+            min-width: 280px;
+            max-width: 85vw;
+            background-color: var(--sidebar-bg);
+            border-left: 1px solid var(--border-color);
+            height: 100vh;
+            height: 100dvh;
+            position: fixed;
+            top: 0; right: 0;
+            transform: translateX(100%);
+            overflow: visible;
+            display: flex;
+            flex-direction: column;
+            z-index: 110;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-sizing: border-box;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.05);
+        }
+        body.chat-sidebar-open #chat-sidebar {
+            transform: translateX(0);
+        }
+        
+        /* Draggable Resize Handle */
+        #chat-resize-handle {
+            width: 8px;
+            height: 100%;
+            position: absolute;
+            left: -4px;
+            top: 0;
+            cursor: ew-resize;
+            z-index: 120;
+            background-color: transparent;
+            transition: background-color 0.2s;
+        }
+        #chat-resize-handle:hover,
+        #chat-sidebar.resizing #chat-resize-handle {
+            background-color: var(--accent-color);
+            opacity: 0.5;
+        }
+        
+        .chat-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-header h3 { margin: 0; font-size: 1.1rem; color: var(--accent-color); }
+        
+        .chat-header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .chat-context-card {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+        .chat-context-card h4 { margin: 0 0 6px 0; color: var(--accent-color); }
+        .chat-context-card p { 
+            margin: 0; 
+            font-style: italic; 
+            display: -webkit-box; 
+            -webkit-line-clamp: 3; 
+            -webkit-box-orient: vertical; 
+            overflow: hidden; 
+            line-height: 1.4;
+        }
+        
+        .chat-message {
+            max-width: 85%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        
+        /* Render styles for AI Markdown elements in chat boxes */
+        .chat-message p { margin: 0 0 8px 0; line-height: 1.5; }
+        .chat-message p:last-child { margin-bottom: 0; }
+        .chat-message strong { font-weight: bold; }
+        .chat-message em { font-style: italic; }
+        .chat-message ul, .chat-message ol { margin: 4px 0 8px 16px; padding: 0; }
+        .chat-message li { margin-bottom: 4px; font-size: 0.92rem; }
+        .chat-message h1, .chat-message h2, .chat-message h3, .chat-message h4, .chat-message h5 {
+            color: var(--accent-color);
+            margin: 12px 0 6px 0;
+            line-height: 1.3;
+        }
+        .chat-message h3 { font-size: 1.15rem; }
+        .chat-message h4 { font-size: 1.05rem; }
+        .chat-message h5 { font-size: 0.95rem; }
+        .chat-message blockquote {
+            border-left: 3px solid var(--accent-color);
+            margin: 8px 0;
+            padding-left: 10px;
+            color: var(--muted-text);
+            font-style: italic;
+        }
+        .chat-message pre {
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.85rem;
+            margin: 8px 0;
+        }
+        .chat-message code {
+            font-family: monospace;
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: var(--accent-color);
+        }
+        
+        .chat-message.user {
+            background-color: var(--accent-color);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .chat-message.user:hover {
+            filter: brightness(1.15);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        /* Override light-colored syntax highlights in dark bubbles */
+        .chat-message.user code {
+            color: #ff8a80;
+            background-color: rgba(0,0,0,0.2);
+            border-color: rgba(0,0,0,0.1);
+        }
+        .chat-message.user pre {
+            background-color: rgba(0,0,0,0.2);
+            border-color: rgba(0,0,0,0.1);
+            color: white;
+        }
+        
+        .chat-message.assistant {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .chat-message.system-error {
+            background-color: #fce8e6;
+            color: #c5221f;
+            border: 1px solid #fad2cf;
+            align-self: center;
+            max-width: 95%;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+        
+        [data-theme="dark"] .chat-message.system-error {
+            background-color: #371d1d;
+            color: #f28b82;
+            border-color: #5c2424;
+        }
+
+        .chat-input-area {
+            padding: 16px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 8px;
+            background-color: var(--sidebar-bg);
+            flex-shrink: 0;
+        }
+        .chat-input-area textarea {
+            flex-grow: 1;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 10px;
+            border-radius: 6px;
+            resize: none;
+            height: 42px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+        }
+        .chat-input-area button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .chat-input-area button:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* Modal Config Dialog */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-content {
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            padding: 24px;
+            box-sizing: border-box;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 12px;
+        }
+        .modal-header h3 { margin: 0; font-size: 1.25rem; color: var(--accent-color); }
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group label {
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        .form-control {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 14px;
+        }
+
+        @media (max-width: 900px) {
+            #sidebar { transform: translateX(-100%); width: 320px; }
+            body.sidebar-open #sidebar { transform: translateX(0); }
+            body.sidebar-closed #sidebar { transform: translateX(-100%); }
+            
+            #chat-sidebar {
+                width: 100% !important;
+                right: 0;
+                transform: translateX(100%);
+                height: 100vh;
+                height: 100dvh;
+            }
+            body.chat-sidebar-open #chat-sidebar {
+                transform: translateX(0);
+            }
+            #chat-resize-handle {
+                display: none;
+            }
+            
+            #main { 
+                margin-left: 0 !important; 
+                width: 100% !important; 
+                padding: 100px 20px 20px 20px !important;
+            }
+            body.mobile-options-open #main {
+                padding-top: 150px !important;
+            }
+            
+            header {
+                padding-bottom: 12px;
+                margin-bottom: 16px;
+                gap: 8px;
+            }
+            header h1 { 
+                font-size: 0.95rem !important;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                text-align: center;
+                flex-grow: 1;
+                margin: 0;
+            }
+            
+            header {
+                left: 0 !important;
+                padding: 12px 16px;
+            }
+            
+            .header-top { 
+                display: flex;
+                flex-direction: row !important;
+                align-items: center; 
+                justify-content: space-between; 
+                width: 100%;
+                gap: 12px; 
+            }
+            
+            .menu-toggle { 
+                width: auto !important; 
+                padding: 6px 12px;
+                font-size: 0.85rem;
+            }
+            
+            .options-toggle {
+                display: inline-flex;
+            }
+            
+            .controls-group {
+                display: none;
+                width: 100%;
+                justify-content: center;
+                padding-top: 12px;
+                border-top: 1px dashed var(--border-color);
+            }
+            header.options-open .controls-group {
+                display: flex;
+            }
+            
+            #book-content { grid-template-columns: 1fr; column-gap: 0; max-width: 100%; }
+            .column { max-width: 100% !important; width: 100% !important; }
+            .bilingual-header { display: none; }
+            .page-divider { padding-top: 32px; scroll-margin-top: 110px; }
+            .chapter-anchor { scroll-margin-top: 110px; }
+            .passage { font-size: 1.05rem; }
+        }
+        
+        @media (min-width: 901px) {
+            .menu-toggle {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="mobile-overlay" onclick="toggleSidebar()"></div>
+
+    <div id="expand-bar" onclick="toggleSidebar()" title="Ανάπτυξη Περιεχομένων"></div>
+
+    <aside id="sidebar">
+        <div class="sidebar-header">
+            <h2>Πίνακας Περιεχομένων</h2>
+            <button class="sidebar-close-btn" onclick="toggleSidebar()" title="Σύμπτυξη">‹</button>
+        </div>
+        <div class="toc-list-container">
+            <details class="book-group">
+    <summary>Μονόλογος του Τίμωνα</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-1-chapter-" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΤΙΜΩΝ</span> <span class="toc-page">#1</span></a></li>
+            <li><a href="#book-1-chapter--2" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΤΙΜΩΝ.2</span> <span class="toc-page">#2</span></a></li>
+        </ul>
+    </div>
+</details>
+<details class="book-group">
+    <summary>Ζευς, Ερμής και Πλούτος</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-2-chapter--" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΖΕΥΣ-ΕΡΜΗΣ</span> <span class="toc-page">#3</span></a></li>
+            <li><a href="#book-2-chapter---2" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΖΕΥΣ-ΕΡΜΗΣ.2</span> <span class="toc-page">#4</span></a></li>
+            <li><a href="#book-2-chapter--" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΠΛΟΥΤΟΣ-ΖΕΥΣ</span> <span class="toc-page">#5</span></a></li>
+            <li><a href="#book-2-chapter---2" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΠΛΟΥΤΟΣ-ΖΕΥΣ.2</span> <span class="toc-page">#6</span></a></li>
+        </ul>
+    </div>
+</details>
+<details class="book-group">
+    <summary>Ο Ερμής και ο Πλούτος κατεβαίνουν στη γη</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-3-chapter--" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΕΡΜΗΣ-ΠΛΟΥΤΟΣ</span> <span class="toc-page">#7</span></a></li>
+            <li><a href="#book-3-chapter---2" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΕΡΜΗΣ-ΠΛΟΥΤΟΣ.2</span> <span class="toc-page">#8</span></a></li>
+            <li><a href="#book-3-chapter---3" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΕΡΜΗΣ-ΠΛΟΥΤΟΣ.3</span> <span class="toc-page">#9</span></a></li>
+            <li><a href="#book-3-chapter--" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΕΡΜΗΣ-ΕΡΜΗΣ</span> <span class="toc-page">#10</span></a></li>
+            <li><a href="#book-3-chapter--" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΠΕΝΙΑ-ΕΡΜΗΣ</span> <span class="toc-page">#11</span></a></li>
+        </ul>
+    </div>
+</details>
+<details class="book-group">
+    <summary>Ερμής, Πλούτος και Τίμων</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-4-chapter--" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΤΙΜΩΝ-ΤΙΜΩΝ</span> <span class="toc-page">#12</span></a></li>
+            <li><a href="#book-4-chapter--" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΕΡΜΗΣ-ΠΛΟΥΤΟΣ</span> <span class="toc-page">#13</span></a></li>
+        </ul>
+    </div>
+</details>
+<details class="book-group">
+    <summary>Ο Τίμων βρίσκει τον θησαυρό και επιτίθεται στους κόλακες</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-5-chapter-" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΤΙΜΩΝ</span> <span class="toc-page">#14</span></a></li>
+            <li><a href="#book-5-chapter--" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΓΝΑΘΩΝΙΔΗΣ-ΓΝΑΘΩΝΙΔΗΣ</span> <span class="toc-page">#15</span></a></li>
+            <li><a href="#book-5-chapter--" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΤΙΜΩΝ-ΦΙΛΙΑΔΗΣ</span> <span class="toc-page">#16</span></a></li>
+            <li><a href="#book-5-chapter--" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΤΙΜΩΝ-ΤΙΜΩΝ</span> <span class="toc-page">#17</span></a></li>
+            <li><a href="#book-5-chapter-" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΤΙΜΩΝ</span> <span class="toc-page">#18</span></a></li>
+            <li><a href="#book-5-chapter--" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΘΡΑΣΥΚΛΗΣ-ΤΙΜΩΝ</span> <span class="toc-page">#19</span></a></li>
+        </ul>
+    </div>
+</details>
+        </div>
+    </aside>
+
+    <!-- AI Right Chat Sidebar -->
+    <aside id="chat-sidebar">
+        <div id="chat-resize-handle"></div>
+        <div class="chat-header">
+            <h3>AI Assistant</h3>
+            <div class="chat-header-actions">
+                <button class="btn" style="padding: 4px 8px; font-size: 0.8rem;" onclick="clearChat()">Clear</button>
+                <button class="sidebar-close-btn" style="width: 28px; height: 28px; font-size: 1.1rem;" onclick="toggleChatSidebar()" title="Κλείσιμο">›</button>
+            </div>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <!-- Active Context Card -->
+            <div class="chat-context-card" id="chat-context-card">
+                <h4>Επιλεγμένο Κείμενο</h4>
+                <p id="chat-context-text"></p>
+            </div>
+            <!-- Messages stream here -->
+        </div>
+        <div class="chat-input-area">
+            <textarea id="chat-input" placeholder="Ρωτήστε κάτι για το επιλεγμένο κείμενο..." onkeydown="handleChatKeyDown(event)"></textarea>
+            <button id="chat-send-btn" onclick="sendChatMessage()">Send</button>
+        </div>
+    </aside>
+
+    <!-- Floating Popover Trigger -->
+    <button id="ai-selection-popup"><span style="font-size: 1.1rem;">✨</span> Ask AI</button>
+
+    <!-- Settings Configuration Modal -->
+    <div id="ai-config-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Ρυθμίσεις LLM / AI</h3>
+                <button class="sidebar-close-btn" style="width: 28px; height: 28px; font-size: 1.1rem;" onclick="closeAiSettings()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="ai-provider">Πάροχος (Provider)</label>
+                    <select id="ai-provider" class="form-control" onchange="handleProviderChange()">
+                        <option value="openai">OpenAI (ChatGPT)</option>
+                        <option value="anthropic">Anthropic (Claude)</option>
+                        <option value="gemini">Google Gemini</option>
+                        <option value="openrouter">OpenRouter</option>
+                        <option value="custom">Custom Endpoint (Ollama / Local)</option>
+                    </select>
+                </div>
+                <div class="form-group" id="group-custom-url" style="display: none;">
+                    <label for="ai-custom-url">Base URL</label>
+                    <input type="text" id="ai-custom-url" class="form-control" placeholder="http://localhost:11434/v1/chat/completions">
+                </div>
+                <div class="form-group">
+                    <label for="ai-key">API Key</label>
+                    <input type="password" id="ai-key" class="form-control" placeholder="Εισάγετε το API Key">
+                </div>
+                <div class="form-group">
+                    <label for="ai-model">Μοντέλο (Model Name)</label>
+                    <input type="text" id="ai-model" class="form-control" placeholder="π.χ. gpt-4o-mini">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeAiSettings()">Άκυρο</button>
+                <button class="btn active" onclick="saveAiSettings()">Αποθήκευση</button>
+            </div>
+        </div>
+    </div>
+
+    <main id="main">
+        <header>
+            <div class="header-top">
+                <button class="btn menu-toggle" onclick="toggleSidebar()">☰ Περιεχόμενα</button>
+                <h1>ΛΟΥΚΙΑΝΟΣ Τίμων ἢ Μισάνθρωπος</h1>
+                <button class="btn options-toggle" onclick="toggleMobileOptions()" title="Ρυθμίσεις">⚙️</button>
+            </div>
+            
+            <div class="controls-group">
+                <button id="toggle-layout-btn" class="btn btn-layout" onclick="toggleLayout()">Hide Original</button>
+                <button class="btn" style="border-color: var(--accent-color);" onclick="openAiSettings()">⚙️ AI Config</button>
+                <button class="btn active theme-btn" id="theme-light" onclick="setTheme('light', this)">Light</button>
+                <button class="btn theme-btn" id="theme-sepia" onclick="setTheme('sepia', this)">Sepia</button>
+                <button class="btn theme-btn" id="theme-dark" onclick="setTheme('dark', this)">Dark</button>
+            </div>
+        </header>
+
+        <section id="book-content">
+            <div class="bilingual-header">
+                <div class="original-title">Αρχαία Ελληνικά (Original)</div>
+                <div class="translation-title">Νέα Ελληνικά (Translation)</div>
+            </div>
+
+            
+        <div id="book-1-chapter-" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-1" data-hash="book-1-chapter-">
+            Μονόλογος του Τίμωνα • Κεφάλαιο ΤΙΜΩΝ (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=57&page=1" target="_blank" class="page-link">Page 1</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[1]</span> Ὦ Ζεῦ φίλιε καὶ ξένιε καὶ ἑταιρεῖε καὶ ἐφέστιε καὶ ἀστεροπητὰ καὶ ὅρκιε καὶ νεφεληγερέτα καὶ ἐρίγδουπε καὶ εἴ τί σε ἄλλο οἱ ἐμβρόντητοι ποιηταὶ καλοῦσι —καὶ μάλιστα ὅταν ἀπορῶσι πρὸς τὰ μέτρα· τότε γὰρ αὐτοῖς πολυώνυμος γενόμενος ὑπερείδεις τὸ πῖπτον τοῦ μέτρου καὶ ἀναπληροῖς τὸ κεχηνὸς τοῦ ῥυθμοῦ— ποῦ σοι νῦν ἡ ἐρισμάραγος ἀστραπὴ καὶ ἡ βαρύβρομος βροντὴ καὶ ὁ αἰθαλόεις καὶ ἀργήεις καὶ σμερδαλέος κεραυνός; ἅπαντα γὰρ ταῦτα λῆρος ἤδη ἀναπέφηνε καὶ καπνὸς ἀτεχνῶς ποιητικὸς ἔξω τοῦ πατάγου τῶν ὀνομάτων. τὸ δὲ ἀοίδιμόν σοι καὶ ἑκηβόλον ὅπλον καὶ πρόχειρον οὐκ οἶδ᾽ ὅπως τελέως ἀπέσβη καὶ ψυχρόν ἐστι, μηδὲ ὀλίγον σπινθῆρα ὀργῆς κατὰ τῶν ἀδικούντων διαφυλάττον. <span class="marker">[2]</span> θᾶττον γοῦν τῶν ἐπιορκεῖν τις ἐπιχειρούντων ἕωλον θρυαλλίδα φοβηθείη ἂν ἢ τὴν τοῦ πανδαμάτορος κεραυνοῦ φλόγα· οὕτω δαλόν τινα ἐπανατείνεσθαι δοκεῖς αὐτοῖς, ὡς πῦρ μὲν ἢ καπνὸν ἀπ᾽ αὐτοῦ μὴ δεδιέναι, μόνον δὲ τοῦτο οἴεσθαι ἀπολαύειν τοῦ τραύματος, ὅτι ἀναπλησθήσονται τῆς ἀσβόλου.</span></p>
+<p class="passage indent"><span class="passage-text">Ὥστε ἤδη διὰ ταῦτά σοι καὶ ὁ Σαλμωνεὺς ἀντιβροντᾶν ἐτόλμα, οὐ πάντῃ ἀπίθανος ὤν, πρὸς οὕτω ψυχρὸν τὴν ὀργὴν Δία θερμουργὸς ἀνὴρ μεγαλαυχούμενος. πῶς γὰρ ‹οὐ›, ὅπου γε καθάπερ ὑπὸ μανδραγόρᾳ καθεύδεις, ὃς οὔτε τῶν ἐπιορκούντων ἀκούεις οὔτε τοὺς ἀδικοῦντας ἐπισκοπεῖς, λημᾷς δὲ καὶ ἀμβλυώττεις πρὸς τὰ γινόμενα καὶ τὰ ὦτα ἐκκεκώφησαι καθάπερ οἱ παρηβηκότες; <span class="marker">[3]</span> ἐπεὶ νέος γε ἔτι καὶ ὀξύθυμος ὢν καὶ ἀκμαῖος τὴν ὀργὴν πολλὰ κατὰ τῶν ἀδίκων καὶ βιαίων ἐποίεις καὶ οὐδέποτε ἦγες τότε πρὸς αὐτοὺς ἐκεχειρίαν, ἀλλ᾽ ἀεὶ ἐνεργὸς πάντως ὁ κεραυνὸς ἦν καὶ ἡ αἰγὶς ἐπεσείετο καὶ ἡ βροντὴ ἐπαταγεῖτο καὶ ἡ ἀστραπὴ συνεχὲς ὥσπερ εἰς ἀκροβολισμὸν προηκοντίζετο· οἱ σεισμοὶ δὲ κοσκινηδὸν καὶ ἡ χιὼν σωρηδὸν καὶ ἡ χάλαζα πετρηδόν, ἵνα σοι φορτικῶς διαλέγωμαι, ὑετοί τε ῥαγδαῖοι καὶ βίαιοι, ποταμὸς ἑκάστη σταγών· ὥστε τηλικαύτη ἐν ἀκαρεῖ χρόνου ναυαγία ἐπὶ τοῦ Δευκαλίωνος ἐγένετο, ὡς ὑποβρυχίων ἁπάντων καταδεδυκότων μόγις ἕν τι κιβώτιον περισωθῆναι προσοκεῖλαν τῷ Λυκωρεῖ ζώπυρόν τι τοῦ ἀνθρωπίνου σπέρματος διαφυλάττον εἰς ἐπιγονὴν κακίας μείζονος.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text"><i>(Ο Τιμών σε μια ερημιά στις υπώρειες του Υμηττού, δυστυχής και τομαροντυμένος, με κόπο ανεβοκατεβάζει το δικέλλι του. Μια στιγμή σταματά και κοιτώντας προς τον ουρανό υψώνει προσευχή που είναι μαζί και διαμαρτυρία).</i></span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[1]</span> Δία, θεέ της φιλίας, της φιλοξενίας και της συντροφιάς, εφέστιε, αστραπόχαρε, φύλακα των όρκων, συννεφομαζώχτη, βαρύβροντε και όπως αλλιώς σε ονομάζουν οι έκθαμβοι ποιητές, όταν προπάντων έχουν δυσκολίες με τα μέτρα. Σε στολίζουν τότε με χίλια δυο ονόματα κι εσύ στηρίζεις την αδυναμία του μέτρου και γεφυρώνεις το χάσμα του ρυθμού. Πού είναι λοιπόν η ολόλαμπρη αστραπή σου, πού η βαριά βροντή και ο φλογερός, ο αστραφτερός, ο τρομερός κεραυνός σου; Όλα αυτά αποδείχτηκαν τώρα πια ανοησίες, πέρα για πέρα φαντασίες των ποιητών, ηχηρές μονάχα λέξεις. Και αυτό το φημισμένο και μακροβόλο όπλο, που όλη την ώρα το έχεις στο χέρι, δεν μπορώ να καταλάβω πώς έσβησε ολότελα και είναι τόσο ψυχρό, χωρίς να κρατάει ούτε μια σπίθα οργής γι᾽ αυτούς που διαπράττουν αδικίες. <span class="marker">[2]</span> Έτσι λοιπόν όποιος πάει να γίνει επίορκος, περισσότερο θα φοβόταν ένα τρεμόσβηστο φιτίλι παρά του πανδαμάτορα κεραυνού σου τη φλόγα. Μοιάζει να τους απειλείς μ᾽ ένα δαυλί που δε φοβούνται ούτε τη φωτιά του ούτε τον καπνό του και λογαριάζουν τούτο μόνο από το χτύπημα, ότι θα βουτηχτούν μες στη μουντζούρα.</span></p>
+<p class="passage indent"><span class="passage-text">Γι᾽ αυτό λοιπόν και ο Σαλμωνεύς είχε την τόλμη να σε συναγωνιστεί στη βροντή. Και δεν ήταν ολότελα αποτυχημένος, μπρος σ᾽ έναν τόσο παγερό Δία ο φλογερός εκείνος κομπαστής. Γιατί όχι; Εφόσον κοιμάσαι σαν να έχεις πιει το μανδραγόρα και ούτε τους επιορκούντες ακούς, ούτε τους αδικούντες επιβλέπεις. Τσιμπλιάζεις, κλείνεις τα μάτια σε όσα γίνονται τριγύρω σου και δεν ακούς, όπως οι γέροι. <span class="marker">[3]</span> Όταν ήσουν ακόμη νέος και οξύθυμος και ορμητικός, πολλά έκανες στους άδικους και τους σκληρούς και ποτέ δεν είχες τότε συμμαχία μαζί τους. Ο κεραυνός σου ήταν πάντοτε σε δράση, η αιγίδα σου απειλητική, η βροντή σου έκανε πάταγο και η αστραπή σου εξακοντιζόταν αδιάκοπα, όπως σε συμπλοκή. Οι σεισμοί σου σαν κόσκινο έσειαν τη γη, το χιόνι έπεφτε σωρός και πέτρα το χαλάζι. Και για να σου τα ξαναψάλω, ραγδαίες οι βροχές, άγριες, κάθε σταγόνα σου ποτάμι. Γι᾽ αυτό μέσα σε μια στιγμή έγινε τέτοιος κατακλυσμός τον καιρό του Δευκαλίωνα, που βούλιαξαν τα πάντα και μόλις ένα κιβώτιο εξόκειλε στη Λιάκουρα και σώθηκε κλείνοντας μέσα του μια σπίθα ζωντανή από το ανθρώπινο πνεύμα, για να γεννηθεί έπειτα κακία μεγαλύτερη.</span></p>
+        </div>
+        
+
+        <div id="book-1-chapter--2" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-2" data-hash="book-1-chapter--2">
+            Μονόλογος του Τίμωνα • Κεφάλαιο ΤΙΜΩΝ.2 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=57&page=2" target="_blank" class="page-link">Page 2</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[4]</span> Τοιγάρτοι ἀκόλουθα τῆς ῥᾳθυμίας τἀπίχειρα κομίζῃ παρ᾽ αὐτῶν, οὔτε θύοντος ἔτι σοί τινος οὔτε στεφανοῦντος, εἰ μή τις ἄρα πάρεργον Ὀλυμπίων, καὶ οὗτος οὐ πάνυ ἀναγκαῖα ποιεῖν δοκῶν, ἀλλ᾽ εἰς ἔθος τι ἀρχαῖον συντελῶν· καὶ κατ᾽ ὀλίγον Κρόνον σε, ὦ θεῶν γενναιότατε, ἀποφαίνουσι, παρωσάμενοι τῆς τιμῆς. ἐῶ λέγειν ποσάκις ἤδη σου τὸν νεὼν σεσυλήκασιν· οἱ δὲ καὶ αὐτῷ σοὶ τὰς χεῖρας Ὀλυμπίασιν ἐπιβεβλήκασι, καὶ σὺ ὁ ὑψιβρεμέτης ὤκνησας ἢ ἀναστῆσαι τοὺς κύνας ἢ τοὺς γείτονας ἐπικαλέσασθαι, ὡς βοηδρομήσαντες αὐτοὺς συλλάβοιεν ἔτι συσκευαζομένους πρὸς τὴν φυγήν· ἀλλ᾽ ὁ γενναῖος καὶ Γιγαντολέτωρ καὶ Τιτανοκράτωρ ἐκάθησο τοὺς πλοκάμους περικειρόμενος ὑπ᾽ αὐτῶν, δεκάπηχυν κεραυνὸν ἔχων ἐν τῇ δεξιᾷ.</span></p>
+<p class="passage indent"><span class="passage-text">Ταῦτα τοίνυν, ὦ θαυμάσιε, πηνίκα παύσεται οὕτως ἀμελῶς παρορώμενα; ἢ πότε κολάσεις τὴν τοσαύτην ἀδικίαν; πόσοι Φαέθοντες ἢ Δευκαλίωνες ἱκανοὶ πρὸς οὕτως ὑπέραντλον ὕβριν τοῦ βίου; <span class="marker">[5]</span> ἵνα γὰρ τὰ κοινὰ ἐάσας τἀμὰ εἴπω, τοσούτους Ἀθηναίων εἰς ὕψος ἄρας καὶ πλουσίους ἐκ πενεστάτων ἀποφήνας καὶ πᾶσι τοῖς δεομένοις ἐπικουρήσας, μᾶλλον δὲ ἀθρόον εἰς εὐεργεσίαν τῶν φίλων ἐκχέας τὸν πλοῦτον, ἐπειδὴ πένης διὰ ταῦτα ἐγενόμην, οὐκέτι οὐδὲ γνωρίζομαι πρὸς αὐτῶν οὐδὲ προσβλέπουσιν οἱ τέως ὑποπτήσσοντες καὶ προσκυνοῦντες κἀκ τοῦ ἐμοῦ νεύματος ἀνηρτημένοι, ἀλλ᾽ ἤν που καὶ ὁδῷ βαδίζων ἐντύχω τινὶ αὐτῶν, ὥσπερ τινὰ στήλην παλαιοῦ νεκροῦ ὑπτίαν ὑπὸ τοῦ χρόνου ἀνατετραμμένην παρέρχονται μηδὲ ἀναγνόντες. οἱ δὲ καὶ πόρρωθεν ἰδόντες ἑτέραν ἐκτρέπονται δυσάντητον καὶ ἀποτρόπαιον θέαμα ὄψεσθαι ὑπολαμβάνοντες τὸν οὐ πρὸ πολλοῦ σωτῆρα καὶ εὐεργέτην αὐτῶν γεγενημένον. <span class="marker">[6]</span> ὥστε ὑπὸ τῶν κακῶν ἐπὶ ταύτην τὴν ἐσχατιὰν τραπόμενος ἐναψάμενος διφθέραν ἐργάζομαι τὴν γῆν ὑπόμισθος ὀβολῶν τεσσάρων, τῇ ἐρημίᾳ καὶ τῇ δικέλλῃ προσφιλοσοφῶν. ἐνταῦθα τοῦτο γοῦν μοι δοκῶ κερδανεῖν, μηκέτι ὄψεσθαι πολλοὺς παρὰ τὴν ἀξίαν εὖ πράττοντας· ἀνιαρότερον γὰρ τοῦτό γε.</span></p>
+<p class="passage indent"><span class="passage-text">Ἤδη ποτὲ οὖν, ὦ Κρόνου καὶ Ῥέας υἱέ, τὸν βαθὺν τοῦτον ὕπνον ἀποσεισάμενος καὶ νήδυμον —ὑπὲρ τὸν Ἐπιμενίδην γὰρ κεκοίμησαι— καὶ ἀναρριπίσας τὸν κεραυνὸν ἢ ἐκ τῆς Αἴτνης ἐναυσάμενος μεγάλην ποιήσας τὴν φλόγα ἐπιδείξαιό τινα χολὴν ἀνδρώδους καὶ νεανικοῦ Διός, εἰ μὴ ἀληθῆ ἐστι τὰ ὑπὸ Κρητῶν περὶ σοῦ καὶ τῆς ἐκεῖ ταφῆς μυθολογούμενα.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[4]</span> Παίρνεις λοιπόν από τους ανθρώπους την αμοιβή της οκνηρίας σου. Κανείς δε σου προσφέρει πια θυσίες, μήτε σε στεφανώνει, παρά μόνο τυχαία στην Ολυμπία χωρίς να νομίζει και αυτός ότι κάνει κάτι απαραίτητο, κρατάει μόνο μια συνήθεια παλιά. Και όπου να ᾽ναι θα σε πετάξουν από την εξουσία και θα σε καταντήσουν σαν τον Κρόνο, ω θεέ γενναιότατε. Αφήνω πια πόσες φορές ώς τώρα έχουν κατακλέψει το ναό σου. Άλλοι πάλι άπλωσαν το χέρι τους ακόμα και σ᾽ εσένα τον ίδιο στην Ολυμπία. Κι εσύ, ο υψιβρεμέτης, βαρέθηκες να ξεσηκώσεις τα σκυλιά ή τους γειτόνους να φωνάξεις να τρέξουν για βοήθεια και να τους πιάσουν την ώρα που ετοίμαζαν τα κλεμμένα για φευγάλα. Μα ο δυνατός εσύ Γιγαντοφάγος, ο νικητής των Τιτάνων, καθόσουν και τους άφηνες να σου κόβουν τους πλοκάμους, και ας κρατούσες στο χέρι σου έναν κεραυνό δέκα πήχες.</span></p>
+<p class="passage indent"><span class="passage-text">Πότε λοιπόν, θαυματουργέ, θα πάψεις τόσο να τα παραβλέπεις όλα αυτά; Και πότε θα τιμωρήσεις την τόση αδικία; Πόσοι Φαέθοντες ή Δευκαλίωνες πρέπει να τιμωρηθούν για μια ζωή έτσι ξεχειλισμένη από αλαζονεία; <span class="marker">[5]</span> Και για να αφήσω τα ξένα και να ᾽ρθω στα δικά μου· πόσους Αθηναίους δεν εξύψωσα και από πάμπτωχους τους έκαμα πλούσιους; Όλους που είχαν ανάγκη τους βοήθησα και κυριολεκτικά σωρούς τα πλούτη μου σκόρπισα, για να ευεργετώ τους φίλους. Και τώρα που μ᾽ αυτή μου την τακτική έγινα φτωχός, όλοι αυτοί δε με γνωρίζουν πια, ούτε γυρίζουν να με κοιτάξουν, που κάποτε έσκυβαν και με προσκυνούσαν και κρέμονταν από ένα μου νεύμα. Μα, αν τύχει και στο δρόμο μου συναντήσω κανέναν τους, με προσπερνούν, όπως μια παλιά επιτύμβια στήλη ριγμένη από το χρόνο, χωρίς καν να τη διαβάσουν. Άλλοι πάλι, και από μακριά μόλις με δουν, αλλάζουν δρόμο θεωρώντας με κακό συναπάντημα και γρουσουζιά, έμενα που στάθηκα πριν από λίγο σωτήρας και ευεργέτης τους. <span class="marker">[6]</span> Γι᾽ αυτό λοιπόν από τις δυστυχίες μου αποτραβήχτηκα σ᾽ αυτήν την άκρη, φόρεσα προβιά και σκάβω τη γη με μεροκάματο ένα τεσσάρι οβολούς, φιλοσοφώντας με την ερημιά και το δικέλλι μου. Εδώ επιτέλους τούτο το κέρδος θαρρώ πως θα ᾽χω, δε θα βλέπω πια πολλούς να ευτυχούν, χωρίς να το αξίζουν, γιατί αυτό είναι το καταθλιπτικότερο.</span></p>
+<p class="passage indent"><span class="passage-text">Επιτέλους λοιπόν, γιε του Κρόνου και της Ρέας, πέταξε από πάνω σου αυτόν το βαθύ και γλυκό ύπνο. Περισσότερο και από τον Επιμενίδη έχεις κοιμηθεί. Ξαναφούντωσε τον κεραυνό σου ή άναψέ τον από την Αίτνα, τράνεψε τη φλόγα του και δείξε νεύρο ανδρωμένου και νεανικού Δία, εκτός αν είναι αλήθεια όσα οι Κρήτες διηγούνται για σένα και την ταφή σου εκεί.</span></p>
+        </div>
+        
+
+        <div id="book-2-chapter--" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-3" data-hash="book-2-chapter--">
+            Ζευς, Ερμής και Πλούτος • Κεφάλαιο ΖΕΥΣ-ΕΡΜΗΣ (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=57&page=3" target="_blank" class="page-link">Page 3</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ΖΕΥΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[7]</span> Τίς οὗτός ἐστιν, ὦ Ἑρμῆ, ὁ κεκραγὼς ἐκ τῆς Ἀττικῆς παρὰ τὸν Ὑμηττὸν ἐν τῇ ὑπωρείᾳ πιναρὸς ὅλος καὶ αὐχμῶν καὶ ὑποδίφθερος; σκάπτει δὲ οἶμαι ἐπικεκυφώς· λάλος ἅνθρωπος καὶ θρασύς. ἦ που φιλόσοφός ἐστιν· οὐ γὰρ ἂν οὕτως ἀσεβεῖς τοὺς λόγους διεξῄει καθ᾽ ἡμῶν.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τί φῄς, ὦ πάτερ; ἀγνοεῖς Τίμωνα τὸν Ἐχεκρατίδου τὸν Κολλυτέα; οὗτός ἐστιν ὁ πολλάκις ἡμᾶς καθ᾽ ἱερῶν τελείων ἑστιάσας, ὁ νεόπλουτος, ὁ τὰς ὅλας ἑκατόμβας, παρ᾽ ᾧ λαμπρῶς ἑορτάζειν εἰώθαμεν τὰ Διάσια.</span></p>
+<p class="passage"><span class="passage-text">ΖΕΥΣ</span></p>
+<p class="passage"><span class="passage-text">Φεῦ τῆς ἀλλαγῆς· ὁ καλὸς ἐκεῖνος, ὁ πλούσιος, περὶ ὃν οἱ τοσοῦτοι φίλοι; τί παθὼν οὖν τοιοῦτός ἐστιν, αὐχμηρός, ἄθλιος, καὶ σκαπανεὺς καὶ μισθωτός, ὡς ἔοικεν, οὕτω βαρεῖαν καταφέρων τὴν δίκελλαν;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[8]</span> Οὑτωσὶ μὲν εἰπεῖν, χρηστότης ἐπέτριψεν αὐτὸν καὶ φιλανθρωπία καὶ ὁ πρὸς τοὺς δεομένους ἅπαντας οἶκτος, ὡς δὲ ἀληθεῖ λόγῳ, ἄνοια καὶ εὐήθεια καὶ ἀκρισία περὶ τῶν φίλων, ὃς οὐ συνίει κόραξι καὶ λύκοις χαριζόμενος, ἀλλ᾽ ὑπὸ γυπῶν τοσούτων ὁ κακοδαίμων κειρόμενος τὸ ἧπαρ φίλους εἶναι αὐτοὺς καὶ ἑταίρους ᾤετο, ὑπ᾽ εὐνοίας τῆς πρὸς αὐτὸν χαίροντας τῇ βορᾷ· οἱ δὲ τὰ ὀστᾶ γυμνώσαντες ἀκριβῶς καὶ περιτραγόντες, εἰ δέ τις καὶ μυελὸς ἐνῆν, ἐκμυζήσαντες καὶ τοῦτον εὖ μάλα ἐπιμελῶς, ᾤχοντο αὖον αὐτὸν καὶ τὰς ῥίζας ὑποτετμημένον ἀπολιπόντες, οὐδὲ γνωρίζοντες ἔτι ἢ προσβλέποντες —πόθεν γάρ;— ἢ ἐπικουροῦντες ἢ ἐπιδιδόντες ἐν τῷ μέρει. διὰ ταῦτα δικελλίτης καὶ διφθερίας, ὡς ὁρᾷς, ἀπολιπὼν ὑπ᾽ αἰσχύνης τὸ ἄστυ μισθοῦ γεωργεῖ μελαγχολῶν τοῖς κακοῖς, ὅτι οἱ πλουτοῦντες παρ᾽ αὐτοῦ μάλα ὑπεροπτικῶς παρέρχονται οὐδὲ τοὔνομα, εἰ Τίμων καλοῖτο, εἰδότες.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text"><i>(Ψηλά στον ουρανό ο Δίας και ο Ερμής κουβεντιάζουν κοιτάζοντας τον Τίμωνα).</i></span></p>
+<p class="passage"><span class="passage-text">ΖΕΥΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[7]</span> Ποιός είναι αυτός, Ερμή, που κραυγάζει από την Αττική εκεί στου Υμηττού τις υπώρειες, καταλερωμένος, άλουστος και ντυμένος προβιά; Είναι, σκυμμένος θαρρώ και σκάβει. Φλύαρος άνθρωπος και θρασύς. Σίγουρα φιλόσοφος είναι, αλλιώς δε θα μας περιέλουζε με τέτοια λόγια ασέβειας.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τί λες, πατέρα; Αγνοείς τον Τίμωνα, το γιο του Εχεκρατίδη από τον Κολλυτό; Είναι αυτός που πολλές φορές μας τραπέζωσε με τέλειες θυσίες, εκατόμβες ολόκληρες, ο νεόπλουτος, που στο σπίτι του πάντα γιορτάζαμε λαμπρά τα Διάσια.</span></p>
+<p class="passage"><span class="passage-text">ΖΕΥΣ</span></p>
+<p class="passage"><span class="passage-text">Αλίμονο, τί αλλαγή! Εκείνος ο ωραίος, ο πλούσιος, που είχε τόσους φίλους γύρω του; Και πώς κατάντησε έτσι βρώμικος, άθλιος, σκαφτιάς και μεροκαματιάρης, όπως φαίνεται, που χτυπάει τόσο βαριά το δικέλλι;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[8]</span> Θα έλεγε κανείς ότι η καλοσύνη του τον κατέστρεψε και η φιλανθρωπία και η συμπόνια για όλους που έχουν ανάγκη. Στην πραγματικότητα όμως η αμυαλιά, η κουταμάρα και η έλλειψη κρίσης να διαλέγει τους φίλους. Δεν καταλάβαινε ότι έκανε χάρες σε κοράκια και λύκους. Αντίθετα, ενώ τόσοι γύπες τού κατέτρωγαν το συκώτι, ο δυστυχισμένος αυτός τους νόμιζε φίλους και συντρόφους που ό,τι καταβρόχθιζαν το χαίρονταν μόνο από αγάπη γι᾽ αυτόν. Κι εκείνοι, αφού τον ξεκοκάλισαν και τον τραγάνισαν και αφού ρούφηξαν προσεκτικά και το μεδούλι του ακόμη, αν τυχόν καθόλου απέμεινε, έφυγαν και τον άφησαν ξερό, με κομμένες τις ρίζες. Ούτε τον γνώριζαν πια, ούτε γυρνούσαν να τον δουν, πού σε είδα πού σε ξέρω; Ούτε τον βοηθούσαν, ούτε του πρόσφεραν κάτι και αυτοί με τη σειρά τους. Γι᾽ αυτό σκαφτιάς και τομαροντυμένος, όπως βλέπεις, εγκατέλειψε από ντροπή την πόλη και σκάβει τη γη με μεροκάματο, πικραμένος από τις δυστυχίες, γιατί αυτοί που εξαιτίας του πλούτισαν, τον προσπερνούν με υπεροψία και ούτε τ᾽ όνομά του ξέρουν, αν τον λένε Τίμωνα.</span></p>
+        </div>
+        
+
+        <div id="book-2-chapter---2" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-4" data-hash="book-2-chapter---2">
+            Ζευς, Ερμής και Πλούτος • Κεφάλαιο ΖΕΥΣ-ΕΡΜΗΣ.2 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=57&page=4" target="_blank" class="page-link">Page 4</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ΖΕΥΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[9]</span> Καὶ μὴν οὐ παροπτέος ἁνὴρ οὐδὲ ἀμελητέος· εἰκότως γὰρ ἠγανάκτει δυστυχῶν· ἐπεὶ καὶ ὅμοια ποιήσομεν τοῖς καταράτοις κόλαξιν ἐκείνοις ἐπιλελησμένοι ἀνδρὸς τοσαῦτα μηρία ταύρων τε καὶ αἰγῶν πιότατα καύσαντος ἡμῖν ἐπὶ τῶν βωμῶν· ἔτι γοῦν ἐν ταῖς ῥισὶ τὴν κνῖσαν αὐτῶν ἔχω. πλὴν ὑπ᾽ ἀσχολίας τε καὶ θορύβου πολλοῦ τῶν ἐπιορκούντων καὶ βιαζομένων καὶ ἁρπαζόντων, ἔτι δὲ καὶ φόβου τοῦ παρὰ τῶν ἱεροσυλούντων —πολλοὶ γὰρ οὗτοι καὶ δυσφύλακτοι καὶ οὐδὲ ὀλίγον καταμύσαι ἡμῖν ἐφιᾶσι— πολὺν ἤδη χρόνον οὐδὲ ἀπέβλεψα ἐς τὴν Ἀττικήν, καὶ μάλιστα ἐξ οὗ φιλοσοφία καὶ λόγων ἔριδες ἐπεπόλασαν αὐτοῖς· μαχομένων γὰρ πρὸς ἀλλήλους καὶ κεκραγότων οὐδὲ ἐπακούειν ἔστι τῶν εὐχῶν· ὥστε ἢ ἐπιβυσάμενον χρὴ τὰ ὦτα καθῆσθαι ἢ ἐπιτριβῆναι πρὸς αὐτῶν, ἀρετήν τινα καὶ ἀσώματα καὶ λήρους μεγάλῃ τῇ φωνῇ συνειρόντων. διὰ ταῦτά τοι καὶ τοῦτον ἀμεληθῆναι συνέβη πρὸς ἡμῶν οὐ φαῦλον ὄντα.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[10]</span> Ὅμως δὲ τὸν Πλοῦτον, ὦ Ἑρμῆ, παραλαβὼν ἄπιθι παρ᾽ αὐτὸν κατὰ τάχος· ἀγέτω δὲ ὁ Πλοῦτος καὶ τὸν Θησαυρὸν μεθ᾽ αὑτοῦ καὶ μενέτωσαν ἄμφω παρὰ τῷ Τίμωνι μηδὲ ἀπαλλαττέσθωσαν οὕτω ῥᾳδίως, κἂν ὅτι μάλιστα ὑπὸ χρηστότητος αὖθις ἐκδιώκῃ αὐτοὺς τῆς οἰκίας. περὶ δὲ τῶν κολάκων ἐκείνων καὶ τῆς ἀχαριστίας ἣν ἐπεδείξαντο πρὸς αὐτόν, καὶ αὖθις μὲν σκέψομαι καὶ δίκην δώσουσιν, ἐπειδὰν τὸν κεραυνὸν ἐπισκευάσω· κατεαγμέναι γὰρ αὐτοῦ καὶ ἀπεστομωμέναι εἰσὶ δύο ἀκτῖνες αἱ μέγισται, ὁπότε φιλοτιμότερον ἠκόντισα πρῴην ἐπὶ τὸν σοφιστὴν Ἀναξαγόραν, ὃς ἔπειθε τοὺς ὁμιλητὰς μηδὲ ὅλως εἶναί τινας ἡμᾶς τοὺς θεούς. ἀλλ᾽ ἐκείνου μὲν διήμαρτον —ὑπερέσχε γὰρ αὐτοῦ τὴν χεῖρα Περικλῆς— ὁ δὲ κεραυνὸς εἰς τὸ Ἀνακεῖον παρασκήψας ἐκεῖνό τε κατέφλεξε καὶ αὐτὸς ὀλίγου δεῖν συνετρίβη περὶ τῇ πέτρᾳ. πλὴν ἱκανὴ ἐν τοσούτῳ καὶ αὕτη τιμωρία ἔσται αὐτοῖς, ὑπερπλουτοῦντα τὸν Τίμωνα ὁρῶσιν.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[11]</span> Οἷον ἦν τὸ μέγα κεκραγέναι καὶ ὀχληρὸν εἶναι καὶ θρασύν. οὐ τοῖς δικαιολογοῦσι μόνοις, ἀλλὰ καὶ τοῖς εὐχομένοις τοῦτο χρήσιμον· ἰδού γέ τοι αὐτίκα μάλα πλούσιος ἐκ πενεστάτου καταστήσεται ὁ Τίμων βοήσας καὶ παρρησιασάμενος ἐν τῇ εὐχῇ καὶ ἐπιστρέψας τὸν Δία· εἰ δὲ σιωπῇ ἔσκαπτεν ἐπικεκυφώς, ἔτι ἂν ἔσκαπτεν ἀμελούμενος.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">ΖΕΥΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[9]</span> Αν είναι έτσι, δεν πρέπει να αδιαφορήσουμε γι᾽ αυτόν τον άνθρωπο και να τον παραμελήσουμε, γιατί δικαιολογημένα ήταν αγανακτισμένος με τη δυστυχία του. Αλλιώς θα φερθούμε κι εμείς όπως εκείνοι οι καταραμένοι κόλακες, αν ξεχάσουμε έναν άνθρωπο που έκαψε πάνω στους βωμούς, για να μας τιμήσει, τόσα παχιά μεριά από βόδια και γίδια. Ακόμη έχω στα ρουθούνια μου την κνίσα τους. Με τις διάφορες ασχολίες μου όμως και τις φασαρίες που κάνουν οι επίορκοι, οι βιαστές και οι άρπαγες, αλλά και από το φόβο των ιεροσύλων —είναι πολλοί και δύσκολα μπορείς να τους προσέχεις και δε μας αφήνουν ούτε για λίγο τα μάτια να κλείσουμε— εδώ και πολύν καιρό ούτε ματιά δεν έριξα στην Αττική. Προπάντων από τότε που οι φιλόσοφοι και οι καβγάδες τους πλήθυναν. Με τις λογομαχίες και τις φωνές τους, ούτε τις προσευχές δεν είναι δυνατό να ακούω. Γι᾽ αυτό λοιπόν πρέπει ή να κάθομαι με βουλωμένα τα αυτιά, ή να ξεκουφαθώ ακούοντάς τους να μιλούν με δυνατή φωνή για αρετή και ασώματα και ανοησίες. Έτσι έγινε και παραμελήσαμε τούτον τον άνθρωπο, που για μας δε στάθηκε κακός.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[10]</span> Όμως, Ερμή, πάρε τον Πλούτο και τρέξε κοντά του. Ο Πλούτος να πάρει και το Θησαυρό μαζί του. Να μείνουν και οι δυο κοντά στον Τίμωνα, να μη φύγουν έτσι εύκολα, ακόμη και αν αυτός από χρηστότητα πάλι τους διώχνει από το σπίτι.</span></p>
+<p class="passage indent"><span class="passage-text">Όσο για τους κόλακες και την αχαριστία που του έδειξαν, θα το ξανασκεφτώ και θα τους τιμωρήσω, μόλις επισκευάσω τον κεραυνό. Είναι τσακισμένες και στομωμένες δυο του ακτίνες, οι μεγαλύτερες, από τότε που τις εξακόντισα με δύναμη καταπάνω στο σοφιστή Αναξαγόρα, που στις συζητήσεις του προσπαθούσε να πείσει πως δεν είμαστε τίποτε εμείς οι θεοί. Μα εκείνον δεν τον πέτυχα —γιατί άπλωσε ο Περικλής το χέρι του και τον προστάτεψε— και ο κεραυνός έπεσε πάνω στο Ανακείο, το κατέστρεψε και παραλίγο να τσακιστεί και ο ίδιος πάνω στην πέτρα. Ωστόσο αρκετή τιμωρία στο μεταξύ θα είναι γι᾽ αυτούς να βλέπουν τον Τίμωνα πάμπλουτο.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[11]</span> Πόσο σπουδαίο πράγμα είναι να βάζει κανείς τις φωνές, να γίνεται ενοχλητικός και θρασύς. Είναι χρήσιμο αυτό όχι μόνο στους συνηγόρους, αλλά και σ᾽ αυτούς που κάνουν την προσευχή τους. Νά, ο Τίμων τώρα με το να βάλει τις φωνές και να πει θαρραλέα στην προσευχή του τις αλήθειες αναγκάζοντας το Δία να στραφεί και να τον κοιτάξει, από πάμπτωχος θα γίνει αμέσως πολύ πλούσιος. Αν όμως σκυμμένος έσκαβε χωρίς μιλιά, ακόμα θα έσκαβε παραμελημένος.</span></p>
+        </div>
+        
+
+        
+        <div class="page-divider" id="page-5" data-hash="book-2-chapter--">
+            Ζευς, Ερμής και Πλούτος • Κεφάλαιο ΠΛΟΥΤΟΣ-ΖΕΥΣ (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=57&page=5" target="_blank" class="page-link">Page 5</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Ἀλλ᾽ ἐγὼ οὐκ ἂν ἀπέλθοιμι, ὦ Ζεῦ, παρ᾽ αὐτόν.</span></p>
+<p class="passage"><span class="passage-text">ΖΕΥΣ</span></p>
+<p class="passage"><span class="passage-text">Διὰ τί, ὦ ἄριστε Πλοῦτε, καὶ ταῦτα ἐμοῦ κελεύσαντος;</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[12]</span> Ὅτι νὴ Δία ὕβριζεν εἰς ἐμὲ καὶ ἐξεφόρει καὶ ἐς πολλὰ κατεμέριζε, καὶ ταῦτα πατρῷον αὐτῷ φίλον ὄντα, καὶ μονονουχὶ δικράνοις ἐξεώθει με τῆς οἰκίας καθάπερ οἱ τὸ πῦρ ἐκ τῶν χειρῶν ἀπορριπτοῦντες. αὖθις οὖν ἀπέλθω παρασίτοις καὶ κόλαξι καὶ ἑταίραις παραδοθησόμενος; ἐπ᾽ ἐκείνους, ὦ Ζεῦ, πέμπε με τοὺς ἡσθησομένους τῇ δωρεᾷ, τοὺς περιέψοντας, οἷς τίμιος ἐγὼ καὶ περιπόθητος· οὗτοι δὲ οἱ λάροι τῇ πενίᾳ συνέστωσαν, ἣν προτιμῶσιν ἡμῶν, καὶ διφθέραν παρ᾽ αὐτῆς λαβόντες καὶ δίκελλαν ἀγαπάτωσαν ἄθλιοι τέτταρας ὀβολοὺς ἀποφέροντες, οἱ δεκαταλάντους δωρεὰς ἀμελητὶ προϊέμενοι.</span></p>
+<p class="passage"><span class="passage-text">ΖΕΥΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[13]</span> Οὐδὲν ἔτι τοιοῦτον ὁ Τίμων ἐργάσεται περὶ σέ· πάνυ γὰρ αὐτὸν ἡ δίκελλα πεπαιδαγώγηκεν, εἰ μὴ παντάπασιν ἀνάλγητός ἐστι τὴν ὀσφῦν, ὡς χρῆν σὲ ἀντὶ τῆς πενίας προαιρεῖσθαι. σὺ μέντοι πάνυ μεμψίμοιρος εἶναί μοι δοκεῖς, ὃς νῦν μὲν τὸν Τίμωνα αἰτιᾷ, διότι σοι τὰς θύρας ἀναπετάσας ἠφίει περινοστεῖν ἐλευθέρως οὔτε ἀποκλείων οὔτε ζηλοτυπῶν· ἄλλοτε δὲ τοὐναντίον ἠγανάκτεις κατὰ τῶν πλουσίων κατακεκλεῖσθαι λέγων πρὸς αὐτῶν ὑπὸ μοχλοῖς καὶ κλεισὶ καὶ σημείων ἐπιβολαῖς, ὡς μηδὲ παρακύψαι σοι ἐς τὸ φῶς δυνατὸν εἶναι. ταῦτα γοῦν ἀπωδύρου πρός με, ἀποπνίγεσθαι λέγων ἐν πολλῷ τῷ σκότῳ· καὶ διὰ τοῦτο ὠχρὸς ἡμῖν ἐφαίνου καὶ φροντίδος ἀνάπλεως, συνεσπακὼς τοὺς δακτύλους πρὸς τὸ ἔθος τῶν λογισμῶν καὶ ἀποδράσεσθαι ἀπειλῶν, εἰ καιροῦ λάβοιο, παρ᾽ αὐτῶν· καὶ ὅλως τὸ πρᾶγμα ὑπέρδεινον ἐδόκει σοι, ἐν χαλκῷ ἢ σιδηρῷ τῷ θαλάμῳ καθάπερ τὴν Δανάην παρθενεύεσθαι ὑπ᾽ ἀκριβέσι καὶ παμπονήροις παιδαγωγοῖς ἀνατρεφόμενον, τῷ Τόκῳ καὶ τῷ Λογισμῷ. <span class="marker">[14]</span> ἄτοπα γοῦν ποιεῖν ἔφασκες αὐτοὺς ἐρῶντας μὲν εἰς ὑπερβολήν, ἐξὸν δὲ ἀπολαύειν οὐ τολμῶντας, οὐδὲ ἐπ᾽ ἀδείας χρωμένους τῷ ἔρωτι κυρίους γε ὄντας, ἀλλὰ φυλάττειν ἐγρηγορότας, ἐς τὸ σημεῖον καὶ τὸν μοχλὸν ἀσκαρδαμυκτὶ βλέποντας, ἱκανὴν ἀπόλαυσιν οἰομένους οὐ τὸ αὐτοὺς ἀπολαύειν ἔχειν, ἀλλὰ τὸ μηδενὶ μεταδιδόναι τῆς ἀπολαύσεως, καθάπερ τὴν ἐν τῇ φάτνῃ κύνα μήτε αὐτὴν ἐσθίουσαν τῶν κριθῶν μήτε τῷ ἵππῳ πεινῶντι ἐπιτρέπουσαν. καὶ προσέτι γε καὶ κατεγέλας αὐτῶν φειδομένων καὶ φυλαττόντων καὶ τὸ καινότατον αὑτοὺς ζηλοτυπούντων, ἀγνοούντων δὲ ὡς κατάρατος οἰκέτης ἢ οἰκονόμος πεδότριψ ὑπεισιὼν λαθραίως ἐμπαροινήσει, τὸν κακοδαίμονα καὶ ἀνέραστον δεσπότην πρὸς ἀμαυρόν τι καὶ μικρόστομον λυχνίδιον καὶ διψαλέον θρυαλλίδιον ἐπαγρυπνεῖν ἐάσας τοῖς τόκοις. πῶς οὖν οὐκ ἄδικα ταῦτά σου, πάλαι μὲν ἐκεῖνα αἰτιᾶσθαι, νῦν δὲ τῷ Τίμωνι τὰ ἐναντία ἐπικαλεῖν;</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text"><i>(Ο Πλούτος έρχεται μπροστά στο Δία).</i></span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Αλλά εγώ, Δία, σ᾽ αυτόν δεν πρόκειται να πάω.</span></p>
+<p class="passage"><span class="passage-text">ΖΕΥΣ</span></p>
+<p class="passage"><span class="passage-text">Γιατί, εξοχότατε Πλούτε, αφού μάλιστα σε πρόσταξα εγώ;</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[12]</span> Διότι, μα το Δία, ο Τίμων μού έκανε κακό, με σκορπούσε και με διαμοίραζε, μόλο που ήμουν πατρικός του φίλος. Και μόνο που δεν πήρε στα χέρια του το δικράνι να με πετάξει έξω από το σπίτι, όπως εκείνοι που πετούν τη φωτιά από τα χέρια τους. Να ξαναπάω λοιπόν, για να με παραδώσει σε παράσιτους και κόλακες; Να με στέλνεις, Δία, σ᾽ εκείνους που θα ευχαριστηθούν μ᾽ αυτό το δώρο, που θα με περιποιηθούν, εκεί όπου θα είμαι πολύτιμος και περιπόθητος. Και οι άλλοι οι ανόητοι ας μείνουν συντροφιά με τη φτώχεια που την προτιμούν. Και ας λάβουν απ᾽ αυτήν το τομάρι και το δικέλλι και ας μένουν ευχαριστημένοι με τους τέσσερις οβολούς εκείνοι που ανέμελα αφήνουν μέσα από τα χέρια τους δεκατάλαντα δώρα.</span></p>
+<p class="passage"><span class="passage-text">ΖΕΥΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[13]</span> Δεν πρόκειται πια να σου κάνει κάτι τέτοιο ο Τίμων. Τον έχει για καλά σωφρονίσει το δικέλλι, εκτός και αν έχει τόση αναισθησία στη μέση του, ώστε την πενία από εσένα να προτιμά. Κι εσύ όμως μου παραφαίνεσαι γκρινιάρης. Τώρα κατηγορείς τον Τίμωνα, γιατί σου άνοιξε τις πόρτες και σε άφηνε να τριγυρνάς ελεύθερα, χωρίς να σε περιορίζει ή να σε ζηλεύει, ενώ άλλοτε αγανακτούσες με τους πλουσίους και έλεγες ότι σε σφιχτομανταλώνουν με σύρτες, με κλειδιά και με λουκέτα, ώστε δε σου ήταν μπορετό ούτε να προβάλεις στο φως του ήλιου. Αυτά λοιπόν μου κλαιγόσουν. Και έλεγες ότι πνίγεσαι στο βαθύ σκοτάδι, γι᾽ αυτό μας φαινόσουν ωχρός και γεμάτος φροντίδες με λυγισμένα τα δάχτυλα από τη συνήθεια να μετράς. Και απειλούσες ότι θα αποδράσεις απ᾽ αυτούς, μόλις βρεις την ευκαιρία. Γενικά όλη η κατάσταση σου φαινόταν αφόρητη, να ζεις σαν παρθένα σ᾽ ένα χάλκινο θάλαμο ή σιδερένιο, όπως η Δανάη, με αυστηρούς και παμπόνηρους παιδαγωγούς, τον Τόκο και το Λογαριασμό.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[14]</span> Έλεγες μάλιστα πως αυτοί κάνουν παράλογα πράγματα λατρεύοντάς σε. Δεν τολμούν να σε απολαμβάνουν, ενώ τους είναι δυνατό. Δεν έχουν την ελευθερία να χρησιμοποιούν αυτό που λατρεύουν, ενώ είναι αφέντες του. Αντίθετα άγρυπνοι το φρουρούν με τα μάτια καρφωμένα στο λουκέτο και στο σύρτη. Και θεωρούν αρκετή απόλαυση όχι να χαίρονται οι ίδιοι, αλλά να μη δίνουν την ευχαρίστηση σε κανέναν, όπως η σκύλα στο παχνί, που ούτε η ίδια μπορούσε να φάει το κριθάρι, ούτε όμως άφηνε το πεινασμένο άλογο να το φάει. Και από πάνω τούς κορόιδευες που τσιγκουνεύονταν και σε φρουρούσαν και, το πιο παράξενο, ζήλευαν τον ίδιο τον εαυτό τους, χωρίς να υποψιάζονται ότι κάποιος καταραμένος δούλος του σπιτιού ή ανάξιος επιστάτης μπορεί να γλιστρά κρυφά μέσα και να γλεντοκοπάει, αφήνοντας το δυστυχή και ασυγκίνητο αφέντη να ξαγρυπνά για τους τόκους μπροστά σε μαυρισμένο και μικρόστομο λυχναράκι με διψαλέο φιτίλι. Πώς λοιπόν δεν είσαι άδικος, παλιότερα αυτά να τα κατακρίνεις και τώρα να κατηγορείς τον Τίμωνα για τα αντίθετα;</span></p>
+        </div>
+        
+
+        
+        <div class="page-divider" id="page-6" data-hash="book-2-chapter---2">
+            Ζευς, Ερμής και Πλούτος • Κεφάλαιο ΠΛΟΥΤΟΣ-ΖΕΥΣ.2 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=57&page=6" target="_blank" class="page-link">Page 6</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[15]</span> Καὶ μὴν εἴ γε τἀληθὲς ἐξετάζοις, ἄμφω σοι εὔλογα δόξω ποιεῖν· τοῦ τε γὰρ Τίμωνος τὸ πάνυ τοῦτο ἀνειμένον ἀμελὲς καὶ οὐκ εὐνοϊκὸν ὡς πρὸς ἐμὲ εἰκότως ἂν δοκοίη· τούς τε αὖ κατάκλειστον ἐν θύραις καὶ σκότῳ φυλάττοντας, ὅπως αὐτοῖς παχύτερος γενοίμην καὶ πιμελὴς καὶ ὑπέρογκος ἐπιμελουμένους, οὔτε προσαπτομένους αὐτοὺς οὔτε ἐς τὸ φῶς προάγοντας, ὡς μηδὲ ὀφθείην πρός τινος, ἀνοήτους ἐνόμιζον εἶναι καὶ ὑβριστάς, οὐδὲν ἀδικοῦντά με ὑπὸ τοσούτοις δεσμοῖς κατασήποντας, οὐκ εἰδότας ὡς μετὰ μικρὸν ἀπίασιν ἄλλῳ τινὶ τῶν εὐδαιμόνων με καταλιπόντες. <span class="marker">[16]</span> οὔτ᾽ οὖν ἐκείνους οὔτε τοὺς πάνυ προχείρους εἰς ἐμὲ τούτους ἐπαινῶ, ἀλλὰ τούς, ὅπερ ἄριστόν ἐστι, μέτρον ἐπιθήσοντας τῷ πράγματι καὶ μήτε ἀφεξομένους τὸ παράπαν μήτε προησομένους τὸ ὅλον.</span></p>
+<p class="passage indent"><span class="passage-text">Σκόπει γάρ, ὦ Ζεῦ, πρὸς τοῦ Διός. εἴ τις νόμῳ γήμας γυναῖκα νέαν καὶ καλὴν ἔπειτα μήτε φυλάττοι μήτε ζηλοτυποῖ τὸ παράπαν, ἀφιεὶς καὶ βαδίζειν ἔνθα ἐθέλοι νύκτωρ καὶ μεθ᾽ ἡμέραν καὶ συνεῖναι τοῖς βουλομένοις, μᾶλλον δὲ αὐτὸς ἀπάγοι μοιχευθησομένην ἀνοίγων τὰς θύρας καὶ μαστροπεύων καὶ πάντας ἐπ᾽ αὐτὴν καλῶν, ἆρα ὁ τοιοῦτος ἐρᾶν δόξειεν ἄν; οὐ σύ γε, ὦ Ζεῦ, τοῦτο φαίης ἄν, ἐρασθεὶς πολλάκις. <span class="marker">[17]</span> εἰ δέ τις ἔμπαλιν ἐλευθέραν γυναῖκα εἰς τὴν οἰκίαν νόμῳ παραλαβὼν ἐπ᾽ ἀρότῳ παίδων γνησίων, ὁ δὲ μήτε αὐτὸς προσάπτοιτο ἀκμαίας καὶ καλῆς παρθένου μήτε ἄλλῳ προσβλέπειν ἐπιτρέποι, ἄγονον δὲ καὶ στεῖραν κατακλείσας παρθενεύοι, καὶ ταῦτα ἐρᾶν φάσκων καὶ δῆλος ὢν ἀπὸ τῆς χρόας καὶ τῆς σαρκὸς ἐκτετηκυίας καὶ τῶν ὀφθαλμῶν ὑποδεδυκότων, ἔσθ᾽ ὅπως ὁ τοιοῦτος οὐ παραπαίειν δόξειεν ἄν, δέον παιδοποιεῖσθαι καὶ ἀπολαύειν τοῦ γάμου, καταμαραίνων εὐπρόσωπον οὕτω καὶ ἐπέραστον κόρην καθάπερ ἱέρειαν τῇ Θεσμοφόρῳ τρέφων διὰ παντὸς τοῦ βίου; ταῦτα καὶ αὐτὸς ἀγανακτῶ, πρὸς ἐνίων μὲν ἀτίμως λακτιζόμενος καὶ λαφυσσόμενος καὶ ἐξαντλούμενος, ὑπ᾽ ἐνίων δὲ ὥσπερ στιγματίας δραπέτης πεπεδημένος.</span></p>
+<p class="passage"><span class="passage-text">ΖΕΥΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[18]</span> Τί οὖν ἀγανακτεῖς κατ᾽ αὐτῶν; διδόασι γὰρ ἄμφω καλὴν τὴν δίκην, οἱ μὲν ὥσπερ ὁ Τάνταλος ἄποτοι καὶ ἄγευστοι καὶ ξηροὶ τὸ στόμα, ἐπικεχηνότες μόνον τῷ χρυσίῳ, οἱ δὲ καθάπερ ὁ Φινεὺς ἀπὸ τῆς φάρυγγος τὴν τροφὴν ὑπὸ τῶν Ἁρπυιῶν ἀφαιρούμενοι. ἀλλ᾽ ἄπιθι ἤδη σωφρονεστέρῳ παρὰ πολὺ τῷ Τίμωνι ἐντευξόμενος.</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Ἐκεῖνος γάρ ποτε παύσεται ὥσπερ ἐκ κοφίνου τετρυπημένου, πρὶν ὅλως εἰσρυῆναί με, κατὰ σπουδὴν ἐξαντλῶν, φθάσαι βουλόμενος τὴν ἐπιρροήν, μὴ ὑπέραντλος εἰσπεσὼν ἐπικλύσω αὐτόν; ὥστε ἐς τὸν τῶν Δαναΐδων πίθον ὑδροφορήσειν μοι δοκῶ καὶ μάτην ἐπαντλήσειν, τοῦ κύτους μὴ στέγοντος, ἀλλὰ πρὶν εἰσρυῆναι σχεδὸν ἐκχυθησομένου τοῦ ἐπιρρέοντος· οὕτως εὐρύτερον τὸ πρὸς τὴν ἔκχυσιν κεχηνὸς τοῦ πίθου καὶ ἀκώλυτος ἡ ἔξοδος.</span></p>
+<p class="passage"><span class="passage-text">ΖΕΥΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[19]</span> Οὐκοῦν, ἢν μὴ ἐμφράξηται τὸ κεχηνὸς τοῦτο καὶ ἐς τὸ ἅπαξ ἀναπεπταμένον, ἐκχυθέντος ἐν βραχεῖ σου ῥᾳδίως εὑρήσει τὴν διφθέραν αὖθις καὶ τὴν δίκελλαν ἐν τῇ τρυγὶ τοῦ πίθου. ἀλλ᾽ ἄπιτε ἤδη καὶ πλουτίζετε αὐτόν· σὺ δὲ μέμνησο, ὦ Ἑρμῆ, ἐπανιὼν πρὸς ἡμᾶς ἄγειν τοὺς Κύκλωπας ἐκ τῆς Αἴτνης, ὅπως τὸν κεραυνὸν ἀκονήσαντες ἐπισκευάσωσιν· ὡς ἤδη γε τεθηγμένου αὐτοῦ δεησόμεθα.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[15]</span> Κι όμως, αν θέλεις να ψάξεις για την αλήθεια, θα δεις ότι δικαιολογημένα φέρομαι έτσι και στις δύο περιπτώσεις. Του Τίμωνα αυτή η μεγάλη σπατάλη εύλογα μπορεί να θεωρηθεί αδιαφορία και όχι συμπάθεια για μένα. Τους άλλους πάλι εκείνους που με κρατούν κλειδωμένο στα σκοτεινά, φροντίζοντας να γίνω παχύτερος, καλοθρεμμένος και υπέρογκος και δε με αγγίζουν ούτε με βγάζουν στο φως, μην τυχόν με ιδεί κανένα μάτι, πάντοτε τους νόμιζα ανόητους και αδιάντροπους, γιατί χωρίς να έχω κάνει κανένα κακό με αφήνουν να σαπίζω κάτω από τόσες αλυσίδες. Και δεν ξέρουν ότι ύστερα από λίγο θα φύγουν και θα με εγκαταλείψουν σε κάποιον από τους τυχερούς. <span class="marker">[16]</span> Ούτε εκείνους λοιπόν επαινώ, ούτε όμως και αυτούς που είναι πολύ απερίσκεπτοι μαζί μου· μα όσους θέλουν να τηρήσουν το μέτρο, πράγμα που είναι το καλύτερο. Ούτε να με αφήνουν εντελώς άθικτο, ούτε όμως να με σκορπούν ανόητα.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[17]</span> Αυτό με κάνει κι έμενα να αγανακτώ, γιατί μερικοί με κλωτσούν με περιφρόνηση και με καταβροχθίζουν και με σπαταλούν, ενώ άλλοι πάλι μου έχουν βάλει χειροπέδες σαν στιγματισμένο δραπέτη.</span></p>
+<p class="passage"><span class="passage-text">ΖΕΥΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[18]</span> Γιατί λοιπόν αγανακτείς μ᾽ αυτούς, αφού καλά είναι τιμωρημένοι; Οι πρώτοι, όπως ο Τάνταλος, διψασμένοι, νηστικοί και με στεγνό το στόμα, χάσκουν μόνο μπροστά στο χρυσάφι και οι άλλοι πάλι σαν το Φινέα που οι Άρπυιες τους αρπάζουν την τροφή μέσα από το λαρύγγι τους. Μα πήγαινε τώρα, και θα βρεις τον Τίμωνα πολύ πιο σωφρονισμένο.</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Θα σταματήσει δηλαδή καμιά φορά εκείνος να με σκορπά όπως από ένα τρύπιο κοφίνι, προτού καλά καλά το γεμίσω, θαρρείς για να προλάβει να μην ξεχειλίσω και τον κατακλύσω; Έτσι λοιπόν μου φαίνεται πως θα κουβαλώ νερό στον πίθο των Δαναΐδων και άδικα θα το αδειάζω μέσα, γιατί δεν έχει το δοχείο πάτο, και πριν γεμίσει, θα φεύγει από κάτω όσο θα χύνεται από πάνω. Τόσο πλατύτερο είναι το άνοιγμα του πίθου στον πάτο και το άδειασμα γίνεται ανεμπόδιστα.</span></p>
+<p class="passage"><span class="passage-text">ΖΕΥΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[19]</span> Αν λοιπόν δε φράξει τούτο το άνοιγμα και μείνει για πάντα ανοιχτό, γρήγορα θα χυθείς εσύ έξω κι εκείνος εύκολα θα ξαναβρεί το τομάρι και το δικέλλι στον πάτο του πιθαριού. Αλλά πηγαίνετε τώρα και κάνετέ τον πλούσιο. Κι εσύ, Ερμή, θυμήσου στο γυρισμό να μας φέρεις τους Κύκλωπες από την Αίτνα, για να ακονίσουν και να επισκευάσουν τον κεραυνό, γιατί θα τον χρειαστούμε σε λίγο μάλιστα ακονισμένο.</span></p>
+        </div>
+        
+
+        <div id="book-3-chapter--" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-7" data-hash="book-3-chapter--">
+            Ο Ερμής και ο Πλούτος κατεβαίνουν στη γη • Κεφάλαιο ΕΡΜΗΣ-ΠΛΟΥΤΟΣ (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=57&page=7" target="_blank" class="page-link">Page 7</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[20]</span> Προΐωμεν, ὦ Πλοῦτε. τί τοῦτο; ὑποσκάζεις; ἐλελήθεις με, ὦ γεννάδα, οὐ τυφλὸς μόνον ἀλλὰ καὶ χωλὸς ὤν.</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Οὐκ ἀεὶ τοῦτο, ὦ Ἑρμῆ, ἀλλ᾽ ὁπόταν μὲν ἀπίω παρά τινα πεμφθεὶς ὑπὸ τοῦ Διός, οὐκ οἶδ᾽ ὅπως βραδύς εἰμι καὶ χωλὸς ἀμφοτέροις, ὡς μόγις τελεῖν ἐπὶ τὸ τέρμα, προγηράσαντος ἐνίοτε τοῦ περιμένοντος, ὁπόταν δὲ ἀπαλλάττεσθαι δέῃ, πτηνὸν ὄψει, πολὺ τῶν ὀνείρων ὠκύτερον· ἅμα γοῦν ἔπεσεν ἡ ὕσπληξ, κἀγὼ ἤδη ἀνακηρύττομαι νενικηκώς, ὑπερπηδήσας τὸ στάδιον οὐδὲ ἰδόντων ἐνίοτε τῶν θεατῶν.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Οὐκ ἀληθῆ ταῦτα φῄς· ἐγώ γέ τοι πολλοὺς ἂν εἰπεῖν ἔχοιμί σοι χθὲς μὲν οὐδὲ ὀβολὸν ὥστε πρίασθαι βρόχον ἐσχηκότας, ἄφνω δὲ τήμερον πλουσίους καὶ πολυτελεῖς ἐπὶ λευκοῦ ζεύγους ἐξελαύνοντας, οἷς οὐδὲ κἂν ὄνος ὑπῆρξε πώποτε. καὶ ὅμως πορφυροῖ καὶ χρυσόχειρες περιέρχονται οὐδ᾽ αὐτοὶ πιστεύοντες οἶμαι ὅτι μὴ ὄναρ πλουτοῦσιν.</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[21]</span> Ἑτεροῖον τοῦτ᾽ ἐστίν, ὦ Ἑρμῆ, καὶ οὐχὶ τοῖς ἐμαυτοῦ ποσὶ βαδίζω τότε, οὐδὲ ὁ Ζεὺς ἀλλ᾽ ὁ Πλούτων ἀποστέλλει με παρ᾽ αὐτοὺς ἅτε πλουτοδότης καὶ μεγαλόδωρος καὶ αὐτὸς ὤν· δηλοῖ γοῦν καὶ τῷ ὀνόματι. ἐπειδὰν τοίνυν μετοικισθῆναι δέῃ με παρ᾽ ἑτέρου πρὸς ἕτερον, ἐς δέλτον ἐμβαλόντες με καὶ κατασημηνάμενοι ἐπιμελῶς φορηδὸν ἀράμενοι μετακομίζουσιν· καὶ ὁ μὲν νεκρὸς ἐν σκοτεινῷ που τῆς οἰκίας πρόκειται ὑπὲρ τὰ γόνατα παλαιᾷ τῇ ὀθόνῃ σκεπόμενος, περιμάχητος ταῖς γαλαῖς, ἐμὲ δὲ οἱ ἐπελπίσαντες ἐν τῇ ἀγορᾷ περιμένουσι κεχηνότες ὥσπερ τὴν χελιδόνα προσπετομένην τετριγότες οἱ νεοττοί. <span class="marker">[22]</span> ἐπειδὰν δὲ τὸ σημεῖον ἀφαιρεθῇ καὶ τὸ λίνον ἐντμηθῇ καὶ ἡ δέλτος ἀνοιχθῇ καὶ ἀνακηρυχθῇ μου ὁ καινὸς δεσπότης ἤτοι συγγενής τις ἢ κόλαξ ἢ καταπύγων οἰκέτης ἐκ παιδικῶν τίμιος, ὑπεξυρημένος ἔτι τὴν γνάθον, ἀντὶ ποικίλων καὶ παντοδαπῶν ἡδονῶν ἃς ἤδη ἔξωρος ὢν ὑπηρέτησεν αὐτῷ μέγα τὸ μίσθωμα ὁ γενναῖος ἀπολαβών, ἐκεῖνος μέν, ὅστις ἂν ᾖ ποτε, ἁρπασάμενός με αὐτῇ δέλτῳ θέει φέρων ἀντὶ τοῦ τέως Πυρρίου ἢ Δρόμωνος ἢ Τιβείου Μεγακλῆς ἢ Μεγάβυζος ἢ Πρώταρχος μετονομασθείς, τοὺς μάτην κεχηνότας ἐκείνους ἐς ἀλλήλους ἀποβλέποντας καταλιπὼν ἀληθὲς ἄγοντας τὸ πένθος, οἷος αὐτοὺς ὁ θύννος ἐκ μυχοῦ τῆς σαγήνης διέφυγεν οὐκ ὀλίγον τὸ δέλεαρ καταπιών. <span class="marker">[23]</span> ὁ δὲ ἐμπεσὼν ἀθρόως εἰς ἐμὲ ἀπειρόκαλος καὶ παχύδερμος ἄνθρωπος, ἔτι τὴν πέδην πεφρικὼς καὶ εἰ παριὼν ἄλλως μαστίξειέ τις ὄρθιον ἐφιστὰς τὸ οὖς καὶ τὸν μυλῶνα ὥσπερ τὸ Ἀνάκτορον προσκυνῶν, οὐκέτι φορητός ἐστι τοῖς ἐντυγχάνουσιν, ἀλλὰ τούς τε ἐλευθέρους ὑβρίζει καὶ τοὺς ὁμοδούλους μαστιγοῖ ἀποπειρώμενος εἰ καὶ αὐτῷ τὰ τοιαῦτα ἔξεστιν, ἄχρι ἂν ἢ ἐς πορνίδιόν τι ἐμπεσὼν ἢ ἱπποτροφίας ἐπιθυμήσας ἢ κόλαξι παραδοὺς ἑαυτὸν ὀμνύουσιν, ἦ μὴν εὐμορφότερον μὲν Νιρέως εἶναι αὐτόν, εὐγενέστερον δὲ τοῦ Κέκροπος ἢ Κόδρου, συνετώτερον δὲ τοῦ Ὀδυσσέως, πλουσιώτερον δὲ συνάμα Κροίσων ἑκκαίδεκα, ἐν ἀκαρεῖ τοῦ χρόνου ἄθλιος ἐκχέῃ τὰ κατ᾽ ὀλίγον ἐκ πολλῶν ἐπιορκιῶν καὶ ἁρπαγῶν καὶ πανουργιῶν συνειλεγμένα.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text"><i>(Ο Ερμής και ο Πλούτος ξεκινούν για τη γη).</i></span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[20]</span> Να πηγαίνουμε, Πλούτε. Τί είναι αυτό; Κουτσαίνεις; Δεν είχα προσέξει, ευγενικέ μου άνθρωπε, πως δεν ήσουν μόνο τυφλός, μα και κουτσός.</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Δε μου συμβαίνει πάντα αυτό, Ερμή, αλλά όταν σταλμένος από το Δία φεύγω να πάω σε κάποιον, δεν ξέρω πώς, είμαι αργοκίνητος και κουτσός και από τα δύο πόδια. Έτσι, όταν τα καταφέρνω να φτάσω στο τέρμα, βρίσκω συχνά γερασμένο πια εκείνον που με περιμένει. Όποτε όμως πρέπει να φύγω από κάποιον, θα με δεις πουλί, πιο γρήγορο και από τα όνειρα. Δεν προλαβαίνει να πέσει το νήμα κι εγώ αμέσως ανακηρύσσομαι νικητής. Έχω κιόλας διατρέξει το στάδιο, χωρίς να με δουν καμιά φορά και οι θεατές ακόμα.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Δεν είναι αλήθεια αυτά που λες. Εγώ χωρίς αμφιβολία θα μπορούσα να σου αναφέρω πολλούς που ώς χθες δεν είχαν πεντάρα να αγοράσουν σχοινί να κρεμαστούν και ξαφνικά σήμερα πλούσιοι και με πολυτέλειες κάνουν τις βόλτες τους πάνω σε αμάξι με λευκά άλογα, άνθρωποι που δεν είχαν ούτε γάιδαρο ποτέ τους. Και όμως τριγυρνούν ντυμένοι πορφυρά και με χρυσά δαχτυλίδια στα χέρια. Και ούτε οι ίδιοι, θαρρώ, το πιστεύουν πως δεν είναι ένα όνειρο τα πλούτη τους.</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[21]</span> Αυτό, Ερμή, είναι άλλο. Σε τούτη την περίπτωση δε βαδίζω με τα δικά μου πόδια, ούτε ο Δίας, μα ο Πλούτων με στέλνει κοντά τους, γιατί και αυτός είναι πλουτοδότης και γενναιόδωρος. Το δείχνει άλλωστε και με το όνομά του. Όταν λοιπόν πρέπει να πάω από τον έναν άνθρωπο στον άλλο, αφού με βάλουν σε διαθήκη και τη σφραγίσουν προσεχτικά, με σηκώνουν ύστερα και με μεταφέρουν. Και ο νεκρός κείτεται κάπου στα σκοτεινά του σπιτιού, σκεπασμένος ώς τα γόνατα με το παλιό το σεντόνι, λαχταριστός στις γάτες, ενώ εμένα με καρτερούν στην αγορά με ανοιχτό το στόμα όσοι στήριξαν επάνω μου ελπίδες, έτσι όπως περιμένουν τη χελιδόνα τσιρίζοντας οι νεοσσοί. <span class="marker">[22]</span> Και όταν η σφραγίδα αφαιρεθεί, κοπεί η ταινία και ανοιχτεί η διαθήκη, αναγγέλλεται τότε ο καινούριος μου αφέντης, κάποιος βέβαια συγγενής ή κόλακας ή υπηρέτης. Εκείνος, όποιος και αν είναι τέλος πάντων, με αρπάζει με τη διαθήκη και τρέχει και αλλάζει τ᾽ όνομά του σε Μεγακλή ή Μεγάβυζο ή Πρώταρχο αντί για Πυρρία ή Δρόμωνα ή Τίβειο. Κι εκείνους που άδικα χάσκοντας έβλεπαν ο ένας τον άλλον, τους αφήνει σε αληθινό πένθος, γιατί ένα τέτοιο ψάρι, ενώ κατάπιε όχι λίγο από το δόλωμα, τους ξέφυγε μέσ᾽ από τα δίχτυα.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[23]</span> Και αυτός αμέσως ορμάει επάνω μου, άνθρωπος ακαλαίσθητος και νωθρός, που ακόμη τρέμει τα δεσμά και τεντώνει το αυτί του, όταν κάποιος περαστικός χτυπήσει το μαστίγιό του αδιάφορα, και προσκυνά το μύλο ως Ανάκτορο. Καταντάει πια ανυπόφορος για τους γύρω του: τους ελεύθερους τους προσβάλλει και τους ομόδουλους τους μαστιγώνει, για να διαπιστώνει αν έχει και αυτός ένα τέτοιο δικαίωμα, έως ότου πέσει πάνω σε καμιά παλιογυναίκα ή επιθυμήσει να θρέψει ίππους ή δώσει εμπιστοσύνη σε κόλακες οι όποιοι ορκίζονται ότι είναι στ᾽ αλήθεια πιο όμορφος από το Νιρέα, από καλύτερη γενιά και από τον Κέκροπα ή τον Κόδρο, πιο συνετός από τον Οδυσσέα, πιο πλούσιος και από δεκάξι μαζί Κροίσους, και σκορπίσει μέσα σε μια στιγμή, ο άθλιος, όσα έχουν συγκεντρωθεί σιγά σιγά με πολλές επιορκίες, αρπαγές και πανουργίες.</span></p>
+        </div>
+        
+
+        <div id="book-3-chapter---2" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-8" data-hash="book-3-chapter---2">
+            Ο Ερμής και ο Πλούτος κατεβαίνουν στη γη • Κεφάλαιο ΕΡΜΗΣ-ΠΛΟΥΤΟΣ.2 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=57&page=8" target="_blank" class="page-link">Page 8</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[24]</span> Αὐτά που σχεδὸν φῂς τὰ γινόμενα· ὁπόταν δ᾽ οὖν αὐτόπους βαδίζῃς, πῶς οὕτω τυφλὸς ὢν εὑρίσκεις τὴν ὁδόν; ἢ πῶς διαγινώσκεις ἐφ᾽ οὓς ἄν σε ὁ Ζεὺς ἀποστείλῃ κρίνας εἶναι τοῦ πλουτεῖν ἀξίους;</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Οἴει γὰρ εὑρίσκειν με οἵτινές εἰσι; μὰ τὸν Δία οὐ πάνυ· οὐ γὰρ ἂν Ἀριστείδην καταλιπὼν Ἱππονίκῳ καὶ Καλλίᾳ προσῄειν καὶ πολλοῖς ἄλλοις Ἀθηναίων οὐδὲ ὀβολοῦ ἀξίοις.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πλὴν ἀλλὰ τί πράττεις καταπεμφθείς;</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Ἄνω καὶ κάτω πλανῶμαι, περινοστῶν ἄχρι ἂν λάθω τινὶ ἐμπεσών· ὁ δέ, ὅστις ἂν πρῶτός μοι περιτύχῃ, ἀπαγαγὼν παρ᾽ αὑτὸν ἔχει, σὲ τὸν Ἑρμῆν ἐπὶ τῷ παραλόγῳ τοῦ κέρδους προσκυνῶν.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[25]</span> Οὐκοῦν ἐξηπάτηται ὁ Ζεὺς οἰόμενός σε κατὰ τὰ αὐτῷ δοκοῦντα πλουτίζειν ὅσους ἂν οἴηται τοῦ πλουτεῖν ἀξίους;</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Καὶ μάλα δικαίως, ὦγαθέ, ὅς γε τυφλὸν ὄντα εἰδὼς ἔπεμπεν ἀναζητήσοντα δυσεύρετον οὕτω χρῆμα καὶ πρὸ πολλοῦ ἐκλελοιπὸς ἐκ τοῦ βίου, ὅπερ οὐδ᾽ ὁ Λυγκεὺς ἂν ἐξεύροι ῥᾳδίως ἀμαυρὸν οὕτω καὶ μικρὸν ὄν. τοιγαροῦν ἅτε τῶν μὲν ἀγαθῶν ὀλίγων ὄντων, πονηρῶν δὲ πλείστων ἐν ταῖς πόλεσι τὸ πᾶν ἐπεχόντων, ῥᾷον ἐς τοὺς τοιούτους ἐμπίπτω περιιὼν καὶ σαγηνεύομαι πρὸς αὐτῶν.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Εἶτα πῶς ἐπειδὰν καταλίπῃς αὐτοὺς ῥᾳδίως φεύγεις, οὐκ εἰδὼς τὴν ὁδόν;</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Ὀξυδερκὴς τότε πως καὶ ἀρτίπους γίνομαι πρὸς μόνον τὸν καιρὸν τῆς φυγῆς.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[24]</span> Έτσι πάνω κάτω που τα λες είναι τα πράγματα. Όταν όμως βαδίζεις μόνος σου, πώς, ενώ είσαι τόσο τυφλός, βρίσκεις το δρόμο; Ή πώς διακρίνεις εκείνους στους όποιους σε στέλνει ο Δίας, γιατί έκρινε ότι αξίζουν να είναι πλούσιοι;</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Και νομίζεις πως τους βρίσκω; Μα το Δία όχι, διότι δε θα άφηνα έναν Αριστείδη για να πάω στον Ιππόνικο ή τον Καλλία και σε πολλούς άλλους Αθηναίους, που δεν αξίζουν πεντάρα.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Μα όταν σε στέλνουν, τί κάνεις;</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Περιφέρομαι πάνω κάτω, τριγυρνώντας, έως ότου πέσω πάνω σε οποιονδήποτε. Κι αυτός που θα με πετύχει πρώτος, με αρπάζει, με κρατά κοντά του και δοξάζει εσένα, τον Ερμή, για την ανέλπιστη τύχη.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[25]</span> Ώστε λοιπόν είναι γελασμένος ο Δίας που νομίζει ότι εσύ σύμφωνα με την απόφασή του πλουτίζεις όσους εκείνος θεωρεί ότι αξίζουν να είναι πλούσιοι;</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Και πολύ δίκαια, καλέ μου, γιατί, ενώ γνωρίζει πως είμαι τυφλός, με στέλνει να ανακαλύψω ένα τόσο σπάνιο πράγμα, προ πολλού χαμένο από τη ζωή, που ούτε ο Λυγκεύς θα το ᾽βρισκε εύκολα, τόσο σκοτεινό και μικρό που είναι. Επειδή λοιπόν οι καλοί είναι λίγοι και κακοί οι πιο πολλοί, που τα πάντα κατέχουν στις πόλεις, γι᾽ αυτό, εκεί που τριγυρνώ, ευκολότερα πέφτω πάνω σε τέτοιους ανθρώπους και πιάνομαι στα δίχτυα τους.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Έπειτα, όταν τους εγκαταλείπεις, δεν έχεις δυσκολίες, αφού δεν ξέρεις το δρόμο;</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Γίνομαι τότε ανοιχτομάτης και γερός, μα μόνο όσο είναι να φύγω.</span></p>
+        </div>
+        
+
+        <div id="book-3-chapter---3" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-9" data-hash="book-3-chapter---3">
+            Ο Ερμής και ο Πλούτος κατεβαίνουν στη γη • Κεφάλαιο ΕΡΜΗΣ-ΠΛΟΥΤΟΣ.3 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=57&page=9" target="_blank" class="page-link">Page 9</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[26]</span> Ἔτι δή μοι καὶ τοῦτο ἀπόκριναι, πῶς τυφλὸς ὤν —εἰρήσεται γάρ— καὶ προσέτι ὠχρὸς καὶ βαρὺς ἐκ τοῖν σκελοῖν τοσούτους ἐραστὰς ἔχεις, ὥστε πάντας ἀποβλέπειν εἰς σέ, καὶ τυχόντας μὲν εὐδαιμονεῖν οἴεσθαι, εἰ δὲ ἀποτύχοιεν οὐκ ἀνέχεσθαι ζῶντας; οἶδα γοῦν τινας οὐκ ὀλίγους αὐτῶν οὕτως σου δυσέρωτας ὄντας ὥστε καὶ ἐς βαθυκήτεα πόντον φέροντες ἔρριψαν αὑτοὺς καὶ πετρῶν κατ᾽ ἠλιβάτων, ὑπερορᾶσθαι νομίζοντες ὑπὸ σοῦ ὅτιπερ οὐδὲ τὴν ἀρχὴν ἑώρας αὐτούς. πλὴν ἀλλὰ καὶ σὺ ἂν εὖ οἶδα ὅτι ὁμολογήσειας, εἴ τι συνίης σαυτοῦ, κορυβαντιᾶν αὐτοὺς ἐρωμένῳ τοιούτῳ ἐπιμεμηνότας.</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[27]</span> Οἴει γὰρ τοιοῦτον οἷός εἰμι ὁρᾶσθαι αὐτοῖς, χωλὸν ἢ τυφλὸν ἢ ὅσα ἄλλα μοι πρόσεστιν;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἀλλὰ πῶς, ὦ Πλοῦτε, εἰ μὴ τυφλοὶ καὶ αὐτοὶ πάντες εἰσίν;</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Οὐ τυφλοί, ὦ ἄριστε, ἀλλ᾽ ἡ ἄγνοια καὶ ἡ ἀπάτη, αἵπερ νῦν κατέχουσι τὰ πάντα, ἐπισκιάζουσιν αὐτούς· ἔτι δὲ καὶ αὐτός, ὡς μὴ παντάπασιν ἄμορφος εἴην, προσωπεῖόν τι ἐρασμιώτατον περιθέμενος, διάχρυσον καὶ λιθοκόλλητον, καὶ ποικίλα ἐνδὺς ἐντυγχάνω αὐτοῖς· οἱ δὲ αὐτοπρόσωπον οἰόμενοι ὁρᾶν τὸ κάλλος ἐρῶσι καὶ ἀπόλλυνται μὴ τυγχάνοντες. ὡς εἴ γέ τις αὐτοῖς ὅλον ἀπογυμνώσας ἐπέδειξέ με, δῆλον ὡς κατεγίνωσκον ἂν αὑτῶν ἀμβλυώττοντες τὰ τηλικαῦτα καὶ ἐρῶντες ἀνεράστων καὶ ἀμόρφων πραγμάτων.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[28]</span> Τί οὖν ὅτι καὶ ἐν αὐτῷ ἤδη τῷ πλουτεῖν γενόμενοι καὶ τὸ προσωπεῖον αὐτοὶ περιθέμενοι ἔτι ἐξαπατῶνται, καὶ ἤν τις ἀφαιρῆται αὐτούς, θᾶττον ἂν τὴν κεφαλὴν ἢ τὸ προσωπεῖον πρόοιντο; οὐ γὰρ δὴ καὶ τότε ἀγνοεῖν εἰκὸς αὐτοὺς ὡς ἐπίχριστος ἡ εὐμορφία ἐστίν, ἔνδοθεν τὰ πάντα ὁρῶντας.</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Οὐκ ὀλίγα, ὦ Ἑρμῆ, καὶ πρὸς τοῦτό μοι συναγωνίζεται.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τὰ ποῖα;</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Ἐπειδάν τις ἐντυχὼν τὸ πρῶτον ἀναπετάσας τὴν θύραν εἰσδέχηταί με, συμπαρεισέρχεται μετ᾽ ἐμοῦ λαθὼν ὁ τῦφος καὶ ἡ ἄνοια καὶ ἡ μεγαλαυχία καὶ μαλακία καὶ ὕβρις καὶ ἀπάτη καὶ ἄλλ᾽ ἄττα μυρία· ὑπὸ δὴ τούτων ἁπάντων καταληφθεὶς τὴν ψυχὴν θαυμάζει τε τὰ οὐ θαυμαστὰ καὶ ὀρέγεται τῶν φευκτῶν κἀμὲ τὸν πάντων ἐκείνων πατέρα τῶν εἰσεληλυθότων κακῶν τέθηπε δορυφορούμενον ὑπ᾽ αὐτῶν καὶ πάντα πρότερον πάθοι ἂν ἢ ἐμὲ προέσθαι ὑπομείνειεν ἄν.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[26]</span> Τώρα απάντησέ μου και σε τούτο. Πώς γίνεται να σε αγαπούν τόσοι, ενώ είσαι τυφλός —θα το πω— και ωχρός και βαρύς στα πόδια; Ώστε όλοι εσένα να ποθούν και, όταν σε αποκτήσουν, να λογαριάζουν τον εαυτό τους ευτυχισμένο, αν όμως αποτύχουν, να μη θέλουν τη ζωή τους; Ξέρω για παράδειγμα πολλούς από αυτούς τόσο ξετρελαμένους μαζί σου, που ρίχτηκαν στη βαθύκολπη θάλασσα και στους απόκρημνους βράχους, γιατί νόμιζαν πως τους περιφρονείς, αφού δεν τους πρόσεχες διόλου. Όμως γνωρίζω καλά ότι κι εσύ θα ομολογήσεις, αν έχεις κάποια συνείδηση της καταστάσεώς σου, πως είναι ανισόρροποι να τρελαίνονται για έναν τέτοιο αγαπημένο.</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[27]</span> Νομίζεις ότι με βλέπουν όπως είμαι, χωλό ή τυφλό ή με όσα άλλα ελαττώματα έχω;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Μα πώς, Πλούτε; Εκτός αν όλοι αυτοί είναι τυφλοί.</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Δεν είναι τυφλοί, καλέ μου, μα η άγνοια και η απάτη, που βασιλεύουν τώρα παντού, δεν τους αφήνουν να δουν. Ύστερα κι εγώ ο ίδιος, για να μην είμαι ολότελα άσχημος, τους πλησιάζω με μια μάσκα πολύ αξιαγάπητη, χρυσοΰφαντη και αδαμαντοστόλιστη, και ντυμένος φανταχτερά ρούχα. Εκείνοι θαρρούν πως βλέπουν την ίδια την ομορφιά, ερωτεύονται και, εάν δε με κερδίσουν, καταστρέφονται. Ώστε, εάν κάποιος με ξεγύμνωνε και με παρουσίαζε μπροστά τους, σίγουρα θα κατηγορούσαν τους εαυτούς τους πως είναι κοντόφθαλμοι και πως ερωτεύονται πράγματα ανέραστα και άσχημα.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[28]</span> Όμως γιατί, και όταν πια πλουτίσουν και φορέσουν και οι ίδιοι τη μάσκα, εξακολουθούν να ξεγελιούνται και, αν κανένας τούς αφαιρέσει τη μάσκα, θα προτιμούσαν να χάσουν το κεφάλι τους παρά αυτήν; Δεν είναι βέβαια λογικό να αγνοούν και τότε ότι η ομορφιά είναι ψεύτικη, αφού τώρα τα πάντα τα βλέπουν από μέσα.</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Και σ᾽ αυτό, Ερμή, πολλά με βοηθούν.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ποιά;</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Όταν κάποιος με πρωτοσυναντήσει και μου ανοίξει τις πόρτες του διάπλατες και με δεχτεί στο σπίτι του, γλιστρά μαζί μου η ξιπασιά, η ανοησία, η καυχησιά, η βλακεία, η αυθάδεια, η απάτη και χίλια δυο. Λοιπόν με την ψυχή κυριευμένη απ᾽ αυτά, θαυμάζει όσα δεν είναι για θαυμασμό και επιθυμεί όσα πρέπει να αποφεύγει, κι εμένα, τον πατέρα όλων αυτών των συμφορών που έχουν τρυπώσει μέσα, με έχει σε μεγάλη υπόληψη, γιατί με περικυκλώνουν αυτά όλα. Και θα προτιμούσε να πάθει το καθετί, παρά να με χάσει.</span></p>
+        </div>
+        
+
+        
+        <div class="page-divider" id="page-10" data-hash="book-3-chapter--">
+            Ο Ερμής και ο Πλούτος κατεβαίνουν στη γη • Κεφάλαιο ΕΡΜΗΣ-ΕΡΜΗΣ (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=57&page=10" target="_blank" class="page-link">Page 10</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[29]</span> Ὡς δὲ λεῖος εἶ καὶ ὀλισθηρός, ὦ Πλοῦτε, καὶ δυσκάτοχος καὶ διαφευκτικός, οὐδεμίαν ἀντιλαβὴν παρεχόμενος βεβαίαν ἀλλ᾽ ὥσπερ αἱ ἐγχέλεις ἢ οἱ ὄφεις διὰ τῶν δακτύλων δραπετεύεις οὐκ οἶδα ὅπως· ἡ Πενία δ᾽ ἔμπαλιν ἰξώδης τε καὶ εὐλαβὴς καὶ μυρία τὰ ἄγκιστρα ἐκπεφυκότα ἐξ ἅπαντος τοῦ σώματος ἔχουσα, ὡς πλησιάσαντας εὐθὺς ἔχεσθαι καὶ μὴ ἔχειν ῥᾳδίως ἀπολυθῆναι. ἀλλὰ μεταξὺ φλυαροῦντας ἡμᾶς πρᾶγμα ἤδη οὐ μικρὸν διέλαθε.</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Τὸ ποῖον;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ὅτι τὸν Θησαυρὸν οὐκ ἐπηγαγόμεθα, οὗπερ ἔδει μάλιστα.</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[30]</span> Θάρρει τούτου γε ἕνεκα· ἐν τῇ γῇ αὐτὸν ἀεὶ καταλείπων ἀνέρχομαι πρὸς ὑμᾶς ἐπισκήψας ἔνδον μένειν ἐπικλεισάμενον τὴν θύραν, ἀνοίγειν δὲ μηδενί, ἢν μὴ ἐμοῦ ἀκούσῃ βοήσαντος.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Οὐκοῦν ἐπιβαίνωμεν ἤδη τῆς Ἀττικῆς· καί μοι ἕπου ἐχόμενος τῆς χλαμύδος, ἄχρι ἂν πρὸς τὴν ἐσχατιὰν ἀφίκωμαι.</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Εὖ ποιεῖς, ὦ Ἑρμῆ, χειραγωγῶν· ἐπεὶ ἤν γε ἀπολίπῃς με, Ὑπερβόλῳ τάχα ἢ Κλέωνι ἐμπεσοῦμαι περινοστῶν. ἀλλὰ τίς ὁ ψόφος οὗτός ἐστιν καθάπερ σιδήρου πρὸς λίθον;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[31]</span> Ὁ Τίμων οὑτοσὶ σκάπτει πλησίον ὀρεινὸν καὶ ὑπόλιθον γήδιον. παπαί, καὶ ἡ Πενία πάρεστι καὶ ὁ Πόνος ἐκεῖνος, ἡ Καρτερία τε καὶ ἡ Σοφία καὶ ἡ Ἀνδρεία καὶ ὁ τοιοῦτος ὄχλος τῶν ὑπὸ τῷ Λιμῷ ταττομένων ἁπάντων, πολὺ ἀμείνους τῶν σῶν δορυφόρων.</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Τί οὖν οὐκ ἀπαλλαττόμεθα, ὦ Ἑρμῆ, τὴν ταχίστην; οὐ γὰρ ἄν τι ἡμεῖς δράσαιμεν ἀξιόλογον πρὸς ἄνδρα ὑπὸ τηλικούτου στρατοπέδου περιεσχημένον.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἄλλως ἔδοξε τῷ Διί· μὴ ἀποδειλιῶμεν οὖν.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[29]</span> Δεν ξέρω, Πλούτε, πώς είσαι τόσο λείος και γλιστερός και δυσκολοκράτητος, έτοιμος να διαφεύγεις. Πώς δεν έχεις καμιά σταθερή λαβή, μα ξεγλιστράς, όπως τα χέλια και τα φίδια, δεν το καταλαβαίνω. Απεναντίας η Πενία είναι σαν την κόλλα και ευκολόπιαστη, με μύρια αγκίστρια σε όλο της το σώμα, έτσι που να σκαλώνουν αμέσως όσοι την πλησιάζουν και να μην μπορούν εύκολα να ξεφύγουν. Μα μες στη φλυαρία μας μάς ξέφυγε κάτι το σοβαρό.</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Ποιό πράγμα;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Να πάρουμε μαζί μας το Θησαυρό, που προπάντων χρειαζόμαστε.</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[30]</span> Όσο γι᾽ αυτό μην ανησυχείς. Πάντοτε, όταν ανεβαίνω σε σας, τον αφήνω στη γη και τον εξορκίζω να κλείσει την πόρτα και να μείνει μέσα. Να μην ανοίξει σε κανέναν, αν δεν ακούσει τη φωνή μου.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Λοιπόν πατούμε πια στην Αττική. Πιάσε με από τη χλαμύδα και ακολούθα με, ώσπου να φτάσω στο κτήμα.</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Καλά κάνεις, Ερμή, που με κρατάς και με οδηγείς, γιατί, αν με εγκαταλείψεις, εκεί που τριγυρίζω, ίσως πέσω πάνω σε κανέναν Υπέρβολο ή Κλέωνα. Αλλά τί θόρυβος είναι αυτός; Θαρρείς και χτυπάει σίδερο πάνω σε πέτρα.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[31]</span> Αυτός ο Τίμων σκάβει εδώ κοντά ένα ορεινό χωραφάκι και κακοτράχαλο. Μπα, μπα, και η Πενία είναι εκεί και ο Κόπος, η Καρτερία και η Σοφία και η Ανδρεία, και όλος εκείνος ο συρφετός που υπηρετεί το Λιμό, όλοι τους πολύ πιο γενναίοι από τους δικούς σου σωματοφύλακες.</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Τότε γιατί δε φεύγουμε αμέσως, Ερμή; Δε θα μπορούσαμε να κάνουμε τίποτε σε άνθρωπο που τον προστατεύει τόσο στράτευμα.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Άλλη είναι η απόφαση του Δία. Λοιπόν ας μη φοβηθούμε.</span></p>
+        </div>
+        
+
+        
+        <div class="page-divider" id="page-11" data-hash="book-3-chapter--">
+            Ο Ερμής και ο Πλούτος κατεβαίνουν στη γη • Κεφάλαιο ΠΕΝΙΑ-ΕΡΜΗΣ (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=57&page=11" target="_blank" class="page-link">Page 11</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ΠΕΝΙΑ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[32]</span> Ποῖ τοῦτον ἀπάγεις, ὦ Ἀργειφόντα, χειραγωγῶν;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἐπὶ τουτονὶ τὸν Τίμωνα ἐπέμφθημεν ὑπὸ τοῦ Διός.</span></p>
+<p class="passage"><span class="passage-text">ΠΕΝΙΑ</span></p>
+<p class="passage"><span class="passage-text">Νῦν ὁ Πλοῦτος ἐπὶ Τίμωνα, ὁπότε αὐτὸν ἐγὼ κακῶς ἔχοντα ὑπὸ τῆς Τρυφῆς παραλαβοῦσα, τουτοισὶ παραδοῦσα, τῇ Σοφίᾳ καὶ τῷ Πόνῳ, γενναῖον ἄνδρα καὶ πολλοῦ ἄξιον ἀπέδειξα; οὕτως ἄρα εὐκαταφρόνητος ὑμῖν ἡ Πενία δοκῶ καὶ εὐαδίκητος, ὥσθ᾽ ὃ μόνον κτῆμα εἶχον ἀφαιρεῖσθαί με, ἀκριβῶς πρὸς ἀρετὴν ἐξειργασμένον, ἵνα αὖθις ὁ Πλοῦτος παραλαβὼν αὐτὸν Ὕβρει καὶ Τύφῳ ἐγχειρίσας ὅμοιον τῷ πάλαι μαλθακὸν καὶ ἀγεννῆ καὶ ἀνόητον ἀποφήνας ἀποδῷ πάλιν ἐμοὶ ῥάκος ἤδη γεγενημένον;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἔδοξε ταῦτα, ὦ Πενία, τῷ Διί.</span></p>
+<p class="passage"><span class="passage-text">ΠΕΝΙΑ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[33]</span> Ἀπέρχομαι· καὶ ὑμεῖς δέ, ὦ Πόνε καὶ Σοφία καὶ οἱ λοιποί, ἀκολουθεῖτέ μοι. οὗτος δὲ τάχα εἴσεται, οἵαν με οὖσαν ἀπολείψει, ἀγαθὴν συνεργὸν καὶ διδάσκαλον τῶν ἀρίστων, ᾗ συνὼν ὑγιεινὸς μὲν τὸ σῶμα, ἐρρωμένος δὲ τὴν γνώμην διετέλεσεν, ἀνδρὸς βίον ζῶν καὶ πρὸς αὑτὸν ἀποβλέπων, τὰ δὲ περιττὰ καὶ πολλὰ ταῦτα, ὥσπερ ἐστίν, ἀλλότρια ὑπολαμβάνων.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἀπέρχονται· ἡμεῖς δὲ προσίωμεν αὐτῷ.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text"><i>(Ο Ερμής και ο Πλούτος πατούν πια στη γη, εκεί κοντά όπου σκάβει ο Τίμων. Συναντούν την Πενία και τους συντρόφους της. Ο Τίμων δεν τους βλέπει, ενώ η Πενία απορημένη και πειραγμένη από τον ερχομό τους ρωτάει τον Ερμή.)</i></span></p>
+<p class="passage"><span class="passage-text">ΠΕΝΙΑ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[32]</span> Πού τον πηγαίνεις αυτόν, Αργοφονιά, κρατώντας τον από το χέρι;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Σ᾽ αυτόν εδώ τον Τίμωνα μας έστειλε ο Δίας.</span></p>
+<p class="passage"><span class="passage-text">ΠΕΝΙΑ</span></p>
+<p class="passage"><span class="passage-text">Τώρα ο Πλούτος στον Τίμωνα, την ώρα που εγώ τον απέσπασα από την Τρυφή σε κακά χάλια, τον παρέδωσα σ᾽ αυτούς εδώ, στη Σοφία και τον Κόπο, και τον ανέδειξα έναν άνθρωπο υψηλόφρονα και αξιόλογο; Τόσο ευκαταφρόνητη λοιπόν και ευκολοαδίκητη σας φαίνεται η Πενία, ώστε μου παίρνετε το μόνο μου κτήμα που είχα και το εξάσκησα τέλεια στην αρετή; Και το κάνετε αυτό, για να τον ξαναπαραλάβει ο Πλούτος, να τον δώσει στα χέρια της Αυθάδειας και της Αλαζονείας και να τον κάνει, όπως ήταν πρώτα, δειλό, φαύλο και ανόητο και μετά να μου τον ξαναδώσει ένα κουρέλι πια;</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Αυτή, Πενία, είναι η απόφαση του Δία.</span></p>
+<p class="passage"><span class="passage-text">ΠΕΝΙΑ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[33]</span> Φεύγω· κι εσείς, Κόπος, Σοφία και οι υπόλοιποι, ακολουθάτε με. Και αυτός θα καταλάβει γρήγορα ποιά θα χάσει. Έναν καλό συνεργάτη και δάσκαλο των αρετών, που όταν τον συναναστρεφόταν, είχε γερό το σώμα, θέληση δυνατή και ζούσε σαν άνθρωπος που πίστευε στον εαυτό του και θεωρούσε ξένα, όπως πράγματι είναι, αυτά τα περιττά και πολλά.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Φεύγουν αυτοί. Ας πάμε εμείς κοντά του.</span></p>
+        </div>
+        
+
+        <div id="book-4-chapter--" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-12" data-hash="book-4-chapter--">
+            Ερμής, Πλούτος και Τίμων • Κεφάλαιο ΤΙΜΩΝ-ΤΙΜΩΝ (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=57&page=12" target="_blank" class="page-link">Page 12</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[34]</span> Τίνες ἐστέ, ὦ κατάρατοι; ἢ τί βουλόμενοι δεῦρο ἥκετε ἄνδρα ἐργάτην καὶ μισθοφόρον ἐνοχλήσοντες; ἀλλ᾽ οὐ χαίροντες ἄπιτε μιαροὶ πάντες ὄντες· ἐγὼ γὰρ ὑμᾶς αὐτίκα μάλα βάλλων τοῖς βώλοις καὶ τοῖς λίθοις συντρίψω.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Μηδαμῶς, ὦ Τίμων, μὴ βάλῃς· οὐ γὰρ ἀνθρώπους ὄντας βαλεῖς, ἀλλ᾽ ἐγὼ μὲν Ἑρμῆς εἰμι, οὑτοσὶ δὲ ὁ Πλοῦτος· ἔπεμψε δὲ ὁ Ζεὺς ἐπακούσας τῶν εὐχῶν, ὥστε ἀγαθῇ τύχῃ δέχου τὸν ὄλβον ἀποστὰς τῶν πόνων.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Καὶ ὑμεῖς οἰμώξεσθε ἤδη καίτοι θεοὶ ὄντες, ὥς φατε· πάντας γὰρ ἅμα καὶ ἀνθρώπους καὶ θεοὺς μισῶ, τουτονὶ δὲ τὸν τυφλόν, ὅστις ἂν ᾖ, καὶ ἐπιτρίψειν μοι δοκῶ τῇ δικέλλῃ.</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Ἀπίωμεν, ὦ Ἑρμῆ, πρὸς τοῦ Διός, μελαγχολᾶν γὰρ ὁ ἄνθρωπος οὐ μετρίως μοι δοκεῖ, μή τι κακὸν ἀπέλθω προσλαβών.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[35]</span> Μηδὲν σκαιόν, ὦ Τίμων, ἀλλὰ τὸ πάνυ τοῦτο ἄγριον καὶ τραχὺ καταβαλὼν προτείνας τὼ χεῖρε λάμβανε τὴν ἀγαθὴν τύχην καὶ πλούτει πάλιν καὶ ἴσθι Ἀθηναίων τὰ πρῶτα καὶ ὑπερόρα τῶν ἀχαρίστων ἐκείνων μόνος αὐτὸς εὐδαιμονῶν.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Οὐδὲν ὑμῶν δέομαι· μὴ ἐνοχλεῖτέ μοι· ἱκανὸς ἐμοὶ πλοῦτος ἡ δίκελλα, τὰ δ᾽ ἄλλα εὐδαιμονέστατός εἰμι μηδενός μοι πλησιάζοντος.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Οὕτως, ὦ τάν, ἀπανθρώπως;</span></p>
+<p class="passage indent"><span class="passage-text">τόνδε φέρω Διὶ μῦθον ἀπηνέα τε κρατερόν τε;</span></p>
+<p class="passage"><span class="passage-text">καὶ μὴν εἰκὸς ἦν μισάνθρωπον μὲν εἶναί σε τοσαῦτα ὑπ᾽ αὐτῶν δεινὰ πεπονθότα, μισόθεον δὲ μηδαμῶς, οὕτως ἐπιμελουμένων σου τῶν θεῶν.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[36]</span> Ἀλλὰ σοὶ μέν, Ἑρμῆ, καὶ τῷ Διὶ πλείστη χάρις τῆς ἐπιμελείας, τουτονὶ δὲ τὸν Πλοῦτον οὐκ ἂν λάβοιμι.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τί δή;</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Ὅτι καὶ πάλαι μυρίων μοι κακῶν αἴτιος οὗτος κατέστη κόλαξί τε παραδοὺς καὶ ἐπιβούλους ἐπαγαγὼν καὶ μῖσος ἐπεγείρας καὶ ἡδυπαθείᾳ διαφθείρας καὶ ἐπίφθονον ἀποφήνας, τέλος δὲ ἄφνω καταλιπὼν οὕτως ἀπίστως καὶ προδοτικῶς· ἡ βελτίστη δὲ Πενία πόνοις με τοῖς ἀνδρικωτάτοις καταγυμνάσασα καὶ μετ᾽ ἀληθείας καὶ παρρησίας προσομιλοῦσα τά τε ἀναγκαῖα κάμνοντι παρεῖχε καὶ τῶν πολλῶν ἐκείνων καταφρονεῖν ἐπαίδευεν, ἐξ αὐτοῦ ἐμοῦ τὰς ἐλπίδας ἀπαρτήσασά μοι τοῦ βίου καὶ δείξασα ὅστις ἦν ὁ πλοῦτος ὁ ἐμός, ὃν οὔτε κόλαξ θωπεύων οὔτε συκοφάντης φοβῶν, οὐ δῆμος παροξυνθείς, οὐκ ἐκκλησιαστὴς ψηφοφορήσας, οὐ τύραννος ἐπιβουλεύσας ἀφελέσθαι δύναιτ᾽ ἄν. <span class="marker">[37]</span> ἐρρωμένος τοιγαροῦν ὑπὸ τῶν πόνων τὸν ἀγρὸν τουτονὶ φιλοπόνως ἐπεργαζόμενος, οὐδὲν ὁρῶν τῶν ἐν ἄστει κακῶν, ἱκανὰ καὶ διαρκῆ ἔχω τὰ ἄλφιτα παρὰ τῆς δικέλλης. ὥστε παλίνδρομος ἄπιθι, ὦ Ἑρμῆ, τὸν Πλοῦτον ἀπαγαγὼν τῷ Διί· ἐμοὶ δὲ τοῦτο ἱκανὸν ἦν, πάντας ἀνθρώπους ἡβηδὸν οἰμώζειν ποιῆσαι.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text"><i>(Ο Ερμής και ο Πλούτος πλησιάζουν τον Τίμωνα, ο όποιος μόλις τους βλέπει εξαγριώνεται).</i></span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[34]</span> Ποιοί είστε, καταραμένοι; Και τί θέλετε που ᾽ρθατε εδώ, για να ενοχλήσετε έναν δουλευτή και μεροκαματιάρη; Μα δε θα φύγετε γελαστοί, σιχαμένα μούτρα. Τώρα θα σας τσακίσω με τους σβώλους και τις πέτρες.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Μη, μη ρίξεις, Τίμων. Δε θα χτυπήσεις ανθρώπους. Εγώ είμαι ο Ερμής και αυτός εδώ ο Πλούτος. Μας έστειλε ο Δίας που άκουσε τις προσευχές σου. Γι᾽ αυτό άφησε τους κόπους και δέξου με το καλό τα πλούτη.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Κι εσείς θα ουρλιάξετε τώρα από τον πόνο, ας είστε και θεοί, όπως λέτε. Γιατί όλους τους μισώ μαζί, θεούς και ανθρώπους. Και αυτόν τον τυφλό, όποιος και αν είναι, νομίζω πως θα τον κάνω κομμάτια με το δικέλλι μου.</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Για όνομα του Δία, ας φύγουμε, Ερμή, γιατί μου φαίνεται πως έχει μεγάλη τρέλα ο άνθρωπος. Φοβάμαι, μη φύγω με καμιά ζημιά.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[35]</span> Τίμων, μη γίνεσαι σκληρός. Νίκησε αυτή την υπερβολική αγριάδα και την τραχύτητά σου. Άπλωσε τα δυο χέρια και πάρε την καλή τύχη, γίνε και πάλι πλούσιος και από τους πρώτους Αθηναίους. Περιφρόνησε εκείνους τους αχάριστους, μόνος εσύ ευτυχής.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Δε σας έχω καθόλου ανάγκη και μη με ενοχλείτε. Αρκετός πλούτος για εμένα το δικέλλι μου. Κατά τα άλλα είμαι πολύ πολύ ευτυχισμένος, όταν μάλιστα δε με πλησιάζει κανείς.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τόσο απάνθρωπα φέρνεσαι, φίλε μου;</span></p>
+<p class="passage"><span class="passage-text"><i>Να φέρω στο Δία αυτόν το λόγο το σκληρό και βαρύ;</i></span></p>
+<p class="passage"><span class="passage-text">Και βέβαια φυσικό ήταν να είσαι μισάνθρωπος, ύστερα από τόσα που έπαθες, μα μισόθεος όχι, αφού τόσο σε φροντίζουν οι θεοί.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[36]</span> Ερμή, σ᾽ εσένα και στο Δία χρεωστώ την πιο μεγάλη ευγνωμοσύνη για τις φροντίδες σας, αυτόν όμως τον Πλούτο δε θα τον κάνω δικό μου.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Και για ποιό λόγο;</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Γιατί και παλιά αυτός ήταν αίτια για μύριες δυστυχίες μου· με παρέδωσε στους κόλακες, παρακίνησε δόλιους ανθρώπους και ξεσήκωσε το μίσος εναντίον μου, με διέφθειρε με την τρυφή, με έκανε αξιομίσητο και τέλος ξαφνικά με εγκατέλειψε τόσο άπιστα και προδοτικά. Η αγαθότατη όμως Πενία, αφού με εξάσκησε καλά με τους αντρίκειους κόπους και μιλώντας μου με ειλικρίνεια και παρρησία, και τα αναγκαία μού παρείχε με τη δουλειά μου και με μάθαινε να καταφρονώ εκείνα τα πολλά, κάνοντας ώστε να εξαρτώνται οι ελπίδες της ζωής μου από εμένα τον ίδιο και δείχνοντάς μου ποιά είναι τα πλούτη τα δικά μου, που ούτε κόλακας με τις γαλιφιές του, ούτε συκοφάντης με τη φοβέρα του, ούτε λαός οργισμένος, ούτε πολίτης με την ψήφο του, ούτε τύραννος κακόβουλος θα μπορούσε να μου αφαιρέσει. <span class="marker">[37]</span> Δυναμωμένος λοιπόν από τους κόπους, δουλεύοντας τούτο το χωράφι φιλόπονα, χωρίς να βλέπω καμιά από τις ασχήμιες της πόλης, έχω πάντοτε από το δικέλλι μου το ψωμί μου αρκετό. Γύρνα πίσω λοιπόν, Ερμή, φεύγα και πήγαινε τον Πλούτο στο Δία. Εμένα τούτο μού ήταν αρκετό, να κάνω όλους τους ανθρώπους από νεανική ηλικία και πάνω να σκούζουν.</span></p>
+        </div>
+        
+
+        
+        <div class="page-divider" id="page-13" data-hash="book-4-chapter--">
+            Ερμής, Πλούτος και Τίμων • Κεφάλαιο ΕΡΜΗΣ-ΠΛΟΥΤΟΣ (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=57&page=13" target="_blank" class="page-link">Page 13</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Μηδαμῶς, ὦγαθέ· οὐ γὰρ πάντες εἰσὶν ἐπιτήδειοι πρὸς οἰμωγήν. ἀλλ᾽ ἔα τὰ ὀργίλα ταῦτα καὶ μειρακιώδη καὶ τὸν Πλοῦτον παράλαβε. οὔτοι ἀπόβλητά ἐστι τὰ δῶρα τὰ παρὰ τοῦ Διός.</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Βούλει, ὦ Τίμων, δικαιολογήσομαι πρὸς σέ; ἢ χαλεπανεῖς μοι λέγοντι;</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Λέγε, μὴ μακρὰ μέντοι, μηδὲ μετὰ προοιμίων, ὥσπερ οἱ ἐπίτριπτοι ῥήτορες· ἀνέξομαι γάρ σε ὀλίγα λέγοντα διὰ τὸν Ἑρμῆν τουτονί.</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[38]</span> Ἐχρῆν μέντοι ἴσως καὶ μακρὰ εἰπεῖν, οὕτω πολλὰ ὑπὸ σοῦ κατηγορηθέντα· ὅμως δὲ ὅρα εἴ τί σε, ὡς φῄς, ἠδίκηκα, ὃς τῶν μὲν ἡδίστων ἁπάντων αἴτιός σοι κατέστην, τιμῆς καὶ προεδρίας καὶ στεφάνων καὶ τῆς ἄλλης τρυφῆς, περίβλεπτός τε καὶ ἀοίδιμος δι᾽ ἐμὲ ἦσθα καὶ περισπούδαστος· εἰ δέ τι χαλεπὸν ἐκ τῶν κολάκων πέπονθας, ἀναίτιος ἐγώ σοι· μᾶλλον δὲ αὐτὸς ἠδίκημαι τοῦτο ὑπὸ σοῦ, διότι με οὕτως ἀτίμως ὑπέβαλες ἀνδράσι καταράτοις ἐπαινοῦσι καὶ καταγοητεύουσι καὶ πάντα τρόπον ἐπιβουλεύουσί μοι· καὶ τό γε τελευταῖον ἔφησθα, ὡς προδέδωκά σε, τοὐναντίον δὲ αὐτὸς ἐγκαλέσαιμί σοι πάντα τρόπον ἀπελαθεὶς ὑπὸ σοῦ καὶ ἐπὶ κεφαλὴν ἐξωσθεὶς τῆς οἰκίας. τοιγαροῦν ἀντὶ μαλακῆς χλανίδος ταύτην τὴν διφθέραν ἡ τιμιωτάτη σοι Πενία περιτέθεικεν. ὥστε μάρτυς ὁ Ἑρμῆς οὑτοσί, πῶς ἱκέτευον τὸν Δία μηκέθ᾽ ἥκειν παρὰ σὲ οὕτως δυσμενῶς μοι προσενηνεγμένον.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[39]</span> Ἀλλὰ νῦν ὁρᾷς, ὦ Πλοῦτε, οἷος ἤδη γεγένηται; ὥστε θαρρῶν συνδιάτριβε αὐτῷ· καὶ σὺ μὲν σκάπτε ὡς ἔχεις· σὺ δὲ τὸν Θησαυρὸν ὑπάγαγε τῇ δικέλλῃ· ὑπακούσεται γὰρ ἐμβοήσαντί σοι.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Πειστέον, ὦ Ἑρμῆ, καὶ αὖθις πλουτητέον. τί γὰρ ἂν καὶ πάθοι τις, ὁπότε οἱ θεοὶ βιάζοιντο; πλὴν ὅρα γε εἰς οἷά με πράγματα ἐμβάλλεις τὸν κακοδαίμονα, ὃς ἄχρι νῦν εὐδαιμονέστατα διάγων χρυσὸν ἄφνω τοσοῦτον λήψομαι οὐδὲν ἀδικήσας καὶ τοσαύτας φροντίδας ἀναδέξομαι.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[40]</span> Ὑπόστηθι, ὦ Τίμων, δι᾽ ἐμέ, καὶ εἰ χαλεπὸν τοῦτο καὶ οὐκ οἰστόν ἐστιν, ὅπως οἱ κόλακες ἐκεῖνοι διαρραγῶσιν ὑπὸ τοῦ φθόνου· ἐγὼ δὲ ὑπὲρ τὴν Αἴτνην ἐς τὸν οὐρανὸν ἀναπτήσομαι.</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Ὁ μὲν ἀπελήλυθεν, ὡς δοκεῖ· τεκμαίρομαι γὰρ τῇ εἰρεσίᾳ τῶν πτερῶν· σὺ δὲ αὐτοῦ περίμενε· ἀναπέμψω γάρ σοι τὸν Θησαυρὸν ἀπελθών· μᾶλλον δὲ παῖε. σέ φημι, Θησαυρὲ χρυσοῦ, ὑπάκουσον Τίμωνι τουτῳῒ καὶ παράσχες ἑαυτὸν ἀνελέσθαι. σκάπτε, ὦ Τίμων, βαθείας καταφέρων. ἐγὼ δὲ ὑμῖν ὑπεκστήσομαι.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text">Όχι, καλέ μου, δεν είναι όλοι για ξύλο. Παράτα όμως τα ξεσπάσματα αυτά και τα παιδιαρίσματα και αποδέξου τον Πλούτο. Δεν είναι επιτέλους του πεταμού τα δώρα που στέλνει ο Δίας.</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Θέλεις, Τίμων, να απολογηθώ ενώπιόν σου; Ή θα αγριέψεις, εάν αρχίσω να μιλάω;</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Λέγε, μα όχι πολλά, μήτε προοίμια, όπως οι αχρείοι ρήτορες. Αν πεις λίγα, θα σε ανεχτώ εξαιτίας τούτου εδώ του Ερμή.</span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[38]</span> Ίσως όμως θα έπρεπε να πω πολλά, αφού για ένα σωρό κι εσύ με κατηγόρησες. Όμως πρόσεξε, αν σε έχω σε κάτι, όπως λες, αδικήσει, εγώ που για σένα στάθηκα η πηγή για όλες τις απολαύσεις, για την τιμή, την πρωτοκαθεδρία, τα στεφάνια και την άλλη καλοπέραση. Εξαιτίας μου ήσουν περίβλεπτος, φημισμένος, περιζήτητος. Αν πάλι έπαθες κακό από τους κόλακες, δεν είμαι εγώ η αιτία, εσύ μάλλον μου έκανες την αδικία αυτή, γιατί με πέταξες με περιφρόνηση τόση σε ανθρώπους καταραμένους, που επαινούσαν και γοήτευαν και με κάθε τρόπο ήθελαν το κακό μου. Και στο τέλος είπες ότι τάχα σε έχω προδώσει. Απεναντίας εγώ θα μπορούσα να σε κατηγορήσω, που με κάθε τρόπο διώχτηκα και πετάχτηκα κατακέφαλα έξω από το σπίτι σου. Γι᾽ αυτό λοιπόν αντί για τη μαλακή χλανίδα η αξιότιμη Πενία σου σού φόρεσε την προβιά τούτη. Μάρτυρας αυτός εδώ ο Ερμής, πώς ικέτευα το Δία, να μην έρθω πια σ᾽ εσένα, που τόσο άσχημα μου φέρθηκες τότε.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[39]</span> Αλλά τώρα βλέπεις, Πλούτε, τί λογής έχει γίνει πια; Γι᾽ αυτό άφοβα μείνε μαζί του. Εσύ σκάβε, χωρίς διακοπή. Κι εσύ, Πλούτε, φέρε το θησαυρό κάτω από το δικέλλι του. Θα υπακούσει, άμα του κράξεις.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Πρέπει να πεισθώ, Ερμή, και να γίνω πάλι πλούσιος. Γιατί τί μπορεί να κάνει κανείς, όταν οι θεοί τον πιέζουν; Ωστόσο κοίτα σε τί μπελάδες με βάζεις τον κακότυχο. Ενώ έως τώρα ζούσα πάρα πολύ ευτυχισμένα, ξαφνικά θα πάρω στα χέρια μου τόσο χρυσάφι, χωρίς να έχω κάμει καμιά αδικία και θα φορτωθώ τόσες σκοτούρες.</span></p>
+<p class="passage"><span class="passage-text">ΕΡΜΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[40]</span> Υπόμεινε, Τίμων, για χάρη μου, έστω και αν τούτο είναι δύσκολο και ανυπόφορο, για να σκάσουν από ζήλεια εκείνοι οι κόλακες. Κι εγώ περνώντας πάνω από την Αίτνα θα πετάξω στον ουρανό.</span></p>
+<p class="passage"><span class="passage-text"><i>(Ο Ερμής φεύγει).</i></span></p>
+<p class="passage"><span class="passage-text">ΠΛΟΥΤΟΣ</span></p>
+<p class="passage"><span class="passage-text">Έφυγε, όπως φαίνεται. Το συμπεραίνω από το χτύπημα των φτερών. Εσύ περίμενε αυτού, θα φύγω και θα σου στείλω το θησαυρό. Καλύτερα σκάβε. Θησαυρέ, εσένα κράζω, υπάκουσε στον Τίμωνα τούτον εδώ και άφησε τον εαυτό σου να σε φέρει στο φως. Σκάβε, Τίμων, χτύπα βαθειά. Εγώ θα σας αφήσω και θα αποσυρθώ.</span></p>
+        </div>
+        
+
+        <div id="book-5-chapter-" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-14" data-hash="book-5-chapter-">
+            Ο Τίμων βρίσκει τον θησαυρό και επιτίθεται στους κόλακες • Κεφάλαιο ΤΙΜΩΝ (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=57&page=14" target="_blank" class="page-link">Page 14</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[41]</span> Ἄγε, ὦ δίκελλα, νῦν μοι ἐπίρρωσον σεαυτὴν καὶ μὴ κάμῃς ἐκ τοῦ βάθους τὸν Θησαυρὸν ἐς τοὐμφανὲς προκαλουμένη. ὦ Ζεῦ τεράστιε καὶ φίλοι Κορύβαντες καὶ Ἑρμῆ κερδῷε, πόθεν τοσοῦτον χρυσίον; ἦ που ὄναρ ταῦτά ἐστι; δέδια γοῦν μὴ ἄνθρακας εὕρω ἀνεγρόμενος· ἀλλὰ μὴν χρυσίον ἐστὶν ἐπίσημον, ὑπέρυθρον, βαρὺ καὶ τὴν πρόσοψιν ὑπερήδιστον.</span></p>
+<p class="passage indent"><span class="passage-text">ὦ χρυσέ, δεξίωμα κάλλιστον βροτοῖς·</span></p>
+<p class="passage"><span class="passage-text">αἰθόμενον γὰρ πῦρ ἅτε διαπρέπεις καὶ νύκτωρ καὶ μεθ᾽ ἡμέραν. ἐλθέ, ὦ φίλτατε καὶ ἐρασμιώτατε. νῦν πείθομαί γε καὶ Δία ποτὲ γενέσθαι χρυσόν· τίς γὰρ οὐκ ἂν παρθένος ἀναπεπταμένοις τοῖς κόλποις ὑπεδέξατο οὕτω καλὸν ἐραστὴν διὰ τοῦ τέγους καταρρέοντα; <span class="marker">[42]</span> ὦ Μίδα καὶ Κροῖσε καὶ τὰ ἐν Δελφοῖς ἀναθήματα, ὡς οὐδὲν ἄρα ἦτε ὡς πρὸς Τίμωνα καὶ τὸν Τίμωνος πλοῦτον, ᾧ γε οὐδὲ ὁ βασιλεὺς Περσῶν ἴσος.</span></p>
+<p class="passage indent"><span class="passage-text">Ὦ δίκελλα καὶ φιλτάτη διφθέρα, ὑμᾶς μὲν τῷ Πανὶ τούτῳ ἀναθεῖναι καλόν· αὐτὸς δὲ ἤδη πᾶσαν πριάμενος τὴν ἐσχατιάν, πυργίον οἰκοδομησάμενος ὑπὲρ τοῦ θησαυροῦ μόνῳ ἐμοὶ ἱκανὸν ἐνδιαιτᾶσθαι, τὸν αὐτὸν καὶ τάφον ἀποθανὼν ἕξειν μοι δοκῶ. «Δεδόχθω δὲ ταῦτα καὶ νενομοθετήσθω πρὸς τὸν ἐπίλοιπον βίον, ἀμιξία πρὸς ἅπαντας καὶ ἀγνωσία καὶ ὑπεροψία· φίλος δὲ ἢ ξένος ἢ ἑταῖρος ἢ Ἐλέου βωμὸς ὕθλος πολύς· καὶ τὸ οἰκτεῖραι δακρύοντα ἢ ἐπικουρῆσαι δεομένῳ παρανομία καὶ κατάλυσις τῶν ἐθῶν· μονήρης δὲ ἡ δίαιτα καθάπερ τοῖς λύκοις, καὶ φίλος εἷς Τίμων. <span class="marker">[43]</span> οἱ δὲ ἄλλοι πάντες ἐχθροὶ καὶ ἐπίβουλοι· καὶ τὸ προσομιλῆσαί τινι αὐτῶν μίασμα· καὶ ἤν τινα ἴδω μόνον, ἀποφρὰς ἡ ἡμέρα· καὶ ὅλως ἀνδριάντων λιθίνων ἢ χαλκῶν μηδὲν ἡμῖν διαφερέτωσαν· καὶ μήτε κήρυκα δεχώμεθα παρ᾽ αὐτῶν μήτε σπονδὰς σπενδώμεθα· ἡ ἐρημία δὲ ὅρος ἔστω πρὸς αὐτούς. φυλέται δὲ καὶ φράτορες καὶ δημόται καὶ ἡ πατρὶς αὐτὴ ψυχρὰ καὶ ἀνωφελῆ ὀνόματα καὶ ἀνοήτων ἀνδρῶν φιλοτιμήματα. πλουτείτω δὲ Τίμων μόνος καὶ ὑπεροράτω ἁπάντων καὶ τρυφάτω μόνος καθ᾽ ἑαυτὸν κολακείας καὶ ἐπαίνων φορτικῶν ἀπηλλαγμένος· καὶ θεοῖς θυέτω καὶ εὐωχείτω μόνος, ἑαυτῷ γείτων καὶ ὅμορος, ἐκσείων τῶν ἄλλων. καὶ ἅπαξ ἑαυτὸν δεξιώσασθαι δεδόχθω, ἢν δέῃ ἀποθανεῖν, καὶ αὑτῷ στέφανον ἐπενεγκεῖν. <span class="marker">[44]</span> καὶ ὄνομα μὲν ἔστω ὁ Μισάνθρωπος ἥδιστον, τοῦ τρόπου δὲ γνωρίσματα δυσκολία καὶ τραχύτης καὶ σκαιότης καὶ ὀργὴ καὶ ἀπανθρωπία· εἰ δέ τινα ἴδοιμι ἐν πυρὶ καταδιαφθειρόμενον καὶ σβεννύναι ἱκετεύοντα, πίττῃ καὶ ἐλαίῳ κατασβεννύναι· καὶ ἤν τινα τοῦ χειμῶνος ὁ ποταμὸς παραφέρῃ, ὁ δὲ τὰς χεῖρας ὀρέγων ἀντιλαβέσθαι δέηται, ὠθεῖν καὶ τοῦτον ἐπὶ κεφαλὴν βαπτίζοντα, ὡς μηδὲ ἀνακύψαι δυνηθείη· οὕτω γὰρ ἂν τὴν ἴσην ἀπολάβοιεν. εἰσηγήσατο τὸν νόμον Τίμων Ἐχεκρατίδου Κολλυτεύς, ἐπεψήφισεν τῇ ἐκκλησίᾳ Τίμων ὁ αὐτός.»</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[41]</span> Εμπρός, δικέλλι μου, λάβε θάρρος για χάρη μου και μην κουραστείς να βγάλεις στο φως το θησαυρό από της γης τα βάθη. Ω Δία θαυματουργέ και αγαπητοί Κορύβαντες και Ερμή κερδώε, από πού ξεφύτρωσε τόσο χρυσάφι; Λες να είναι αυτά ένα όνειρο; Φοβούμαι αλήθεια μήπως ξυπνήσω και βρω άνθρακες. Κι όμως είναι χρυσάφι, κομμένο νόμισμα, κοκκινωπό, βαρύ και γλυκύτατο στην όψη.</span></p>
+<p class="passage indent"><span class="passage-text"><i> Ω χρυσάφι, το πιο ωραίο πράγμα που οι άνθρωποι καλοδέχονται.</i></span></p>
+<p class="passage"><span class="passage-text">Σαν φλόγα λαμπερή θαμπώνεις νύχτα και μέρα τα μάτια. Έλα φίλτατο και περιπόθητο. Τώρα πια το πιστεύω πως και ο Δίας κάποτε έγινε χρυσάφι. Ποιά κοπέλα δε θα υποδεχόταν με ανοιχτές αγκάλες έναν τόσο ωραίο αγαπημένο, που πέφτει σαν βροχή από τη στέγη; <span class="marker">[42]</span> Ω Μίδα και Κροίσε και Δελφικά αφιερώματα, δεν είστε λοιπόν τίποτε μπρος στον Τίμωνα και στα πλούτη του Τίμωνα, με τον όποιο φυσικά ούτε ο βασιλιάς των Περσών είναι ίσος.</span></p>
+<p class="passage indent"><span class="passage-text">Ω δικέλλι μου, φιλτάτη μου προβιά, είναι ωραίο εσάς να σας αφιερώσω σε τούτον τον Πάνα. Κι εγώ, αφού αγοράσω πια ολόκληρο το χωράφι, έχω σκοπό να οικοδομήσω πύργο πάνω στο θησαυρό κατάλληλο, για να ζω μέσα μόνο εγώ, και θα τον έχω, μου φαίνεται, και τάφο μου, όταν πεθάνω.</span></p>
+<p class="passage indent"><span class="passage-text">«Για τον υπόλοιπο βίο μου ας αποφασιστούν και ας νομοθετηθούν αυτά. Με κανέναν επικοινωνία και γνωριμία. Προς όλους περιφρόνηση. Φίλος, ξένος, σύντροφος ή βωμός του Ελέου, φλυαρίες σκέτες. Και η συμπάθεια για έναν που χύνει δάκρυα και η βοήθεια σε έναν που έχει ανάγκη, παρανομία και των εθίμων καταπάτηση. Μοναχική η ζωή όπως και αυτή των λύκων. Και φίλος ένας, ο Τίμων. Και όλοι οι άλλοι εχθροί και επίβουλοι. <span class="marker">[43]</span> Ακόμα και η συνομιλία με κάποιον απ᾽ αυτούς να είναι μίασμα, και μόνο το μάτι μου αν πέσει σε κανέναν τους, αποφράδα η ημέρα. Και γενικά να μην έχουν για μας καμιά διαφορά από ανδριάντες μαρμάρινους ή χάλκινους. Και μήτε κήρυκα να δεχόμαστε απ᾽ αυτούς, μήτε να κάνουμε συνθήκες. Η ερημιά να είναι το σύνορο που μας χωρίζει απ᾽ αυτούς. Και φυλή, φράτρα, δήμος και η πατρίδα η ίδια λέξεις ψυχρές και ανώφελες, φιλοδοξίες ανόητων ανθρώπων. Πλούσιος να είναι μόνο ο Τίμων, όλους να τους περιφρονεί και να καλοπερνά μόνος με τον εαυτό του, απαλλαγμένος από κολακείες και επαίνους φορτικούς. Και να θυσιάζει στους θεούς και να παρακάθεται στα συμπόσια μόνος του, γείτονας και πλησίον με τον εαυτό του, κρατώντας μακριά τους άλλους. Και να οριστεί μια φορά να χαιρετίσει τον εαυτό του, όταν είναι να πεθάνει, και να του προσφέρει στεφάνι. <span class="marker">[44]</span> Και όνομά μου γλυκύτατο ας είναι ο Μισάνθρωπος. Και γνωρίσματα του χαρακτήρα η παραξενιά, η τραχύτητα, η σκαιότητα, η οργή και η μισανθρωπία. Αν δω πάλι κανέναν μες στη φωτιά να χάνεται και να παρακαλεί να τον σώσω, εγώ με πίσσα και με λάδι να σβήσω τη φωτιά. Και αν το χειμώνα ο ποταμός παρασύρει κάποιον κι εκείνος απλώνοντας τα χέρια παρακαλεί να τον κρατήσω, εγώ σπρώχνοντάς τον να τον βουλιάζω κατακέφαλα, να μην μπορεί να ξαναβγεί επάνω. Γιατί έτσι όλοι αυτοί θα λάβουν τα ίσα. Το νόμο εισηγήθηκε Τίμων ο Εχεκρατίδης από τον Κολλυτό, τον έθεσε σε ψηφοφορία στην Εκκλησία του Δήμου ο Τίμων ο ίδιος.»</span></p>
+        </div>
+        
+
+        <div id="book-5-chapter--" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-15" data-hash="book-5-chapter--">
+            Ο Τίμων βρίσκει τον θησαυρό και επιτίθεται στους κόλακες • Κεφάλαιο ΓΝΑΘΩΝΙΔΗΣ-ΓΝΑΘΩΝΙΔΗΣ (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=57&page=15" target="_blank" class="page-link">Page 15</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text">Εἶἑν, ταῦτα ἡμῖν δεδόχθω καὶ ἀνδρικῶς ἐμμένωμεν αὐτοῖς. <span class="marker">[45]</span> πλὴν ἀλλὰ περὶ πολλοῦ ἂν ἐποιησάμην ἅπασι γνώριμά πως ταῦτα γενέσθαι, διότι ὑπερπλουτῶ· ἀγχόνη γὰρ ἂν τὸ πρᾶγμα γένοιτο αὐτοῖς. καίτοι τί τοῦτο; φεῦ τοῦ τάχους. πανταχόθεν συνθέουσιν κεκονιμένοι καὶ πνευστιῶντες, οὐκ οἶδα ὅθεν ὀσφραινόμενοι τοῦ χρυσίου. πότερον οὖν ἐπὶ τὸν πάγον τοῦτον ἀναβὰς ἀπελαύνω αὐτοὺς τοῖς λίθοις ἐξ ὑπερδεξίων ἀκροβολιζόμενος, ἢ τό γε τοσοῦτον παρανομήσομεν εἰσάπαξ αὐτοῖς ὁμιλήσαντες, ὡς πλέον ἀνιῷντο ὑπερορώμενοι; τοῦτο οἶμαι καὶ ἄμεινον. ὥστε δεχώμεθα ἤδη αὐτοὺς ὑποστάντες. φέρε ἴδω, τίς ὁ πρῶτος αὐτῶν οὗτός ἐστι; Γναθωνίδης ὁ κόλαξ, ὁ πρῴην ἔρανον αἰτήσαντί μοι ὀρέξας τὸν βρόχον, πίθους ὅλους παρ᾽ ἐμοὶ πολλάκις ἐμημεκώς. ἀλλ᾽ εὖ γε ἐποίησεν ἀφικόμενος· οἰμώξεται γὰρ πρὸ τῶν ἄλλων.</span></p>
+<p class="passage"><span class="passage-text">ΓΝΑΘΩΝΙΔΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[46]</span> Οὐκ ἐγὼ ἔλεγον ὡς οὐκ ἀμελήσουσι Τίμωνος ἀγαθοῦ ἀνδρὸς οἱ θεοί; χαῖρε Τίμων εὐμορφότατε καὶ ἥδιστε καὶ συμποτικώτατε.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Νὴ καὶ σύ γε, ὦ Γναθωνίδη, γυπῶν ἁπάντων βορώτατε καὶ ἀνθρώπων ἐπιτριπτότατε.</span></p>
+<p class="passage"><span class="passage-text">ΓΝΑΘΩΝΙΔΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἀεὶ φιλοσκώμμων σύ γε. ἀλλὰ ποῦ τὸ συμπόσιον; ὡς καινόν τί σοι ᾆσμα τῶν νεοδιδάκτων διθυράμβων ἥκω κομίζων.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Καὶ μὴν ἐλεγεῖά γε ᾄσῃ μάλα περιπαθῶς ὑπὸ ταύτῃ τῇ δικέλλῃ.</span></p>
+<p class="passage"><span class="passage-text">ΓΝΑΘΩΝΙΔΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τί τοῦτο; παίεις, ὦ Τίμων; μαρτύρομαι· ὦ Ἡράκλεις, ἰοὺ ἰού, προκαλοῦμαί σε τραύματος εἰς Ἄρειον πάγον.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Καὶ μὴν ἄν γε μικρὸν ἐπιβραδύνῃς, φόνου τάχα προκεκλήσομαι.</span></p>
+<p class="passage"><span class="passage-text">ΓΝΑΘΩΝΙΔΗΣ</span></p>
+<p class="passage"><span class="passage-text">Μηδαμῶς· ἀλλὰ σύ γε πάντως τὸ τραῦμα ἴασαι μικρὸν ἐπιπάσας τοῦ χρυσίου· δεινῶς γὰρ ἴσχαιμόν ἐστι τὸ φάρμακον.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Ἔτι γὰρ μένεις;</span></p>
+<p class="passage"><span class="passage-text">ΓΝΑΘΩΝΙΔΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἄπειμι· σὺ δὲ οὐ χαιρήσεις οὕτω σκαιὸς ἐκ χρηστοῦ γενόμενος.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text">Πολύ καλά. Αυτά ας έχουμε αποφασισμένα και αντρίκεια πιστοί ας μείνουμε σε τούτα. <span class="marker">[45]</span> Πάρα πολύ θα ᾽θελα ωστόσο σε όλους να γίνουν αυτά κάπως γνωστά, ότι δηλαδή είμαι ζάπλουτος. Γιατί αυτό το πράγμα θα τους γινόταν θηλιά στο λαιμό. Μα τί είναι τούτο; πω, πω τί βιασύνη!</span></p>
+<p class="passage"><span class="passage-text"><i> (Καταφθάνουν οι κόλακες και πρώτος ο Γναθωνίδης, πολύ διαχυτικός).</i></span></p>
+<p class="passage"><span class="passage-text">Από παντού τρέχουν σκονισμένοι και λαχανιασμένοι, γιατί μυρίστηκαν, δεν ξέρω από πού, το χρυσάφι. Τί να κάνω λοιπόν, να ανέβω σ᾽ αυτόν το βράχο και να τους διώξω με τις πέτρες χτυπώντας τους από ψηλά ή θα είναι μεγάλη η παράβαση να τους μιλήσουμε για μια φορά και μόνο, να πικραθούν ακόμα πιο πολύ, που περιφρονούνται; Αυτό είναι νομίζω το καλύτερο. Ώστε λοιπόν ας τους υποδεχτούμε τηρώντας τη θέση μας. Για να δω, ποιός είναι αυτός ο πρώτος; Ο Γναθωνίδης ο κόλακας, που προχθές, όταν του ζήτησα μια χάρη, μου πέταξε το βρόχο και ας είχε ξεράσει πιθάρια ολόκληρα κρασί πολλές φορές στο σπίτι μου. Μα έκανε καλά και ήρθε, θα βογκήξει πριν από τους άλλους.</span></p>
+<p class="passage"><span class="passage-text">ΓΝΑΘΩΝΙΔΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[46]</span> Δεν το ᾽λεγα εγώ πως οι θεοί δε θα παραμελήσουν τον Τίμωνα, έναν καλό άνθρωπο; Γεια και χαρά, Τίμων, ομορφάνθρωπε, γλυκύτατε και ανοιχτόκαρδε.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Χαίρε και συ, Γναθωνίδη, πιο αχόρταγε απ᾽ όλους τους γύπες και πιο δόλιε απ᾽ όλους τους ανθρώπους.</span></p>
+<p class="passage"><span class="passage-text">ΓΝΑΘΩΝΙΔΗΣ</span></p>
+<p class="passage"><span class="passage-text">Πάντα σού αρέσει να περιπαίζεις. Μα πού είναι το συμπόσιο; Σου φέρνω ένα καινούριο τραγούδι, από τους διθυράμβους που τελευταία παρουσιάστηκαν.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Πραγματικά κάτω απ᾽ αυτό το δικέλλι θα τραγουδήσεις ελεγείες με πολύ πάθος.</span></p>
+<p class="passage"><span class="passage-text">ΓΝΑΘΩΝΙΔΗΣ</span></p>
+<p class="passage"><span class="passage-text">Τί είναι αυτό; Τίμων, χτυπάς; Να είστε μάρτυρες· ω Ηρακλή, όχου όχου, θα σε καταγγείλω στον Άρειο Πάγο για τραυματισμό.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Λίγο αν βραδύνεις, χωρίς άλλο θα κατηγορηθώ για φόνο.</span></p>
+<p class="passage"><span class="passage-text">ΓΝΑΘΩΝΙΔΗΣ</span></p>
+<p class="passage"><span class="passage-text">Όχι, όχι μα γιάτρεψε τουλάχιστον την πληγή μου, πασπαλίζοντας επάνω λίγο χρυσάφι, είναι φοβερά αιμοστατικό αυτό το φάρμακο.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Ακόμη εδώ είσαι;</span></p>
+<p class="passage"><span class="passage-text">ΓΝΑΘΩΝΙΔΗΣ</span></p>
+<p class="passage"><span class="passage-text">Θα φύγω. Κι εσύ όμως δε θα καλοπεράσεις, που από καλός άνθρωπος τόσο σκληρός έχεις γίνει.</span></p>
+        </div>
+        
+
+        
+        <div class="page-divider" id="page-16" data-hash="book-5-chapter--">
+            Ο Τίμων βρίσκει τον θησαυρό και επιτίθεται στους κόλακες • Κεφάλαιο ΤΙΜΩΝ-ΦΙΛΙΑΔΗΣ (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=57&page=16" target="_blank" class="page-link">Page 16</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[47]</span> Τίς οὗτός ἐστιν ὁ προσιών, ὁ ἀναφαλαντίας; Φιλιάδης, κολάκων ἁπάντων ὁ βδελυρώτατος. οὗτος δὲ ἀγρὸν ὅλον παρ᾽ ἐμοῦ λαβὼν καὶ τῇ θυγατρὶ προῖκα δύο τάλαντα, μισθὸν τοῦ ἐπαίνου, ὁπότε ᾄσαντά με πάντων σιωπώντων μόνος ὑπερεπῄνεσεν ἐπομοσάμενος ᾠδικώτερον εἶναι τῶν κύκνων, ἐπειδὴ νοσοῦντα πρῴην εἶδέ με καὶ προσῆλθον ἐπικουρίας δεόμενος, πληγὰς ὁ γενναῖος προσενέτεινεν.</span></p>
+<p class="passage"><span class="passage-text">ΦΙΛΙΑΔΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[48]</span> Ὢ τῆς ἀναισχυντίας. νῦν Τίμωνα γνωρίζετε; νῦν Γναθωνίδης φίλος καὶ συμπότης; τοιγαροῦν δίκαια πέπονθεν οὕτως ἀχάριστος ὤν. ἡμεῖς δὲ οἱ πάλαι συνήθεις καὶ συνέφηβοι καὶ δημόται ὅμως μετριάζομεν, ὡς μὴ ἐπιπηδᾶν δοκῶμεν. χαῖρε, ὦ δέσποτα, καὶ ὅπως τοὺς μιαροὺς τούτους κόλακας φυλάξῃ, τοὺς ἐπὶ τῆς τραπέζης μόνον, τὰ ἄλλα δὲ κοράκων οὐδὲν διαφέροντας. οὐκέτι πιστευτέα τῶν νῦν οὐδενί· πάντες ἀχάριστοι καὶ πονηροί. ἐγὼ δὲ τάλαντόν σοι κομίζων, ὡς ἔχοις πρὸς τὰ κατεπείγοντα χρῆσθαι, καθ᾽ ὁδὸν ἤδη πλησίον ἤκουσα, ὡς πλουτοίης ὑπερμεγέθη τινὰ πλοῦτον. ἥκω τοιγαροῦν ταῦτά σε νουθετήσων· καίτοι σύ γε οὕτω σοφὸς ὢν οὐδὲν ἴσως δεήσῃ τῶν παρ᾽ ἐμοῦ λόγων, ὃς καὶ τῷ Νέστορι τὸ δέον παραινέσειας ἄν.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Ἔσται ταῦτα, ὦ Φιλιάδη. πλὴν ἀλλὰ πρόσιθι, ὡς καὶ σὲ φιλοφρονήσωμαι τῇ δικέλλῃ.</span></p>
+<p class="passage"><span class="passage-text">ΦΙΛΙΑΔΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ἄνθρωποι, κατέαγα τοῦ κρανίου ὑπὸ τοῦ ἀχαρίστου, διότι τὰ συμφέροντα ἐνουθέτουν αὐτόν.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[47]</span> Ποιός είναι αυτός που καταφθάνει, ο φαλακρός; Ο Φιλιάδης, ο πιο σιχαμερός απ᾽ όλους τους κόλακες. Και αυτός πήρε από εμένα ολόκληρο χωράφι και δύο τάλαντα προίκα για την κόρη του, αμοιβή για τον έπαινο που μου έκανε, όταν κάποτε τραγούδησα και, ενώ όλοι σιωπούσαν, μόνο αυτός με παίνεψε πολύ παίρνοντας όρκο ότι είμαι μελωδικότερος και από τους κύκνους. Όταν τις προάλλες με είδε άρρωστο και πλησίασα ζητώντας βοήθεια, με έδειρε για τα καλά ο γενναίος.</span></p>
+<p class="passage"><span class="passage-text">ΦΙΛΙΑΔΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[48]</span> Ω τί ντροπή! Τώρα τον ξέρετε τον Τίμωνα; Τώρα ο Γναθωνίδης φίλος και συμπότης; Λοιπόν —καλά έπαθε— έτσι αχάριστος που είναι. Ενώ εμείς οι παλιοί γνώριμοι, συνέφηβοι και συμπολίτες, μένουμε πίσω, για να μη φανούμε υπερβολικοί. Χαίρε, αφέντη. Κοίταξε πώς να φυλαχτείς απ᾽ αυτούς τους μιαρούς κόλακες, που είναι μόνο για τραπέζια και δε διαφέρουν στα άλλα από κοράκια. Δεν πρέπει να έχει κανείς εμπιστοσύνη σήμερα σε κανέναν. Όλοι είναι αχάριστοι και κακοί. Εγώ σου έφερνα ένα τάλαντο να έχεις για τις επείγουσες ανάγκες και στο δρόμο, ενώ πλησίαζα, άκουσα πως έχεις γίνει πάμπλουτος. Έχω λοιπόν έρθει να σου δώσω τούτες τις συμβουλές, αν και εσύ βέβαια είσαι τόσο σοφός και ίσως δε θα σου χρειαστούν τα λόγια τα δικά μου, γιατί και το Νέστορα θα μπορούσες να συμβουλέψεις τα πρέποντα.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Θα γίνουν αυτά, Φιλιάδη. Μα έλα κοντά να σε περιποιηθώ κι εσένα με το δικέλλι μου.</span></p>
+<p class="passage"><span class="passage-text">ΦΙΛΙΑΔΗΣ</span></p>
+<p class="passage"><span class="passage-text">Άνθρωποι, μου τσάκισε το κρανίο ο αχάριστος, γιατί τον συμβούλεψα για τα συμφέροντά του.</span></p>
+        </div>
+        
+
+        
+        <div class="page-divider" id="page-17" data-hash="book-5-chapter--">
+            Ο Τίμων βρίσκει τον θησαυρό και επιτίθεται στους κόλακες • Κεφάλαιο ΤΙΜΩΝ-ΤΙΜΩΝ (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=57&page=17" target="_blank" class="page-link">Page 17</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[49]</span> Ἰδοὺ τρίτος οὗτος ὁ ῥήτωρ Δημέας προσέρχεται ψήφισμα ἔχων ἐν τῇ δεξιᾷ καὶ συγγενὴς ἡμέτερος εἶναι λέγων. οὗτος ἑκκαίδεκα παρ᾽ ἐμοῦ τάλαντα μιᾶς ἡμέρας ἐκτίσας τῇ πόλει —καταδεδίκαστο γὰρ καὶ ἐδέδετο οὐκ ἀποδιδούς, κἀγὼ ἐλεήσας ἐλυσάμην αὐτόν— ἐπειδὴ πρῴην ἔλαχεν τῇ Ἐρεχθηΐδι φυλῇ διανέμειν τὸ θεωρικὸν κἀγὼ προσῆλθον αἰτῶν τὸ γινόμενον, οὐκ ἔφη γνωρίζειν πολίτην ὄντα με.</span></p>
+<p class="passage"><span class="passage-text">ΔΗΜΕΑΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[50]</span> Χαῖρε, ὦ Τίμων, τὸ μέγα ὄφελος τοῦ γένους, τὸ ἔρεισμα τῶν Ἀθηνῶν, τὸ πρόβλημα τῆς Ἑλλάδος· καὶ μὴν πάλαι σε ὁ δῆμος συνειλεγμένος καὶ αἱ βουλαὶ ἀμφότεραι περιμένουσι. πρότερον δὲ ἄκουσον τὸ ψήφισμα, ὃ ὑπὲρ σοῦ γέγραφα·</span></p>
+<p class="passage indent"><span class="passage-text">«Ἐπειδὴ Τίμων [ὁ] Ἐχεκρατίδου Κολλυτεύς, ἀνὴρ οὐ μόνον καλὸς κἀγαθός, ἀλλὰ καὶ σοφὸς ὡς οὐκ ἄλλος ἐν τῇ Ἑλλάδι, παρὰ πάντα χρόνον διατελεῖ τὰ ἄριστα πράττων τῇ πόλει, νενίκηκεν δὲ πὺξ καὶ πάλην καὶ δρόμον ἐν Ὀλυμπίᾳ μιᾶς ἡμέρας καὶ τελείῳ ἅρματι καὶ συνωρίδι πωλικῇ—»</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Ἀλλ᾽ οὐδὲ ἐθεώρησα ἐγὼ πώποτε εἰς Ὀλυμπίαν.</span></p>
+<p class="passage"><span class="passage-text">ΔΗΜΕΑΣ</span></p>
+<p class="passage"><span class="passage-text">Τί οὖν; θεωρήσεις ὕστερον· τὰ τοιαῦτα δὲ πολλὰ προσκεῖσθαι ἄμεινον. «Καὶ ἠρίστευσε δὲ ὑπὲρ τῆς πόλεως πέρυσι πρὸς Ἀχαρναῖς καὶ κατέκοψε Πελοποννησίων δύο μοίρας—»</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[51]</span> Πῶς; διὰ γὰρ τὸ μὴ ἔχειν ὅπλα οὐδὲ προὐγράφην ἐν τῷ καταλόγῳ.</span></p>
+<p class="passage"><span class="passage-text">ΔΗΜΕΑΣ</span></p>
+<p class="passage"><span class="passage-text">Μέτρια τὰ περὶ σαυτοῦ λέγεις, ἡμεῖς δὲ ἀχάριστοι ἂν εἴημεν ἀμνημονοῦντες. «Ἔτι δὲ καὶ ψηφίσματα γράφων καὶ συμβουλεύων καὶ στρατηγῶν οὐ μικρὰ ὠφέλησε τὴν πόλιν· ἐπὶ τούτοις ἅπασι δεδόχθω τῇ βουλῇ καὶ τῷ δήμῳ καὶ τῇ Ἡλιαίᾳ κατὰ φυλὰς καὶ τοῖς δήμοις ἰδίᾳ καὶ κοινῇ πᾶσι χρυσοῦν ἀναστῆσαι τὸν Τίμωνα παρὰ τὴν Ἀθηνᾶν ἐν τῇ ἀκροπόλει κεραυνὸν ἐν τῇ δεξιᾷ ἔχοντα καὶ ἀκτῖνας ἐπὶ τῇ κεφαλῇ καὶ στεφανῶσαι αὐτὸν χρυσοῖς στεφάνοις ἑπτὰ καὶ ἀνακηρυχθῆναι τοὺς στεφάνους σήμερον Διονυσίοις τραγῳδοῖς καινοῖς — ἀχθῆναι γὰρ δι᾽ αὐτὸν δεῖ τήμερον τὰ Διονύσια. εἶπε τὴν γνώμην Δημέας ὁ ῥήτωρ, συγγενὴς αὐτοῦ ἀγχιστεὺς καὶ μαθητὴς ὤν· καὶ γὰρ ῥήτωρ ἄριστος ὁ Τίμων καὶ τὰ ἄλλα πάντα ὁπόσα ἂν ἐθέλοι.»</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[52]</span> Τουτὶ μὲν οὖν σοι τὸ ψήφισμα. ἐγὼ δὲ καὶ τὸν υἱὸν ἐβουλόμην ἀγαγεῖν παρὰ σέ, ὃν ἐπὶ τῷ σῷ ὀνόματι Τίμωνα ὠνόμακα.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Πῶς, ὦ Δημέα, ὃς οὐδὲ γεγάμηκας, ὅσα γε καὶ ἡμᾶς εἰδέναι;</span></p>
+<p class="passage"><span class="passage-text">ΔΗΜΕΑΣ</span></p>
+<p class="passage"><span class="passage-text">Ἀλλὰ γαμῶ, ἢν διδῷ θεός, ἐς νέωτα καὶ παιδοποιήσομαι καὶ τὸ γεννηθησόμενον —ἄρρεν γὰρ ἔσται— Τίμωνα ἤδη καλῶ.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Οὐκ οἶδα εἰ γαμησείεις ἔτι, ὦ οὗτος, τηλικαύτην παρ᾽ ἐμοῦ πληγὴν λαμβάνων.</span></p>
+<p class="passage"><span class="passage-text">ΔΗΜΕΑΣ</span></p>
+<p class="passage"><span class="passage-text">Οἴμοι· τί τοῦτο; τυραννίδι Τίμων ἐπιχειρεῖς καὶ τύπτεις τοὺς ἐλευθέρους οὐ καθαρῶς ἐλεύθερος οὐδ᾽ ἀστὸς ὤν; ἀλλὰ δώσεις ἐν τάχει τὴν δίκην τά τε ἄλλα καὶ ὅτι τὴν ἀκρόπολιν ἐνέπρησας.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[53]</span> Ἀλλ᾽ οὐκ ἐμπέπρησται, ὦ μιαρέ, ἡ ἀκρόπολις· ὥστε δῆλος εἶ συκοφαντῶν.</span></p>
+<p class="passage"><span class="passage-text">ΔΗΜΕΑΣ</span></p>
+<p class="passage"><span class="passage-text">Ἀλλὰ καὶ πλουτεῖς τὸν ὀπισθόδομον διορύξας.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Οὐ διώρυκται οὐδὲ οὗτος, ὥστε ἀπίθανά σου καὶ ταῦτα.</span></p>
+<p class="passage"><span class="passage-text">ΔΗΜΕΑΣ</span></p>
+<p class="passage"><span class="passage-text">Διορυχθήσεται μὲν ὕστερον· ἤδη δὲ σὺ πάντα τὰ ἐν αὐτῷ ἔχεις.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Οὐκοῦν καὶ ἄλλην λάμβανε.</span></p>
+<p class="passage"><span class="passage-text">ΔΗΜΕΑΣ</span></p>
+<p class="passage"><span class="passage-text">Οἴμοι τὸ μετάφρενον.</span></p>
+<p class="passage"><span class="passage-text">Μὴ κέκραχθι· κατοίσω γάρ σοι καὶ τρίτην· ἐπεὶ καὶ γελοῖα πάμπαν ‹ἂν› πάθοιμι δύο μὲν Λακεδαιμονίων μοίρας κατακόψας ἄνοπλος, ἓν δὲ μιαρὸν ἀνθρώπιον μὴ ἐπιτρίψας· μάτην γὰρ ἂν εἴην καὶ νενικηκὼς Ὀλύμπια πὺξ καὶ πάλην.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[49]</span> Νά, έρχεται και τρίτος, ο ρήτορας Δημέας, με ψήφισμα στα χέρια και λέει ότι είναι συγγενής μας. Αυτός, ενώ από δικά μου πλήρωσε στην πόλη δεκαέξι τάλαντα εντός μιας ημέρας —είχε καταδικαστεί και τον έβαλαν φυλακή, επειδή δεν τα έδινε, κι εγώ τον λυπήθηκα και τον ελευθέρωσα— όταν προχθές κληρώθηκε να μοιράζει τα θεωρικά στην Ερεχθηίδα φυλή κι εγώ πήγα να ζητήσω το ποσό μου, είπε πως δε με ήξερε για πολίτη.</span></p>
+<p class="passage"><span class="passage-text">ΔΗΜΕΑΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[50]</span> Χαίρε, Τίμων, η μεγάλη δόξα της γενιάς, το στήριγμα των Αθηνών, ο προμαχώνας της Ελλάδας. Συγκεντρωμένος από ώρα πολλή ο λαός και οι δύο βουλές σε περιμένουν. Πρωτύτερα όμως άκουσε το ψήφισμα, που έχω γράψει για εσένα.</span></p>
+<p class="passage indent"><span class="passage-text">«Επειδή ο Τίμων ο Εχεκρατίδης από τον Κολλυτό, όχι μόνο καλός και αγαθός αλλά και σοφός όσο κανένας άλλος στην Ελλάδα, πράττει πάντα για την πόλη τα πιο σωστά και επειδή έχει νικήσει στην Ολυμπία την ίδια μέρα στην πυγμαχία και στην πάλη, στο τρέξιμο, στο άρμα και στο δίφρο τον πωλικό—»</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Μα εγώ ούτε θεατής πήγα ποτέ στην Ολυμπία.</span></p>
+<p class="passage"><span class="passage-text">ΔΗΜΕΑΣ</span></p>
+<p class="passage"><span class="passage-text">Και τί σημασία έχει; Θα πας αργότερα. Καλύτερα είναι κάτι τέτοια να προστεθούν πολλά. «Και ανδραγάθησε υπέρ της πόλεως πέρυσι στις Αχαρνές και τσάκισε δύο τμήματα Πελοποννησίων—»</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[51]</span> Πώς; μη έχοντας όπλα ούτε στον κατάλογο γράφτηκα.</span></p>
+<p class="passage"><span class="passage-text">ΔΗΜΕΑΣ</span></p>
+<p class="passage"><span class="passage-text">Μιλάς με μετριοφροσύνη για τον εαυτό σου, αλλά εμείς θα ήμαστε αχάριστοι, αν τα ξεχνούσαμε. «Ακόμη και με ψηφίσματα και συμβουλές και στρατηγίες δεν πρόσφερε μικρές υπηρεσίες στην πόλη· για όλα αυτά ας αποφασίσει η βουλή και ο δήμος και η Ηλιαία χωριστά κατά φυλές και οι δήμοι ξεχωριστά ο καθένας, και όλοι μαζί να στήσουν χρυσό ανδριάντα του Τίμωνα δίπλα στην Αθηνά στην Ακρόπολη με κεραυνό στο δεξί χέρι και ακτίνες στο κεφάλι. Και να τον στεφανώσουν με επτά χρυσά στεφάνια και να αναγγελθούν τα στεφάνια σήμερα κατά την παράσταση νέων τραγωδιών στα Διονύσια. Πρέπει για χάρη του σήμερα να γιορταστούν τα Διονύσια. Την πρόταση έκαμε ο Δημέας ο ρήτορας, στενός συγγενής και μαθητής του. Γιατί ο Τίμων είναι άριστος ρήτορας και όλα τα άλλα όσα θα ᾽θελε να είναι.»</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[52]</span> Αυτό λοιπόν είναι το ψήφισμα για εσένα. Εγώ μάλιστα ήθελα να σου φέρω και το γιο μου, που προς τιμή σου τον έχω ονομάσει Τίμωνα.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Πώς γίνεται, Δημέα, αφού εσύ ούτε έχεις παντρευτεί, απ᾽ όσο τουλάχιστον κι εμείς ξέρουμε;</span></p>
+<p class="passage"><span class="passage-text">ΔΗΜΕΑΣ</span></p>
+<p class="passage"><span class="passage-text">Μα θα παντρευτώ, αν δώσει ο θεός, τη χρονιά που μας έρχεται. Θα κάνω παιδί, και το παιδί που θα γεννηθεί —θα είναι βέβαια αγόρι— από τώρα το ονομάζω Τίμωνα.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Ε, εσύ, δεν ξέρω αν θα παντρευτείς πια, ύστερα από ένα τέτοιο δικό μου χτύπημα.</span></p>
+<p class="passage"><span class="passage-text">ΔΗΜΕΑΣ</span></p>
+<p class="passage"><span class="passage-text">Αλίμονο! Τί είναι τούτο; Επιχειρείς να γίνεις τύραννος και χτυπάς τους ελεύθερους πολίτες, ενώ ούτε γνήσια ελεύθερος, ούτε πολίτης είσαι; Μα γρήγορα θα τιμωρηθείς και για τα άλλα και γιατί έβαλες φωτιά στην Ακρόπολη.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[53]</span> Αλλά δεν έχει καεί, άθλιε, η Ακρόπολη. Ολοφάνερο λοιπόν ότι συκοφαντείς.</span></p>
+<p class="passage"><span class="passage-text">ΔΗΜΕΑΣ</span></p>
+<p class="passage"><span class="passage-text">Αλλά έγινες πλούσιος, γιατί έσκαψες κρυφά και έφτασες στον οπισθόδομο.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Ούτε αυτός έχει σκαφτεί, επομένως και αυτά σου απίστευτα.</span></p>
+<p class="passage"><span class="passage-text">ΔΗΜΕΑΣ</span></p>
+<p class="passage"><span class="passage-text">Θα σκαφτεί αργότερα. Εσύ όμως έχεις τώρα όλα όσα ήταν εκεί μέσα.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Λοιπόν πάρε και άλλη.</span></p>
+<p class="passage"><span class="passage-text">ΔΗΜΕΑΣ</span></p>
+<p class="passage"><span class="passage-text">Ωχ, η πλάτη μου.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Μη σκούζεις, γιατί θα σου κατεβάσω και τρίτη. Εξάλλου θα ήμουν εντελώς γελοίος, αν δεν τσάκιζα ένα μιαρό ανθρωπάριο, ενώ κατέσφαξα άοπλος δύο τμήματα Λακεδαιμονίων. Μάταιη θα ήταν και η νίκη μου στην πυγμαχία και στην πάλη στους Ολυμπιακούς αγώνες.</span></p>
+        </div>
+        
+
+        
+        <div class="page-divider" id="page-18" data-hash="book-5-chapter-">
+            Ο Τίμων βρίσκει τον θησαυρό και επιτίθεται στους κόλακες • Κεφάλαιο ΤΙΜΩΝ (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=57&page=18" target="_blank" class="page-link">Page 18</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[54]</span> Ἀλλὰ τί τοῦτο; οὐ Θρασυκλῆς ὁ φιλόσοφος οὗτός ἐστιν; οὐ μὲν οὖν ἄλλος· ἐκπετάσας γοῦν τὸν πώγωνα καὶ τὰς ὀφρῦς ἀνατείνας καὶ βρενθυόμενός τι πρὸς αὑτὸν ἔρχεται, τιτανῶδες βλέπων, ἀνασεσοβημένος τὴν ἐπὶ τῷ μετώπῳ κόμην, Αὐτοβορέας τις ἢ Τρίτων, οἵους ὁ Ζεῦξις ἔγραψεν. οὗτος ὁ τὸ σχῆμα εὐσταλὴς καὶ κόσμιος τὸ βάδισμα καὶ σωφρονικὸς τὴν ἀναβολὴν ἕωθεν μυρία ὅσα περὶ ἀρετῆς διεξιὼν καὶ τῶν ἡδονῇ χαιρόντων κατηγορῶν καὶ τὸ ὀλιγαρκὲς ἐπαινῶν, ἐπειδὴ λουσάμενος ἀφίκοιτο ἐπὶ τὸ δεῖπνον καὶ ὁ παῖς μεγάλην τὴν κύλικα ὀρέξειεν αὐτῷ —τῷ ζωροτέρῳ δὲ χαίρει μάλιστα— καθάπερ τὸ Λήθης ὕδωρ ἐκπιὼν ἐναντιώτατα ἐπιδείκνυται τοῖς ἑωθινοῖς ἐκείνοις λόγοις, προαρπάζων ὥσπερ ἴκτινος τὰ ὄψα καὶ τὸν πλησίον παραγκωνιζόμενος, καρύκης τὸ γένειον ἀνάπλεως, κυνηδὸν ἐμφορούμενος, ἐπικεκυφὼς καθάπερ ἐν ταῖς λοπάσι τὴν ἀρετὴν εὑρήσειν προσδοκῶν, ἀκριβῶς τὰ τρύβλια τῷ λιχανῷ ἀποσμήχων ὡς μηδὲ ὀλίγον τοῦ μυττωτοῦ καταλίποι, <span class="marker">[55]</span> μεμψίμοιρος ἀεί, κἂν τὸν πλακοῦντα ὅλον ἢ τὸν σῦν μόνος τῶν ἄλλων λάβῃ, ὅ τι περ λιχνείας καὶ ἀπληστίας ὄφελος, μέθυσος καὶ πάροινος οὐκ ἄχρι ᾠδῆς καὶ ὀρχηστύος μόνον, ἀλλὰ καὶ λοιδορίας καὶ ὀργῆς. προσέτι καὶ λόγοι πολλοὶ ἐπὶ τῇ κύλικι, τότε δὴ καὶ μάλιστα, περὶ σωφροσύνης καὶ κοσμιότητος· καὶ ταῦτά φησιν ἤδη ὑπὸ τοῦ ἀκράτου πονηρῶς ἔχων καὶ ὑποτραυλίζων γελοίως· εἶτα ἔμετος ἐπὶ τούτοις· καὶ τὸ τελευταῖον, ἀράμενοί τινες ἐκφέρουσιν αὐτὸν ἐκ τοῦ συμποσίου τῆς αὐλητρίδος ἀμφοτέραις ἐπειλημμένον. πλὴν ἀλλὰ καὶ νήφων οὐδενὶ τῶν πρωτείων παραχωρήσειεν ἂν ψεύσματος ἕνεκα ἢ θρασύτητος ἢ φιλαργυρίας· ἀλλὰ καὶ κολάκων ἐστὶ τὰ πρῶτα καὶ ἐπιορκεῖ προχειρότατα, καὶ ἡ γοητεία προηγεῖται καὶ ἡ ἀναισχυντία παρομαρτεῖ, καὶ ὅλως πάνσοφόν τι χρῆμα καὶ πανταχόθεν ἀκριβὲς καὶ ποικίλως ἐντελές. οἰμώξεται τοιγαροῦν οὐκ εἰς μακρὰν χρηστὸς ὤν. τί τοῦτο; παπαί, χρόνιος ἡμῖν Θρασυκλῆς.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[54]</span> Αλλά τί είναι τούτο; Δεν είναι αυτός ο Θρασυκλής ο φιλόσοφος; Σίγουρα δεν είναι άλλος. Άπλωσε λοιπόν τη γενειάδα του, ύψωσε τα φρύδια και όλος καμάρι έρχεται με βλέμμα τρομερό, τα μαλλιά ορθωμένα σαν πραγματικός Βοριάς ή Τρίτων, όπως τους ζωγράφισε ο Ζεύξης. Αυτός ο ευπρεπής στην εμφάνιση, ο κόσμιος στο βάδισμα και σοβαρός στο ντύσιμο από το πρωί αρχίζει και λέει μύρια όσα για την αρετή, κατηγορώντας εκείνους που χαίρονται την ηδονή και επαινώντας την ολιγάρκεια. Από την ώρα όμως που λούζεται και καταφθάνει στο δείπνο και ο υπηρέτης τού προσφέρει το μεγάλο κρασοπότηρο —χαίρεται πιο πολύ το ανέρωτο κρασί— θαρρείς και ήπιε το νερό της Λήθης, παρουσιάζεται τελείως αντίθετος από τις πρωινές εκείνες διδαχές του. Αρπάζει σαν περδικογέρακο μπρος από τους άλλους το φαγητό και σπρώχνει το διπλανό του, με πασαλειμμένα τα γένια και φέρσιμο σκύλου· σκύβει στις γαβάθες σαν να περιμένει να βρει μέσα σ᾽ αυτές την αρετή, σκουπίζει με το δάχτυλο καλά τις κούπες, ώστε να μην αφήσει ούτε στάλα σάλτσα. <span class="marker">[55]</span> Πάντα μεμψιμοιρεί, και αν ακόμα πάρει ολόκληρη την πίτα και το χοιρίδιο μόνος του, καύχημα της λαιμαργίας και της αχορτασιάς. Μέθυσος και έκλυτος όχι μόνο ώς το σημείο του τραγουδιού και του χορού, μα φτάνοντας και στη βρισιά και στο θυμό. Επιπλέον λέει λόγια πολλά την ώρα του πιοτού, τότε προπάντων για σωφροσύνη και ευπρέπεια. Και αυτά τα λέει, ενώ το ανέρωτο κρασί τον έχει πια καταντήσει στα χάλια του και τραυλίζει γελοία. Και έπειτα κάνει εμετό. Τέλος μερικοί τον σηκώνουν και τον βγάζουν έξω από το συμπόσιο, ενώ κρατά με τα δυο του χέρια την αυλητρίδα. Όμως και ξεμέθυστος σε κανένα δε θα παραχωρούσε τα πρωτεία της ψευτιάς, της θρασύτητας και φιλαργυρίας. Αλλά και από τους κόλακες είναι ο πρώτος και ευκολότατα επιορκεί· η απάτη πάει μπροστά του και η αναισχυντία τον ακολουθεί· γενικά είναι ένα πάνσοφο πράγμα, από κάθε πλευρά σωστό και ποικιλοτρόπως τέλειο. Θα κλάψει λοιπόν γρήγορα, και αυτός, μια και είναι χρηστός. Τί συμβαίνει; Μπα, μπα χρόνια να δούμε το Θρασυκλή.</span></p>
+        </div>
+        
+
+        
+        <div class="page-divider" id="page-19" data-hash="book-5-chapter--">
+            Ο Τίμων βρίσκει τον θησαυρό και επιτίθεται στους κόλακες • Κεφάλαιο ΘΡΑΣΥΚΛΗΣ-ΤΙΜΩΝ (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=57&page=19" target="_blank" class="page-link">Page 19</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ΘΡΑΣΥΚΛΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[56]</span> Οὐ κατὰ ταὐτά, ὦ Τίμων, τοῖς πολλοῖς τούτοις ἀφῖγμαι, ὥσπερ οἱ τὸν πλοῦτόν σου τεθηπότες ἀργυρίου καὶ χρυσίου καὶ δείπνων πολυτελῶν ἐλπίδι συνδεδραμήκασι, πολλὴν τὴν κολακείαν ἐπιδειξόμενοι πρὸς ἄνδρα οἷον σὲ ἁπλοϊκὸν καὶ τῶν ὄντων κοινωνικόν· οἶσθα γὰρ ὡς μᾶζα μὲν ἐμοὶ δεῖπνον ἱκανόν, ὄψον δὲ ἥδιστον θύμον ἢ κάρδαμον ἢ εἴ ποτε τρυφῴην, ὀλίγον τῶν ἁλῶν· ποτὸν δὲ ἡ ἐννεάκρουνος· ὁ δὲ τρίβων οὗτος ἧς βούλει πορφυρίδος ἀμείνων. τὸ χρυσίον μὲν γὰρ οὐδὲν τιμιώτερον τῶν ἐν τοῖς αἰγιαλοῖς ψηφίδων μοι δοκεῖ. σοῦ δὲ αὐτοῦ χάριν ἐστάλην, ὡς μὴ διαφθείρῃ σε τὸ κάκιστον τοῦτο καὶ ἐπιβουλότατον κτῆμα ὁ πλοῦτος, ὁ πολλοῖς πολλάκις αἴτιος ἀνηκέστων συμφορῶν γεγενημένος· εἰ γάρ μοι πείθοιο, μάλιστα ‹μὲν› ὅλον ἐς τὴν θάλατταν ἐμβαλεῖς αὐτὸν οὐδὲν ἀναγκαῖον ἀνδρὶ ἀγαθῷ ὄντα καὶ τὸν φιλοσοφίας πλοῦτον ὁρᾶν δυναμένῳ· μὴ μέντοι ἐς βάθος, ὦγαθέ, ἀλλ᾽ ὅσον ἐς βουβῶνας ἐπεμβὰς ὀλίγον πρὸ τῆς κυματωγῆς, ἐμοῦ ὁρῶντος μόνου· <span class="marker">[57]</span> εἰ δὲ μὴ τοῦτο βούλει, σὺ δὲ ἄλλον τρόπον ἀμείνω κατὰ τάχος ἐκφόρησον αὐτὸν ἐκ τῆς οἰκίας μηδ᾽ ὀβολὸν αὑτῷ ἀνείς, διαδιδοὺς ἅπασι τοῖς δεομένοις, ᾧ μὲν πέντε δραχμάς, ᾧ δὲ μνᾶν, ᾧ δὲ ἡμιτάλαντον· εἰ δέ τις φιλόσοφος εἴη, διμοιρίαν ἢ τριμοιρίαν φέρεσθαι δίκαιος· ἐμοὶ δέ —καίτοι οὐκ ἐμαυτοῦ χάριν αἰτῶ, ἀλλ᾽ ὅπως μεταδῶ τῶν ἑταίρων τοῖς δεομένοις— ἱκανὸν εἰ ταυτηνὶ τὴν πήραν ἐμπλήσας παράσχοις οὐδὲ ὅλους δύο μεδίμνους χωροῦσαν Αἰγινητικούς. ὀλιγαρκῆ δὲ καὶ μέτριον χρὴ εἶναι τὸν φιλοσοφοῦντα καὶ μηδὲν ὑπὲρ τὴν πήραν φρονεῖν.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Ἐπαινῶ ταῦτά σου, ὦ Θρασύκλεις· πρὸ δ᾽ οὖν τῆς πήρας, εἰ δοκεῖ, φέρε σοι τὴν κεφαλὴν ἐμπλήσω κονδύλων ἐπιμετρήσας τῇ δικέλλῃ.</span></p>
+<p class="passage"><span class="passage-text">ΘΡΑΣΥΚΛΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ὦ δημοκρατία καὶ νόμοι, παιόμεθα ὑπὸ τοῦ καταράτου ἐν ἐλευθέρᾳ τῇ πόλει.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Τί ἀγανακτεῖς, ὦγαθέ; μῶν παρακέκρουσμαί σε; καὶ μὴν ἐπεμβαλῶ χοίνικας ὑπὲρ τὸ μέτρον τέτταρας. ἀλλὰ τί τοῦτο; <span class="marker">[58]</span> πολλοὶ συνέρχονται· Βλεψίας ἐκεῖνος καὶ Λάχης καὶ Γνίφων καὶ ὅλον τὸ σύνταγμα τῶν οἰμωξομένων. ὥστε τί οὐκ ἐπὶ τὴν πέτραν ταύτην ἀνελθὼν τὴν μὲν δίκελλαν ὀλίγον ἀναπαύω πάλαι πεπονηκυῖαν, αὐτὸς δὲ ὅτι πλείστους λίθους συμφορήσας ἐπιχαλαζῶ πόρρωθεν αὐτούς;</span></p>
+<p class="passage"><span class="passage-text">ΒΛΕΨΙΑΣ</span></p>
+<p class="passage"><span class="passage-text">Μὴ βάλλε, ὦ Τίμων· ἄπιμεν γάρ.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Ἀλλ᾽ οὐκ ἀναιμωτί γε ὑμεῖς οὐδὲ ἄνευ τραυμάτων.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">ΘΡΑΣΥΚΛΗΣ</span></p>
+<p class="passage"><span class="passage-text"><span class="marker">[56]</span> Δεν έχω έρθει, Τίμων, για τους ίδιους λόγους που ήρθαν αυτοί οι πολλοί. Όπως έτρεξαν για παράδειγμα αυτοί που θαυμάζουν τα πλούτη σου περιμένοντας ασήμι και χρυσάφι και δείπνα πλούσια, για να πουν πολλές κολακείες σ᾽ έναν άνθρωπο, όπως εσύ, απλό και ανοιχτοχέρη. Ξέρεις βέβαια ότι το κριθαρόψωμο για εμένα είναι δείπνο αρκετό, προσφάγι νοστιμότατο το θυμάρι ή το κάρδαμο και, όταν κάποτε το ρίχνω στην τρυφή, του βάζω και λίγο αλάτι. Πιοτό μου η Εννεάκρουνος. Και αυτό το τριβώνιο καλύτερο από όποια θέλεις πορφύρα. Το χρυσάφι πάλι καθόλου πιο πολύτιμο από τα χαλίκια του γιαλού. Αλλά κουβαλήθηκα μόνο για χάρη σου, για να μη σε διαφθείρει το πιο κακό και καταστρεπτικό πράγμα, ο πλούτος, που πολλές φορές σε πολλούς στάθηκε αίτια αγιάτρευτων συμφορών. Εάν λοιπόν πειστείς σ᾽ εμένα, σίγουρα θα τον πετάξεις όλον στη θάλασσα, διότι καθόλου δεν είναι αναγκαίος για έναν άνθρωπο αγαθό, που μπορεί να καταλάβει τον πλούτο της φιλοσοφίας. Μην τον ρίξεις όμως βαθιά, καλέ μου, αλλά μόλις μπεις ώς τη μέση στο νερό, λίγο πιο πέρα από την ακτή και να σε βλέπω μόνο εγώ. <span class="marker">[57]</span> Και αν αυτό δε σου αρέσει, εσύ με άλλο τρόπο καλύτερο γρήγορα σύρε τον έξω από το σπίτι σου, χωρίς να αφήσεις για τον εαυτό σου ούτε οβολό. Μοίρασέ τον σε όλους που έχουν ανάγκη, σε άλλον πέντε δραχμές, σε άλλον μία μνα, σε άλλον μισό τάλαντο. Εάν μάλιστα κανείς είναι φιλόσοφος, είναι δίκαιο να πάρει διπλό ή τριπλό μερίδιο. Και σ᾽ εμένα —αν και δε ζητώ για τον εαυτό μου, αλλά για να δώσω σε φίλους, που έχουν ανάγκη— φτάνει να μου γεμίσεις τούτο το ταγάρι, που καλά καλά δε χωρά ούτε δύο Αιγινητικούς μεδίμνους. Πρέπει ο φιλόσοφος να είναι ολιγαρκής και μετριόφρων και να μη σκέπτεται τίποτε πέρα από το ταγάρι του.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Σε επαινώ για τούτα, Θρασυκλή. Πριν όμως από το ταγάρι έλα, αν θέλεις, να σου γεμίσω το κεφάλι γροθιές και να σου δώσω και από πάνω άλλες με τη δικέλλα.</span></p>
+<p class="passage"><span class="passage-text">ΘΡΑΣΥΚΛΗΣ</span></p>
+<p class="passage"><span class="passage-text">Ω δημοκρατία και νόμοι, σε ελεύθερη πόλη δεχόμαστε χτυπήματα από τον καταραμένο.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Τί αγανακτείς, καλέ μου; Μήπως σε έχω ξεγελάσει; Μα θα προσθέσω τέσσερις χοίνικες επί πλέον. Μα τί είναι αυτό; <span class="marker">[58]</span> Έρχονται πολλοί μαζί. Ο Βλεψίας εκείνος και ο Λάχης και ο Γνίφων και όλο το σύνταγμα που θα βογκήξουν. Γιατί λοιπόν να μην ανέβω σ᾽ αυτόν το βράχο και να ξεκουράσω το δικέλλι μου, που από καιρό έχει κουραστεί, και να μαζέψω ο ίδιος όσο γίνεται πιο πολλές πέτρες και να τους πετροβολήσω από μακριά;</span></p>
+<p class="passage"><span class="passage-text">ΒΛΕΨΙΑΣ</span></p>
+<p class="passage"><span class="passage-text">Μη βαράς, Τίμων. Θα φύγουμε.</span></p>
+<p class="passage"><span class="passage-text">ΤΙΜΩΝ</span></p>
+<p class="passage"><span class="passage-text">Αλλ᾽ όχι χωρίς αίματα, μήτε χωρίς τραύματα.</span></p>
+        </div>
+        
+        </section>
+    </main>
+
+    <script>
+        // Layout and Theme controls
+        function toggleLayout() {
+            const body = document.body;
+            const btn = document.getElementById('toggle-layout-btn');
+            
+            if (body.classList.contains('hide-original')) {
+                body.classList.remove('hide-original');
+                btn.innerText = 'Hide Original';
+                localStorage.setItem('ebook-hide-original', 'false');
+            } else {
+                body.classList.add('hide-original');
+                btn.innerText = 'Show Original';
+                localStorage.setItem('ebook-hide-original', 'true');
+            }
+        }
+
+        function setTheme(theme, buttonElement) {
+            if (theme === 'light') {
+                document.documentElement.removeAttribute('data-theme');
+            } else {
+                document.documentElement.setAttribute('data-theme', theme);
+            }
+            
+            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+            buttonElement.classList.add('active');
+            
+            localStorage.setItem('ebook-theme', theme);
+        }
+
+        function toggleSidebar() {
+            const body = document.body;
+            const overlay = document.getElementById('mobile-overlay');
+            const isMobile = window.innerWidth <= 900;
+            
+            if (isMobile) {
+                if (body.classList.contains('sidebar-open')) {
+                    body.classList.remove('sidebar-open');
+                    overlay.classList.remove('open');
+                } else {
+                    body.classList.add('sidebar-open');
+                    overlay.classList.add('open');
+                    // Close right sidebar if open
+                    body.classList.remove('chat-sidebar-open');
+                }
+            } else {
+                if (body.classList.contains('sidebar-closed')) {
+                    body.classList.remove('sidebar-closed');
+                    localStorage.setItem('ebook-sidebar-closed', 'false');
+                } else {
+                    body.classList.add('sidebar-closed');
+                    localStorage.setItem('ebook-sidebar-closed', 'true');
+                }
+            }
+        }
+        
+        function closeSidebarOnMobile() {
+            if (window.innerWidth <= 900) {
+                document.body.classList.remove('sidebar-open');
+                document.getElementById('mobile-overlay').classList.remove('open');
+            }
+        }
+        
+        function toggleMobileOptions() {
+            const header = document.querySelector('header');
+            const btn = document.querySelector('.options-toggle');
+            
+            if (header.classList.contains('options-open')) {
+                header.classList.remove('options-open');
+                document.body.classList.remove('mobile-options-open');
+                btn.classList.remove('active');
+            } else {
+                header.classList.add('options-open');
+                document.body.classList.add('mobile-options-open');
+                btn.classList.add('active');
+            }
+        }
+
+        // Adjusts sidebar height dynamically to match mobile visual viewport when virtual keyboard is launched
+        function adjustSidebarHeightForKeyboard() {
+            if (window.visualViewport) {
+                const chatSidebar = document.getElementById('chat-sidebar');
+                const isMobile = window.innerWidth <= 900;
+                if (isMobile && document.body.classList.contains('chat-sidebar-open')) {
+                    chatSidebar.style.height = window.visualViewport.height + 'px';
+                } else {
+                    chatSidebar.style.height = ''; // Fallback to CSS rules
+                }
+            }
+        }
+
+        // Right AI Sidebar Toggles
+        function toggleChatSidebar() {
+            const body = document.body;
+            if (body.classList.contains('chat-sidebar-open')) {
+                body.classList.remove('chat-sidebar-open');
+                adjustSidebarHeightForKeyboard();
+            } else {
+                body.classList.add('chat-sidebar-open');
+                // Close Left Sidebar on Mobile
+                if (window.innerWidth <= 900) {
+                    body.classList.remove('sidebar-open');
+                    document.getElementById('mobile-overlay').classList.remove('open');
+                }
+                // Focus text area
+                setTimeout(() => {
+                    document.getElementById('chat-input').focus();
+                    adjustSidebarHeightForKeyboard();
+                }, 100);
+            }
+        }
+
+        // AI Configuration Modal controls
+        function openAiSettings() {
+            document.getElementById('ai-config-modal').classList.add('open');
+            loadSavedAiSettings();
+        }
+
+        function closeAiSettings() {
+            document.getElementById('ai-config-modal').classList.remove('open');
+        }
+
+        function handleProviderChange() {
+            const p = document.getElementById('ai-provider').value;
+            const customUrlGroup = document.getElementById('group-custom-url');
+            const modelInput = document.getElementById('ai-model');
+
+            if (p === 'custom') {
+                customUrlGroup.style.display = 'flex';
+            } else {
+                customUrlGroup.style.display = 'none';
+            }
+
+            // Suggest model placeholders and default values based on provider selection
+            if (p === 'openai') {
+                modelInput.placeholder = 'gpt-4o-mini';
+                if (modelInput.value === 'gemini-flash-latest' || modelInput.value === '' || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gemini')) {
+                    modelInput.value = 'gpt-4o-mini';
+                }
+            } else if (p === 'anthropic') {
+                modelInput.placeholder = 'claude-3-5-sonnet-20241022';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('gemini') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'claude-3-5-sonnet-20241022';
+                }
+            } else if (p === 'gemini') {
+                modelInput.placeholder = 'gemini-flash-latest';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'gemini-flash-latest';
+                }
+            } else if (p === 'openrouter') {
+                modelInput.placeholder = 'meta-llama/llama-3-8b-instruct:free';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('gemini') || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'meta-llama/llama-3-8b-instruct:free';
+                }
+            } else if (p === 'custom') {
+                modelInput.placeholder = 'model-name';
+            }
+        }
+
+        function loadSavedAiSettings() {
+            const provider = localStorage.getItem('ai-prov') || 'openai';
+            const apiKey = localStorage.getItem('ai-key') || '';
+            const model = localStorage.getItem('ai-mod') || '';
+            const customUrl = localStorage.getItem('ai-url') || '';
+
+            document.getElementById('ai-provider').value = provider;
+            document.getElementById('ai-key').value = apiKey;
+            document.getElementById('ai-model').value = model;
+            document.getElementById('ai-custom-url').value = customUrl;
+
+            handleProviderChange();
+        }
+
+        function saveAiSettings() {
+            const provider = document.getElementById('ai-provider').value;
+            const apiKey = document.getElementById('ai-key').value;
+            const model = document.getElementById('ai-model').value;
+            const customUrl = document.getElementById('ai-custom-url').value;
+
+            localStorage.setItem('ai-prov', provider);
+            localStorage.setItem('ai-key', apiKey);
+            localStorage.setItem('ai-mod', model);
+            localStorage.setItem('ai-url', customUrl);
+
+            closeAiSettings();
+        }
+
+        // Text Selection & Chat logic
+        let currentSelection = "";
+        let currentContext = null;
+        let chatHistory = [];
+
+        function getPageContext(node) {
+            let current = node.nodeType === Node.TEXT_NODE ? node.parentElement : node;
+            let col = current.closest('.column');
+            if (!col) return null;
+
+            // Find the preceding page-divider element
+            let sibling = col.previousElementSibling;
+            while (sibling && !sibling.classList.contains('page-divider')) {
+                sibling = sibling.previousElementSibling;
+            }
+            if (!sibling) return null;
+
+            const pageNum = sibling.id.replace('page-', '');
+
+            // Identify parallel original and translation sibling columns
+            let origCol = sibling.nextElementSibling;
+            while (origCol && !origCol.classList.contains('original-col')) {
+                origCol = origCol.nextElementSibling;
+            }
+            let transCol = sibling.nextElementSibling;
+            while (transCol && !transCol.classList.contains('translation-col')) {
+                transCol = transCol.nextElementSibling;
+            }
+
+            const isOriginal = col.classList.contains('original-col');
+
+            return {
+                pageNum: pageNum,
+                dividerText: sibling.textContent.trim(),
+                originalText: origCol ? origCol.innerText : "",
+                translationText: transCol ? transCol.innerText : "",
+                selectedColType: isOriginal ? "original" : "translation"
+            };
+        }
+
+        function handleTextSelection(e) {
+            setTimeout(() => {
+                const selection = window.getSelection();
+                const text = selection.toString().trim();
+                const popup = document.getElementById('ai-selection-popup');
+
+                if (!text) {
+                    if (e.target && e.target.id !== 'ai-selection-popup') {
+                        popup.style.display = 'none';
+                    }
+                    return;
+                }
+
+                const anchorNode = selection.anchorNode;
+                if (!anchorNode) return;
+
+                const context = getPageContext(anchorNode);
+                if (!context) {
+                    popup.style.display = 'none';
+                    return;
+                }
+
+                currentSelection = text;
+                currentContext = context;
+
+                const isMobile = window.innerWidth <= 900;
+                
+                if (isMobile) {
+                    // Position fixed at the bottom on mobile to avoid native Android contextual menu overlap
+                    popup.style.display = 'flex';
+                    popup.style.position = 'fixed';
+                    popup.style.bottom = '24px';
+                    popup.style.left = '50%';
+                    popup.style.transform = 'translateX(-50%)';
+                    popup.style.top = 'auto';
+                    popup.style.width = 'calc(100% - 40px)';
+                    popup.style.maxWidth = '340px';
+                    popup.style.justifyContent = 'center';
+                    popup.style.boxShadow = '0 8px 24px rgba(0,0,0,0.3)';
+                } else {
+                    // Position relative to selection on desktop
+                    const range = selection.getRangeAt(0);
+                    const rect = range.getBoundingClientRect();
+
+                    popup.style.display = 'flex';
+                    popup.style.position = 'fixed';
+                    popup.style.bottom = 'auto';
+                    popup.style.transform = 'none';
+                    popup.style.width = 'auto';
+                    popup.style.maxWidth = 'none';
+                    popup.style.left = Math.max(10, Math.min(window.innerWidth - popup.offsetWidth - 10, rect.left + (rect.width / 2) - 50)) + "px";
+                    popup.style.top = (rect.top - 45) + "px";
+                    popup.style.justifyContent = 'flex-start';
+                    popup.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+                }
+            }, 10);
+        }
+
+        function openChatWithSelection() {
+            document.getElementById('ai-selection-popup').style.display = 'none';
+            
+            // Populate context card
+            const contextTextNode = document.getElementById('chat-context-text');
+            const colLabel = currentContext.selectedColType === 'original' ? 'Αρχαία' : 'Μετάφραση';
+            contextTextNode.textContent = '"' + currentSelection + '" (' + colLabel + ' • Σελίδα ' + currentContext.pageNum + ')';
+            
+            // Clear prior conversation when selecting new text
+            clearChat();
+
+            // Open sidebar
+            document.body.classList.add('chat-sidebar-open');
+            setTimeout(() => {
+                document.getElementById('chat-input').focus();
+                adjustSidebarHeightForKeyboard();
+            }, 100);
+        }
+
+        function clearChat() {
+            chatHistory = [];
+            const msgsContainer = document.getElementById('chat-messages');
+            
+            // Keep the context card, wipe standard bubble divs
+            const contextCard = document.getElementById('chat-context-card');
+            msgsContainer.innerHTML = '';
+            msgsContainer.appendChild(contextCard);
+        }
+
+        function handleChatKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendChatMessage();
+            }
+        }
+
+        function appendMessage(sender, text, isError = false, historyIndex = null) {
+            const msgsContainer = document.getElementById('chat-messages');
+            const msgDiv = document.createElement('div');
+            
+            if (isError) {
+                msgDiv.className = 'chat-message system-error';
+            } else {
+                msgDiv.className = 'chat-message ' + sender;
+            }
+
+            // If it is a user message and linked to history, attach interactive attributes
+            if (sender === 'user' && historyIndex !== null) {
+                msgDiv.setAttribute('data-history-index', historyIndex);
+                msgDiv.setAttribute('title', 'Κλικ για εκ νέου εκτέλεση από αυτό το σημείο');
+                msgDiv.addEventListener('click', () => handleHistoryClick(historyIndex));
+            }
+            
+            msgDiv.innerHTML = formatMarkdown(text);
+            msgsContainer.appendChild(msgDiv);
+            msgsContainer.scrollTop = msgsContainer.scrollHeight;
+        }
+
+        // Truncate history and re-run on user dialog click
+        async function handleHistoryClick(historyIndex) {
+            // Prevent duplicate triggers if query is running
+            const inputEl = document.getElementById('chat-input');
+            if (inputEl.disabled) return;
+
+            // Slice history array up to and including the selected user query
+            chatHistory = chatHistory.slice(0, historyIndex + 1);
+
+            // Redraw UI container to match truncated array
+            rebuildChatUI();
+
+            // Re-fire query
+            await runQuery();
+        }
+
+        // Clean redraw of current stack
+        function rebuildChatUI() {
+            const msgsContainer = document.getElementById('chat-messages');
+            const contextCard = document.getElementById('chat-context-card');
+            
+            msgsContainer.innerHTML = '';
+            msgsContainer.appendChild(contextCard);
+            
+            chatHistory.forEach((msg, idx) => {
+                if (msg.role === 'user') {
+                    let displayContent = msg.content;
+                    // Extract original question portion from first structured input turn for a clean UI
+                    if (idx === 0 && msg.content.includes("Ερώτηση:\n")) {
+                        displayContent = msg.content.split("Ερώτηση:\n").slice(1).join("Ερώτηση:\n");
+                    }
+                    appendMessage('user', displayContent, false, idx);
+                } else if (msg.role === 'assistant') {
+                    appendMessage('assistant', msg.content);
+                }
+            });
+        }
+
+        // Native Markdown parser leveraging standard Marked.js library
+        function formatMarkdown(text) {
+            if (!text) return "";
+            try {
+                // Parse standard markdown strings to structural HTML
+                return marked.parse(text);
+            } catch (err) {
+                // Fallback to basic text escaping on parse failure
+                return text
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/\n/g, "<br>");
+            }
+        }
+
+        // Modular core query runner
+        async function runQuery() {
+            const inputEl = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('chat-send-btn');
+            
+            // Disable inputs during network transaction
+            inputEl.disabled = true;
+            sendBtn.disabled = true;
+            
+            // Append loading container
+            appendMessage('assistant', 'Thinking...');
+            const lastMsgDiv = document.getElementById('chat-messages').lastChild;
+
+            // Load credentials
+            const provider = localStorage.getItem('ai-prov') || 'openai';
+            const apiKey = localStorage.getItem('ai-key') || '';
+            const savedMod = localStorage.getItem('ai-mod') || '';
+            const customUrl = localStorage.getItem('ai-url') || '';
+
+            if (!apiKey && provider !== 'custom') {
+                lastMsgDiv.className = 'chat-message system-error';
+                lastMsgDiv.innerText = '⚠️ Παρακαλούμε ρυθμίστε το API Key στις ρυθμίσεις AI Config πρώτα.';
+                openAiSettings();
+                inputEl.disabled = false;
+                sendBtn.disabled = false;
+                return;
+            }
+
+            // Build the System Prompt Context dynamically on EVERY call
+            const isOriginal = currentContext.selectedColType === 'original';
+            const contextText = isOriginal ? currentContext.originalText : currentContext.translationText;
+            const contextLabel = isOriginal ? "Αρχαίο Κείμενο" : "Σύγχρονη Μετάφραση";
+			const pageTitle = document.title;
+
+            let systemInstruction = "Είσαι διακεκριμένος φιλόσοφος και γνώστης της φιλοσοφίας του Αριστοτέλη και Πλάτωνα και άλλων αρχαίων ελλήνων συγγραφέων.\n" +
+                "Ο χρήστης διαβάζει το βιβλίου του " + pageTitle + " και βάσει αυτού θα σου κάνει μερικές ερωτήσεις, περιλαμβάνοντας κάποιες φορές αποσπάσματα απο το βιβλίο αυτό πάνω στα οποία σχετίζονται οι ερωτήσεις. Ακολουθεί το ευρύτειο πλαίσιο της σελίδας/κεφαλαίου (Σελίδα " + currentContext.pageNum + ", " + currentContext.dividerText + ") για αναφορά:\n" +
+                "--- " + contextLabel + ":\n" + contextText + "\n\n" +
+                "Απάντησε στις ερωτήσεις του χρήστη σε σχέση με το πλαίσιο του κειμένου που παρέχεται. " +
+                "Δώσε τις απαντήσεις σου στα νέα ελληνικά χρησιμοποιώντας markdown μορφοποίηση.";
+
+            // Construct Payload Messages (Always prepending system prompt at index 0)
+            let payloadMessages = [{ role: "system", content: systemInstruction }];
+            payloadMessages = payloadMessages.concat(chatHistory);
+
+            try {
+                const answer = await requestAPI(provider, apiKey, savedMod, payloadMessages, customUrl);
+                lastMsgDiv.innerHTML = formatMarkdown(answer);
+                chatHistory.push({ role: "assistant", content: answer });
+            } catch (error) {
+                lastMsgDiv.className = 'chat-message system-error';
+                lastMsgDiv.innerText = "Error: " + error.message;
+                // If API failed, keep the user question on screen so they can click to retry it,
+                // do not silently clear the UI anymore.
+            } finally {
+                inputEl.disabled = false;
+                sendBtn.disabled = false;
+                document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+                inputEl.focus();
+                adjustSidebarHeightForKeyboard();
+            }
+        }
+
+        async function sendChatMessage() {
+            const inputEl = document.getElementById('chat-input');
+            const prompt = inputEl.value.trim();
+            if (!prompt) return;
+
+            // If the last message in history is a 'user' query (due to a previous failed turn),
+            // pop it before sending so that our conversational stack maintains alternating roles.
+            if (chatHistory.length > 0 && chatHistory[chatHistory.length - 1].role === 'user') {
+                chatHistory.pop();
+            }
+
+            // 1. Manage Chat History & Highlight Context
+            let histIdx;
+            if (chatHistory.length === 0) {
+                // Incorporate highlighted text directly into the first user turn, NOT the system prompt
+                const firstUserContent = "Επισημασμένο κείμενο:\n\"" + currentSelection + "\"\n\nΕρώτηση:\n" + prompt;
+                chatHistory.push({ role: "user", content: firstUserContent });
+                histIdx = 0;
+            } else {
+                // Subsequent turns: push the raw user follow-up prompt
+                chatHistory.push({ role: "user", content: prompt });
+                histIdx = chatHistory.length - 1;
+            }
+
+            // 2. Display user message in UI with history index
+            appendMessage('user', prompt, false, histIdx);
+            inputEl.value = '';
+
+            // 3. Trigger query execution
+            await runQuery();
+        }
+
+        async function requestAPI(provider, apiKey, model, messages, customUrl) {
+            let url = "";
+            let headers = { "Content-Type": "application/json" };
+            let body = {};
+
+            // Normalize models to defaults if unspecified
+            let activeModel = model;
+            if (!activeModel) {
+                if (provider === 'openai') activeModel = 'gpt-4o-mini';
+                else if (provider === 'anthropic') activeModel = 'claude-3-5-sonnet-20241022';
+                else if (provider === 'gemini') activeModel = 'gemini-flash-latest';
+                else if (provider === 'openrouter') activeModel = 'meta-llama/llama-3-8b-instruct:free';
+                else activeModel = 'local-model';
+            }
+
+            if (provider === 'openai') {
+                url = "https://api.openai.com/v1/chat/completions";
+                headers["Authorization"] = "Bearer " + apiKey;
+                body = { model: activeModel, messages: messages };
+            } else if (provider === 'openrouter') {
+                url = "https://openrouter.ai/api/v1/chat/completions";
+                headers["Authorization"] = "Bearer " + apiKey;
+                headers["HTTP-Referer"] = window.location.href;
+                headers["X-Title"] = "Ancient Greek Bilingual Reader";
+                body = { model: activeModel, messages: messages };
+            } else if (provider === 'gemini') {
+                url = "https://generativelanguage.googleapis.com/v1beta/models/" + activeModel + ":generateContent?key=" + apiKey;
+                
+                // Restructure typical OpenAI formats to Gemini's native API structure
+                const systemItem = messages.find(m => m.role === 'system');
+                const userItems = messages.filter(m => m.role !== 'system');
+                
+                const contents = userItems.map(m => ({
+                    role: m.role === 'assistant' ? 'model' : 'user',
+                    parts: [{ text: m.content }]
+                }));
+
+                body = { contents: contents };
+                if (systemItem) {
+                    body.systemInstruction = { parts: [{ text: systemItem.content }] };
+                }
+            } else if (provider === 'anthropic') {
+                url = "https://api.anthropic.com/v1/messages";
+                headers["x-api-key"] = apiKey;
+                headers["anthropic-version"] = "2023-06-01";
+                headers["dangerously-allow-browser"] = "true";
+
+                const systemItem = messages.find(m => m.role === 'system');
+                const userItems = messages.filter(m => m.role !== 'system');
+
+                body = {
+                    model: activeModel,
+                    messages: userItems.map(m => ({ role: m.role, content: m.content })),
+                    max_tokens: 1500
+                };
+                if (systemItem) {
+                    body.system = systemItem.content;
+                }
+            } else if (provider === 'custom') {
+                url = customUrl || "http://localhost:11434/v1/chat/completions";
+                if (apiKey) {
+                    headers["Authorization"] = "Bearer " + apiKey;
+                }
+                body = { model: activeModel, messages: messages };
+            }
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(body)
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error("API Error (" + response.status + "): " + (errText || response.statusText));
+            }
+
+            const responseData = await response.json();
+
+            // Extract content responses safely depending on the selected engine
+            if (provider === 'gemini') {
+                return responseData.candidates[0].content.parts[0].text;
+            } else if (provider === 'anthropic') {
+                return responseData.content[0].text;
+            } else {
+                // OpenAI / OpenRouter / Ollama
+                return responseData.choices[0].message.content;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('ebook-theme');
+            if (savedTheme) {
+                const targetBtn = document.getElementById('theme-' + savedTheme);
+                if (targetBtn) setTheme(savedTheme, targetBtn);
+            }
+
+            const hideOriginal = localStorage.getItem('ebook-hide-original');
+            if (hideOriginal === 'true') {
+                document.body.classList.add('hide-original');
+                document.getElementById('toggle-layout-btn').innerText = 'Show Original';
+            }
+            
+            if (window.innerWidth > 900) {
+                const sidebarClosed = localStorage.getItem('ebook-sidebar-closed');
+                if (sidebarClosed === 'true') {
+                    document.body.classList.add('sidebar-closed');
+                }
+            }
+
+            // Restore saved chat width on desktop
+            const chatSidebar = document.getElementById('chat-sidebar');
+            const savedChatWidth = localStorage.getItem('ebook-chat-width');
+            if (savedChatWidth && window.innerWidth > 900) {
+                chatSidebar.style.width = savedChatWidth;
+            }
+
+            // Setup Resizing for AI Chat Sidebar
+            const resizeHandle = document.getElementById('chat-resize-handle');
+            let isResizing = false;
+
+            resizeHandle.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                chatSidebar.classList.add('resizing');
+                document.body.style.userSelect = 'none';
+                document.body.style.cursor = 'ew-resize';
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isResizing) return;
+                const newWidth = window.innerWidth - e.clientX;
+                // Limit range between 280px and 85% of total screen width
+                if (newWidth > 280 && newWidth < window.innerWidth * 0.85) {
+                    chatSidebar.style.width = newWidth + 'px';
+                    localStorage.setItem('ebook-chat-width', newWidth + 'px');
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (isResizing) {
+                    isResizing = false;
+                    chatSidebar.classList.remove('resizing');
+                    document.body.style.userSelect = '';
+                    document.body.style.cursor = '';
+                }
+            });
+            
+            // Listen for selection events on layout columns (supports mouse and touch handles)
+            document.addEventListener('mouseup', handleTextSelection);
+            document.addEventListener('keyup', handleTextSelection);
+            document.addEventListener('selectionchange', handleTextSelection);
+
+            // Bind selection popup using both mousedown and touchstart with preventDefault.
+            // This guarantees instant tap execution on touch devices before selection focus is lost.
+            const popup = document.getElementById('ai-selection-popup');
+            const handleTriggerTap = (e) => {
+                e.preventDefault();
+                openChatWithSelection();
+            };
+            popup.addEventListener('mousedown', handleTriggerTap);
+            popup.addEventListener('touchstart', handleTriggerTap);
+
+            // Hide the popup trigger during scroll shifts (desktop only to prevent mobile touch glitches)
+            window.addEventListener('scroll', () => {
+                if (window.innerWidth > 900) {
+                    document.getElementById('ai-selection-popup').style.display = 'none';
+                }
+            }, { passive: true });
+
+            // VisualViewport resizing adjustments (Handles Android virtual keyboard overlap natively)
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', adjustSidebarHeightForKeyboard);
+                window.visualViewport.addEventListener('scroll', adjustSidebarHeightForKeyboard);
+            }
+
+            const chatInput = document.getElementById('chat-input');
+            if (chatInput) {
+                chatInput.addEventListener('focus', () => {
+                    setTimeout(adjustSidebarHeightForKeyboard, 150);
+                });
+                chatInput.addEventListener('blur', () => {
+                    setTimeout(adjustSidebarHeightForKeyboard, 150);
+                });
+            }
+            
+            let lastScrollTop = 0;
+            const header = document.querySelector('header');
+            const optBtn = document.querySelector('.options-toggle');
+            
+            window.addEventListener('scroll', () => {
+                let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                
+                if (scrollTop < 0) scrollTop = 0;
+                
+                if (scrollTop > 10) {
+                    document.body.classList.add('scrolled');
+                } else {
+                    document.body.classList.remove('scrolled');
+                }
+                
+                if (scrollTop > lastScrollTop && scrollTop > 120) {
+                    header.classList.add('header-hidden');
+                    header.classList.remove('options-open');
+                    document.body.classList.remove('mobile-options-open');
+                    optBtn.classList.remove('active');
+                } else {
+                    header.classList.remove('header-hidden');
+                }
+                
+                lastScrollTop = scrollTop;
+            }, { passive: true });
+            
+            const observerOptions = {
+                root: null,
+                rootMargin: "-100px 0px -60% 0px", 
+                threshold: 0
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const hash = entry.target.getAttribute('data-hash');
+                        if (hash && window.location.hash !== '#' + hash) {
+                            history.replaceState(null, null, '#' + hash);
+                        }
+                    }
+                });
+            }, observerOptions);
+            
+            document.querySelectorAll('.page-divider').forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>

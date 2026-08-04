@@ -1,0 +1,2584 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ΠΙΝΔΑΡΟΣ Νεμεονίκαις</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Marked.js Markdown rendering library -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #faf8f5;
+            --text-color: #2c2520;
+            --accent-color: #8b263e;
+            --sidebar-bg: #f3efe9;
+            --border-color: #e3ded5;
+            --muted-text: #706357;
+            --font-serif: "Cardo", "Georgia", "Palatino", serif;
+        }
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --accent-color: #ff8a80;
+            --sidebar-bg: #2d2d2d;
+            --border-color: #404040;
+            --muted-text: #999999;
+        }
+        [data-theme="sepia"] {
+            --bg-color: #f4ecd8;
+            --text-color: #5b4636;
+            --accent-color: #a04000;
+            --sidebar-bg: #ebdcb9;
+            --border-color: #d7c59d;
+            --muted-text: #7c6857;
+        }
+        
+        body {
+            margin: 0;
+            font-family: var(--font-serif);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            transition: background-color 0.2s, color 0.2s;
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        #mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 90;
+        }
+        #mobile-overlay.open {
+            display: block;
+        }
+        
+        #expand-bar {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 24px;
+            height: 100vh;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            cursor: pointer;
+            z-index: 95;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+        #expand-bar:hover {
+            background-color: var(--border-color);
+        }
+        #expand-bar::after {
+            content: "›";
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        
+        #sidebar {
+            width: 340px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            height: 100vh;
+            position: fixed;
+            top: 0; left: 0;
+            overflow-y: auto;
+            padding: 24px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transform: translateX(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+        #sidebar h2 {
+            font-size: 1.25rem;
+            margin: 0;
+            color: var(--text-color);
+        }
+        .sidebar-close-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--accent-color);
+            font-size: 1.4rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            line-height: 1;
+        }
+        .sidebar-close-btn:hover {
+            background-color: var(--border-color);
+        }
+        
+        .toc-list-container { overflow-y: auto; flex-grow: 1; }
+        
+        details.book-group {
+            margin-bottom: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            background-color: var(--sidebar-bg);
+        }
+        details.book-group[open] { border-color: var(--accent-color); }
+        details.book-group summary {
+            font-weight: bold; font-size: 1.05rem; cursor: pointer; padding: 10px 14px;
+            background-color: var(--sidebar-bg); list-style: none; display: flex;
+            justify-content: space-between; align-items: center; user-select: none;
+        }
+        details.book-group summary::-webkit-details-marker { display: none; }
+        details.book-group summary::after { content: "▾"; font-size: 0.9rem; color: var(--accent-color); }
+        details.book-group[open] summary::after { transform: rotate(180deg); }
+        
+        .toc-sublist-container {
+            background-color: var(--bg-color);
+            border-top: 1px solid var(--border-color);
+        }
+        .toc-group-title {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            padding: 8px 14px 4px 14px;
+            line-height: 1.3;
+        }
+        .toc-sublist { list-style: none; padding: 4px 14px 8px 14px; margin: 0; }
+        .toc-sublist li { margin-bottom: 8px; font-size: 0.88rem; }
+        
+        .toc-sublist a { 
+            color: var(--text-color); 
+            text-decoration: none; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding: 4px; 
+        }
+        .toc-sublist a:hover { color: var(--accent-color); }
+        .toc-page {
+            color: var(--muted-text);
+            font-size: 0.8rem;
+            font-family: var(--font-serif);
+        }
+        
+        #main {
+            margin-left: 340px;
+            flex-grow: 1;
+            padding: 180px 40px 40px 40px;
+            box-sizing: border-box;
+            width: calc(100% - 340px);
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        padding-top 0.3s ease;
+        }
+        
+        header {
+            position: fixed;
+            top: 0;
+            left: 340px;
+            right: 0;
+            background-color: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px 40px;
+            z-index: 50;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transform: translateY(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        left 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        background-color 0.2s, 
+                        box-shadow 0.2s;
+        }
+        header.header-hidden {
+            transform: translateY(-100%);
+            box-shadow: none !important;
+        }
+        body.scrolled header {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        [data-theme="dark"] body.scrolled header {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .header-top { display: flex; align-items: center; gap: 20px; }
+        header h1 { margin: 0; font-size: 1.8rem; color: var(--accent-color); line-height: 1.2; }
+        
+        .controls-group {
+            display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+        }
+        .btn {
+            background-color: var(--sidebar-bg); color: var(--text-color);
+            border: 1px solid var(--border-color); padding: 8px 14px;
+            font-family: inherit; cursor: pointer; border-radius: 6px;
+            font-size: 0.9rem; font-weight: bold; transition: all 0.2s; white-space: nowrap;
+        }
+        .btn:hover { background-color: var(--border-color); }
+        .btn.active { background-color: var(--accent-color); color: white; border-color: var(--accent-color); }
+        .btn-layout { background-color: var(--bg-color); border: 2px solid var(--accent-color); color: var(--accent-color); }
+        
+        .menu-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+            white-space: nowrap;
+        }
+        .menu-toggle:hover {
+            background-color: var(--text-color);
+        }
+        
+        .options-toggle {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 6px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            width: 38px;
+            height: 38px;
+            transition: all 0.2s;
+        }
+        .options-toggle:hover {
+            background-color: var(--sidebar-bg);
+        }
+
+        #book-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            column-gap: 48px;
+            row-gap: 0;
+            margin: 0 auto;
+            max-width: 140ch;
+            width: 100%;
+        }
+        
+        body.sidebar-closed #expand-bar {
+            display: flex;
+        }
+        body.sidebar-closed #sidebar {
+            transform: translateX(-340px);
+        }
+        body.sidebar-closed #main {
+            margin-left: 24px;
+            width: calc(100% - 24px);
+        }
+        body.sidebar-closed header {
+            left: 24px;
+        }
+        
+        body.hide-original #book-content { 
+            grid-template-columns: 1fr; 
+            max-width: 140ch;
+        }
+        body.hide-original .original-col { display: none; }
+        body.hide-original .bilingual-header { grid-template-columns: 1fr; }
+        body.hide-original .original-title { display: none; }
+        body.hide-original .translation-col {
+            max-width: 100% !important;
+            justify-self: stretch !important;
+        }
+
+        .bilingual-header {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px; position: sticky; top: 0;
+            background-color: var(--bg-color); padding: 16px 0;
+            border-bottom: 2px solid var(--accent-color); z-index: 10;
+            font-weight: bold; text-transform: uppercase; font-size: 0.85rem;
+            letter-spacing: 0.05em; color: var(--muted-text);
+        }
+        
+        .chapter-anchor {
+            display: block;
+            scroll-margin-top: 180px;
+        }
+        
+        .page-divider {
+            grid-column: 1 / -1;
+            border-bottom: 1px solid var(--border-color);
+            padding-top: 48px; padding-bottom: 12px; margin-bottom: 24px;
+            font-size: 0.95rem; color: var(--accent-color); text-transform: uppercase;
+            letter-spacing: 0.05em; font-weight: bold; 
+            scroll-margin-top: 180px;
+        }
+        
+        .page-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--accent-color);
+            transition: color 0.2s, border-bottom-color 0.2s;
+        }
+        .page-link:hover {
+            color: var(--text-color);
+            border-bottom-color: var(--text-color);
+        }
+        
+        .column { 
+            box-sizing: border-box; 
+            padding-bottom: 24px; 
+            display: flex; 
+            flex-direction: column; 
+            max-width: 65ch;
+            width: fit-content;
+            min-width: 0;
+        }
+        
+        .original-col {
+            justify-self: end;
+        }
+        .translation-col {
+            justify-self: start;
+        }
+        
+        .passage { 
+            margin: 0 0 1.2em 0; 
+            font-size: 1.15rem; 
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 1.5rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .passage-text {
+            flex: 1;
+            min-width: 0;
+            text-align: justify;
+        }
+        .passage.indent .passage-text { text-indent: 2em; }
+        .marker { color: var(--accent-color); font-weight: bold; margin-right: 4px; }
+        .line-number { 
+            color: var(--muted-text); 
+            font-size: 0.85em; 
+            font-weight: normal; 
+            user-select: none;
+            margin-left: auto;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+        i { font-style: italic; }
+
+        /* Floating popover trigger styling */
+        #ai-selection-popup {
+            position: fixed;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 14px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1005;
+            display: none;
+            font-family: var(--font-serif);
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.1s ease;
+        }
+        #ai-selection-popup:hover {
+            transform: scale(1.05);
+        }
+
+        /* Resizable sliding Right Chat Sidebar */
+        #chat-sidebar {
+            width: 380px;
+            min-width: 280px;
+            max-width: 85vw;
+            background-color: var(--sidebar-bg);
+            border-left: 1px solid var(--border-color);
+            height: 100vh;
+            height: 100dvh;
+            position: fixed;
+            top: 0; right: 0;
+            transform: translateX(100%);
+            overflow: visible;
+            display: flex;
+            flex-direction: column;
+            z-index: 110;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-sizing: border-box;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.05);
+        }
+        body.chat-sidebar-open #chat-sidebar {
+            transform: translateX(0);
+        }
+        
+        /* Draggable Resize Handle */
+        #chat-resize-handle {
+            width: 8px;
+            height: 100%;
+            position: absolute;
+            left: -4px;
+            top: 0;
+            cursor: ew-resize;
+            z-index: 120;
+            background-color: transparent;
+            transition: background-color 0.2s;
+        }
+        #chat-resize-handle:hover,
+        #chat-sidebar.resizing #chat-resize-handle {
+            background-color: var(--accent-color);
+            opacity: 0.5;
+        }
+        
+        .chat-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-header h3 { margin: 0; font-size: 1.1rem; color: var(--accent-color); }
+        
+        .chat-header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .chat-context-card {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+        .chat-context-card h4 { margin: 0 0 6px 0; color: var(--accent-color); }
+        .chat-context-card p { 
+            margin: 0; 
+            font-style: italic; 
+            display: -webkit-box; 
+            -webkit-line-clamp: 3; 
+            -webkit-box-orient: vertical; 
+            overflow: hidden; 
+            line-height: 1.4;
+        }
+        
+        .chat-message {
+            max-width: 85%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        
+        /* Render styles for AI Markdown elements in chat boxes */
+        .chat-message p { margin: 0 0 8px 0; line-height: 1.5; }
+        .chat-message p:last-child { margin-bottom: 0; }
+        .chat-message strong { font-weight: bold; }
+        .chat-message em { font-style: italic; }
+        .chat-message ul, .chat-message ol { margin: 4px 0 8px 16px; padding: 0; }
+        .chat-message li { margin-bottom: 4px; font-size: 0.92rem; }
+        .chat-message h1, .chat-message h2, .chat-message h3, .chat-message h4, .chat-message h5 {
+            color: var(--accent-color);
+            margin: 12px 0 6px 0;
+            line-height: 1.3;
+        }
+        .chat-message h3 { font-size: 1.15rem; }
+        .chat-message h4 { font-size: 1.05rem; }
+        .chat-message h5 { font-size: 0.95rem; }
+        .chat-message blockquote {
+            border-left: 3px solid var(--accent-color);
+            margin: 8px 0;
+            padding-left: 10px;
+            color: var(--muted-text);
+            font-style: italic;
+        }
+        .chat-message pre {
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.85rem;
+            margin: 8px 0;
+        }
+        .chat-message code {
+            font-family: monospace;
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: var(--accent-color);
+        }
+        
+        .chat-message.user {
+            background-color: var(--accent-color);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .chat-message.user:hover {
+            filter: brightness(1.15);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        /* Override light-colored syntax highlights in dark bubbles */
+        .chat-message.user code {
+            color: #ff8a80;
+            background-color: rgba(0,0,0,0.2);
+            border-color: rgba(0,0,0,0.1);
+        }
+        .chat-message.user pre {
+            background-color: rgba(0,0,0,0.2);
+            border-color: rgba(0,0,0,0.1);
+            color: white;
+        }
+        
+        .chat-message.assistant {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .chat-message.system-error {
+            background-color: #fce8e6;
+            color: #c5221f;
+            border: 1px solid #fad2cf;
+            align-self: center;
+            max-width: 95%;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+        
+        [data-theme="dark"] .chat-message.system-error {
+            background-color: #371d1d;
+            color: #f28b82;
+            border-color: #5c2424;
+        }
+
+        .chat-input-area {
+            padding: 16px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 8px;
+            background-color: var(--sidebar-bg);
+            flex-shrink: 0;
+        }
+        .chat-input-area textarea {
+            flex-grow: 1;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 10px;
+            border-radius: 6px;
+            resize: none;
+            height: 42px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+        }
+        .chat-input-area button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .chat-input-area button:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* Modal Config Dialog */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-content {
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            padding: 24px;
+            box-sizing: border-box;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 12px;
+        }
+        .modal-header h3 { margin: 0; font-size: 1.25rem; color: var(--accent-color); }
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group label {
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        .form-control {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 14px;
+        }
+
+        @media (max-width: 900px) {
+            #sidebar { transform: translateX(-100%); width: 320px; }
+            body.sidebar-open #sidebar { transform: translateX(0); }
+            body.sidebar-closed #sidebar { transform: translateX(-100%); }
+            
+            #chat-sidebar {
+                width: 100% !important;
+                right: 0;
+                transform: translateX(100%);
+                height: 100vh;
+                height: 100dvh;
+            }
+            body.chat-sidebar-open #chat-sidebar {
+                transform: translateX(0);
+            }
+            #chat-resize-handle {
+                display: none;
+            }
+            
+            #main { 
+                margin-left: 0 !important; 
+                width: 100% !important; 
+                padding: 100px 20px 20px 20px !important;
+            }
+            body.mobile-options-open #main {
+                padding-top: 150px !important;
+            }
+            
+            header {
+                padding-bottom: 12px;
+                margin-bottom: 16px;
+                gap: 8px;
+            }
+            header h1 { 
+                font-size: 0.95rem !important;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                text-align: center;
+                flex-grow: 1;
+                margin: 0;
+            }
+            
+            header {
+                left: 0 !important;
+                padding: 12px 16px;
+            }
+            
+            .header-top { 
+                display: flex;
+                flex-direction: row !important;
+                align-items: center; 
+                justify-content: space-between; 
+                width: 100%;
+                gap: 12px; 
+            }
+            
+            .menu-toggle { 
+                width: auto !important; 
+                padding: 6px 12px;
+                font-size: 0.85rem;
+            }
+            
+            .options-toggle {
+                display: inline-flex;
+            }
+            
+            .controls-group {
+                display: none;
+                width: 100%;
+                justify-content: center;
+                padding-top: 12px;
+                border-top: 1px dashed var(--border-color);
+            }
+            header.options-open .controls-group {
+                display: flex;
+            }
+            
+            #book-content { grid-template-columns: 1fr; column-gap: 0; max-width: 100%; }
+            .column { max-width: 100% !important; width: 100% !important; }
+            .bilingual-header { display: none; }
+            .page-divider { padding-top: 32px; scroll-margin-top: 110px; }
+            .chapter-anchor { scroll-margin-top: 110px; }
+            .passage { font-size: 1.05rem; }
+        }
+        
+        @media (min-width: 901px) {
+            .menu-toggle {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="mobile-overlay" onclick="toggleSidebar()"></div>
+
+    <div id="expand-bar" onclick="toggleSidebar()" title="Ανάπτυξη Περιεχομένων"></div>
+
+    <aside id="sidebar">
+        <div class="sidebar-header">
+            <h2>Πίνακας Περιεχομένων</h2>
+            <button class="sidebar-close-btn" onclick="toggleSidebar()" title="Σύμπτυξη">‹</button>
+        </div>
+        <div class="toc-list-container">
+            <details class="book-group">
+    <summary>Νεμεονίκαις V - Πυθέᾳ ‹Αἰγινήτῃ ἀγενείῳ› παγκρατιαστῇ</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-1-chapter-1" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1</span> <span class="toc-page">#1</span></a></li>
+            <li><a href="#book-1-chapter-1-2" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.2</span> <span class="toc-page">#2</span></a></li>
+            <li><a href="#book-1-chapter-1-3" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.3</span> <span class="toc-page">#3</span></a></li>
+        </ul>
+    </div>
+</details>
+<details class="book-group">
+    <summary>Νεμεονίκαις VII - Σωγένει Αἰγινήτῃ παιδὶ πεντάθλῳ</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-2-chapter-1" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1</span> <span class="toc-page">#4</span></a></li>
+            <li><a href="#book-2-chapter-1-2" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.2</span> <span class="toc-page">#5</span></a></li>
+            <li><a href="#book-2-chapter-1-3" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.3</span> <span class="toc-page">#6</span></a></li>
+            <li><a href="#book-2-chapter-1-4" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.4</span> <span class="toc-page">#7</span></a></li>
+            <li><a href="#book-2-chapter-1-5" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.5</span> <span class="toc-page">#8</span></a></li>
+        </ul>
+    </div>
+</details>
+<details class="book-group">
+    <summary>Νεμεονίκαις X -  ‹Θεαίῳ Ἀργείῳ παλαιστῇ›</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-3-chapter-1" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1</span> <span class="toc-page">#9</span></a></li>
+            <li><a href="#book-3-chapter-1-2" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.2</span> <span class="toc-page">#10</span></a></li>
+            <li><a href="#book-3-chapter-1-3" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.3</span> <span class="toc-page">#11</span></a></li>
+            <li><a href="#book-3-chapter-1-4" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.4</span> <span class="toc-page">#12</span></a></li>
+            <li><a href="#book-3-chapter-1-5" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο 1.5</span> <span class="toc-page">#13</span></a></li>
+        </ul>
+    </div>
+</details>
+        </div>
+    </aside>
+
+    <!-- AI Right Chat Sidebar -->
+    <aside id="chat-sidebar">
+        <div id="chat-resize-handle"></div>
+        <div class="chat-header">
+            <h3>AI Assistant</h3>
+            <div class="chat-header-actions">
+                <button class="btn" style="padding: 4px 8px; font-size: 0.8rem;" onclick="clearChat()">Clear</button>
+                <button class="sidebar-close-btn" style="width: 28px; height: 28px; font-size: 1.1rem;" onclick="toggleChatSidebar()" title="Κλείσιμο">›</button>
+            </div>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <!-- Active Context Card -->
+            <div class="chat-context-card" id="chat-context-card">
+                <h4>Επιλεγμένο Κείμενο</h4>
+                <p id="chat-context-text"></p>
+            </div>
+            <!-- Messages stream here -->
+        </div>
+        <div class="chat-input-area">
+            <textarea id="chat-input" placeholder="Ρωτήστε κάτι για το επιλεγμένο κείμενο..." onkeydown="handleChatKeyDown(event)"></textarea>
+            <button id="chat-send-btn" onclick="sendChatMessage()">Send</button>
+        </div>
+    </aside>
+
+    <!-- Floating Popover Trigger -->
+    <button id="ai-selection-popup"><span style="font-size: 1.1rem;">✨</span> Ask AI</button>
+
+    <!-- Settings Configuration Modal -->
+    <div id="ai-config-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Ρυθμίσεις LLM / AI</h3>
+                <button class="sidebar-close-btn" style="width: 28px; height: 28px; font-size: 1.1rem;" onclick="closeAiSettings()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="ai-provider">Πάροχος (Provider)</label>
+                    <select id="ai-provider" class="form-control" onchange="handleProviderChange()">
+                        <option value="openai">OpenAI (ChatGPT)</option>
+                        <option value="anthropic">Anthropic (Claude)</option>
+                        <option value="gemini">Google Gemini</option>
+                        <option value="openrouter">OpenRouter</option>
+                        <option value="custom">Custom Endpoint (Ollama / Local)</option>
+                    </select>
+                </div>
+                <div class="form-group" id="group-custom-url" style="display: none;">
+                    <label for="ai-custom-url">Base URL</label>
+                    <input type="text" id="ai-custom-url" class="form-control" placeholder="http://localhost:11434/v1/chat/completions">
+                </div>
+                <div class="form-group">
+                    <label for="ai-key">API Key</label>
+                    <input type="password" id="ai-key" class="form-control" placeholder="Εισάγετε το API Key">
+                </div>
+                <div class="form-group">
+                    <label for="ai-model">Μοντέλο (Model Name)</label>
+                    <input type="text" id="ai-model" class="form-control" placeholder="π.χ. gpt-4o-mini">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeAiSettings()">Άκυρο</button>
+                <button class="btn active" onclick="saveAiSettings()">Αποθήκευση</button>
+            </div>
+        </div>
+    </div>
+
+    <main id="main">
+        <header>
+            <div class="header-top">
+                <button class="btn menu-toggle" onclick="toggleSidebar()">☰ Περιεχόμενα</button>
+                <h1>ΠΙΝΔΑΡΟΣ Νεμεονίκαις</h1>
+                <button class="btn options-toggle" onclick="toggleMobileOptions()" title="Ρυθμίσεις">⚙️</button>
+            </div>
+            
+            <div class="controls-group">
+                <button id="toggle-layout-btn" class="btn btn-layout" onclick="toggleLayout()">Hide Original</button>
+                <button class="btn" style="border-color: var(--accent-color);" onclick="openAiSettings()">⚙️ AI Config</button>
+                <button class="btn active theme-btn" id="theme-light" onclick="setTheme('light', this)">Light</button>
+                <button class="btn theme-btn" id="theme-sepia" onclick="setTheme('sepia', this)">Sepia</button>
+                <button class="btn theme-btn" id="theme-dark" onclick="setTheme('dark', this)">Dark</button>
+            </div>
+        </header>
+
+        <section id="book-content">
+            <div class="bilingual-header">
+                <div class="original-title">Αρχαία Ελληνικά (Original)</div>
+                <div class="translation-title">Νέα Ελληνικά (Translation)</div>
+            </div>
+
+            
+        <div id="book-1-chapter-1" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-1" data-hash="book-1-chapter-1">
+            Νεμεονίκαις V - Πυθέᾳ ‹Αἰγινήτῃ ἀγενείῳ› παγκρατιαστῇ • Κεφάλαιο 1 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=156&page=1" target="_blank" class="page-link">Page 1</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text"><h4><i>ΝΕΜΕΟΝΙΚΑΙΣ V</i></h4><h4><i>ΠΥΘΕΑΙ ‹ΑΙΓΙΝΗΤΗΙ ΑΓΕΝΕΙΩΙ› ΠΑΓΚΡΑΤΙΑΣΤΗΙ</i></h4></span></p>
+<p class="passage"><span class="passage-text">Οὐκ ἀνδριαντοποιός εἰμ᾽, ὥστ᾽ ἐλινύσοντα ἐργά- [στρ. α]</span></p>
+<p class="passage indent"><span class="passage-text">ζεσθαι ἀγάλματ᾽ ἐπ᾽ αὐτᾶς βαθμίδος</span></p>
+<p class="passage"><span class="passage-text">ἑσταότ᾽· ἀλλ᾽ ἐπὶ πάσας</span></p>
+<p class="passage indent"><span class="passage-text">ὁλκάδος ἔν τ᾽ ἀκάτῳ, γλυκεῖ᾽ ἀοιδά,</span></p>
+<p class="passage"><span class="passage-text">στεῖχ᾽ ἀπ᾽ Αἰγίνας διαγγέλλοισ᾽, ὅτι</span></p>
+<p class="passage"><span class="passage-text">Λάμπωνος υἱὸς Πυθέας εὐρυσθενής</span></p>
+<p class="passage"><span class="passage-text">νίκη Νεμείοις παγκρατίου στέφανον,</span><span class="line-number">5</span></p>
+<p class="passage"><span class="passage-text">οὔπω γένυσι φαίνων τερείνας</span></p>
+<p class="passage indent"><span class="passage-text">ματέρ᾽ οἰνάνθας ὀπώραν,</span></p>
+<p class="passage"><span class="passage-text">ἐκ δὲ Κρόνου καὶ Ζηνὸς ἥρωας αἰχματὰς φυτευθέν- [ἀντ. α]</span></p>
+<p class="passage indent"><span class="passage-text">τας καὶ ἀπὸ χρυσεᾶν Νηρηΐδων</span></p>
+<p class="passage"><span class="passage-text">Αἰακίδας ἐγέραιρεν</span></p>
+<p class="passage indent"><span class="passage-text">ματρόπολίν τε, φίλαν ξένων ἄρουραν·</span></p>
+<p class="passage"><span class="passage-text">τάν ποτ᾽ εὔανδρόν τε καὶ ναυσικλυτάν</span></p>
+<p class="passage"><span class="passage-text">θέσσαντο, πὰρ βωμὸν πατέρος Ἑλλανίου</span><span class="line-number">10</span></p>
+<p class="passage"><span class="passage-text">στάντες, πίτναν τ᾽ ἐς αἰθέρα χεῖρας ἁμᾶ</span></p>
+<p class="passage"><span class="passage-text">Ἐνδαΐδος ἀριγνῶτες υἱοί</span></p>
+<p class="passage indent"><span class="passage-text">καὶ βία Φώκου κρέοντος,</span></p>
+<p class="passage"><span class="passage-text">ὁ τᾶς θεοῦ, ὃν Ψαμάθεια τίκτ᾽ ἐπὶ ῥηγμῖνι πόντου. [ἐπῳδ. α]</span></p>
+<p class="passage"><span class="passage-text">αἰδέομαι μέγα εἰπεῖν</span></p>
+<p class="passage indent"><span class="passage-text">ἐν δίκᾳ τε μὴ κεκινδυνευμένον,</span></p>
+<p class="passage"><span class="passage-text">πῶς δὴ λίπον εὐκλέα νᾶσον,</span><span class="line-number">15</span></p>
+<p class="passage indent"><span class="passage-text">καὶ τίς ἄνδρας ἀλκίμους</span></p>
+<p class="passage"><span class="passage-text">δαίμων ἀπ᾽ Οἰνώνας ἔλασεν.</span></p>
+<p class="passage indent"><span class="passage-text">στάσομαι· οὔ τοι ἅπασα κερδίων</span></p>
+<p class="passage"><span class="passage-text">φαίνοισα πρόσωπον ἀλάθει᾽ ἀτρεκές·</span></p>
+<p class="passage"><span class="passage-text">καὶ τὸ σιγᾶν πολλάκις ἐστὶ σοφώ-</span></p>
+<p class="passage indent"><span class="passage-text">τατον ἀνθρώπῳ νοῆσαι.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text"><h4><i>ΠΕΜΠΤΟΣ ΝΕΜΕΟΝΙΚΗΣ</i></h4><h4><i>(ΠΥΘΕΑ ΑΙΓΙΝΗΤΗ ΠΑΓΚΡΑΤΙΑΣΤΗ ΑΓΕΝΕΙΩ)</i></h4></span></p>
+<p class="passage"><span class="passage-text">Δεν είμ᾽ αδριαντοποιός [στρ. α]</span></p>
+<p class="passage"><span class="passage-text">για να δουλεύω αγάλματα, που αργεύουν</span></p>
+<p class="passage"><span class="passage-text">στα βάθρα τους απάνω πάντ᾽ ασάλευτα.</span></p>
+<p class="passage"><span class="passage-text">Μα εσύ, τραγούδι μου γλυκό, ξεκίνα</span></p>
+<p class="passage"><span class="passage-text">με κάθε καράβι και βάρκ᾽ απ᾽ την Αίγινα</span></p>
+<p class="passage"><span class="passage-text">να διαλαλήσεις παντού, πως του Λάμπωνα</span></p>
+<p class="passage"><span class="passage-text">ο χεροδύναμος γιος, ο Πυθέας,</span></p>
+<p class="passage"><span class="passage-text">του παγκρατίου νίκησε στα Νέμεα το στεφάνι</span><span class="line-number">5</span></p>
+<p class="passage"><span class="passage-text">πριν τ᾽ άωρ᾽ ακόμα τρυφερά του μάγουλα</span></p>
+<p class="passage"><span class="passage-text">το χνούδι το πρωτάνθιστο σκιάσει·</span></p>
+<p class="passage"><span class="passage-text">και τους κονταρομάχους ήρωες τίμησε, [αντ. α]</span></p>
+<p class="passage"><span class="passage-text">που από τον Κρόνο και το Δία κρατούνε</span></p>
+<p class="passage"><span class="passage-text">κι απ᾽ τις Νεράϊδες τις χρυσές,</span></p>
+<p class="passage"><span class="passage-text">τους Αιακίδες και την πόλη τους,</span></p>
+<p class="passage"><span class="passage-text">τη χώρα την αγαπητή στους ξένους·</span></p>
+<p class="passage"><span class="passage-text">που έναν καιρό δεήθηκαν,</span></p>
+<p class="passage"><span class="passage-text">να γίνει αντρών γενναίων γεννήτρα</span></p>
+<p class="passage"><span class="passage-text">και ξακουστή για τα καράβια της,</span></p>
+<p class="passage"><span class="passage-text">ορθοί μπρος στου Ελληνίου πατέρα το βωμό</span><span class="line-number">10</span></p>
+<p class="passage"><span class="passage-text">υψώνοντας τα χέρια στον αιθέρα</span></p>
+<p class="passage"><span class="passage-text">οι παντοφήμιστοι της Ενδαΐδας γιοι</span></p>
+<p class="passage"><span class="passage-text">κι ο τρανός άρχοντας ο Φώκος, ο αδερφός των,</span></p>
+<p class="passage"><span class="passage-text">γιος της θεάς, που απάνω στο κατάγιαλο [επωδ. α]</span></p>
+<p class="passage"><span class="passage-text">της θάλασσας τον γέννησε η Ψαμμάθη.</span></p>
+<p class="passage"><span class="passage-text">Ντηριούμαι ν᾽ αναθυμηθώ πράξη βαριά</span></p>
+<p class="passage"><span class="passage-text">και που τολμήθηκε όχι με το δίκιο:</span></p>
+<p class="passage"><span class="passage-text">Πώς το λαμπρό νησί παράτησαν στερνά</span><span class="line-number">15</span></p>
+<p class="passage"><span class="passage-text">και ποιά μοίρα τούς ξόρισε κακιά</span></p>
+<p class="passage"><span class="passage-text">τους ήρωες τους τρανούς απ᾽ την Οινώνη.</span></p>
+<p class="passage"><span class="passage-text">Θα σταματήσω· δεν κερδίζει πάντα</span></p>
+<p class="passage"><span class="passage-text">το πρόσωπό της η σωστή να δείχτει αλήθεια</span></p>
+<p class="passage"><span class="passage-text">κι είν᾽ η σιωπή πολλές φορές η πιο σοφή</span></p>
+<p class="passage"><span class="passage-text">απόφαση πὄχει κανείς να πάρει.</span></p>
+        </div>
+        
+
+        <div id="book-1-chapter-1-2" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-2" data-hash="book-1-chapter-1-2">
+            Νεμεονίκαις V - Πυθέᾳ ‹Αἰγινήτῃ ἀγενείῳ› παγκρατιαστῇ • Κεφάλαιο 1.2 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=156&page=2" target="_blank" class="page-link">Page 2</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">εἰ δ᾽ ὄλβον ἢ χειρῶν βίαν ἢ σιδαρίταν ἐπαινῆ- [στρ. β]</span></p>
+<p class="passage indent"><span class="passage-text">σαι πόλεμον δεδόκηται, μακρά μοι</span></p>
+<p class="passage"><span class="passage-text">αὐτόθεν ἅλμαθ᾽ ὑποσκά-</span><span class="line-number">20</span></p>
+<p class="passage indent"><span class="passage-text">πτοι τις· ἔχω γονάτων ὁρμὰν ἐλαφράν·</span></p>
+<p class="passage"><span class="passage-text">καὶ πέραν πόντοιο πάλλοντ᾽ αἰετοί.</span></p>
+<p class="passage"><span class="passage-text">πρόφρων δὲ καὶ κείνοις ἄειδ᾽ ἐν Παλίῳ</span></p>
+<p class="passage"><span class="passage-text">Μοισᾶν ὁ κάλλιστος χορός, ἐν δὲ μέσαις</span></p>
+<p class="passage"><span class="passage-text">φόρμιγγ᾽ Ἀπόλλων ἑπτάγλωσσον</span></p>
+<p class="passage indent"><span class="passage-text">χρυσέῳ πλάκτρῳ διώκων</span></p>
+<p class="passage"><span class="passage-text">ἁγεῖτο παντοίων νόμων· αἱ δὲ πρώτιστον μὲν ὕμνη- [ἀντ. β]</span><span class="line-number">25</span></p>
+<p class="passage indent"><span class="passage-text">σαν Διὸς ἀρχόμεναι σεμνὰν Θέτιν</span></p>
+<p class="passage"><span class="passage-text">Πηλέα θ᾽, ὥς τέ νιν ἁβρὰ</span></p>
+<p class="passage indent"><span class="passage-text">Κρηθεῒς Ἱππολύτα δόλῳ πεδᾶσαι</span></p>
+<p class="passage"><span class="passage-text">ἤθελε ξυνᾶνα Μαγνήτων σκοπόν</span></p>
+<p class="passage"><span class="passage-text">πείσαισ᾽ ἀκοίταν ποικίλοις βουλεύμασιν,</span></p>
+<p class="passage"><span class="passage-text">ψεύσταν δὲ ποιητὸν συνέπαξε λόγον,</span></p>
+<p class="passage"><span class="passage-text">ὡς ἦρα νυμφείας ἐπείρα</span><span class="line-number">30</span></p>
+<p class="passage indent"><span class="passage-text">κεῖνος ἐν λέκτροις Ἀκάστου</span></p>
+<p class="passage"><span class="passage-text">εὐνᾶς· τὸ δ᾽ ἐναντίον ἔσκεν· πολλὰ γάρ νιν παντὶ θυμῷ [ἐπῳδ. β]</span></p>
+<p class="passage"><span class="passage-text">παρφαμένα λιτάνευεν.</span></p>
+<p class="passage indent"><span class="passage-text">τοῖο δ᾽ ὀργὰν κνίζον αἰπεινοὶ λόγοι·</span></p>
+<p class="passage"><span class="passage-text">εὐθὺς δ᾽ ἀπανάνατο νύμφαν,</span></p>
+<p class="passage indent"><span class="passage-text">ξεινίου πατρὸς χόλον</span></p>
+<p class="passage"><span class="passage-text">δείσαις· ὁ δ᾽ εὖ φράσθη κατένευ-</span></p>
+<p class="passage indent"><span class="passage-text">σέν τέ οἱ ὀρσινεφὴς ἐξ οὐρανοῦ</span></p>
+<p class="passage"><span class="passage-text">Ζεὺς ἀθανάτων βασιλεύς, ὥστ᾽ ἐν τάχει</span><span class="line-number">35</span></p>
+<p class="passage"><span class="passage-text">ποντίαν χρυσαλακάτων τινὰ Νη-</span></p>
+<p class="passage indent"><span class="passage-text">ρεΐδων πράξειν ἄκοιτιν,</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">Μ᾽ αν είναι λόγος, ή την ευτυχία τους [στρ. β]</span></p>
+<p class="passage"><span class="passage-text">ή των χεριώ τη δύναμη να εγκωμιάσω</span></p>
+<p class="passage"><span class="passage-text">ή τους σιδερομάχητους πολέμους των,</span></p>
+<p class="passage"><span class="passage-text">τότ᾽ ας μου σκάψουν τόπο για τα πιο μακριά</span><span class="line-number">20</span></p>
+<p class="passage"><span class="passage-text">πηδήματα· ορμήν έχουν ελαφριά</span></p>
+<p class="passage"><span class="passage-text">τα γόνατά μου· και πέρ᾽ απ᾽ τα πέλαγα</span></p>
+<p class="passage"><span class="passage-text">παίρνουν οι αητοί το πέταμά των.</span></p>
+<p class="passage"><span class="passage-text">Για κείνους πρόθυμα τραγούδησε και των Μουσών</span></p>
+<p class="passage"><span class="passage-text">ο θεϊκός χορός στο Πήλιο και στη μέση</span></p>
+<p class="passage"><span class="passage-text">χτυπώντας την εφτάγλωσση τη φόρμιγγα</span></p>
+<p class="passage"><span class="passage-text">ο Απόλλωνας με το χρυσό το πλήχτρο</span></p>
+<p class="passage"><span class="passage-text">τις μελωδίες των οδηγούσε τις πολύτροπες· [αντ. β]</span><span class="line-number">25</span></p>
+<p class="passage"><span class="passage-text">και, πρώτ᾽ από το Δία αρχίζοντας,</span></p>
+<p class="passage"><span class="passage-text">τη σεβαστή ύμνησαν τη Θέτη</span></p>
+<p class="passage"><span class="passage-text">και τον Πηλέα· κι έλεγαν, πώς ζήτησε</span></p>
+<p class="passage"><span class="passage-text">του Κρηθέα η κόρη, η γιόμορφη Ιππολύτη</span></p>
+<p class="passage"><span class="passage-text">με δόλο να τον πεδικλώσει και με ποιές</span></p>
+<p class="passage"><span class="passage-text">πίβουλες τέχνες τον κατάφερε τον άντρα της</span></p>
+<p class="passage"><span class="passage-text">και σύντροφό του, των Μαγνήτων το φρουρό,</span></p>
+<p class="passage"><span class="passage-text">ράβοντας λόγια ψεύτικα πλασμένα</span></p>
+<p class="passage"><span class="passage-text">πως τάχα εκείνος στο κρεβάτι επάνω του Άκαστου</span><span class="line-number">30</span></p>
+<p class="passage"><span class="passage-text">δοκίμασε τη νυφική της πίστη</span></p>
+<p class="passage"><span class="passage-text">να βιάσει· μα το ενάντιο ήταν η αλήθεια: [επωδ. β]</span></p>
+<p class="passage"><span class="passage-text">αυτή, μ᾽ όλη του πάθους της τη φλόγα τού έπεφτε</span></p>
+<p class="passage"><span class="passage-text">πολλά παρακαλώντας για να τον πλανέσει·</span></p>
+<p class="passage"><span class="passage-text">μα εκείνου μ᾽ αγανάχτηση αγκαθιάσανε</span></p>
+<p class="passage"><span class="passage-text">τ᾽ ασύφταστα τα λόγια την καρδιά του</span></p>
+<p class="passage"><span class="passage-text">κι αδίσταχτα τη νέα γυναίκ᾽ απόστρεψε</span></p>
+<p class="passage"><span class="passage-text">γιατ᾽ είχε του Ξενίου πατρός το φόβο.</span></p>
+<p class="passage"><span class="passage-text">Όλα καλ᾽ απ᾽ τ᾽ ουρανό τ᾽ απείκασε</span></p>
+<p class="passage"><span class="passage-text">ο βασιλιάς των αθανάτων, που σηκώνει</span><span class="line-number">35</span></p>
+<p class="passage"><span class="passage-text">τα σύγνεφα και του ᾽ταξε μ᾽ ένα του διάνεμα</span></p>
+<p class="passage"><span class="passage-text">γρήγορα να του δώσει μια απὀ τις θαλασσινές</span></p>
+<p class="passage"><span class="passage-text">τις Νηρηίδες τις χρυσαδραχτούσες ταίρι,</span></p>
+        </div>
+        
+
+        <div id="book-1-chapter-1-3" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-3" data-hash="book-1-chapter-1-3">
+            Νεμεονίκαις V - Πυθέᾳ ‹Αἰγινήτῃ ἀγενείῳ› παγκρατιαστῇ • Κεφάλαιο 1.3 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=156&page=3" target="_blank" class="page-link">Page 3</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">γαμβρὸν Ποσειδάωνα πείσαις, ὃς Αἰγᾶθεν ποτὶ κλει- [στρ. γ]</span></p>
+<p class="passage indent"><span class="passage-text">τὰν θαμὰ νίσεται Ἰσθμὸν Δωρίαν·</span></p>
+<p class="passage"><span class="passage-text">ἔνθα νιν εὔφρονες ἶλαι</span></p>
+<p class="passage indent"><span class="passage-text">σὺν καλάμοιο βοᾷ θεὸν δέκονται,</span></p>
+<p class="passage"><span class="passage-text">καὶ σθένει γυίων ἐρίζοντι θρασεῖ.</span></p>
+<p class="passage"><span class="passage-text">Πότμος δὲ κρίνει συγγενὴς ἔργων πέρι</span><span class="line-number">40</span></p>
+<p class="passage"><span class="passage-text">πάντων. τὺ δ᾽ Αἰγίναθε δίς, Εὐθύμενες,</span></p>
+<p class="passage"><span class="passage-text">Νίκας ἐν ἀγκώνεσσι πίτνων</span></p>
+<p class="passage indent"><span class="passage-text">ποικίλων ἔψαυσας ὕμνων.</span></p>
+<p class="passage"><span class="passage-text">ἤτοι μεταΐξαις σὲ καὶ νῦν τεὸς μάτρως ἀγάλλει [ἀντ. γ]</span></p>
+<p class="passage indent"><span class="passage-text">κείνου ὁμόσπορον ἔθνος, Πυθέα.</span></p>
+<p class="passage"><span class="passage-text">ἁ Νεμέα μὲν ἄραρεν</span></p>
+<p class="passage indent"><span class="passage-text">μείς τ᾽ ἐπιχώριος, ὃν φίλησ᾽ Ἀπόλλων·</span></p>
+<p class="passage"><span class="passage-text">ἅλικας δ᾽ ἐλθόντας οἴκοι τ᾽ ἐκράτει</span><span class="line-number">45</span></p>
+<p class="passage"><span class="passage-text">Νίσου τ᾽ ἐν εὐαγκεῖ λόφῳ. χαίρω δ᾽ ὅτι</span></p>
+<p class="passage"><span class="passage-text">ἐσλοῖσι μάρναται πέρι πᾶσα πόλις.</span></p>
+<p class="passage"><span class="passage-text">ἴσθι, γλυκεῖάν τοι Μενάνδρου</span></p>
+<p class="passage indent"><span class="passage-text">σὺν τύχᾳ μόχθων ἀμοιβάν</span></p>
+<p class="passage"><span class="passage-text">ἐπαύρεο. χρὴ δ᾽ ἀπ᾽ Ἀθανᾶν τέκτον᾽ ἀεθληταῖσιν ἔμμεν· [ἐπῳδ. γ]</span></p>
+<p class="passage"><span class="passage-text">εἰ δὲ Θεμίστιον ἵκεις</span><span class="line-number">50</span></p>
+<p class="passage indent"><span class="passage-text">ὥστ᾽ ἀείδειν, μηκέτι ῥ¯ίγει· δίδοι</span></p>
+<p class="passage"><span class="passage-text">φωνάν, ἀνὰ δ᾽ ἱστία τεῖνον</span></p>
+<p class="passage indent"><span class="passage-text">πρὸς ζυγὸν καρχασίου,</span></p>
+<p class="passage"><span class="passage-text">πύκταν τέ νιν καὶ παγκρατίου</span></p>
+<p class="passage indent"><span class="passage-text">φθέγξαι ἑλεῖν Ἐπιδαύρῳ διπλόαν</span></p>
+<p class="passage"><span class="passage-text">νικῶντ᾽ ἀρετάν, προθύροισιν δ᾽ Αἰακοῦ</span></p>
+<p class="passage"><span class="passage-text">ἀνθέων ποιάεντα φέρε στεφανώ-</span><span class="line-number">54</span></p>
+<p class="passage indent"><span class="passage-text">ματα σὺν ξανθαῖς Χάρισσιν.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">τον Ποσειδώνα το γαμπρό των πείθοντας· [στρ. γ]</span></p>
+<p class="passage"><span class="passage-text">που αυτός απ᾽ τις Αιγές συχνά κινάει και πάει</span></p>
+<p class="passage"><span class="passage-text">στο φημισμένο τον Ισθμό το δωρικό</span></p>
+<p class="passage"><span class="passage-text">και κει φαιδροί χοροί τον προβοδίζουν</span></p>
+<p class="passage"><span class="passage-text">με ήχους αυλών και στους αγώνες παραβγαίνουνε</span></p>
+<p class="passage"><span class="passage-text">οι νέοι με τη θρασιά τη ζόρη των κορμιών των.</span></p>
+<p class="passage"><span class="passage-text">Μα σ᾽ όλα τα έργα κρίνει την αξιά</span><span class="line-number">40</span></p>
+<p class="passage"><span class="passage-text">του καθενός η μοίρα πὄχει από γενιάς του·</span></p>
+<p class="passage"><span class="passage-text">έτσι, Ευθυμένη, πέφτοντας και συ,</span></p>
+<p class="passage"><span class="passage-text">στην Αίγινα, στην αγκαλιά της θεάς της Νίκης,</span></p>
+<p class="passage"><span class="passage-text">περίσσιους ύμνους κορφολόγησες·</span></p>
+<p class="passage"><span class="passage-text">και τώρα εσένα, που στα χνάρια του όρμησες, [αντ. γ]</span></p>
+<p class="passage"><span class="passage-text">Πυθέα, ο μητρικός ο θείος σε καμαρώνει</span></p>
+<p class="passage"><span class="passage-text">κι όλ᾽ η γενιά σου η ομόσπορη,</span></p>
+<p class="passage"><span class="passage-text">που σου έστρεξε η Νεμέα</span></p>
+<p class="passage"><span class="passage-text">κι ο εγχώριος μήνας, π᾽ αγαπά ο Απόλλωνας,</span></p>
+<p class="passage"><span class="passage-text">και νίκησες στους συνομήλικούς σου</span><span class="line-number">45</span></p>
+<p class="passage"><span class="passage-text">που ήρθανε στην πατρίδα σου</span></p>
+<p class="passage"><span class="passage-text">και στο ακρολόφι τ᾽ ομορφόλογγο του Νίσου.</span></p>
+<p class="passage"><span class="passage-text">Χαίρομαι να θωρώ πώς συνερίζεται</span></p>
+<p class="passage"><span class="passage-text">για τους ευγενικούς αγώνες κάθε πόλη·</span></p>
+<p class="passage"><span class="passage-text">μα μη ξεχνάς, πως το χρωστάς στο Μέναντρο</span></p>
+<p class="passage"><span class="passage-text">που το γλυκό καρπό των μόχτων σου</span></p>
+<p class="passage"><span class="passage-text">απόλαυσες· απ᾽ την Αθήνα πρέπει να ᾽ναι [επωδ. γ]</span></p>
+<p class="passage"><span class="passage-text">ο άξιος τεχνίτης για τους αθλητές.</span></p>
+<p class="passage"><span class="passage-text">Μ᾽ αν το Θεμίστιο κινάς να κελαδήσεις,</span><span class="line-number">50</span></p>
+<p class="passage"><span class="passage-text">να μη σκιαχτείς· δίνε φωνή· και σήκω το</span></p>
+<p class="passage"><span class="passage-text">στου καταρτιού την ξάκρη το πανί σου</span></p>
+<p class="passage"><span class="passage-text">και πε τον, πως πυγμάχος, στην Επίδαυρο,</span></p>
+<p class="passage"><span class="passage-text">και στο παγκράτιο πήρε τ᾽ άθλα διπλής νίκης</span></p>
+<p class="passage"><span class="passage-text">κι έφερε στου Αιακού τα πρόθυρα</span></p>
+<p class="passage"><span class="passage-text">χλωρόφυλλ᾽ ανθοστέφανα</span><span class="line-number">54</span></p>
+<p class="passage"><span class="passage-text">με τη βοήθεια των ξανθών Χαρίτων.</span></p>
+        </div>
+        
+
+        <div id="book-2-chapter-1" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-4" data-hash="book-2-chapter-1">
+            Νεμεονίκαις VII - Σωγένει Αἰγινήτῃ παιδὶ πεντάθλῳ • Κεφάλαιο 1 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=156&page=4" target="_blank" class="page-link">Page 4</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text"><h4><i>ΝΕΜΕΟΝΙΚΑΙΣ VII</i></h4><h4><i>ΣΩΓΕΝΕΙ ΑΙΓΙΝΗΤΗΙ ΠΑΙΔΙ ΠΕΝΤΑΘΛΩΙ</i></h4></span></p>
+<p class="passage"><span class="passage-text">Ἐλείθυια, πάρεδρε Μοιρᾶν βαθυφρόνων, [στρ. α]</span></p>
+<p class="passage"><span class="passage-text">παῖ μεγαλοσθενέος, ἄκου-</span></p>
+<p class="passage indent"><span class="passage-text">σον, Ἥρας, γενέτειρα τέκνων· ἄνευ σέθεν</span></p>
+<p class="passage"><span class="passage-text">οὐ φάος, οὐ μέλαιναν δρακέντες εὐφρόναν</span></p>
+<p class="passage"><span class="passage-text">τεὰν ἀδελφεὰν ἐλάχομεν ἀγλαόγυιον Ἥβαν.</span></p>
+<p class="passage"><span class="passage-text">ἀναπνέομεν δ᾽ οὐχ ἅπαντες ἐπὶ ἴσα·</span><span class="line-number">5</span></p>
+<p class="passage"><span class="passage-text">εἴργει δὲ πότμῳ ζυγένθ᾽ ἕτερον ἕτερα. σὺν δὲ τίν</span></p>
+<p class="passage"><span class="passage-text">καὶ παῖς ὁ Θεαρίωνος ἀρετᾷ κριθείς</span></p>
+<p class="passage"><span class="passage-text">εὔδοξος ἀείδεται Σωγένης μετὰ πενταέθλοις.</span></p>
+<p class="passage"><span class="passage-text">πόλιν γὰρ φιλόμολπον οἰκεῖ δορικτύπων [ἀντ. α]</span></p>
+<p class="passage"><span class="passage-text">Αἰακιδᾶν· μάλα δ᾽ ἐθέλον-</span><span class="line-number">10</span></p>
+<p class="passage indent"><span class="passage-text">τι σύμπειρον ἀγωνίᾳ θυμὸν ἀμφέπειν.</span></p>
+<p class="passage"><span class="passage-text">εἰ δὲ τύχῃ τις ἔρδων, μελίφρον᾽ αἰτίαν</span></p>
+<p class="passage"><span class="passage-text">ῥοαῖσι Μοισᾶν ἐνέβαλε· ταὶ μεγάλαι γὰρ ἀλκαί</span></p>
+<p class="passage"><span class="passage-text">σκότον πολὺν ὕμνων ἔχοντι δεόμεναι·</span></p>
+<p class="passage"><span class="passage-text">ἔργοις δὲ καλοῖς ἔσοπτρον ἴσαμεν ἑνὶ σὺν τρόπῳ,</span></p>
+<p class="passage"><span class="passage-text">εἰ Μναμοσύνας ἕκατι λιπαράμπυκος</span><span class="line-number">15</span></p>
+<p class="passage"><span class="passage-text">εὕρηται ἄποινα μόχθων κλυταῖς ἐπέων ἀοιδαῖς.</span></p>
+<p class="passage"><span class="passage-text">σοφοὶ δὲ μέλλοντα τριταῖον ἄνεμον [ἐπῳδ. α]</span></p>
+<p class="passage"><span class="passage-text">ἔμαθον, οὐδ᾽ ὑπὸ κέρδει βλάβεν·</span></p>
+<p class="passage"><span class="passage-text">ἀφνεὸς πενιχρός τε θανάτου παρά</span></p>
+<p class="passage"><span class="passage-text">σᾶμα νέονται. ἐγὼ δὲ πλέον᾽ ἔλπομαι</span></p>
+<p class="passage"><span class="passage-text">λόγον Ὀδυσσέος ἢ πάθαν</span></p>
+<p class="passage indent"><span class="passage-text">διὰ τὸν ἁδυεπῆ γενέσθ᾽ Ὅμηρον·</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text"><h4><i>ΕΒΔΟΜΟΣ ΝΕΜΕΟΝΙΚΗΣ</i></h4><h4><i>(ΣΩΓΕΝΕΙ ΑΙΓΙΝΗΤΗΙ ΠΑΙΔΙ ΠΕΝΤΑΘΛΩΙ)</i></h4></span></p>
+<p class="passage"><span class="passage-text">Κόρη της δέσποινας Ήρας, Ειλείθυια, [στρ. α]</span></p>
+<p class="passage"><span class="passage-text">που με τις Μοίρες μαζί τις βαθύβουλες</span></p>
+<p class="passage"><span class="passage-text">στων παιδιών παραστέκεις τις γέννες,</span></p>
+<p class="passage"><span class="passage-text">άκουσε· δίχως εσέ της ημέρας το φως</span></p>
+<p class="passage"><span class="passage-text">δε θα βλέπαμε, μήτε τη μαύρη τη νύχτα,</span></p>
+<p class="passage"><span class="passage-text">δίχως εσέ δε θα φτάναμε</span></p>
+<p class="passage"><span class="passage-text">τη λαμπρόκορμη αδελφή σου την Ήβη.</span></p>
+<p class="passage"><span class="passage-text">Όμως δεν αναπνέομε κι όλοι για τα ίδια</span><span class="line-number">5</span></p>
+<p class="passage"><span class="passage-text">και μποδίζει τον ένα μια διάφορη απ᾽ άλλον</span></p>
+<p class="passage"><span class="passage-text">που ζεύχτηκε μοίρα·</span></p>
+<p class="passage"><span class="passage-text">μα χάρη σε σέ του Θεαρίωνα ο γιος</span></p>
+<p class="passage"><span class="passage-text">ο Σωγένης, αφού νικητής απ᾽ αξιά του κηρύχτηκε,</span></p>
+<p class="passage"><span class="passage-text">μες στους πεντάθλους να ψάλλεται η δόξα του βλέπει.</span></p>
+<p class="passage"><span class="passage-text">Γιατ᾽ έχει πατρίδα που ξέρει από ύμνους, την πόλη [αντ. α]</span></p>
+<p class="passage"><span class="passage-text">των δοριχτύπων παιδιών του Αιακού,</span></p>
+<p class="passage"><span class="passage-text">που αγαπούν να τιμούν όποιος έχει καρδιά</span><span class="line-number">10</span></p>
+<p class="passage"><span class="passage-text">σαν κι αυτούς μαθημένη σε αγώνες·</span></p>
+<p class="passage"><span class="passage-text">κι όταν κανείς κινδυνεύοντας βγει νικητής,</span></p>
+<p class="passage"><span class="passage-text">δίνει γλυκιά σαν το μέλι αφορμή</span></p>
+<p class="passage"><span class="passage-text">να χυθούν των Μουσών οι ροές·</span></p>
+<p class="passage"><span class="passage-text">γιατ᾽ έχουν σκοτάδι βαθύ κι οι αρετές οι τρανές</span></p>
+<p class="passage"><span class="passage-text">όταν οι ύμνοι τούς λείψουν</span></p>
+<p class="passage"><span class="passage-text">κι ενός είδους μονάχα καθρέφτη γνωρίζομε</span></p>
+<p class="passage"><span class="passage-text">για τα λαμπρά κατορθώματα:</span></p>
+<p class="passage"><span class="passage-text">ν᾽ αξιώνει η χρυσή Μνημοσύνη να βρίσκουνε</span><span class="line-number">15</span></p>
+<p class="passage"><span class="passage-text">πλερωμή για τους τόσους των μόχτους</span></p>
+<p class="passage"><span class="passage-text">στους κοσμολόγητους ήχους των ύμνων.</span></p>
+<p class="passage"><span class="passage-text">Ξέρει ο σοφός και πριν τρείς ημέρες [επωδ. α]</span></p>
+<p class="passage"><span class="passage-text">να προβλέψει ποιόν άνεμο θα ᾽χει</span></p>
+<p class="passage"><span class="passage-text">και δεν πάει να χαθεί για το κέρδος.</span></p>
+<p class="passage"><span class="passage-text">Όλοι μας, πλούσιος μαζί και φτωχός,</span></p>
+<p class="passage"><span class="passage-text">σ᾽ ένα τέρμα τραβούμε, το θάνατο·</span></p>
+<p class="passage"><span class="passage-text">μα εγώ λογιάζω, πως τ᾽ όνομα πὄβγαλε</span><span class="line-number">20</span></p>
+<p class="passage"><span class="passage-text">ο Οδυσσέας ξεπέρασε τα όσα κι αν τράβηξε</span></p>
+<p class="passage"><span class="passage-text">χάρη στο μάγο τραγούδι του Ομήρου.</span></p>
+        </div>
+        
+
+        <div id="book-2-chapter-1-2" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-5" data-hash="book-2-chapter-1-2">
+            Νεμεονίκαις VII - Σωγένει Αἰγινήτῃ παιδὶ πεντάθλῳ • Κεφάλαιο 1.2 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=156&page=5" target="_blank" class="page-link">Page 5</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ἐπεὶ ψεύδεσί οἱ ποτανᾷ ‹τε› μαχανᾷ [στρ. β]</span></p>
+<p class="passage"><span class="passage-text">σεμνὸν ἔπεστί τι· σοφία</span></p>
+<p class="passage indent"><span class="passage-text">δὲ κλέπτει παράγοισα μύθοις. τυφλὸν δ᾽ ἔχει</span></p>
+<p class="passage"><span class="passage-text">ἦτορ ὅμιλος ἀνδρῶν ὁ πλεῖστος. εἰ γὰρ ἦν</span></p>
+<p class="passage"><span class="passage-text">ἓ τὰν ἀλάθειαν ἰδέμεν, οὔ κεν ὅπλων χολωθείς</span><span class="line-number">25</span></p>
+<p class="passage"><span class="passage-text">ὁ καρτερὸς Αἴας ἔπαξε διὰ φρενῶν</span></p>
+<p class="passage"><span class="passage-text">λευρὸν ξίφος· ὃν κράτιστον Ἀχιλέος ἄτερ μάχᾳ</span></p>
+<p class="passage"><span class="passage-text">ξανθῷ Μενέλᾳ δάμαρτα κομίσαι θοαῖς</span></p>
+<p class="passage"><span class="passage-text">ἂν ναυσὶ πόρευσαν εὐθυπνόου Ζεφύροιο πομπαί</span></p>
+<p class="passage"><span class="passage-text">πρὸς Ἴλου πόλιν. ἀλλὰ κοινὸν γὰρ ἔρχεται [ἀντ. β]</span><span class="line-number">30</span></p>
+<p class="passage"><span class="passage-text">κῦμ᾽ Ἀίδα, πέσε δ᾽ ἀδόκη-</span></p>
+<p class="passage indent"><span class="passage-text">τον ἐν καὶ δοκέοντα· τιμὰ δὲ γίνεται</span></p>
+<p class="passage"><span class="passage-text">ὧν θεὸς ἁβρὸν αὔξει λόγον τεθνακότων.</span></p>
+<p class="passage"><span class="passage-text">βοαθοῶν τοι παρὰ μέγαν ὀμφαλὸν εὐρυκόλπου</span></p>
+<p class="passage"><span class="passage-text">μόλον χθονός. ἐν Πυθίοισι δὲ δαπέδοις</span></p>
+<p class="passage"><span class="passage-text">κεῖται Πριάμου πόλιν Νεοπτόλεμος ἐπεὶ πράθεν,</span></p>
+<p class="passage"><span class="passage-text">τᾷ καὶ Δαναοὶ πόνησαν· ὁ δ᾽ ἀποπλέων</span></p>
+<p class="passage"><span class="passage-text">Σκύρου μὲν ἅμαρτε, πλαγχθέντες δ᾽ εἰς Ἐφύραν ἵκοντο.</span></p>
+<p class="passage"><span class="passage-text">Μολοσσίᾳ δ᾽ ἐμβασίλευεν ὀλίγον [ἐπῳδ. β]</span></p>
+<p class="passage"><span class="passage-text">χρόνον· ἀτὰρ γένος αἰεὶ φέρει</span></p>
+<p class="passage"><span class="passage-text">τοῦτό οἱ γέρας. ᾤχετο δὲ πρὸς θεόν,</span><span class="line-number">40</span></p>
+<p class="passage"><span class="passage-text">κτέατ᾽ ἄγων Τροΐαθεν ἀκροθινίων·</span></p>
+<p class="passage"><span class="passage-text">ἵνα κρεῶν νιν ὕπερ μάχας</span></p>
+<p class="passage indent"><span class="passage-text">ἔλασεν ἀντιτυχόντ᾽ ἀνὴρ μαχαίρᾳ.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">Γιατί με τα ψέματα και με τις τέχνες [στρ. β]</span></p>
+<p class="passage"><span class="passage-text">της φτερωτής φαντασίας εκείνος το πήρε</span></p>
+<p class="passage"><span class="passage-text">το κάποιο ξέχωρο πὄχει ντυθεί μεγαλείο·</span></p>
+<p class="passage"><span class="passage-text">με παραμύθια η σοφία ξεπλανά, παρασέρνοντας</span></p>
+<p class="passage"><span class="passage-text">το σωρό των ανθρώπων το πιότερο</span></p>
+<p class="passage"><span class="passage-text">πὄχει το νου τον τυφλό· γιατ᾽ αν ήταν σε θέση</span></p>
+<p class="passage"><span class="passage-text">την καθαρή την αλήθεια να βλέπει,</span><span class="line-number">25</span></p>
+<p class="passage"><span class="passage-text">δε θα ᾽μπηγε μες στα πλευρά του σπαθί κοφτερό,</span></p>
+<p class="passage"><span class="passage-text">χολωμένος για τα όπλα, ο γενναίος ο Αίας·</span></p>
+<p class="passage"><span class="passage-text">που αντρειότερο απ᾽ όλους εχτός του Αχιλλέα,</span></p>
+<p class="passage"><span class="passage-text">δεν προβόδησαν του πρύμου Ζεφύρου οι πνοές</span></p>
+<p class="passage"><span class="passage-text">μες σε καράβια γοργά προς του Ίλου την πόλη,</span></p>
+<p class="passage"><span class="passage-text">για να πάρουνε πίσω με πόλεμο</span></p>
+<p class="passage"><span class="passage-text">του ξανθού Μενελάου τη γυναίκα.</span></p>
+<p class="passage"><span class="passage-text">Όμως έρχεται του Άδη το κύμα [αντ. β]</span><span class="line-number">30</span></p>
+<p class="passage"><span class="passage-text">για όλους όμοια και πήρ᾽ από κάτω</span></p>
+<p class="passage"><span class="passage-text">και τον ανεπάντεχο κι όποιος το πρόσμενε·</span></p>
+<p class="passage"><span class="passage-text">μα η τιμή ᾽ναι για κείνους</span></p>
+<p class="passage"><span class="passage-text">που λαμπρό τ᾽ όνομά των αυξαίνει ο θεός</span></p>
+<p class="passage"><span class="passage-text">όταν έχουν πεθάνει στη λάτρα του.</span></p>
+<p class="passage"><span class="passage-text">Έτσ᾽ ήρθε στης γης της πλατύστηθης</span></p>
+<p class="passage"><span class="passage-text">το μεγάλ᾽ Ομφαλό και στο έδαφος είναι θαμμένος</span></p>
+<p class="passage"><span class="passage-text">της Πυθώς ο Νεοπτόλεμος,</span></p>
+<p class="passage"><span class="passage-text">αφού πήρε του Πριάμου την πόλη,</span><span class="line-number">35</span></p>
+<p class="passage"><span class="passage-text">που γι᾽ αυτήν τόσα τράβηξαν οι Ελληνες·</span></p>
+<p class="passage"><span class="passage-text">γιατί γυρνώντας εκείθε, απ᾽ τη Σκύρο ξενέρισε</span></p>
+<p class="passage"><span class="passage-text">κι αφού πλανηθήκαν στη θάλασσα</span></p>
+<p class="passage"><span class="passage-text">στην Εφύρα ξεπέσανε τέλος.</span></p>
+<p class="passage"><span class="passage-text">Στη Μολοσσία βασίλευσε λίγον καιρό [επωδ. β]</span></p>
+<p class="passage"><span class="passage-text">—μα η γενιά του για πάντα</span></p>
+<p class="passage"><span class="passage-text">το αξίωμα κράτησε αυτό—</span><span class="line-number">40</span></p>
+<p class="passage"><span class="passage-text">κι έφυγε προς το θεό των Δελφών, να του πάει</span></p>
+<p class="passage"><span class="passage-text">προφαντές προσφορές απ᾽ της Τροίας τα λάφυρα</span></p>
+<p class="passage"><span class="passage-text">όπου, σε άμαχη που του έτυχ᾽ εκεί</span></p>
+<p class="passage"><span class="passage-text">για της θυσίας τα κρέατα,</span></p>
+<p class="passage"><span class="passage-text">με το μαχαίρι του κάποιος τον τρύπησε.</span></p>
+        </div>
+        
+
+        <div id="book-2-chapter-1-3" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-6" data-hash="book-2-chapter-1-3">
+            Νεμεονίκαις VII - Σωγένει Αἰγινήτῃ παιδὶ πεντάθλῳ • Κεφάλαιο 1.3 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=156&page=6" target="_blank" class="page-link">Page 6</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">βάρυνθεν δὲ περισσὰ Δελφοὶ ξεναγέται. [στρ. γ]</span></p>
+<p class="passage"><span class="passage-text">ἀλλὰ τὸ μόρσιμον ἀπέδω-</span></p>
+<p class="passage indent"><span class="passage-text">κεν· ἐχρῆν δέ τιν᾽ ἔνδον ἄλσει παλαιτάτῳ</span></p>
+<p class="passage"><span class="passage-text">Αἰακιδᾶν κρεόντων τὸ λοιπὸν ἔμμεναι</span><span class="line-number">45</span></p>
+<p class="passage"><span class="passage-text">θεοῦ παρ᾽ εὐτειχέα δόμον, ἡροΐαις δὲ πομπαῖς</span></p>
+<p class="passage"><span class="passage-text">θεμισκόπον οἰκεῖν ἐόντα πολυθύτοις.</span></p>
+<p class="passage"><span class="passage-text">εὐώνυμον ἐς δίκαν τρία ἔπεα διαρκέσει·</span></p>
+<p class="passage"><span class="passage-text">οὐ ψεῦδις ὁ μάρτυς ἔργμασιν ἐπιστατεῖ,</span></p>
+<p class="passage"><span class="passage-text">Αἴγινα, τεῶν Διός τ᾽ ἐκγόνων. θρασύ μοι τόδ᾽ εἰπεῖν</span><span class="line-number">50</span></p>
+<p class="passage"><span class="passage-text">φαενναῖς ἀρεταῖς ὁδὸν κυρίαν λόγων [ἀντ. γ]</span></p>
+<p class="passage"><span class="passage-text">οἴκοθεν· ἀλλὰ γὰρ ἀνάπαυ-</span></p>
+<p class="passage indent"><span class="passage-text">σις ἐν παντὶ γλυκεῖα ἔργῳ· κόρον δ᾽ ἔχει</span></p>
+<p class="passage"><span class="passage-text">καὶ μέλι καὶ τὰ τέρπν᾽ ἄνθε᾽ Ἀφροδίσια.</span></p>
+<p class="passage"><span class="passage-text">φυᾷ δ᾽ ἕκαστος διαφέρομεν βιοτὰν λαχόντες</span></p>
+<p class="passage"><span class="passage-text">ὁ μὲν τά, τὰ δ᾽ ἄλλοι· τυχεῖν δ᾽ ἕν᾽ ἀδύνατον</span><span class="line-number">55</span></p>
+<p class="passage"><span class="passage-text">εὐδαιμονίαν ἅπασαν ἀνελόμενον· οὐκ ἔχω</span></p>
+<p class="passage"><span class="passage-text">εἰπεῖν, τίνι τοῦτο Μοῖρα τέλος ἔμπεδον</span></p>
+<p class="passage"><span class="passage-text">ὤρεξε. Θεαρίων, τὶν δ᾽ ἐοικότα καιρὸν ὄλβου</span></p>
+<p class="passage"><span class="passage-text">δίδωσι, τόλμαν τε καλῶν ἀρομένῳ [ἐπῳδ. γ]</span></p>
+<p class="passage"><span class="passage-text">σύνεσιν οὐκ ἀποβλάπτει φρενῶν.</span><span class="line-number">60</span></p>
+<p class="passage"><span class="passage-text">ξεῖνός εἰμι· σκοτεινὸν ἀπέχων ψόγον,</span></p>
+<p class="passage"><span class="passage-text">ὕδατος ὥτε ῥοὰς φίλον ἐς ἄνδρ᾽ ἄγων</span></p>
+<p class="passage"><span class="passage-text">κλέος ἐτήτυμον αἰνέσω·</span></p>
+<p class="passage indent"><span class="passage-text">ποτίφορος δ᾽ ἀγαθοῖσι μισθὸς οὗτος.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">Βαριά λύπη οι φιλόξενοι πήραν Δελφοί, [στρ. γ]</span></p>
+<p class="passage"><span class="passage-text">μα η βουλή τέλειων᾽ έτσι της Μοίρας·</span></p>
+<p class="passage"><span class="passage-text">γιατί στο πανάρχαιον έπρεπε το άλσος</span></p>
+<p class="passage"><span class="passage-text">νά ητανε μέσα για πάντα</span></p>
+<p class="passage"><span class="passage-text">κι ένας από τους τρανούς Αιακίδες</span><span class="line-number">45</span></p>
+<p class="passage"><span class="passage-text">πλάι στου θεού τα ομορφόχτιστα μέγαρα</span></p>
+<p class="passage"><span class="passage-text">και, δίκιος επόπτης, εκεί να επιβλέπει</span></p>
+<p class="passage"><span class="passage-text">τις πομπές με τις άφθονες</span></p>
+<p class="passage"><span class="passage-text">προς τιμή των ηρώων θυσίες.</span></p>
+<p class="passage"><span class="passage-text">Τρία λόγια θα φτάσουν για να δικαιωθεί</span></p>
+<p class="passage"><span class="passage-text">το καλό τ᾽ όνομά του:</span></p>
+<p class="passage"><span class="passage-text">Δεν είναι ψεύτης ο μάρτυρας, Αίγινα,</span></p>
+<p class="passage"><span class="passage-text">που επιστατεί στους αντρίκιους αγώνες</span></p>
+<p class="passage"><span class="passage-text">των δικών σου απογόνων και του Δία·</span><span class="line-number">50</span></p>
+<p class="passage"><span class="passage-text">έχω την τόλμη να πω, πως αυτός</span></p>
+<p class="passage"><span class="passage-text">είν᾽ ο διάπλατος δρόμος της φήμης [αντ. γ]</span></p>
+<p class="passage"><span class="passage-text">για τις λαμπρές αρετές των παιδιώ σου.</span></p>
+<p class="passage"><span class="passage-text">Μα είναι στην κάθε δουλειά κι η παύση γλυκιά</span></p>
+<p class="passage"><span class="passage-text">γιατί μπουχτίζει κανείς και το μέλι</span></p>
+<p class="passage"><span class="passage-text">και τα τερπνά τ᾽ Αφροδίσια τ᾽ άνθια.</span></p>
+<p class="passage"><span class="passage-text">Έχει απ᾽ τη φύση καθένας και διάφορο λάχει</span></p>
+<p class="passage"><span class="passage-text">κλήρο ζωής, έν᾽ αυτός, άλλο εκείνος·</span><span class="line-number">55</span></p>
+<p class="passage"><span class="passage-text">μα είν᾽ αδύνατο κι ένας ποτέ να βρεθεί</span></p>
+<p class="passage"><span class="passage-text">που την πάσα ευτυχία να πήρε</span></p>
+<p class="passage"><span class="passage-text">και δεν έχω να πω σε ποιόν πρόσφερ᾽ η Μοίρα</span></p>
+<p class="passage"><span class="passage-text">το δώρο αυτό, κατοχή του για πάντα.</span></p>
+<p class="passage"><span class="passage-text">Μα εσένα καν το σωστό, Θεαρίωνα, μέτρο</span></p>
+<p class="passage"><span class="passage-text">της ευτυχίας σού δίνει· κι ενώ και την τόλμη [επωδ. γ]</span></p>
+<p class="passage"><span class="passage-text">των γενναίων των έργων ακόμη κρατάς,</span></p>
+<p class="passage"><span class="passage-text">και την κρίση του νου δε σου βλάφτει.</span><span class="line-number">60</span></p>
+<p class="passage"><span class="passage-text">Ξένος σας είμαι· και διώχνοντας κάθε</span></p>
+<p class="passage"><span class="passage-text">σκοτεινό ψόγο μακριά μου,</span></p>
+<p class="passage"><span class="passage-text">σα να φέρνω καθάριο σε φίλο νερό,</span></p>
+<p class="passage"><span class="passage-text">το σωστόν ύμνο θα ψάλω της δόξας του,</span></p>
+<p class="passage"><span class="passage-text">που είν᾽ ο μόνος μιστός να ταιριάζει στους άξιους.</span></p>
+        </div>
+        
+
+        <div id="book-2-chapter-1-4" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-7" data-hash="book-2-chapter-1-4">
+            Νεμεονίκαις VII - Σωγένει Αἰγινήτῃ παιδὶ πεντάθλῳ • Κεφάλαιο 1.4 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=156&page=7" target="_blank" class="page-link">Page 7</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ἐὼν δ᾽ ἐγγὺς Ἀχαιὸς οὐ μέμψεταί μ᾽ ἀνήρ [στρ. δ]</span></p>
+<p class="passage"><span class="passage-text">Ἰονίας ὑπὲρ ἁλὸς οἰ-</span><span class="line-number">65</span></p>
+<p class="passage indent"><span class="passage-text">κέων, καὶ προξενίᾳ πέποιθ᾽, ἔν τε δαμόταις</span></p>
+<p class="passage"><span class="passage-text">ὄμματι δέρκομαι λαμπρόν, οὐχ ὑπερβαλών,</span></p>
+<p class="passage"><span class="passage-text">βίαια πάντ᾽ ἐκ ποδὸς ἐρύσαις· ὁ δὲ λοιπὸς εὔφρων</span></p>
+<p class="passage"><span class="passage-text">ποτὶ χρόνος ἕρποι. μαθὼν δέ τις ἀνερεῖ,</span></p>
+<p class="passage"><span class="passage-text">εἰ πὰρ μέλος ἔρχομαι ψάγιον ὄαρον ἐννέπων.</span></p>
+<p class="passage"><span class="passage-text">Εὐξένιδα πάτραθε Σώγενες, ἀπομνύω</span><span class="line-number">70</span></p>
+<p class="passage"><span class="passage-text">μὴ τέρμα προβαὶς ἄκονθ᾽ ὥτε χαλκοπάραον ὄρσαι</span></p>
+<p class="passage"><span class="passage-text">θοὰν γλῶσσαν, ὃς ἐξέπεμψεν παλαισμάτων [ἀντ. δ]</span></p>
+<p class="passage"><span class="passage-text">αὐχένα καὶ σθένος ἀδίαν-</span></p>
+<p class="passage indent"><span class="passage-text">τον, αἴθωνι πρὶν ἁλίῳ γυῖον ἐμπεσεῖν.</span></p>
+<p class="passage"><span class="passage-text">εἰ πόνος ἦν, τὸ τερπνὸν πλέον πεδέρχεται.</span></p>
+<p class="passage"><span class="passage-text">ἔα με· νικῶντί γε χάριν, εἴ τι πέραν ἀερθείς</span><span class="line-number">75</span></p>
+<p class="passage"><span class="passage-text">ἀνέκραγον, οὐ τραχύς εἰμι καταθέμεν.</span></p>
+<p class="passage"><span class="passage-text">εἴρειν στεφάνους ἐλαφρόν, ἀναβάλεο· Μοῖσά τοι</span></p>
+<p class="passage"><span class="passage-text">κολλᾷ χρυσὸν ἔν τε λευκὸν ἐλέφανθ᾽ ἁμᾶ</span></p>
+<p class="passage"><span class="passage-text">καὶ λείριον ἄνθεμον ποντίας ὑφελοῖσ᾽ ἐέρσας.</span></p>
+<p class="passage"><span class="passage-text">Διὸς δὲ μεμναμένος ἀμφὶ Νεμέᾳ [ἐπῳδ. δ]</span><span class="line-number">80</span></p>
+<p class="passage"><span class="passage-text">πολύφατον θρόον ὕμνων δόνει</span></p>
+<p class="passage"><span class="passage-text">ἡσυχᾷ. βασιλῆα δὲ θεῶν πρέπει</span></p>
+<p class="passage"><span class="passage-text">δάπεδον ἂν τόδε γαρυέμεν ἡμέρᾳ</span></p>
+<p class="passage"><span class="passage-text">ὀπί· λέγοντι γὰρ Αἰακόν</span></p>
+<p class="passage indent"><span class="passage-text">νιν ὑπὸ ματροδόκοις γοναῖς φυτεῦσαι,</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">Κι αν ήταν κοντά κανείς Αχαιός [στρ. δ]</span></p>
+<p class="passage"><span class="passage-text">που μεσ᾽ απ᾽ το Ιόνιο πέλαγος κάθεται,</span><span class="line-number">65</span></p>
+<p class="passage"><span class="passage-text">δε θα ᾽χε καμιά να μου έβρει αφορμή·</span></p>
+<p class="passage"><span class="passage-text">στου προξένου τον τίτλο έχω τα θάρρη μου·</span></p>
+<p class="passage"><span class="passage-text">μα τέτοιος και στους πατριώτες μου ανάμεσα</span></p>
+<p class="passage"><span class="passage-text">με καθάριο κοιτάζω το μάτι, χωρίς</span></p>
+<p class="passage"><span class="passage-text">απ᾽ το μέτρο να βγαίνω, αποδιώχνοντας</span></p>
+<p class="passage"><span class="passage-text">κάθε απόκοτη πράξη απ᾽ το δρόμο μου.</span></p>
+<p class="passage"><span class="passage-text">Είθ᾽ έτσι κι οι επίλοιπες μέρες μου</span></p>
+<p class="passage"><span class="passage-text">να κυλούν καλοπρόθετες· όποιος με ξέρει,</span></p>
+<p class="passage"><span class="passage-text">θα μαρτυρήσει αν ξεπέφτω παράτονα</span></p>
+<p class="passage"><span class="passage-text">σε ψογερά ποτέ λόγια.</span></p>
+<p class="passage"><span class="passage-text">Ω Ευξενίδη από γένος, Σωγένη, όρκο παίρνω</span><span class="line-number">70</span></p>
+<p class="passage"><span class="passage-text">πως βγαίνοντας έξω απ᾽ το τέρμα δεν τίναξα,</span></p>
+<p class="passage"><span class="passage-text">σαν όταν χαλκόστομο κοντάρι,</span></p>
+<p class="passage"><span class="passage-text">τη γλώσσα μου γρήγορη· ω εσύ, [αντ. δ]</span></p>
+<p class="passage"><span class="passage-text">που απ᾽ τα παλαίματ᾽ ανίδρωτο απάλλαξες</span></p>
+<p class="passage"><span class="passage-text">το στιβαρό σου τον τράχηλο, πριν</span></p>
+<p class="passage"><span class="passage-text">του ήλιου πέσει το κάμα στα μέλη σου·</span></p>
+<p class="passage"><span class="passage-text">αν εστάθηκε κόπος, εκεί</span></p>
+<p class="passage"><span class="passage-text">πιο μεγάλη ακλουθά η χαρά.</span></p>
+<p class="passage"><span class="passage-text">Εμέν᾽ άφησ᾽ με· εγώ κι αν το πήρα ψηλότερα</span><span class="line-number">75</span></p>
+<p class="passage"><span class="passage-text">και τη φωνή μου πιο πάνω αν εσήκωσα,</span></p>
+<p class="passage"><span class="passage-text">στο νικητή καν δε θα ᾽μαι πιο δύσκολος</span></p>
+<p class="passage"><span class="passage-text">του εγκωμίου του να εξοφλήσω το χρέος.</span></p>
+<p class="passage"><span class="passage-text">Εύκολο είναι στεφάνια να πλέκει κανείς·</span></p>
+<p class="passage"><span class="passage-text">μα περίμενε· η Μούσα μου εμένα χρυσάφι κολλά</span></p>
+<p class="passage"><span class="passage-text">με λευκό ελεφαντόδοντο κι άλικο</span></p>
+<p class="passage"><span class="passage-text">κρινανθό, που απ᾽ τα σπλάχνα της θάλασσας βγάζει.</span></p>
+<p class="passage"><span class="passage-text">Να μνημονεύεις το Δία η Νεμέα σού ζητά· [επωδ. δ]</span><span class="line-number">80</span></p>
+<p class="passage"><span class="passage-text">πολυφήμιστων ύμνων ανάδευε ηχούς</span></p>
+<p class="passage"><span class="passage-text">γαληνούς· σ᾽αυτά πρέπει τα χώματα</span></p>
+<p class="passage"><span class="passage-text">το βασιλέα του Ολύμπου να ψάλλομε</span></p>
+<p class="passage"><span class="passage-text">με φωνή ταπεινή· γιατί λέγουν</span></p>
+<p class="passage"><span class="passage-text">πως το μητρόδεχτο σπέρμα του φύτεψε</span></p>
+        </div>
+        
+
+        <div id="book-2-chapter-1-5" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-8" data-hash="book-2-chapter-1-5">
+            Νεμεονίκαις VII - Σωγένει Αἰγινήτῃ παιδὶ πεντάθλῳ • Κεφάλαιο 1.5 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=156&page=8" target="_blank" class="page-link">Page 8</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ἐμᾷ μὲν πολίαρχον εὐωνύμῳ πάτρᾳ, [στρ. ε]</span><span class="line-number">85</span></p>
+<p class="passage"><span class="passage-text">Ἡράκλεες, σέο δὲ προπράον᾽</span></p>
+<p class="passage indent"><span class="passage-text">ἔμ‹μ›εν ξεῖνον ἀδελφεόν τ᾽. εἰ δὲ γεύεται</span></p>
+<p class="passage"><span class="passage-text">ἀνδρὸς ἀνήρ τι, φαῖμέν κε γείτον᾽ ἔμμεναι</span></p>
+<p class="passage"><span class="passage-text">νόῳ φιλήσαντ᾽ ἀτενέϊ γείτονι χάρμα πάντων</span></p>
+<p class="passage"><span class="passage-text">ἐπάξιον· εἰ δ᾽ αὐτὸ καὶ θεὸς ἀνέχοι,—</span></p>
+<p class="passage"><span class="passage-text">ἐν τίν κ᾽ ἐθέλοι, Γίγαντας ὃς ἐδάμασας, εὐτυχῶς</span><span class="line-number">90</span></p>
+<p class="passage"><span class="passage-text">ναίειν πατρὶ Σωγένης ἀταλὸν ἀμφέπων</span></p>
+<p class="passage"><span class="passage-text">θυμὸν προγόνων ἐϋκτήμονα ζαθέαν ἄγυιαν.</span></p>
+<p class="passage"><span class="passage-text">ἐπεὶ τετραόροισιν ὥθ᾽ ἁρμάτων ζυγοῖς [ἀντ. ε]</span></p>
+<p class="passage"><span class="passage-text">ἐν τεμένεσσι δόμον ἔχει</span></p>
+<p class="passage indent"><span class="passage-text">τεοῖς, ἀμφοτέρας ἰὼν χειρός. ὦ μάκαρ,</span></p>
+<p class="passage"><span class="passage-text">τὶν δ᾽ ἐπέοικεν Ἥρας πόσιν τε πειθέμεν</span><span class="line-number">95</span></p>
+<p class="passage"><span class="passage-text">κόραν τε γλαυκώπιδα· δύνασαι δὲ βροτοῖσιν ἀλκάν</span></p>
+<p class="passage"><span class="passage-text">ἀμαχανιᾶν δυσβάτων θαμὰ διδόμεν.</span></p>
+<p class="passage"><span class="passage-text">εἰ γὰρ σύ ἱν ἐμπεδοσθενέα βίοτον ἁρμόσαις</span></p>
+<p class="passage"><span class="passage-text">ἥβᾳ λιπαρῷ τε γήραϊ διαπλέκοις</span></p>
+<p class="passage"><span class="passage-text">εὐδαίμον᾽ ἐόντα, παίδων δὲ παῖδες ἔχοιεν αἰεί</span><span class="line-number">100</span></p>
+<p class="passage"><span class="passage-text">γέρας τό περ νῦν καὶ ἄρειον ὄπιθεν. [ἐπῳδ. ε]</span></p>
+<p class="passage"><span class="passage-text">τὸ δ᾽ ἐμὸν οὔ ποτε φάσει κέαρ</span></p>
+<p class="passage"><span class="passage-text">ἀτρόποισι Νεοπτόλεμον ἑλκύσαι</span></p>
+<p class="passage"><span class="passage-text">ἔπεσι· ταὐτὰ δὲ τρὶς τετράκι τ᾽ ἀμπολεῖν</span></p>
+<p class="passage"><span class="passage-text">ἀπορία τελέθει, τέκνοι-</span><span class="line-number">105</span></p>
+<p class="passage indent"><span class="passage-text">σιν ἅτε μαψυλάκας «Διὸς Κόρινθος».</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">τον Αιακό, πολιούχο της ένδοξης πατρίδας του, [στρ. ε]</span></p>
+<p class="passage"><span class="passage-text">και δικό σου, ω Ηρακλή, πολύ πρόθυμο φίλο αδερφό.</span><span class="line-number">85</span></p>
+<p class="passage"><span class="passage-text">Αν άνθρωπος γεύεται κάτι από άνθρωπο,</span></p>
+<p class="passage"><span class="passage-text">μπορεί να πούμε πως γείτονας</span></p>
+<p class="passage"><span class="passage-text">που μ᾽ όλη αγαπά την καρδιά του το γείτονα,</span></p>
+<p class="passage"><span class="passage-text">είν᾽ ευτυχία που αξίζει ό,τι πεις.</span></p>
+<p class="passage"><span class="passage-text">Κι αν το κρατούσαν αυτό κι οι θεοί,</span></p>
+<p class="passage"><span class="passage-text">στη γειτονιά σου, ω εσύ δαμαστή των Γιγάντων, θενά ᾽θελε</span><span class="line-number">90</span></p>
+<p class="passage"><span class="passage-text">κι ο Σωγένης να ζει ευτυχισμένα</span></p>
+<p class="passage"><span class="passage-text">και την απαλή του ψυχή καλουργώντας,</span></p>
+<p class="passage"><span class="passage-text">προς χαρά του πατέρα του, πάντα να κάθεται</span></p>
+<p class="passage"><span class="passage-text">στων προγόνων τον πλούσιο θεοφύλαχτο δρόμο.</span></p>
+<p class="passage"><span class="passage-text">Γιατ᾽ έχει, σα να ᾽ταν τετράζυγων αρμάτων τιμόνια, [αντ. ε]</span></p>
+<p class="passage"><span class="passage-text">στα δικά σου τεμένη το σπίτι του ανάμεσα</span></p>
+<p class="passage"><span class="passage-text">καθώς έρχετ᾽ απ᾽ το ένα το χέρι κι απ᾽ τ᾽ άλλο.</span></p>
+<p class="passage"><span class="passage-text">Μα ω μακάριε, είναι εσένα στο χέρι σου</span></p>
+<p class="passage"><span class="passage-text">και της Ήρας τον άντρα να φέρνεις στη γνώμη σου</span><span class="line-number">95</span></p>
+<p class="passage"><span class="passage-text">και τη γλαυκομάτα παρθένα</span></p>
+<p class="passage"><span class="passage-text">και μπορείς των ανθρώπων να δίνεις βοήθεια</span></p>
+<p class="passage"><span class="passage-text">στις σκληρότερες ανάγκες των συχνά.</span></p>
+<p class="passage"><span class="passage-text">Είθε στους δυο των, πατέρα και γιό,</span></p>
+<p class="passage"><span class="passage-text">συνταιριάζοντας νιότη κι αδρά γερατειά,</span></p>
+<p class="passage"><span class="passage-text">της ζωής των να υφαίνεις τα νήματα</span></p>
+<p class="passage"><span class="passage-text">σ᾽ απαρασάλευτη μέσα ευτυχία</span></p>
+<p class="passage"><span class="passage-text">και τα παιδιά των παιδιώ τωνε να ᾽χουνε πάντα</span><span class="line-number">100</span></p>
+<p class="passage"><span class="passage-text">την τωρινή την τιμή και καλύτερη ακόμα κατόπι. [επωδ. ε]</span></p>
+<p class="passage"><span class="passage-text">Όσο για μένα, η καρδιά μου ποτέ δε θα πει</span></p>
+<p class="passage"><span class="passage-text">πως το Νεοπτόλεμο μ᾽ άπρεπα ξέσυρα λόγια.</span></p>
+<p class="passage"><span class="passage-text">Μα είναι φτώχεια κανείς να γυρνά</span></p>
+<p class="passage"><span class="passage-text">τρεις και τέσσερις στα ίδια φορές,</span></p>
+<p class="passage"><span class="passage-text">σαν το μωρόλογο που όλο κι αυτό κοπανά</span><span class="line-number">105</span></p>
+<p class="passage"><span class="passage-text">στα παιδόπουλα «ο Κόρινθος, γιός του Διός».</span></p>
+        </div>
+        
+
+        <div id="book-3-chapter-1" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-9" data-hash="book-3-chapter-1">
+            Νεμεονίκαις X -  ‹Θεαίῳ Ἀργείῳ παλαιστῇ› • Κεφάλαιο 1 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=156&page=9" target="_blank" class="page-link">Page 9</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text"><h4><i>ΝΕΜΕΟΝΙΚΑΙΣ X</i></h4><h4><i>‹ΘΕΑΙΩΙ ΑΡΓΕΙΩΙ ΠΑΛΑΙΣΤΗΙ›</i></h4></span></p>
+<p class="passage"><span class="passage-text">Δαναοῦ πόλιν ἀγλαοθρό- [στρ. α]</span></p>
+<p class="passage indent"><span class="passage-text">νων τε πεντήκοντα κορᾶν, Χάριτες,</span></p>
+<p class="passage"><span class="passage-text">Ἄργος Ἥρας δῶμα θεοπρεπὲς ὑμνεῖ-</span></p>
+<p class="passage indent"><span class="passage-text">τε· φλέγεται δ᾽ ἀρεταῖς</span></p>
+<p class="passage"><span class="passage-text">μυρίαις ἔργων θρασέων ἕνεκεν.</span></p>
+<p class="passage"><span class="passage-text">μακρὰ μὲν τὰ Περσέος ἀμφὶ Μεδοίσας Γοργόνος,</span></p>
+<p class="passage"><span class="passage-text">πολλὰ δ᾽ Αἰγύπτῳ καταοίκισεν ἄστη</span><span class="line-number">5</span></p>
+<p class="passage indent"><span class="passage-text">ταῖς Ἐπάφου παλάμαις·</span></p>
+<p class="passage"><span class="passage-text">οὐδ᾽ Ὑπερμήστρα παρεπλάγχθη, μονό-</span></p>
+<p class="passage indent"><span class="passage-text">ψαφον ἐν κολεῷ κατασχοῖσα ξίφος.</span></p>
+<p class="passage"><span class="passage-text">Διομήδεα δ᾽ ἄμβροτον ξαν- [ἀντ. α]</span></p>
+<p class="passage indent"><span class="passage-text">θά ποτε Γλαυκῶπις ἔθηκε θεόν·</span></p>
+<p class="passage"><span class="passage-text">γαῖα δ᾽ ἐν Θήβαις ὑπέδεκτο κεραυνω-</span></p>
+<p class="passage indent"><span class="passage-text">θεῖσα Διὸς βέλεσιν</span></p>
+<p class="passage"><span class="passage-text">μάντιν Οἰκλείδαν, πολέμοιο νέφος·</span></p>
+<p class="passage"><span class="passage-text">καὶ γυναιξὶν καλλικόμοισιν ἀριστεύει πάλαι·</span><span class="line-number">10</span></p>
+<p class="passage"><span class="passage-text">Ζεὺς ἐπ᾽ Ἀλκμήναν Δανάαν τε μολὼν τοῦ-</span></p>
+<p class="passage indent"><span class="passage-text">τον κατέφανε λόγον·</span></p>
+<p class="passage"><span class="passage-text">πατρὶ δ᾽ Ἀδράστοιο Λυγκεῖ τε φρενῶν</span></p>
+<p class="passage indent"><span class="passage-text">καρπὸν εὐθείᾳ συνάρμοξεν δίκᾳ·</span></p>
+<p class="passage"><span class="passage-text">θρέψε δ᾽ αἰχμὰν Ἀμφιτρύωνος. ὁ δ᾽ ὄλβῳ φέρτατος [ἐπῳδ. α]</span></p>
+<p class="passage"><span class="passage-text">ἵκετ᾽ ἐς κείνου γενεάν, ἐπεὶ ἐν χαλκέοις ὅπλοις</span></p>
+<p class="passage"><span class="passage-text">Τηλεβόας ἔναρεν· τῷ ὄψιν ἐειδόμενος</span><span class="line-number">15</span></p>
+<p class="passage"><span class="passage-text">ἀθανάτων βασιλεὺς αὐλὰν ἐσῆλθεν,</span></p>
+<p class="passage"><span class="passage-text">σπέρμ᾽ ἀδείμαντον φέρων Ἡρακλέος· οὗ κατ᾽ Ὄλυμπον</span></p>
+<p class="passage"><span class="passage-text">ἄλοχος Ἥβα τελείᾳ παρὰ ματέρι βαίνοισ᾽</span></p>
+<p class="passage indent"><span class="passage-text">ἔστι, καλλίστα θεῶν.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text"><h4><i>ΔΕΚΑΤΟΣ ΝΕΜΕΟΝΙΚΗΣ</i></h4><h4><i>(ΘΕΑΙΩΙ ΑΡΓΕΙΩΙ ΠΑΛΑΙΣΤΗΙ)</i></h4></span></p>
+<p class="passage"><span class="passage-text">Του Δαναού και των πενήντα λαμπροθρόνων του [στρ. α]</span></p>
+<p class="passage"><span class="passage-text">θυγατέρων την πόλη υμνείτε, Χάριτες,</span></p>
+<p class="passage"><span class="passage-text">το Άργος, τη θεόπρεπη της Ήρας έδρα,</span></p>
+<p class="passage"><span class="passage-text">που φλέγεται με δόξες άμετρες</span></p>
+<p class="passage"><span class="passage-text">για τα παντότολμά του τα έργα.</span></p>
+<p class="passage"><span class="passage-text">Δε θα ᾽χε τελειωμό να λες</span></p>
+<p class="passage"><span class="passage-text">για τον Περσέα με τη Γοργόνα Μέδουσα,</span></p>
+<p class="passage"><span class="passage-text">για τις πολιτείες που θεμέλιωσε</span><span class="line-number">5</span></p>
+<p class="passage"><span class="passage-text">στην Αίγυπτο με του Έπαφου το χέρι</span></p>
+<p class="passage"><span class="passage-text">και για την Υπερμνήστρα, που δεν παρασύρθηκε</span></p>
+<p class="passage"><span class="passage-text">στο κρίμα, μόνο κράτησε</span></p>
+<p class="passage"><span class="passage-text">μονόψηφο στη θήκη του μαχαίρι.</span></p>
+<p class="passage"><span class="passage-text">Το Διομήδη έναν καιρό η ξανθιά [αντ. α]</span></p>
+<p class="passage"><span class="passage-text">η Γλαυκομάτα αθάνατο έκαμε θεό.</span></p>
+<p class="passage"><span class="passage-text">Κι η γη στη Θήβα, με τα βέλη του Διός</span></p>
+<p class="passage"><span class="passage-text">κεραυνωμένη, δέχτηκε το μάντη Οϊκλείδη,</span></p>
+<p class="passage"><span class="passage-text">πού ηταν πόλεμου αστραποσύγνεφο·</span></p>
+<p class="passage"><span class="passage-text">κι αν πεις για τις πανώριες του γυναίκες,</span><span class="line-number">10</span></p>
+<p class="passage"><span class="passage-text">από τα χρόνια τα παλιά</span></p>
+<p class="passage"><span class="passage-text">έχει στον κόσμο τα πρωτειά·</span></p>
+<p class="passage"><span class="passage-text">και μαρτυριά στου λόγου την αλήθεια δίνει</span></p>
+<p class="passage"><span class="passage-text">αυτός ο Δίας, που κατέβηκε απ᾽ τον ουρανό</span></p>
+<p class="passage"><span class="passage-text">για τη Δανάη και την Αλκμήνη,</span></p>
+<p class="passage"><span class="passage-text">κι ακόμα στον πατέρα του Άδραστου</span></p>
+<p class="passage"><span class="passage-text">και στο Λυγκέα συνάρμοσε της γνώσης τον καρπό</span></p>
+<p class="passage"><span class="passage-text">με την ίσια μαζί δικαιοσύνη.</span></p>
+<p class="passage"><span class="passage-text">Έθρεψε το Άργος του Αμφιτρύωνα την αιχμή [επωδ. α]</span></p>
+<p class="passage"><span class="passage-text">κι ο παμμακάριστος θεός</span></p>
+<p class="passage"><span class="passage-text">στη γενεά του αξίωσε να μπει·</span></p>
+<p class="passage"><span class="passage-text">αφού, ζωσμένος στα χαλκά του τ᾽ άρματα,</span></p>
+<p class="passage"><span class="passage-text">ξολόθρεψε τους Τηλεβόες εκείνος,</span><span class="line-number">15</span></p>
+<p class="passage"><span class="passage-text">παίρνοντας τη μορφή του ο βασιλιάς</span></p>
+<p class="passage"><span class="passage-text">των αθανάτων μπήκε στην αυλή του,</span></p>
+<p class="passage"><span class="passage-text">κομίζοντας εκεί</span></p>
+<p class="passage"><span class="passage-text">το ατρέμιστο το σπέρμα του Ηρακλή·</span></p>
+<p class="passage"><span class="passage-text">πὄχει γυναίκα τώρ᾽ αυτός στον Όλυμπο</span></p>
+<p class="passage"><span class="passage-text">την πιο ᾽μορφη από τις θεές, την Ήβη,</span></p>
+<p class="passage"><span class="passage-text">που πλάι με τη μητέρα της,</span></p>
+<p class="passage"><span class="passage-text">του τέλειου γάμου τη θεά, βαδίζει.</span></p>
+        </div>
+        
+
+        <div id="book-3-chapter-1-2" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-10" data-hash="book-3-chapter-1-2">
+            Νεμεονίκαις X -  ‹Θεαίῳ Ἀργείῳ παλαιστῇ› • Κεφάλαιο 1.2 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=156&page=10" target="_blank" class="page-link">Page 10</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">βραχύ μοι στόμα πάντ᾽ ἀναγή- [στρ. β]</span></p>
+<p class="passage indent"><span class="passage-text">σασθ᾽, ὅσων Ἀργεῖον ἔχει τέμενος</span></p>
+<p class="passage"><span class="passage-text">μοῖραν ἐσλῶν· ἔστι δὲ καὶ κόρος ἀνθρώ-</span><span class="line-number">20</span></p>
+<p class="passage indent"><span class="passage-text">πων βαρὺς ἀντιάσαι·</span></p>
+<p class="passage"><span class="passage-text">ἀλλ᾽ ὅμως εὔχορδον ἔγειρε λύραν,</span></p>
+<p class="passage"><span class="passage-text">καὶ παλαισμάτων λάβε φροντίδ᾽· ἀγών τοι χάλκεος</span></p>
+<p class="passage"><span class="passage-text">δᾶμον ὀτρύνει ποτὶ βουθυσίαν Ἥ-</span></p>
+<p class="passage indent"><span class="passage-text">ρας ἀέθλων τε κρίσιν·</span></p>
+<p class="passage"><span class="passage-text">Οὐλία παῖς ἔνθα νικάσαις δὶς ἔ-</span></p>
+<p class="passage indent"><span class="passage-text">σχεν Θεαῖος εὐφόρων λάθαν πόνων.</span></p>
+<p class="passage"><span class="passage-text">ἐκράτησε δὲ καί ποθ᾽ Ἕλλα- [ἀντ. β]</span><span class="line-number">25</span></p>
+<p class="passage indent"><span class="passage-text">να στρατὸν Πυθῶνι, τύχᾳ τε μολών</span></p>
+<p class="passage"><span class="passage-text">καὶ τὸν Ἰσθμοῖ καὶ Νεμέᾳ στέφανον, Μοί-</span></p>
+<p class="passage indent"><span class="passage-text">σαισί τ᾽ ἔδωκ᾽ ἀρόσαι,</span></p>
+<p class="passage"><span class="passage-text">τρὶς μὲν ἐν πόντοιο πύλαισι λαχών,</span></p>
+<p class="passage"><span class="passage-text">τρὶς δὲ καὶ σεμνοῖς δαπέδοις ἐν Ἀδραστείῳ νόμῳ.</span></p>
+<p class="passage"><span class="passage-text">Ζεῦ πάτερ, τῶν μὰν ἔραται φρενί, σιγᾷ</span></p>
+<p class="passage indent"><span class="passage-text">οἱ στόμα· πὰν δὲ τέλος</span></p>
+<p class="passage"><span class="passage-text">ἐν τὶν ἔργων· οὐδ᾽ ἀμόχθῳ καρδίᾳ</span><span class="line-number">30</span></p>
+<p class="passage indent"><span class="passage-text">προσφέρων τόλμαν παραιτεῖται χάριν.</span></p>
+<p class="passage"><span class="passage-text">γνώτ᾽ ἀείδω θεῷ τε καὶ ὅστις ἁμιλλᾶται πέρι [ἐπῳδ. β]</span></p>
+<p class="passage"><span class="passage-text">ἐσχάτων ἀέθλων κορυφαῖς. ὕπατον δ᾽ ἔσχεν Πίσα</span></p>
+<p class="passage"><span class="passage-text">Ἡρακλέος τεθμόν. ἁδεῖαί γε μὲν ἀμβολάδαν</span></p>
+<p class="passage"><span class="passage-text">ἐν τελεταῖς δὶς Ἀθαναίων νιν ὀμφαί</span></p>
+<p class="passage"><span class="passage-text">κώμασαν· γαίᾳ δὲ καυθείσᾳ πυρὶ καρπὸς ἐλαίας</span><span class="line-number">35</span></p>
+<p class="passage"><span class="passage-text">ἔμολεν Ἥρας τὸν εὐάνορα λαὸν ἐν ἀγγέων</span></p>
+<p class="passage indent"><span class="passage-text">ἕρκεσιν παμποικίλοις.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">Κοντή ᾽ναι η ανάσα μου όλες να ιστορώ [στρ. β]</span></p>
+<p class="passage"><span class="passage-text">τις δόξες, πὄλαχαν στην άγια του Άργους γη·</span></p>
+<p class="passage"><span class="passage-text">κι ο κόρος των ανθρώπω είναι βαρύς</span><span class="line-number">20</span></p>
+<p class="passage"><span class="passage-text">μ᾽ αυτόν ν᾽ αντικριστείς.</span></p>
+<p class="passage"><span class="passage-text">Μα σήκωσε τη λύρα την καλλίχορδη</span></p>
+<p class="passage"><span class="passage-text">και στα παλαίσματα το νου σου γύρνα·</span></p>
+<p class="passage"><span class="passage-text">ο χάλκινος ο αγώνας τους λαούς καλεί</span></p>
+<p class="passage"><span class="passage-text">στη βουθυσία της Ήρας,</span></p>
+<p class="passage"><span class="passage-text">εκεί που τ᾽ άθλα κρίνουνται μπρος σ᾽ όλους</span></p>
+<p class="passage"><span class="passage-text">κι όπου ο Θειαίος του Ουλία το παιδί</span></p>
+<p class="passage"><span class="passage-text">βρήκε, νικώντας δυο φορές,</span></p>
+<p class="passage"><span class="passage-text">τη λησμονιά απ᾽ τους γόνιμούς του μόχτους.</span></p>
+<p class="passage"><span class="passage-text">Μα κι άλλη φορά νίκησε [αντ. β]</span><span class="line-number">25</span></p>
+<p class="passage"><span class="passage-text">τη μαζεμένη Ελλάδα στην Πυθώ</span></p>
+<p class="passage"><span class="passage-text">και με την τύχη συνοδειά πηγαίνοντας</span></p>
+<p class="passage"><span class="passage-text">πήρε στεφάνια στη Νεμέα και τον Ισθμό</span></p>
+<p class="passage"><span class="passage-text">κι έδωσε των Μουσών δουλειά, να οργώνουμε,</span></p>
+<p class="passage"><span class="passage-text">νικώντας τρεις φορές στου πόντου τις ποριές</span></p>
+<p class="passage"><span class="passage-text">και τρεις στα τιμημένα ισιώματα</span></p>
+<p class="passage"><span class="passage-text">με του Άδραστου το θεσμό.</span></p>
+<p class="passage"><span class="passage-text">Ω Δία πατέρα, όσα η καρδιά του λαχταρά,</span></p>
+<p class="passage"><span class="passage-text">το στόμα του σωπαίνει·</span></p>
+<p class="passage"><span class="passage-text">μα κι αν την τόλμη παίρνει αυτή,</span></p>
+<p class="passage"><span class="passage-text">τη χάρη δε ζητά</span><span class="line-number">30</span></p>
+<p class="passage"><span class="passage-text">χωρίς καρδιά στους μόχτους γυμνασμένη.</span></p>
+<p class="passage"><span class="passage-text">Τα ξέρει αυτά που ψάλλω κι ο θεός [επωδ. β]</span></p>
+<p class="passage"><span class="passage-text">κι όσοι αγωνίζονται για τις κορφές</span></p>
+<p class="passage"><span class="passage-text">των πιο μεγάλων άθλων·</span></p>
+<p class="passage"><span class="passage-text">κι είναι στην Πίσα που ίδρυσε ο Ηρακλής</span></p>
+<p class="passage"><span class="passage-text">τον πρώτο απ᾽ όλους τους αγώνες.</span></p>
+<p class="passage"><span class="passage-text">Μα όμως γλυκιές φωνές, σαν προανάκρουσμα,</span></p>
+<p class="passage"><span class="passage-text">δυο φορές τώρα το Θειαίο πανηγυρίσανε</span></p>
+<p class="passage"><span class="passage-text">στις μεγάλες γιορτές των Αθηναίων</span></p>
+<p class="passage"><span class="passage-text">και δυο φορές της ελιάς ήρθεν ο καρπός</span><span class="line-number">35</span></p>
+<p class="passage"><span class="passage-text">στης Ήρας το λαό το δοξασμένο,</span></p>
+<p class="passage"><span class="passage-text">μες σ᾽ ομορφογραμμένους αμφορείς</span></p>
+<p class="passage"><span class="passage-text">από άσπρο χώμα στη φωτιά ψημένο.</span></p>
+        </div>
+        
+
+        <div id="book-3-chapter-1-3" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-11" data-hash="book-3-chapter-1-3">
+            Νεμεονίκαις X -  ‹Θεαίῳ Ἀργείῳ παλαιστῇ› • Κεφάλαιο 1.3 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=156&page=11" target="_blank" class="page-link">Page 11</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ἐπέβα δέ, Θεαῖε, ματρώ- [στρ. γ]</span></p>
+<p class="passage indent"><span class="passage-text">ων πολύγνωτον γένος ὑμετέρων</span></p>
+<p class="passage"><span class="passage-text">εὐάγων τιμὰ Χαρίτεσσί τε καὶ σὺν</span></p>
+<p class="passage indent"><span class="passage-text">Τυνδαρίδαις θαμάκις.</span></p>
+<p class="passage"><span class="passage-text">ἀξιωθείην κεν, ἐὼν Θρασύκλου</span></p>
+<p class="passage"><span class="passage-text">Ἀντία τε σύγγονος, Ἄργεϊ μὴ κρύπτειν φάος</span><span class="line-number">40</span></p>
+<p class="passage"><span class="passage-text">ὀμμάτων. νικαφορίαις γὰρ ὅσαις †ἱπ-</span></p>
+<p class="passage indent"><span class="passage-text">ποτρόφον ἄστυ τὸ Προί-</span></p>
+<p class="passage"><span class="passage-text">τοιο θάλησεν† Κορίνθου τ᾽ ἐν μυχοῖς·</span></p>
+<p class="passage indent"><span class="passage-text">καὶ Κλεωναίων πρὸς ἀνδρῶν τετράκις,</span></p>
+<p class="passage"><span class="passage-text">Σικυωνόθε δ᾽ ἀργυρωθέν- [ἀντ. γ]</span></p>
+<p class="passage indent"><span class="passage-text">τες σὺν οἰνηραῖς φιάλαις ἀπέβαν,</span></p>
+<p class="passage"><span class="passage-text">ἐκ δὲ Πελλάνας ἐπιεσσάμενοι νῶ-</span></p>
+<p class="passage indent"><span class="passage-text">τον μαλακαῖσι κρόκαις·</span></p>
+<p class="passage"><span class="passage-text">ἀλλὰ χαλκὸν μυρίον οὐ δυνατόν</span><span class="line-number">45</span></p>
+<p class="passage"><span class="passage-text">ἐξελέγχειν —μακροτέρας γὰρ ἀριθμῆσαι σχολᾶς—</span></p>
+<p class="passage"><span class="passage-text">ὅν τε Κλείτωρ καὶ Τεγέα καὶ Ἀχαιῶν</span></p>
+<p class="passage indent"><span class="passage-text">ὑψίβατοι πόλιες</span></p>
+<p class="passage"><span class="passage-text">καὶ Λύκαιον πὰρ Διὸς θῆκε δρόμῳ,</span></p>
+<p class="passage indent"><span class="passage-text">σὺν ποδῶν χειρῶν τε νικῶντι σθένει.</span></p>
+<p class="passage"><span class="passage-text">Κάστορος δ᾽ ἐλθόντος ἐπὶ ξενίαν πὰρ Παμφάη [ἐπῳδ. γ]</span></p>
+<p class="passage"><span class="passage-text">καὶ κασιγνήτου Πολυδεύκεος, οὐ θαῦμα σφίσιν</span><span class="line-number">50</span></p>
+<p class="passage"><span class="passage-text">ἐγγενὲς ἔμμεν ἀεθληταῖς ἀγαθοῖσιν· ἐπεί</span></p>
+<p class="passage"><span class="passage-text">εὐρυχόρου ταμίαι Σπάρτας ἀγώνων</span></p>
+<p class="passage"><span class="passage-text">μοῖραν Ἑρμᾷ καὶ σὺν Ἡρακλεῖ διέποντι θάλειαν,</span></p>
+<p class="passage"><span class="passage-text">μάλα μὲν ἀνδρῶν δικαίων περικαδόμενοι. καὶ</span></p>
+<p class="passage indent"><span class="passage-text">μὰν θεῶν πιστὸν γένος.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">Συχνά η τιμή από αγώνες ένδοξους [στρ. γ]</span></p>
+<p class="passage"><span class="passage-text">έχει, Θειαίε, ακολουθήσει</span></p>
+<p class="passage"><span class="passage-text">τη γενιά της μητέρας σου την πολυοξάκουστη,</span></p>
+<p class="passage"><span class="passage-text">με τη βοήθεια των Χαρίτων</span></p>
+<p class="passage"><span class="passage-text">και των Τυνδαριδών·</span></p>
+<p class="passage"><span class="passage-text">που αν ήμουν του Θρασύκλου και του Αντία συγγενής,</span><span class="line-number">40</span></p>
+<p class="passage"><span class="passage-text">άξιος μες στο Άργος θα ᾽μουνα</span></p>
+<p class="passage"><span class="passage-text">να περπατώ μ᾽ όχι κατεβασμένα μάτια·</span></p>
+<p class="passage"><span class="passage-text">γιατί του Προίτου η αλογοθρόφα πόλη αυτή</span></p>
+<p class="passage"><span class="passage-text">με πόσες έχει αναγαλλιάσει νίκες,</span></p>
+<p class="passage"><span class="passage-text">που πήραν στης Κορίνθου τους μυχούς</span></p>
+<p class="passage"><span class="passage-text">και, τέσσερις, από τους Κλεωναίους αγωνοδίκες.</span></p>
+<p class="passage"><span class="passage-text">Από τη Σικυώνα ασημωμένοι γύρισαν [αντ. γ]</span></p>
+<p class="passage"><span class="passage-text">με κύπελλα κρασιού κι από την Πελλήνη</span></p>
+<p class="passage"><span class="passage-text">με ριχμένες στους ώμους χλαίνες μαλακές·</span></p>
+<p class="passage"><span class="passage-text">και ποιός μπορεί —θενά ᾽θελε μακρύτερο καιρό—</span><span class="line-number">45</span></p>
+<p class="passage"><span class="passage-text">να λογαριάσει τον αμέτρητο χαλκό</span></p>
+<p class="passage"><span class="passage-text">που Κλείτορας, Τεγέα και των Αχαιών</span></p>
+<p class="passage"><span class="passage-text">οι ψηλόχτιστες πόλεις και το Λύκαιο,</span></p>
+<p class="passage"><span class="passage-text">έπαθλα, στον ιππόδρομο του Δία, είχαν ορίσει</span></p>
+<p class="passage"><span class="passage-text">για όποιον με των ποδιών και των χεριών τη δύναμη</span></p>
+<p class="passage"><span class="passage-text">θενά ᾽ταν άξιος για να κερδίσει.</span></p>
+<p class="passage"><span class="passage-text">Μα αφού ήρθε ο Κάστορας μαζί [επωδ. γ]</span></p>
+<p class="passage"><span class="passage-text">με τον αυτάδερφό του Πολυδεύκη</span><span class="line-number">50</span></p>
+<p class="passage"><span class="passage-text">στα σπίτια του Παμφάη να φιλοξενηθούν,</span></p>
+<p class="passage"><span class="passage-text">θαύμα δεν είναι αν το ᾽χει στο αίμα της</span></p>
+<p class="passage"><span class="passage-text">αυτή η γενιά παράξιους αθλητές να βγάζει·</span></p>
+<p class="passage"><span class="passage-text">γιατί της Σπάρτης οι Πολιούχοι της τρανής,</span></p>
+<p class="passage"><span class="passage-text">μαζί με τον Ερμή και με τον Ηρακλή,</span></p>
+<p class="passage"><span class="passage-text">τη λαμπρή μοίρα των αγώνων κυβερνούνε,</span></p>
+<p class="passage"><span class="passage-text">τους δίκιους τους ανθρώπους έχοντας</span></p>
+<p class="passage"><span class="passage-text">στην έγνοια τους ξεχωριστά·</span></p>
+<p class="passage"><span class="passage-text">και ξέρουνε οι θεοί την πίστη να κρατούνε.</span></p>
+        </div>
+        
+
+        <div id="book-3-chapter-1-4" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-12" data-hash="book-3-chapter-1-4">
+            Νεμεονίκαις X -  ‹Θεαίῳ Ἀργείῳ παλαιστῇ› • Κεφάλαιο 1.4 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=156&page=12" target="_blank" class="page-link">Page 12</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">μεταμειβόμενοι δ᾽ ἐναλλὰξ [στρ. δ]</span><span class="line-number">55</span></p>
+<p class="passage indent"><span class="passage-text">ἁμέραν τὰν μὲν παρὰ πατρὶ φίλῳ</span></p>
+<p class="passage"><span class="passage-text">Δὶ νέμονται, τὰν δ᾽ ὑπὸ κεύθεσι γαίας</span></p>
+<p class="passage indent"><span class="passage-text">ἐν γυάλοις Θεράπνας,</span></p>
+<p class="passage"><span class="passage-text">πότμον ἀμπιπλάντες ὁμοῖον· ἐπεί</span></p>
+<p class="passage"><span class="passage-text">τοῦτον, ἢ πάμπαν θεὸς ἔμμεναι οἰκεῖν τ᾽ οὐρανῷ,</span></p>
+<p class="passage"><span class="passage-text">εἵλετ᾽ αἰῶνα φθιμένου Πολυδεύκης</span></p>
+<p class="passage indent"><span class="passage-text">Κάστορος ἐν πολέμῳ.</span></p>
+<p class="passage"><span class="passage-text">τὸν γὰρ Ἴδας ἀμφὶ βουσίν πως χολω-</span><span class="line-number">60</span></p>
+<p class="passage indent"><span class="passage-text">θεὶς ἔτρωσεν χαλκέας λόγχας ἀκμᾷ.</span></p>
+<p class="passage"><span class="passage-text">ἀπὸ Ταϋγέτου πεδαυγά- [ἀντ. δ]</span></p>
+<p class="passage indent"><span class="passage-text">ζων ἴδεν Λυγκεὺς δρυὸς ἐν στελέχει</span></p>
+<p class="passage"><span class="passage-text">ἡμένους. κείνου γὰρ ἐπιχθονίων πάν-</span></p>
+<p class="passage indent"><span class="passage-text">των γένετ᾽ ὀξύτατον</span></p>
+<p class="passage"><span class="passage-text">ὄμμα. λαιψηροῖς δὲ πόδεσσιν ἄφαρ</span></p>
+<p class="passage"><span class="passage-text">ἐξικέσθαν, καὶ μέγα ἔργον ἐμήσαντ᾽ ὠκέως</span></p>
+<p class="passage"><span class="passage-text">καὶ πάθον δεινὸν παλάμαις Ἀφαρητί-</span><span class="line-number">65</span></p>
+<p class="passage indent"><span class="passage-text">δαι Διός· αὐτίκα γάρ</span></p>
+<p class="passage"><span class="passage-text">ἦλθε Λήδας παῖς διώκων· τοὶ δ᾽ ἔναν-</span></p>
+<p class="passage indent"><span class="passage-text">τα στάθεν τύμβῳ σχεδὸν πατρωΐῳ·</span></p>
+<p class="passage"><span class="passage-text">ἔνθεν ἁρπάξαντες ἄγαλμ᾽ Ἀΐδα, ξεστὸν πέτρον, [ἐπῳδ. δ]</span></p>
+<p class="passage"><span class="passage-text">ἔμβαλον στέρνῳ Πολυδεύκεος· ἀλλ᾽ οὔ νιν φλάσαν</span></p>
+<p class="passage"><span class="passage-text">οὐδ᾽ ἀνέχασσαν· ἐφορμαθεὶς δ᾽ ἄρ᾽ ἄκοντι θοῷ,</span></p>
+<p class="passage"><span class="passage-text">ἤλασε Λυγκέος ἐν πλευραῖσι χαλκόν.</span><span class="line-number">70</span></p>
+<p class="passage"><span class="passage-text">Ζεὺς δ᾽ ἐπ᾽ Ἴδᾳ πυρφόρον πλᾶξε ψολόεντα κεραυνόν·</span></p>
+<p class="passage"><span class="passage-text">ἅμα δ᾽ ἐκαίοντ᾽ ἐρῆμοι. χαλεπὰ δ᾽ ἔρις ἀνθρώ-</span></p>
+<p class="passage indent"><span class="passage-text">ποις ὁμιλεῖν κρεσσόνων.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">Μέρα τη μέρα αλλάζοντας, περνούν αυτοί [στρ. δ]</span><span class="line-number">55</span></p>
+<p class="passage"><span class="passage-text">τη μια πλάι στον πατέρα Δία,</span></p>
+<p class="passage"><span class="passage-text">την άλλη κάτω από της γης τη σκοτεινιά,</span></p>
+<p class="passage"><span class="passage-text">στης Θεράπνας τη βαθυλαγκαδιά,</span></p>
+<p class="passage"><span class="passage-text">την όμοια μερασμένη μοίρα·</span></p>
+<p class="passage"><span class="passage-text">γιατί έτσι ο Πολυδεύκης πρόκρινε,</span></p>
+<p class="passage"><span class="passage-text">παρά για πάντ᾽ αθάνατος θεός</span></p>
+<p class="passage"><span class="passage-text">να ζει στους ουρανούς αυτός,</span></p>
+<p class="passage"><span class="passage-text">ενώ έπεσε στη μάχη σκοτωμένος</span></p>
+<p class="passage"><span class="passage-text">ο Κάστορας, που με τη λόγχη του τον τρύπησε</span><span class="line-number">60</span></p>
+<p class="passage"><span class="passage-text">ο Ίδας, για τα βόδια του οργισμένος.</span></p>
+<p class="passage"><span class="passage-text">Ψηλ᾽ απ᾽ του Ταϋγέτου τις κορφές βιγλίζοντας [αντ. δ]</span></p>
+<p class="passage"><span class="passage-text">τον είχε δει ο Λυγκέας να κάθεται</span></p>
+<p class="passage"><span class="passage-text">μες στην κουφάλα μιας βελανιδιάς·</span></p>
+<p class="passage"><span class="passage-text">γιατί στη γη δεν ήταν άνθρωπος</span></p>
+<p class="passage"><span class="passage-text">πιο οξύθωρη απ᾽ αυτόν να ᾽χει ματιά.</span></p>
+<p class="passage"><span class="passage-text">Κι ευθύς με τα γοργά τους πόδια πρόφταξαν</span></p>
+<p class="passage"><span class="passage-text">οι Αφαρητίδες κι έπραξαν το μέγα κρίμα,</span></p>
+<p class="passage"><span class="passage-text">μα που φρικτά απ᾽ του Δία τα χέρια πλέρωσαν</span><span class="line-number">65</span></p>
+<p class="passage"><span class="passage-text">γιατ᾽ ήρθ᾽ αμέσως κυνηγώντας τους</span></p>
+<p class="passage"><span class="passage-text">ο γιος της Λήδας· κείνοι τού σταθήκανε</span></p>
+<p class="passage"><span class="passage-text">αντίκρυ, στου πατέρα τους κοντά το μνήμα.</span></p>
+<p class="passage"><span class="passage-text">Κι αρπώντας κείθε μάρμαρο πελεκητό, [επωδ. δ]</span></p>
+<p class="passage"><span class="passage-text">του τάφου νεκρικό στολίδι,</span></p>
+<p class="passage"><span class="passage-text">κατάστηθα του Πολυδεύκη του σφεντόνισαν,</span></p>
+<p class="passage"><span class="passage-text">μα δεν τον σπάσανε, ούτε που τον πισωσάλεψαν·</span></p>
+<p class="passage"><span class="passage-text">κι απάνω τους με το γοργό του αυτός</span></p>
+<p class="passage"><span class="passage-text">χιμώντας το κοντάρι</span></p>
+<p class="passage"><span class="passage-text">μες στου Λυγκέα τα πλευρά το χώνεψε,</span><span class="line-number">70</span></p>
+<p class="passage"><span class="passage-text">ενώ στον Ίδα πάνω ο Δίας βρόντηξε</span></p>
+<p class="passage"><span class="passage-text">τον κεραυνό του, φλόγα και τουφάνι.</span></p>
+<p class="passage"><span class="passage-text">Στην ερημιά μονάχοι των κι οι δυο</span></p>
+<p class="passage"><span class="passage-text">καιγόντουσαν. Δε βγαίνει των ανθρώπων σε καλό</span></p>
+<p class="passage"><span class="passage-text">να πέφτουν με τους δυνατότερους σε αμάχη.</span></p>
+        </div>
+        
+
+        <div id="book-3-chapter-1-5" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-13" data-hash="book-3-chapter-1-5">
+            Νεμεονίκαις X -  ‹Θεαίῳ Ἀργείῳ παλαιστῇ› • Κεφάλαιο 1.5 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=156&page=13" target="_blank" class="page-link">Page 13</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage"><span class="passage-text">ταχέως δ᾽ ἐπ᾽ ἀδελφεοῦ βί- [στρ. ε]</span></p>
+<p class="passage indent"><span class="passage-text">αν πάλιν χώρησεν ὁ Τυνδαρίδας,</span></p>
+<p class="passage"><span class="passage-text">καί νιν οὔπω τεθναότ᾽, ἄσθματι δὲ φρίσ-</span></p>
+<p class="passage indent"><span class="passage-text">σοντα πνοὰς ἔκιχεν.</span></p>
+<p class="passage"><span class="passage-text">θερμὰ δὴ τέγγων δάκρυα στοναχαῖς</span><span class="line-number">75</span></p>
+<p class="passage"><span class="passage-text">ὄρθιον φώνασε· «Πάτερ Κρονίων, τίς δὴ λύσις</span></p>
+<p class="passage"><span class="passage-text">ἔσσεται πενθέων; καὶ ἐμοὶ θάνατον σὺν</span></p>
+<p class="passage indent"><span class="passage-text">τῷδ᾽ ἐπίτειλον, ἄναξ.</span></p>
+<p class="passage"><span class="passage-text">οἴχεται τιμὰ φίλων τατωμένῳ</span></p>
+<p class="passage indent"><span class="passage-text">φωτί· παῦροι δ᾽ ἐν πόνῳ πιστοὶ βροτῶν</span></p>
+<p class="passage"><span class="passage-text">καμάτου μεταλαμβάνειν.» ὣς [ἀντ. ε]</span></p>
+<p class="passage indent"><span class="passage-text">ἤνεπε· Ζεὺς δ᾽ ἀντίος ἤλυθέ οἱ,</span></p>
+<p class="passage"><span class="passage-text">καὶ τόδ᾽ ἐξαύδασ᾽ ἔπος· «Ἐσσί μοι υἱός·</span><span class="line-number">80</span></p>
+<p class="passage indent"><span class="passage-text">τόνδε δ᾽ ἔπειτα πόσις</span></p>
+<p class="passage"><span class="passage-text">σπέρμα θνατὸν ματρὶ τεᾷ πελάσαις</span></p>
+<p class="passage"><span class="passage-text">στάξεν ἥρως, ἀλλ᾽ ἄγε τῶνδέ τοι ἔμπαν αἵρεσιν</span></p>
+<p class="passage"><span class="passage-text">παρδίδωμ᾽· εἰ μὲν θάνατόν τε φυγὼν καὶ</span></p>
+<p class="passage indent"><span class="passage-text">γῆρας ἀπεχθόμενον</span></p>
+<p class="passage"><span class="passage-text">αὐτὸς Οὔλυμπον θέλεις ‹ναίειν ἐμοὶ›</span></p>
+<p class="passage indent"><span class="passage-text">σύν τ᾽ Ἀθαναίᾳ κελαινεγχεῖ τ᾽ Ἄρει,</span></p>
+<p class="passage"><span class="passage-text">ἔστι σοι τούτων λάχος· εἰ δὲ κασιγνήτου πέρι [ἐπῳδ. ε]</span><span class="line-number">85</span></p>
+<p class="passage"><span class="passage-text">μάρνασαι, πάντων δὲ νοεῖς ἀποδάσσασθαι ἴσον,</span></p>
+<p class="passage"><span class="passage-text">ἥμισυ μέν κε πνέοις γαίας ὑπένερθεν ἐών,</span></p>
+<p class="passage"><span class="passage-text">ἥμισυ δ᾽ οὐρανοῦ ἐν χρυσέοις δόμοισιν.»</span></p>
+<p class="passage"><span class="passage-text">ὣς ἄρ᾽ αὐδάσαντος οὐ γνώμᾳ διπλόαν θέτο βουλάν,</span></p>
+<p class="passage"><span class="passage-text">ἀνὰ δ᾽ ἔλυσεν μὲν ὀφθαλμόν, ἔπειτα δὲ φωνὰν</span><span class="line-number">90</span></p>
+<p class="passage indent"><span class="passage-text">χαλκομίτρα Κάστορος.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage"><span class="passage-text">Βιαστικά πίσω ο Τυνδαρίδης γύρισε [στρ. ε]</span></p>
+<p class="passage"><span class="passage-text">στον ήρωα τον αδερφό του και τον βρήκε</span></p>
+<p class="passage"><span class="passage-text">όχι νεκρόν ακόμη, μα που τις στερνές</span></p>
+<p class="passage"><span class="passage-text">πνοές του βαριαγκομαχούσε·</span></p>
+<p class="passage"><span class="passage-text">και βρέχοντας δάκρυα θερμά κι αναλυγκιάζοντας,</span><span class="line-number">75</span></p>
+<p class="passage"><span class="passage-text">έκραξε με φωνή σπαραχτικιά:</span></p>
+<p class="passage"><span class="passage-text">«Δία, ω πατέρα, ποιός θα γίνει λυτρωμός</span></p>
+<p class="passage"><span class="passage-text">στον πόνο αυτό μου; τάξε μου και μένα</span></p>
+<p class="passage"><span class="passage-text">θάνατο, ω Κύριε, μαζί μ᾽ αυτόν·</span></p>
+<p class="passage"><span class="passage-text">τιμή δεν του απομένει πια, σα στερηθεί</span></p>
+<p class="passage"><span class="passage-text">τους δικούς τους κανείς τους ακριβούς του·</span></p>
+<p class="passage"><span class="passage-text">κι από τους άλλους, λίγοι στην ανάγκη του πιστοί</span></p>
+<p class="passage"><span class="passage-text">να μεραστούν μαζί τους κίντυνούς του».</span></p>
+<p class="passage"><span class="passage-text">Είπε και βγήκε ο Δίας αντίκρυ του [αντ. ε]</span></p>
+<p class="passage"><span class="passage-text">κι αυτόν του μίλησε το λόγο:</span><span class="line-number">80</span></p>
+<p class="passage"><span class="passage-text">«Εσύ ᾽σαι γιος μου εμένα μα αυτόν έπειτα</span></p>
+<p class="passage"><span class="passage-text">σμίγοντας τη μητέρα σου ο θνητός της άντρας</span></p>
+<p class="passage"><span class="passage-text">τον έσπειρε, φύτρα θνητή.</span></p>
+<p class="passage"><span class="passage-text">Μα έλα και νά, σου δίνω να διαλέξεις απ᾽ αυτά:</span></p>
+<p class="passage"><span class="passage-text">αν θες, απαλλαγμένος απ᾽ το θάνατο</span></p>
+<p class="passage"><span class="passage-text">κι από τα μαύρα γηρατειά, να ζεις αιώνια εσύ</span></p>
+<p class="passage"><span class="passage-text">στον Όλυμπο με μένα και την Αθηνά</span></p>
+<p class="passage"><span class="passage-text">και με τον πολεμόχαρο τον Άρη,</span></p>
+<p class="passage"><span class="passage-text">η μοίρα θα σου λάχει αυτή. [επωδ. ε]</span><span class="line-number">85</span></p>
+<p class="passage"><span class="passage-text">Μα αν πάλι για τον αδερφό σου ψυχομάχεσαι</span></p>
+<p class="passage"><span class="passage-text">κι έχεις στο νου σου να ισιομοιραστείς</span></p>
+<p class="passage"><span class="passage-text">μαζί του όλα τα πάντα, τη μισή ζωή σου</span></p>
+<p class="passage"><span class="passage-text">θα την περνάς κάτω απ᾽ τη γης, και τη μισή</span></p>
+<p class="passage"><span class="passage-text">στα ολόχρυσα παλάτια τ᾽ ουρανού».</span></p>
+<p class="passage"><span class="passage-text">Είπε και κείνος ούτε που στιγμή</span></p>
+<p class="passage"><span class="passage-text">δεν έδωσε διπλή βουλή του λογισμού του.</span></p>
+<p class="passage"><span class="passage-text">Ξανάλυσε τα μάτια ευθύς και τη φωνή</span><span class="line-number">90</span></p>
+<p class="passage"><span class="passage-text">του Κάστορα, του χαλκαρμάτωτου αδερφού του.</span></p>
+        </div>
+        
+        </section>
+    </main>
+
+    <script>
+        // Layout and Theme controls
+        function toggleLayout() {
+            const body = document.body;
+            const btn = document.getElementById('toggle-layout-btn');
+            
+            if (body.classList.contains('hide-original')) {
+                body.classList.remove('hide-original');
+                btn.innerText = 'Hide Original';
+                localStorage.setItem('ebook-hide-original', 'false');
+            } else {
+                body.classList.add('hide-original');
+                btn.innerText = 'Show Original';
+                localStorage.setItem('ebook-hide-original', 'true');
+            }
+        }
+
+        function setTheme(theme, buttonElement) {
+            if (theme === 'light') {
+                document.documentElement.removeAttribute('data-theme');
+            } else {
+                document.documentElement.setAttribute('data-theme', theme);
+            }
+            
+            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+            buttonElement.classList.add('active');
+            
+            localStorage.setItem('ebook-theme', theme);
+        }
+
+        function toggleSidebar() {
+            const body = document.body;
+            const overlay = document.getElementById('mobile-overlay');
+            const isMobile = window.innerWidth <= 900;
+            
+            if (isMobile) {
+                if (body.classList.contains('sidebar-open')) {
+                    body.classList.remove('sidebar-open');
+                    overlay.classList.remove('open');
+                } else {
+                    body.classList.add('sidebar-open');
+                    overlay.classList.add('open');
+                    // Close right sidebar if open
+                    body.classList.remove('chat-sidebar-open');
+                }
+            } else {
+                if (body.classList.contains('sidebar-closed')) {
+                    body.classList.remove('sidebar-closed');
+                    localStorage.setItem('ebook-sidebar-closed', 'false');
+                } else {
+                    body.classList.add('sidebar-closed');
+                    localStorage.setItem('ebook-sidebar-closed', 'true');
+                }
+            }
+        }
+        
+        function closeSidebarOnMobile() {
+            if (window.innerWidth <= 900) {
+                document.body.classList.remove('sidebar-open');
+                document.getElementById('mobile-overlay').classList.remove('open');
+            }
+        }
+        
+        function toggleMobileOptions() {
+            const header = document.querySelector('header');
+            const btn = document.querySelector('.options-toggle');
+            
+            if (header.classList.contains('options-open')) {
+                header.classList.remove('options-open');
+                document.body.classList.remove('mobile-options-open');
+                btn.classList.remove('active');
+            } else {
+                header.classList.add('options-open');
+                document.body.classList.add('mobile-options-open');
+                btn.classList.add('active');
+            }
+        }
+
+        // Adjusts sidebar height dynamically to match mobile visual viewport when virtual keyboard is launched
+        function adjustSidebarHeightForKeyboard() {
+            if (window.visualViewport) {
+                const chatSidebar = document.getElementById('chat-sidebar');
+                const isMobile = window.innerWidth <= 900;
+                if (isMobile && document.body.classList.contains('chat-sidebar-open')) {
+                    chatSidebar.style.height = window.visualViewport.height + 'px';
+                } else {
+                    chatSidebar.style.height = ''; // Fallback to CSS rules
+                }
+            }
+        }
+
+        // Right AI Sidebar Toggles
+        function toggleChatSidebar() {
+            const body = document.body;
+            if (body.classList.contains('chat-sidebar-open')) {
+                body.classList.remove('chat-sidebar-open');
+                adjustSidebarHeightForKeyboard();
+            } else {
+                body.classList.add('chat-sidebar-open');
+                // Close Left Sidebar on Mobile
+                if (window.innerWidth <= 900) {
+                    body.classList.remove('sidebar-open');
+                    document.getElementById('mobile-overlay').classList.remove('open');
+                }
+                // Focus text area
+                setTimeout(() => {
+                    document.getElementById('chat-input').focus();
+                    adjustSidebarHeightForKeyboard();
+                }, 100);
+            }
+        }
+
+        // AI Configuration Modal controls
+        function openAiSettings() {
+            document.getElementById('ai-config-modal').classList.add('open');
+            loadSavedAiSettings();
+        }
+
+        function closeAiSettings() {
+            document.getElementById('ai-config-modal').classList.remove('open');
+        }
+
+        function handleProviderChange() {
+            const p = document.getElementById('ai-provider').value;
+            const customUrlGroup = document.getElementById('group-custom-url');
+            const modelInput = document.getElementById('ai-model');
+
+            if (p === 'custom') {
+                customUrlGroup.style.display = 'flex';
+            } else {
+                customUrlGroup.style.display = 'none';
+            }
+
+            // Suggest model placeholders and default values based on provider selection
+            if (p === 'openai') {
+                modelInput.placeholder = 'gpt-4o-mini';
+                if (modelInput.value === 'gemini-flash-latest' || modelInput.value === '' || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gemini')) {
+                    modelInput.value = 'gpt-4o-mini';
+                }
+            } else if (p === 'anthropic') {
+                modelInput.placeholder = 'claude-3-5-sonnet-20241022';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('gemini') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'claude-3-5-sonnet-20241022';
+                }
+            } else if (p === 'gemini') {
+                modelInput.placeholder = 'gemini-flash-latest';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'gemini-flash-latest';
+                }
+            } else if (p === 'openrouter') {
+                modelInput.placeholder = 'meta-llama/llama-3-8b-instruct:free';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('gemini') || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'meta-llama/llama-3-8b-instruct:free';
+                }
+            } else if (p === 'custom') {
+                modelInput.placeholder = 'model-name';
+            }
+        }
+
+        function loadSavedAiSettings() {
+            const provider = localStorage.getItem('ai-prov') || 'openai';
+            const apiKey = localStorage.getItem('ai-key') || '';
+            const model = localStorage.getItem('ai-mod') || '';
+            const customUrl = localStorage.getItem('ai-url') || '';
+
+            document.getElementById('ai-provider').value = provider;
+            document.getElementById('ai-key').value = apiKey;
+            document.getElementById('ai-model').value = model;
+            document.getElementById('ai-custom-url').value = customUrl;
+
+            handleProviderChange();
+        }
+
+        function saveAiSettings() {
+            const provider = document.getElementById('ai-provider').value;
+            const apiKey = document.getElementById('ai-key').value;
+            const model = document.getElementById('ai-model').value;
+            const customUrl = document.getElementById('ai-custom-url').value;
+
+            localStorage.setItem('ai-prov', provider);
+            localStorage.setItem('ai-key', apiKey);
+            localStorage.setItem('ai-mod', model);
+            localStorage.setItem('ai-url', customUrl);
+
+            closeAiSettings();
+        }
+
+        // Text Selection & Chat logic
+        let currentSelection = "";
+        let currentContext = null;
+        let chatHistory = [];
+
+        function getPageContext(node) {
+            let current = node.nodeType === Node.TEXT_NODE ? node.parentElement : node;
+            let col = current.closest('.column');
+            if (!col) return null;
+
+            // Find the preceding page-divider element
+            let sibling = col.previousElementSibling;
+            while (sibling && !sibling.classList.contains('page-divider')) {
+                sibling = sibling.previousElementSibling;
+            }
+            if (!sibling) return null;
+
+            const pageNum = sibling.id.replace('page-', '');
+
+            // Identify parallel original and translation sibling columns
+            let origCol = sibling.nextElementSibling;
+            while (origCol && !origCol.classList.contains('original-col')) {
+                origCol = origCol.nextElementSibling;
+            }
+            let transCol = sibling.nextElementSibling;
+            while (transCol && !transCol.classList.contains('translation-col')) {
+                transCol = transCol.nextElementSibling;
+            }
+
+            const isOriginal = col.classList.contains('original-col');
+
+            return {
+                pageNum: pageNum,
+                dividerText: sibling.textContent.trim(),
+                originalText: origCol ? origCol.innerText : "",
+                translationText: transCol ? transCol.innerText : "",
+                selectedColType: isOriginal ? "original" : "translation"
+            };
+        }
+
+        function handleTextSelection(e) {
+            setTimeout(() => {
+                const selection = window.getSelection();
+                const text = selection.toString().trim();
+                const popup = document.getElementById('ai-selection-popup');
+
+                if (!text) {
+                    if (e.target && e.target.id !== 'ai-selection-popup') {
+                        popup.style.display = 'none';
+                    }
+                    return;
+                }
+
+                const anchorNode = selection.anchorNode;
+                if (!anchorNode) return;
+
+                const context = getPageContext(anchorNode);
+                if (!context) {
+                    popup.style.display = 'none';
+                    return;
+                }
+
+                currentSelection = text;
+                currentContext = context;
+
+                const isMobile = window.innerWidth <= 900;
+                
+                if (isMobile) {
+                    // Position fixed at the bottom on mobile to avoid native Android contextual menu overlap
+                    popup.style.display = 'flex';
+                    popup.style.position = 'fixed';
+                    popup.style.bottom = '24px';
+                    popup.style.left = '50%';
+                    popup.style.transform = 'translateX(-50%)';
+                    popup.style.top = 'auto';
+                    popup.style.width = 'calc(100% - 40px)';
+                    popup.style.maxWidth = '340px';
+                    popup.style.justifyContent = 'center';
+                    popup.style.boxShadow = '0 8px 24px rgba(0,0,0,0.3)';
+                } else {
+                    // Position relative to selection on desktop
+                    const range = selection.getRangeAt(0);
+                    const rect = range.getBoundingClientRect();
+
+                    popup.style.display = 'flex';
+                    popup.style.position = 'fixed';
+                    popup.style.bottom = 'auto';
+                    popup.style.transform = 'none';
+                    popup.style.width = 'auto';
+                    popup.style.maxWidth = 'none';
+                    popup.style.left = Math.max(10, Math.min(window.innerWidth - popup.offsetWidth - 10, rect.left + (rect.width / 2) - 50)) + "px";
+                    popup.style.top = (rect.top - 45) + "px";
+                    popup.style.justifyContent = 'flex-start';
+                    popup.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+                }
+            }, 10);
+        }
+
+        function openChatWithSelection() {
+            document.getElementById('ai-selection-popup').style.display = 'none';
+            
+            // Populate context card
+            const contextTextNode = document.getElementById('chat-context-text');
+            const colLabel = currentContext.selectedColType === 'original' ? 'Αρχαία' : 'Μετάφραση';
+            contextTextNode.textContent = '"' + currentSelection + '" (' + colLabel + ' • Σελίδα ' + currentContext.pageNum + ')';
+            
+            // Clear prior conversation when selecting new text
+            clearChat();
+
+            // Open sidebar
+            document.body.classList.add('chat-sidebar-open');
+            setTimeout(() => {
+                document.getElementById('chat-input').focus();
+                adjustSidebarHeightForKeyboard();
+            }, 100);
+        }
+
+        function clearChat() {
+            chatHistory = [];
+            const msgsContainer = document.getElementById('chat-messages');
+            
+            // Keep the context card, wipe standard bubble divs
+            const contextCard = document.getElementById('chat-context-card');
+            msgsContainer.innerHTML = '';
+            msgsContainer.appendChild(contextCard);
+        }
+
+        function handleChatKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendChatMessage();
+            }
+        }
+
+        function appendMessage(sender, text, isError = false, historyIndex = null) {
+            const msgsContainer = document.getElementById('chat-messages');
+            const msgDiv = document.createElement('div');
+            
+            if (isError) {
+                msgDiv.className = 'chat-message system-error';
+            } else {
+                msgDiv.className = 'chat-message ' + sender;
+            }
+
+            // If it is a user message and linked to history, attach interactive attributes
+            if (sender === 'user' && historyIndex !== null) {
+                msgDiv.setAttribute('data-history-index', historyIndex);
+                msgDiv.setAttribute('title', 'Κλικ για εκ νέου εκτέλεση από αυτό το σημείο');
+                msgDiv.addEventListener('click', () => handleHistoryClick(historyIndex));
+            }
+            
+            msgDiv.innerHTML = formatMarkdown(text);
+            msgsContainer.appendChild(msgDiv);
+            msgsContainer.scrollTop = msgsContainer.scrollHeight;
+        }
+
+        // Truncate history and re-run on user dialog click
+        async function handleHistoryClick(historyIndex) {
+            // Prevent duplicate triggers if query is running
+            const inputEl = document.getElementById('chat-input');
+            if (inputEl.disabled) return;
+
+            // Slice history array up to and including the selected user query
+            chatHistory = chatHistory.slice(0, historyIndex + 1);
+
+            // Redraw UI container to match truncated array
+            rebuildChatUI();
+
+            // Re-fire query
+            await runQuery();
+        }
+
+        // Clean redraw of current stack
+        function rebuildChatUI() {
+            const msgsContainer = document.getElementById('chat-messages');
+            const contextCard = document.getElementById('chat-context-card');
+            
+            msgsContainer.innerHTML = '';
+            msgsContainer.appendChild(contextCard);
+            
+            chatHistory.forEach((msg, idx) => {
+                if (msg.role === 'user') {
+                    let displayContent = msg.content;
+                    // Extract original question portion from first structured input turn for a clean UI
+                    if (idx === 0 && msg.content.includes("Ερώτηση:\n")) {
+                        displayContent = msg.content.split("Ερώτηση:\n").slice(1).join("Ερώτηση:\n");
+                    }
+                    appendMessage('user', displayContent, false, idx);
+                } else if (msg.role === 'assistant') {
+                    appendMessage('assistant', msg.content);
+                }
+            });
+        }
+
+        // Native Markdown parser leveraging standard Marked.js library
+        function formatMarkdown(text) {
+            if (!text) return "";
+            try {
+                // Parse standard markdown strings to structural HTML
+                return marked.parse(text);
+            } catch (err) {
+                // Fallback to basic text escaping on parse failure
+                return text
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/\n/g, "<br>");
+            }
+        }
+
+        // Modular core query runner
+        async function runQuery() {
+            const inputEl = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('chat-send-btn');
+            
+            // Disable inputs during network transaction
+            inputEl.disabled = true;
+            sendBtn.disabled = true;
+            
+            // Append loading container
+            appendMessage('assistant', 'Thinking...');
+            const lastMsgDiv = document.getElementById('chat-messages').lastChild;
+
+            // Load credentials
+            const provider = localStorage.getItem('ai-prov') || 'openai';
+            const apiKey = localStorage.getItem('ai-key') || '';
+            const savedMod = localStorage.getItem('ai-mod') || '';
+            const customUrl = localStorage.getItem('ai-url') || '';
+
+            if (!apiKey && provider !== 'custom') {
+                lastMsgDiv.className = 'chat-message system-error';
+                lastMsgDiv.innerText = '⚠️ Παρακαλούμε ρυθμίστε το API Key στις ρυθμίσεις AI Config πρώτα.';
+                openAiSettings();
+                inputEl.disabled = false;
+                sendBtn.disabled = false;
+                return;
+            }
+
+            // Build the System Prompt Context dynamically on EVERY call
+            const isOriginal = currentContext.selectedColType === 'original';
+            const contextText = isOriginal ? currentContext.originalText : currentContext.translationText;
+            const contextLabel = isOriginal ? "Αρχαίο Κείμενο" : "Σύγχρονη Μετάφραση";
+			const pageTitle = document.title;
+
+            let systemInstruction = "Είσαι διακεκριμένος φιλόσοφος και γνώστης της φιλοσοφίας του Αριστοτέλη και Πλάτωνα και άλλων αρχαίων ελλήνων συγγραφέων.\n" +
+                "Ο χρήστης διαβάζει το βιβλίου του " + pageTitle + " και βάσει αυτού θα σου κάνει μερικές ερωτήσεις, περιλαμβάνοντας κάποιες φορές αποσπάσματα απο το βιβλίο αυτό πάνω στα οποία σχετίζονται οι ερωτήσεις. Ακολουθεί το ευρύτειο πλαίσιο της σελίδας/κεφαλαίου (Σελίδα " + currentContext.pageNum + ", " + currentContext.dividerText + ") για αναφορά:\n" +
+                "--- " + contextLabel + ":\n" + contextText + "\n\n" +
+                "Απάντησε στις ερωτήσεις του χρήστη σε σχέση με το πλαίσιο του κειμένου που παρέχεται. " +
+                "Δώσε τις απαντήσεις σου στα νέα ελληνικά χρησιμοποιώντας markdown μορφοποίηση.";
+
+            // Construct Payload Messages (Always prepending system prompt at index 0)
+            let payloadMessages = [{ role: "system", content: systemInstruction }];
+            payloadMessages = payloadMessages.concat(chatHistory);
+
+            try {
+                const answer = await requestAPI(provider, apiKey, savedMod, payloadMessages, customUrl);
+                lastMsgDiv.innerHTML = formatMarkdown(answer);
+                chatHistory.push({ role: "assistant", content: answer });
+            } catch (error) {
+                lastMsgDiv.className = 'chat-message system-error';
+                lastMsgDiv.innerText = "Error: " + error.message;
+                // If API failed, keep the user question on screen so they can click to retry it,
+                // do not silently clear the UI anymore.
+            } finally {
+                inputEl.disabled = false;
+                sendBtn.disabled = false;
+                document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+                inputEl.focus();
+                adjustSidebarHeightForKeyboard();
+            }
+        }
+
+        async function sendChatMessage() {
+            const inputEl = document.getElementById('chat-input');
+            const prompt = inputEl.value.trim();
+            if (!prompt) return;
+
+            // If the last message in history is a 'user' query (due to a previous failed turn),
+            // pop it before sending so that our conversational stack maintains alternating roles.
+            if (chatHistory.length > 0 && chatHistory[chatHistory.length - 1].role === 'user') {
+                chatHistory.pop();
+            }
+
+            // 1. Manage Chat History & Highlight Context
+            let histIdx;
+            if (chatHistory.length === 0) {
+                // Incorporate highlighted text directly into the first user turn, NOT the system prompt
+                const firstUserContent = "Επισημασμένο κείμενο:\n\"" + currentSelection + "\"\n\nΕρώτηση:\n" + prompt;
+                chatHistory.push({ role: "user", content: firstUserContent });
+                histIdx = 0;
+            } else {
+                // Subsequent turns: push the raw user follow-up prompt
+                chatHistory.push({ role: "user", content: prompt });
+                histIdx = chatHistory.length - 1;
+            }
+
+            // 2. Display user message in UI with history index
+            appendMessage('user', prompt, false, histIdx);
+            inputEl.value = '';
+
+            // 3. Trigger query execution
+            await runQuery();
+        }
+
+        async function requestAPI(provider, apiKey, model, messages, customUrl) {
+            let url = "";
+            let headers = { "Content-Type": "application/json" };
+            let body = {};
+
+            // Normalize models to defaults if unspecified
+            let activeModel = model;
+            if (!activeModel) {
+                if (provider === 'openai') activeModel = 'gpt-4o-mini';
+                else if (provider === 'anthropic') activeModel = 'claude-3-5-sonnet-20241022';
+                else if (provider === 'gemini') activeModel = 'gemini-flash-latest';
+                else if (provider === 'openrouter') activeModel = 'meta-llama/llama-3-8b-instruct:free';
+                else activeModel = 'local-model';
+            }
+
+            if (provider === 'openai') {
+                url = "https://api.openai.com/v1/chat/completions";
+                headers["Authorization"] = "Bearer " + apiKey;
+                body = { model: activeModel, messages: messages };
+            } else if (provider === 'openrouter') {
+                url = "https://openrouter.ai/api/v1/chat/completions";
+                headers["Authorization"] = "Bearer " + apiKey;
+                headers["HTTP-Referer"] = window.location.href;
+                headers["X-Title"] = "Ancient Greek Bilingual Reader";
+                body = { model: activeModel, messages: messages };
+            } else if (provider === 'gemini') {
+                url = "https://generativelanguage.googleapis.com/v1beta/models/" + activeModel + ":generateContent?key=" + apiKey;
+                
+                // Restructure typical OpenAI formats to Gemini's native API structure
+                const systemItem = messages.find(m => m.role === 'system');
+                const userItems = messages.filter(m => m.role !== 'system');
+                
+                const contents = userItems.map(m => ({
+                    role: m.role === 'assistant' ? 'model' : 'user',
+                    parts: [{ text: m.content }]
+                }));
+
+                body = { contents: contents };
+                if (systemItem) {
+                    body.systemInstruction = { parts: [{ text: systemItem.content }] };
+                }
+            } else if (provider === 'anthropic') {
+                url = "https://api.anthropic.com/v1/messages";
+                headers["x-api-key"] = apiKey;
+                headers["anthropic-version"] = "2023-06-01";
+                headers["dangerously-allow-browser"] = "true";
+
+                const systemItem = messages.find(m => m.role === 'system');
+                const userItems = messages.filter(m => m.role !== 'system');
+
+                body = {
+                    model: activeModel,
+                    messages: userItems.map(m => ({ role: m.role, content: m.content })),
+                    max_tokens: 1500
+                };
+                if (systemItem) {
+                    body.system = systemItem.content;
+                }
+            } else if (provider === 'custom') {
+                url = customUrl || "http://localhost:11434/v1/chat/completions";
+                if (apiKey) {
+                    headers["Authorization"] = "Bearer " + apiKey;
+                }
+                body = { model: activeModel, messages: messages };
+            }
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(body)
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error("API Error (" + response.status + "): " + (errText || response.statusText));
+            }
+
+            const responseData = await response.json();
+
+            // Extract content responses safely depending on the selected engine
+            if (provider === 'gemini') {
+                return responseData.candidates[0].content.parts[0].text;
+            } else if (provider === 'anthropic') {
+                return responseData.content[0].text;
+            } else {
+                // OpenAI / OpenRouter / Ollama
+                return responseData.choices[0].message.content;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('ebook-theme');
+            if (savedTheme) {
+                const targetBtn = document.getElementById('theme-' + savedTheme);
+                if (targetBtn) setTheme(savedTheme, targetBtn);
+            }
+
+            const hideOriginal = localStorage.getItem('ebook-hide-original');
+            if (hideOriginal === 'true') {
+                document.body.classList.add('hide-original');
+                document.getElementById('toggle-layout-btn').innerText = 'Show Original';
+            }
+            
+            if (window.innerWidth > 900) {
+                const sidebarClosed = localStorage.getItem('ebook-sidebar-closed');
+                if (sidebarClosed === 'true') {
+                    document.body.classList.add('sidebar-closed');
+                }
+            }
+
+            // Restore saved chat width on desktop
+            const chatSidebar = document.getElementById('chat-sidebar');
+            const savedChatWidth = localStorage.getItem('ebook-chat-width');
+            if (savedChatWidth && window.innerWidth > 900) {
+                chatSidebar.style.width = savedChatWidth;
+            }
+
+            // Setup Resizing for AI Chat Sidebar
+            const resizeHandle = document.getElementById('chat-resize-handle');
+            let isResizing = false;
+
+            resizeHandle.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                chatSidebar.classList.add('resizing');
+                document.body.style.userSelect = 'none';
+                document.body.style.cursor = 'ew-resize';
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isResizing) return;
+                const newWidth = window.innerWidth - e.clientX;
+                // Limit range between 280px and 85% of total screen width
+                if (newWidth > 280 && newWidth < window.innerWidth * 0.85) {
+                    chatSidebar.style.width = newWidth + 'px';
+                    localStorage.setItem('ebook-chat-width', newWidth + 'px');
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (isResizing) {
+                    isResizing = false;
+                    chatSidebar.classList.remove('resizing');
+                    document.body.style.userSelect = '';
+                    document.body.style.cursor = '';
+                }
+            });
+            
+            // Listen for selection events on layout columns (supports mouse and touch handles)
+            document.addEventListener('mouseup', handleTextSelection);
+            document.addEventListener('keyup', handleTextSelection);
+            document.addEventListener('selectionchange', handleTextSelection);
+
+            // Bind selection popup using both mousedown and touchstart with preventDefault.
+            // This guarantees instant tap execution on touch devices before selection focus is lost.
+            const popup = document.getElementById('ai-selection-popup');
+            const handleTriggerTap = (e) => {
+                e.preventDefault();
+                openChatWithSelection();
+            };
+            popup.addEventListener('mousedown', handleTriggerTap);
+            popup.addEventListener('touchstart', handleTriggerTap);
+
+            // Hide the popup trigger during scroll shifts (desktop only to prevent mobile touch glitches)
+            window.addEventListener('scroll', () => {
+                if (window.innerWidth > 900) {
+                    document.getElementById('ai-selection-popup').style.display = 'none';
+                }
+            }, { passive: true });
+
+            // VisualViewport resizing adjustments (Handles Android virtual keyboard overlap natively)
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', adjustSidebarHeightForKeyboard);
+                window.visualViewport.addEventListener('scroll', adjustSidebarHeightForKeyboard);
+            }
+
+            const chatInput = document.getElementById('chat-input');
+            if (chatInput) {
+                chatInput.addEventListener('focus', () => {
+                    setTimeout(adjustSidebarHeightForKeyboard, 150);
+                });
+                chatInput.addEventListener('blur', () => {
+                    setTimeout(adjustSidebarHeightForKeyboard, 150);
+                });
+            }
+            
+            let lastScrollTop = 0;
+            const header = document.querySelector('header');
+            const optBtn = document.querySelector('.options-toggle');
+            
+            window.addEventListener('scroll', () => {
+                let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                
+                if (scrollTop < 0) scrollTop = 0;
+                
+                if (scrollTop > 10) {
+                    document.body.classList.add('scrolled');
+                } else {
+                    document.body.classList.remove('scrolled');
+                }
+                
+                if (scrollTop > lastScrollTop && scrollTop > 120) {
+                    header.classList.add('header-hidden');
+                    header.classList.remove('options-open');
+                    document.body.classList.remove('mobile-options-open');
+                    optBtn.classList.remove('active');
+                } else {
+                    header.classList.remove('header-hidden');
+                }
+                
+                lastScrollTop = scrollTop;
+            }, { passive: true });
+            
+            const observerOptions = {
+                root: null,
+                rootMargin: "-100px 0px -60% 0px", 
+                threshold: 0
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const hash = entry.target.getAttribute('data-hash');
+                        if (hash && window.location.hash !== '#' + hash) {
+                            history.replaceState(null, null, '#' + hash);
+                        }
+                    }
+                });
+            }, observerOptions);
+            
+            document.querySelectorAll('.page-divider').forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>

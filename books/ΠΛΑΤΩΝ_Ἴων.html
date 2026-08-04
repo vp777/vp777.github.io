@@ -1,0 +1,2139 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ΠΛΑΤΩΝ Ἴων</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Marked.js Markdown rendering library -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #faf8f5;
+            --text-color: #2c2520;
+            --accent-color: #8b263e;
+            --sidebar-bg: #f3efe9;
+            --border-color: #e3ded5;
+            --muted-text: #706357;
+            --font-serif: "Cardo", "Georgia", "Palatino", serif;
+        }
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --accent-color: #ff8a80;
+            --sidebar-bg: #2d2d2d;
+            --border-color: #404040;
+            --muted-text: #999999;
+        }
+        [data-theme="sepia"] {
+            --bg-color: #f4ecd8;
+            --text-color: #5b4636;
+            --accent-color: #a04000;
+            --sidebar-bg: #ebdcb9;
+            --border-color: #d7c59d;
+            --muted-text: #7c6857;
+        }
+        
+        body {
+            margin: 0;
+            font-family: var(--font-serif);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            transition: background-color 0.2s, color 0.2s;
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        #mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 90;
+        }
+        #mobile-overlay.open {
+            display: block;
+        }
+        
+        #expand-bar {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 24px;
+            height: 100vh;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            cursor: pointer;
+            z-index: 95;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+        #expand-bar:hover {
+            background-color: var(--border-color);
+        }
+        #expand-bar::after {
+            content: "›";
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        
+        #sidebar {
+            width: 340px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            height: 100vh;
+            position: fixed;
+            top: 0; left: 0;
+            overflow-y: auto;
+            padding: 24px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transform: translateX(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+        #sidebar h2 {
+            font-size: 1.25rem;
+            margin: 0;
+            color: var(--text-color);
+        }
+        .sidebar-close-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--accent-color);
+            font-size: 1.4rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            line-height: 1;
+        }
+        .sidebar-close-btn:hover {
+            background-color: var(--border-color);
+        }
+        
+        .toc-list-container { overflow-y: auto; flex-grow: 1; }
+        
+        details.book-group {
+            margin-bottom: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            background-color: var(--sidebar-bg);
+        }
+        details.book-group[open] { border-color: var(--accent-color); }
+        details.book-group summary {
+            font-weight: bold; font-size: 1.05rem; cursor: pointer; padding: 10px 14px;
+            background-color: var(--sidebar-bg); list-style: none; display: flex;
+            justify-content: space-between; align-items: center; user-select: none;
+        }
+        details.book-group summary::-webkit-details-marker { display: none; }
+        details.book-group summary::after { content: "▾"; font-size: 0.9rem; color: var(--accent-color); }
+        details.book-group[open] summary::after { transform: rotate(180deg); }
+        
+        .toc-sublist-container {
+            background-color: var(--bg-color);
+            border-top: 1px solid var(--border-color);
+        }
+        .toc-group-title {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            padding: 8px 14px 4px 14px;
+            line-height: 1.3;
+        }
+        .toc-sublist { list-style: none; padding: 4px 14px 8px 14px; margin: 0; }
+        .toc-sublist li { margin-bottom: 8px; font-size: 0.88rem; }
+        
+        .toc-sublist a { 
+            color: var(--text-color); 
+            text-decoration: none; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding: 4px; 
+        }
+        .toc-sublist a:hover { color: var(--accent-color); }
+        .toc-page {
+            color: var(--muted-text);
+            font-size: 0.8rem;
+            font-family: var(--font-serif);
+        }
+        
+        #main {
+            margin-left: 340px;
+            flex-grow: 1;
+            padding: 180px 40px 40px 40px;
+            box-sizing: border-box;
+            width: calc(100% - 340px);
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        padding-top 0.3s ease;
+        }
+        
+        header {
+            position: fixed;
+            top: 0;
+            left: 340px;
+            right: 0;
+            background-color: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px 40px;
+            z-index: 50;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transform: translateY(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        left 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        background-color 0.2s, 
+                        box-shadow 0.2s;
+        }
+        header.header-hidden {
+            transform: translateY(-100%);
+            box-shadow: none !important;
+        }
+        body.scrolled header {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        [data-theme="dark"] body.scrolled header {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .header-top { display: flex; align-items: center; gap: 20px; }
+        header h1 { margin: 0; font-size: 1.8rem; color: var(--accent-color); line-height: 1.2; }
+        
+        .controls-group {
+            display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+        }
+        .btn {
+            background-color: var(--sidebar-bg); color: var(--text-color);
+            border: 1px solid var(--border-color); padding: 8px 14px;
+            font-family: inherit; cursor: pointer; border-radius: 6px;
+            font-size: 0.9rem; font-weight: bold; transition: all 0.2s; white-space: nowrap;
+        }
+        .btn:hover { background-color: var(--border-color); }
+        .btn.active { background-color: var(--accent-color); color: white; border-color: var(--accent-color); }
+        .btn-layout { background-color: var(--bg-color); border: 2px solid var(--accent-color); color: var(--accent-color); }
+        
+        .menu-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+            white-space: nowrap;
+        }
+        .menu-toggle:hover {
+            background-color: var(--text-color);
+        }
+        
+        .options-toggle {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 6px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            width: 38px;
+            height: 38px;
+            transition: all 0.2s;
+        }
+        .options-toggle:hover {
+            background-color: var(--sidebar-bg);
+        }
+
+        #book-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            column-gap: 48px;
+            row-gap: 0;
+            margin: 0 auto;
+            max-width: 140ch;
+            width: 100%;
+        }
+        
+        body.sidebar-closed #expand-bar {
+            display: flex;
+        }
+        body.sidebar-closed #sidebar {
+            transform: translateX(-340px);
+        }
+        body.sidebar-closed #main {
+            margin-left: 24px;
+            width: calc(100% - 24px);
+        }
+        body.sidebar-closed header {
+            left: 24px;
+        }
+        
+        body.hide-original #book-content { 
+            grid-template-columns: 1fr; 
+            max-width: 140ch;
+        }
+        body.hide-original .original-col { display: none; }
+        body.hide-original .bilingual-header { grid-template-columns: 1fr; }
+        body.hide-original .original-title { display: none; }
+        body.hide-original .translation-col {
+            max-width: 100% !important;
+            justify-self: stretch !important;
+        }
+
+        .bilingual-header {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px; position: sticky; top: 0;
+            background-color: var(--bg-color); padding: 16px 0;
+            border-bottom: 2px solid var(--accent-color); z-index: 10;
+            font-weight: bold; text-transform: uppercase; font-size: 0.85rem;
+            letter-spacing: 0.05em; color: var(--muted-text);
+        }
+        
+        .chapter-anchor {
+            display: block;
+            scroll-margin-top: 180px;
+        }
+        
+        .page-divider {
+            grid-column: 1 / -1;
+            border-bottom: 1px solid var(--border-color);
+            padding-top: 48px; padding-bottom: 12px; margin-bottom: 24px;
+            font-size: 0.95rem; color: var(--accent-color); text-transform: uppercase;
+            letter-spacing: 0.05em; font-weight: bold; 
+            scroll-margin-top: 180px;
+        }
+        
+        .page-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--accent-color);
+            transition: color 0.2s, border-bottom-color 0.2s;
+        }
+        .page-link:hover {
+            color: var(--text-color);
+            border-bottom-color: var(--text-color);
+        }
+        
+        .column { 
+            box-sizing: border-box; 
+            padding-bottom: 24px; 
+            display: flex; 
+            flex-direction: column; 
+            max-width: 65ch;
+            width: fit-content;
+            min-width: 0;
+        }
+        
+        .original-col {
+            justify-self: end;
+        }
+        .translation-col {
+            justify-self: start;
+        }
+        
+        .passage { 
+            margin: 0 0 1.2em 0; 
+            font-size: 1.15rem; 
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 1.5rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .passage-text {
+            flex: 1;
+            min-width: 0;
+            text-align: justify;
+        }
+        .passage.indent .passage-text { text-indent: 2em; }
+        .marker { color: var(--accent-color); font-weight: bold; margin-right: 4px; }
+        .line-number { 
+            color: var(--muted-text); 
+            font-size: 0.85em; 
+            font-weight: normal; 
+            user-select: none;
+            margin-left: auto;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+        i { font-style: italic; }
+
+        /* Floating popover trigger styling */
+        #ai-selection-popup {
+            position: fixed;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 14px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1005;
+            display: none;
+            font-family: var(--font-serif);
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.1s ease;
+        }
+        #ai-selection-popup:hover {
+            transform: scale(1.05);
+        }
+
+        /* Resizable sliding Right Chat Sidebar */
+        #chat-sidebar {
+            width: 380px;
+            min-width: 280px;
+            max-width: 85vw;
+            background-color: var(--sidebar-bg);
+            border-left: 1px solid var(--border-color);
+            height: 100vh;
+            height: 100dvh;
+            position: fixed;
+            top: 0; right: 0;
+            transform: translateX(100%);
+            overflow: visible;
+            display: flex;
+            flex-direction: column;
+            z-index: 110;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-sizing: border-box;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.05);
+        }
+        body.chat-sidebar-open #chat-sidebar {
+            transform: translateX(0);
+        }
+        
+        /* Draggable Resize Handle */
+        #chat-resize-handle {
+            width: 8px;
+            height: 100%;
+            position: absolute;
+            left: -4px;
+            top: 0;
+            cursor: ew-resize;
+            z-index: 120;
+            background-color: transparent;
+            transition: background-color 0.2s;
+        }
+        #chat-resize-handle:hover,
+        #chat-sidebar.resizing #chat-resize-handle {
+            background-color: var(--accent-color);
+            opacity: 0.5;
+        }
+        
+        .chat-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-header h3 { margin: 0; font-size: 1.1rem; color: var(--accent-color); }
+        
+        .chat-header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .chat-context-card {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+        .chat-context-card h4 { margin: 0 0 6px 0; color: var(--accent-color); }
+        .chat-context-card p { 
+            margin: 0; 
+            font-style: italic; 
+            display: -webkit-box; 
+            -webkit-line-clamp: 3; 
+            -webkit-box-orient: vertical; 
+            overflow: hidden; 
+            line-height: 1.4;
+        }
+        
+        .chat-message {
+            max-width: 85%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        
+        /* Render styles for AI Markdown elements in chat boxes */
+        .chat-message p { margin: 0 0 8px 0; line-height: 1.5; }
+        .chat-message p:last-child { margin-bottom: 0; }
+        .chat-message strong { font-weight: bold; }
+        .chat-message em { font-style: italic; }
+        .chat-message ul, .chat-message ol { margin: 4px 0 8px 16px; padding: 0; }
+        .chat-message li { margin-bottom: 4px; font-size: 0.92rem; }
+        .chat-message h1, .chat-message h2, .chat-message h3, .chat-message h4, .chat-message h5 {
+            color: var(--accent-color);
+            margin: 12px 0 6px 0;
+            line-height: 1.3;
+        }
+        .chat-message h3 { font-size: 1.15rem; }
+        .chat-message h4 { font-size: 1.05rem; }
+        .chat-message h5 { font-size: 0.95rem; }
+        .chat-message blockquote {
+            border-left: 3px solid var(--accent-color);
+            margin: 8px 0;
+            padding-left: 10px;
+            color: var(--muted-text);
+            font-style: italic;
+        }
+        .chat-message pre {
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.85rem;
+            margin: 8px 0;
+        }
+        .chat-message code {
+            font-family: monospace;
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: var(--accent-color);
+        }
+        
+        .chat-message.user {
+            background-color: var(--accent-color);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .chat-message.user:hover {
+            filter: brightness(1.15);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        /* Override light-colored syntax highlights in dark bubbles */
+        .chat-message.user code {
+            color: #ff8a80;
+            background-color: rgba(0,0,0,0.2);
+            border-color: rgba(0,0,0,0.1);
+        }
+        .chat-message.user pre {
+            background-color: rgba(0,0,0,0.2);
+            border-color: rgba(0,0,0,0.1);
+            color: white;
+        }
+        
+        .chat-message.assistant {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .chat-message.system-error {
+            background-color: #fce8e6;
+            color: #c5221f;
+            border: 1px solid #fad2cf;
+            align-self: center;
+            max-width: 95%;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+        
+        [data-theme="dark"] .chat-message.system-error {
+            background-color: #371d1d;
+            color: #f28b82;
+            border-color: #5c2424;
+        }
+
+        .chat-input-area {
+            padding: 16px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 8px;
+            background-color: var(--sidebar-bg);
+            flex-shrink: 0;
+        }
+        .chat-input-area textarea {
+            flex-grow: 1;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 10px;
+            border-radius: 6px;
+            resize: none;
+            height: 42px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+        }
+        .chat-input-area button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .chat-input-area button:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* Modal Config Dialog */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-content {
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            padding: 24px;
+            box-sizing: border-box;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 12px;
+        }
+        .modal-header h3 { margin: 0; font-size: 1.25rem; color: var(--accent-color); }
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group label {
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        .form-control {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 14px;
+        }
+
+        @media (max-width: 900px) {
+            #sidebar { transform: translateX(-100%); width: 320px; }
+            body.sidebar-open #sidebar { transform: translateX(0); }
+            body.sidebar-closed #sidebar { transform: translateX(-100%); }
+            
+            #chat-sidebar {
+                width: 100% !important;
+                right: 0;
+                transform: translateX(100%);
+                height: 100vh;
+                height: 100dvh;
+            }
+            body.chat-sidebar-open #chat-sidebar {
+                transform: translateX(0);
+            }
+            #chat-resize-handle {
+                display: none;
+            }
+            
+            #main { 
+                margin-left: 0 !important; 
+                width: 100% !important; 
+                padding: 100px 20px 20px 20px !important;
+            }
+            body.mobile-options-open #main {
+                padding-top: 150px !important;
+            }
+            
+            header {
+                padding-bottom: 12px;
+                margin-bottom: 16px;
+                gap: 8px;
+            }
+            header h1 { 
+                font-size: 0.95rem !important;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                text-align: center;
+                flex-grow: 1;
+                margin: 0;
+            }
+            
+            header {
+                left: 0 !important;
+                padding: 12px 16px;
+            }
+            
+            .header-top { 
+                display: flex;
+                flex-direction: row !important;
+                align-items: center; 
+                justify-content: space-between; 
+                width: 100%;
+                gap: 12px; 
+            }
+            
+            .menu-toggle { 
+                width: auto !important; 
+                padding: 6px 12px;
+                font-size: 0.85rem;
+            }
+            
+            .options-toggle {
+                display: inline-flex;
+            }
+            
+            .controls-group {
+                display: none;
+                width: 100%;
+                justify-content: center;
+                padding-top: 12px;
+                border-top: 1px dashed var(--border-color);
+            }
+            header.options-open .controls-group {
+                display: flex;
+            }
+            
+            #book-content { grid-template-columns: 1fr; column-gap: 0; max-width: 100%; }
+            .column { max-width: 100% !important; width: 100% !important; }
+            .bilingual-header { display: none; }
+            .page-divider { padding-top: 32px; scroll-margin-top: 110px; }
+            .chapter-anchor { scroll-margin-top: 110px; }
+            .passage { font-size: 1.05rem; }
+        }
+        
+        @media (min-width: 901px) {
+            .menu-toggle {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="mobile-overlay" onclick="toggleSidebar()"></div>
+
+    <div id="expand-bar" onclick="toggleSidebar()" title="Ανάπτυξη Περιεχομένων"></div>
+
+    <aside id="sidebar">
+        <div class="sidebar-header">
+            <h2>Πίνακας Περιεχομένων</h2>
+            <button class="sidebar-close-btn" onclick="toggleSidebar()" title="Σύμπτυξη">‹</button>
+        </div>
+        <div class="toc-list-container">
+            <details class="book-group">
+    <summary>Η ποιητική είναι τέχνη ή αποτέλεσμα θεϊκής έμπνευσης;</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-1-chapter----" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΣΩ.-ΙΩΝ.</span> <span class="toc-page">#1</span></a></li>
+            <li><a href="#book-1-chapter----" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΣΩ.-ΣΩ.</span> <span class="toc-page">#2</span></a></li>
+            <li><a href="#book-1-chapter----" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΙΩΝ.-ΙΩΝ.</span> <span class="toc-page">#3</span></a></li>
+            <li><a href="#book-1-chapter----" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΣΩ.-ΙΩΝ.</span> <span class="toc-page">#4</span></a></li>
+            <li><a href="#book-1-chapter-----2" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΣΩ.-ΙΩΝ..2</span> <span class="toc-page">#5</span></a></li>
+        </ul>
+    </div>
+</details>
+<details class="book-group">
+    <summary>Αν η ποιητική είναι τέχνη ποιό είναι το γνωστικό αντικείμενό της;</summary>
+    <div class="toc-sublist-container">
+        <ul class="toc-sublist">
+            <li><a href="#book-2-chapter----" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΣΩ.-ΙΩΝ.</span> <span class="toc-page">#6</span></a></li>
+            <li><a href="#book-2-chapter-----2" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΣΩ.-ΙΩΝ..2</span> <span class="toc-page">#7</span></a></li>
+            <li><a href="#book-2-chapter-----3" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΣΩ.-ΙΩΝ..3</span> <span class="toc-page">#8</span></a></li>
+            <li><a href="#book-2-chapter----" onclick="closeSidebarOnMobile()"><span class="toc-chap">Κεφάλαιο ΣΩ.-ΣΩ.</span> <span class="toc-page">#9</span></a></li>
+        </ul>
+    </div>
+</details>
+        </div>
+    </aside>
+
+    <!-- AI Right Chat Sidebar -->
+    <aside id="chat-sidebar">
+        <div id="chat-resize-handle"></div>
+        <div class="chat-header">
+            <h3>AI Assistant</h3>
+            <div class="chat-header-actions">
+                <button class="btn" style="padding: 4px 8px; font-size: 0.8rem;" onclick="clearChat()">Clear</button>
+                <button class="sidebar-close-btn" style="width: 28px; height: 28px; font-size: 1.1rem;" onclick="toggleChatSidebar()" title="Κλείσιμο">›</button>
+            </div>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <!-- Active Context Card -->
+            <div class="chat-context-card" id="chat-context-card">
+                <h4>Επιλεγμένο Κείμενο</h4>
+                <p id="chat-context-text"></p>
+            </div>
+            <!-- Messages stream here -->
+        </div>
+        <div class="chat-input-area">
+            <textarea id="chat-input" placeholder="Ρωτήστε κάτι για το επιλεγμένο κείμενο..." onkeydown="handleChatKeyDown(event)"></textarea>
+            <button id="chat-send-btn" onclick="sendChatMessage()">Send</button>
+        </div>
+    </aside>
+
+    <!-- Floating Popover Trigger -->
+    <button id="ai-selection-popup"><span style="font-size: 1.1rem;">✨</span> Ask AI</button>
+
+    <!-- Settings Configuration Modal -->
+    <div id="ai-config-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Ρυθμίσεις LLM / AI</h3>
+                <button class="sidebar-close-btn" style="width: 28px; height: 28px; font-size: 1.1rem;" onclick="closeAiSettings()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="ai-provider">Πάροχος (Provider)</label>
+                    <select id="ai-provider" class="form-control" onchange="handleProviderChange()">
+                        <option value="openai">OpenAI (ChatGPT)</option>
+                        <option value="anthropic">Anthropic (Claude)</option>
+                        <option value="gemini">Google Gemini</option>
+                        <option value="openrouter">OpenRouter</option>
+                        <option value="custom">Custom Endpoint (Ollama / Local)</option>
+                    </select>
+                </div>
+                <div class="form-group" id="group-custom-url" style="display: none;">
+                    <label for="ai-custom-url">Base URL</label>
+                    <input type="text" id="ai-custom-url" class="form-control" placeholder="http://localhost:11434/v1/chat/completions">
+                </div>
+                <div class="form-group">
+                    <label for="ai-key">API Key</label>
+                    <input type="password" id="ai-key" class="form-control" placeholder="Εισάγετε το API Key">
+                </div>
+                <div class="form-group">
+                    <label for="ai-model">Μοντέλο (Model Name)</label>
+                    <input type="text" id="ai-model" class="form-control" placeholder="π.χ. gpt-4o-mini">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeAiSettings()">Άκυρο</button>
+                <button class="btn active" onclick="saveAiSettings()">Αποθήκευση</button>
+            </div>
+        </div>
+    </div>
+
+    <main id="main">
+        <header>
+            <div class="header-top">
+                <button class="btn menu-toggle" onclick="toggleSidebar()">☰ Περιεχόμενα</button>
+                <h1>ΠΛΑΤΩΝ Ἴων</h1>
+                <button class="btn options-toggle" onclick="toggleMobileOptions()" title="Ρυθμίσεις">⚙️</button>
+            </div>
+            
+            <div class="controls-group">
+                <button id="toggle-layout-btn" class="btn btn-layout" onclick="toggleLayout()">Hide Original</button>
+                <button class="btn" style="border-color: var(--accent-color);" onclick="openAiSettings()">⚙️ AI Config</button>
+                <button class="btn active theme-btn" id="theme-light" onclick="setTheme('light', this)">Light</button>
+                <button class="btn theme-btn" id="theme-sepia" onclick="setTheme('sepia', this)">Sepia</button>
+                <button class="btn theme-btn" id="theme-dark" onclick="setTheme('dark', this)">Dark</button>
+            </div>
+        </header>
+
+        <section id="book-content">
+            <div class="bilingual-header">
+                <div class="original-title">Αρχαία Ελληνικά (Original)</div>
+                <div class="translation-title">Νέα Ελληνικά (Translation)</div>
+            </div>
+
+            
+        <div id="book-1-chapter----" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-1" data-hash="book-1-chapter----">
+            Η ποιητική είναι τέχνη ή αποτέλεσμα θεϊκής έμπνευσης; • Κεφάλαιο ΣΩ.-ΙΩΝ. (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=106&page=1" target="_blank" class="page-link">Page 1</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[530a]</span> ΣΩΚΡΑΤΗΣ. Τὸν Ἴωνα χαίρειν. πόθεν τὰ νῦν ἡμῖν ἐπιδεδήμηκας; ἢ οἴκοθεν ἐξ Ἐφέσου;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Οὐδαμῶς, ὦ Σώκρατες, ἀλλ᾽ ἐξ Ἐπιδαύρου ἐκ τῶν Ἀσκληπιείων.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Μῶν καὶ ῥαψῳδῶν ἀγῶνα τιθέασιν τῷ θεῷ οἱ Ἐπιδαύριοι;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Πάνυ γε, καὶ τῆς ἄλλης γε μουσικῆς.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Τί οὖν; ἠγωνίζου τι ἡμῖν; καὶ πῶς τι ἠγωνίσω;</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[530b]</span> ΙΩΝ. Τὰ πρῶτα τῶν ἄθλων ἠνεγκάμεθα, ὦ Σώκρατες.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Εὖ λέγεις· ἄγε δὴ ὅπως καὶ τὰ Παναθήναια νικήσομεν.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ἀλλ᾽ ἔσται ταῦτα, ἐὰν θεὸς ἐθέλῃ.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Καὶ μὴν πολλάκις γε ἐζήλωσα ὑμᾶς τοὺς ῥαψῳδούς, ὦ Ἴων, τῆς τέχνης· τὸ γὰρ ἅμα μὲν τὸ σῶμα κεκοσμῆσθαι ἀεὶ πρέπον ὑμῶν εἶναι τῇ τέχνῃ καὶ ὡς καλλίστοις φαίνεσθαι, ἅμα δὲ ἀναγκαῖον εἶναι ἔν τε ἄλλοις ποιηταῖς διατρίβειν πολλοῖς καὶ ἀγαθοῖς καὶ δὴ καὶ μάλιστα ἐν Ὁμήρῳ, τῷ ἀρίστῳ καὶ θειοτάτῳ τῶν ποιητῶν, καὶ τὴν τούτου <span class="marker">[530c]</span> διάνοιαν ἐκμανθάνειν, μὴ μόνον τὰ ἔπη, ζηλωτόν ἐστιν. οὐ γὰρ ἂν γένοιτό ποτε ἀγαθὸς ῥαψῳδός, εἰ μὴ συνείη τὰ λεγόμενα ὑπὸ τοῦ ποιητοῦ. τὸν γὰρ ῥαψῳδὸν ἑρμηνέα δεῖ τοῦ ποιητοῦ τῆς διανοίας γίγνεσθαι τοῖς ἀκούουσι· τοῦτο δὲ καλῶς ποιεῖν μὴ γιγνώσκοντα ὅτι λέγει ὁ ποιητὴς ἀδύνατον. ταῦτα οὖν πάντα ἄξια ζηλοῦσθαι.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ἀληθῆ λέγεις, ὦ Σώκρατες· ἐμοὶ γοῦν τοῦτο πλεῖστον ἔργον παρέσχεν τῆς τέχνης, καὶ οἶμαι κάλλιστα ἀνθρώπων λέγειν περὶ Ὁμήρου, ὡς οὔτε Μητρόδωρος ὁ <span class="marker">[530d]</span> Λαμψακηνὸς οὔτε Στησίμβροτος ὁ Θάσιος οὔτε Γλαύκων οὔτε ἄλλος οὐδεὶς τῶν πώποτε γενομένων ἔσχεν εἰπεῖν οὕτω πολλὰς καὶ καλὰς διανοίας περὶ Ὁμήρου ὅσας ἐγώ.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Εὖ λέγεις, ὦ Ἴων· δῆλον γὰρ ὅτι οὐ φθονήσεις μοι ἐπιδεῖξαι.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Καὶ μὴν ἄξιόν γε ἀκοῦσαι, ὦ Σώκρατες, ὡς εὖ κεκόσμηκα τὸν Ὅμηρον· ὥστε οἶμαι ὑπὸ Ὁμηριδῶν ἄξιος εἶναι χρυσῷ στεφάνῳ στεφανωθῆναι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Καὶ μὴν ἐγὼ ἔτι ποιήσομαι σχολὴν ἀκροάσασθαί <span class="marker">[531a]</span> σου, νῦν δέ μοι τοσόνδε ἀπόκριναι· πότερον περὶ Ὁμήρου μόνον δεινὸς εἶ ἢ καὶ περὶ Ἡσιόδου καὶ Ἀρχιλόχου;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Οὐδαμῶς, ἀλλὰ περὶ Ὁμήρου μόνον· ἱκανὸν γάρ μοι δοκεῖ εἶναι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ἔστι δὲ περὶ ὅτου Ὅμηρός τε καὶ Ἡσίοδος ταὐτὰ λέγετον;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Οἶμαι ἔγωγε καὶ πολλά.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Πότερον οὖν περὶ τούτων κάλλιον ἂν ἐξηγήσαιο ἃ Ὅμηρος λέγει ἢ ἃ Ἡσίοδος;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ὁμοίως ἂν περί γε τούτων, ὦ <span class="marker">[531b]</span> Σώκρατες, περὶ ὧν ταὐτὰ λέγουσιν.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Τί δὲ ὧν πέρι μὴ ταὐτὰ λέγουσιν; οἷον περὶ μαντικῆς λέγει τι Ὅμηρός τε καὶ Ἡσίοδος.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Πάνυ γε.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Τί οὖν; ὅσα τε ὁμοίως καὶ ὅσα διαφόρως περὶ μαντικῆς λέγετον τὼ ποιητὰ τούτω, πότερον σὺ κάλλιον ἂν ἐξηγήσαιο ἢ τῶν μάντεών τις τῶν ἀγαθῶν;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Τῶν μάντεων.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Εἰ δὲ σὺ ἦσθα μάντις, οὐκ, εἴπερ περὶ τῶν ὁμοίως λεγομένων οἷός τ᾽ ἦσθα ἐξηγήσασθαι, καὶ περὶ τῶν διαφόρως λεγομένων ἠπίστω ἂν ἐξηγεῖσθαι;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Δῆλον ὅτι.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[530a]</span> ΣΩ. Καλώς τον Ίωνα! Πούθε μας έρχεσαι τούτη τη φορά; Από την πατρίδα σου μήπως, την Έφεσο;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Α, όχι, Σωκράτη· από την Επίδαυρο έρχομαι, από τις γιορτές του Ασκληπιού.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Ώστε λοιπόν οι Επιδαύριοι οργανώνουν τώρα και αγώνα ραψωδών προς τιμήν του θεού;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Βεβαιότατα, και μάλιστα και για τις άλλες τέχνες.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Λοιπόν τί; Έλαβες μήπως μέρος κι εσύ; Πώς μας τα πήγες;</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[530b]</span> ΙΩΝ.Το πρώτο βραβείο πήραμε, Σωκράτη</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Υπέροχα! Εμπρός λοιπόν, να πάρουμε και τα Παναθήναια.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Κι αυτό θα γίνει, αν θέλει ο θεός.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Στο λόγο μου, Ίωνα, πολλές φορές σας ζήλεψα εσάς τους ραψωδούς για την τέχνη σας. Από τη μια η εμφάνισή σας, στολισμένοι πάντα όπως απαιτεί η τέχνη, κι όσο γίνεται πιο όμορφοι, κι από την άλλη η υποχρέωση να καταπιάνεστε με πολλούς και καλούς ποιητές, πρώτα πρώτα με τον Όμηρο, τον μεγαλύτερο και τον πιο θεϊκό απ᾽ όλους τους ποιητές, και <span class="marker">[530c]</span> να μαθαίνετε στην εντέλεια τα νοήματά του, όχι μόνο τα λόγια του — ε, αυτά όλα είναι στ᾽ αλήθεια αξιοζήλευτα· γιατί δεν θα μπορούσε ποτέ να είναι κανείς καλός ραψωδός, αν δεν κατανοούσε πέρα για πέρα όσα λέει ο ποιητής. Ο ραψωδός, βλέπεις, οφείλει να είναι, για όσους τον ακούνε, ο ερμηνευτής του πνεύματος του ποιητή· κι αυτό είναι αδύνατον να το κατορθώσει κάποιος που δεν γνωρίζει τί λέει ο ποιητής. Αυτά λοιπόν όλα είναι αξιοζήλευτα.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Σωστά τα λες, Σωκράτη. Για μένα τουλάχιστον αυτό είναι το πιο κοπιαστικό στη δουλειά μου, αλλά νομίζω ότι τελικά μπορώ να μιλώ καλύτερα απ᾽ όλους τους ανθρώπους για τον Όμηρο· ούτε ο Μητρόδωρος <span class="marker">[530d]</span> ο Λαμψακηνός, ούτε ο Στησίμβροτος από τη Θάσο, ούτε ο Γλαύκων, ούτε άλλος κανένας ίσαμε τώρα μπόρεσε να πει τόσο πολλά και όμορφα πράγματα για τον Όμηρο, όσα εγώ.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Τέλεια, Ίωνα· είναι φανερό ότι δεν θα αρνηθείς να μου δείξεις την τέχνη σου.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Αληθινά, Σωκράτη, αξίζει να ακούσεις πόσο όμορφα παρουσιάζω τον Όμηρο· τόσο που νομίζω ότι αξίζω να με στεφανώσουν οι Ομηρίδες με χρυσό στεφάνι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Χωρίς άλλο θα μου δοθεί κάποια στιγμή η ευκαιρία να σε ακούσω· <span class="marker">[531a]</span> προς το παρόν όμως απάντησέ μου μονάχα σε τούτο: στον Όμηρο μόνο είσαι τόσο καλός ή και στον Ησίοδο και στον Αρχίλοχο;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Καθόλου· μόνο στον Όμηρο. Και νομίζω πως αυτό είναι αρκετό.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Υπάρχουν θέματα για τα οποία και ο Όμηρος και ο Ησίοδος λένε τα ίδια πράγματα;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Κατά τη γνώμη μου υπάρχουν, και μάλιστα πολλά.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Εσύ ποιά από αυτά θα μπορούσες να ερμηνεύσεις καλύτερα: αυτά που λέει ο Όμηρος ή αυτά που λέει ο Ησίοδος;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Το ίδιο καλά και τα δύο, <span class="marker">[531b]</span> Σωκράτη, όσον αφορά βέβαια αυτά για τα οποία και οι δύο λένε τα ίδια πράγματα.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Για όσα όμως δεν λένε τα ίδια; Λόγου χάριν για τη μαντική, λέει κάτι ο Όμηρος, λέει και ο Ησίοδος.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Βεβαιότατα.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Λοιπόν; Όσα όμοια και όσα διαφορετικά λένε για τη μαντική αυτοί οι δύο ποιητές ποιός θα τα εξηγούσε καλύτερα: εσύ ή ένας μάντης, από τους καλούς;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ένας μάντης.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Κι αν εσύ ήσουν μάντης και μπορούσες να ερμηνεύσεις αυτά στα οποία λένε τα ίδια πράγματα, δεν θα ᾽ξερες να ερμηνεύσεις κι εκείνα, στα οποία λένε πράγματα διαφορετικά;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Προφανώς.</span></p>
+        </div>
+        
+
+        
+        <div class="page-divider" id="page-2" data-hash="book-1-chapter----">
+            Η ποιητική είναι τέχνη ή αποτέλεσμα θεϊκής έμπνευσης; • Κεφάλαιο ΣΩ.-ΣΩ. (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=106&page=2" target="_blank" class="page-link">Page 2</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[531c]</span> ΣΩΚΡΑΤΗΣ. Τί οὖν ποτε περὶ μὲν Ὁμήρου δεινὸς εἶ, περὶ δὲ Ἡσιόδου οὔ, οὐδὲ τῶν ἄλλων ποιητῶν; ἢ Ὅμηρος περὶ ἄλλων τινῶν λέγει ἢ ὧνπερ σύμπαντες οἱ ἄλλοι ποιηταί; οὐ περὶ πολέμου τε τὰ πολλὰ διελήλυθεν καὶ περὶ ὁμιλιῶν πρὸς ἀλλήλους ἀνθρώπων ἀγαθῶν τε καὶ κακῶν καὶ ἰδιωτῶν καὶ δημιουργῶν, καὶ περὶ θεῶν πρὸς ἀλλήλους καὶ πρὸς ἀνθρώπους ὁμιλούντων, ὡς ὁμιλοῦσι, καὶ περὶ τῶν οὐρανίων παθημάτων καὶ περὶ τῶν ἐν Ἅιδου, καὶ γενέσεις καὶ θεῶν <span class="marker">[531d]</span> καὶ ἡρώων; οὐ ταῦτά ἐστι περὶ ὧν Ὅμηρος τὴν ποίησιν πεποίηκεν;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ἀληθῆ λέγεις, ὦ Σώκρατες.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Τί δὲ οἱ ἄλλοι ποιηταί; οὐ περὶ τῶν αὐτῶν τούτων;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναί, ἀλλ᾽, ὦ Σώκρατες, οὐχ ὁμοίως πεποιήκασι καὶ Ὅμηρος.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Τί μήν; κάκιον;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Πολύ γε.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ὅμηρος δὲ ἄμεινον;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ἄμεινον μέντοι νὴ Δία.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐκοῦν, ὦ φίλη κεφαλὴ Ἴων, ὅταν περὶ ἀριθμοῦ πολλῶν λεγόντων εἷς τις ἄριστα λέγῃ, γνώσεται δήπου τις <span class="marker">[531e]</span> τὸν εὖ λέγοντα;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Φημί.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Πότερον οὖν ὁ αὐτὸς ὅσπερ καὶ τοὺς κακῶς λέγοντας, ἢ ἄλλος;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ὁ αὐτὸς δήπου.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐκοῦν ὁ τὴν ἀριθμητικὴν τέχνην ἔχων οὗτός ἐστιν;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναί.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Τί δ᾽; ὅταν πολλῶν λεγόντων περὶ ὑγιεινῶν σιτίων ὁποῖά ἐστιν, εἷς τις ἄριστα λέγῃ, πότερον ἕτερος μέν τις τὸν ἄριστα λέγοντα γνώσεται ὅτι ἄριστα λέγει, ἕτερος δὲ τὸν κάκιον ὅτι κάκιον, ἢ ὁ αὐτός;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Δῆλον δήπου, ὁ αὐτός.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Τίς οὗτος; τί ὄνομα αὐτῷ;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ἰατρός.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐκοῦν ἐν κεφαλαίῳ λέγομεν ὡς ὁ αὐτὸς γνώσεται ἀεί, περὶ τῶν αὐτῶν πολλῶν <span class="marker">[532a]</span> λεγόντων, ὅστις τε εὖ λέγει καὶ ὅστις κακῶς· ἢ εἰ μὴ γνώσεται τὸν κακῶς λέγοντα, δῆλον ὅτι οὐδὲ τὸν εὖ, περί γε τοῦ αὐτοῦ.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Οὕτως.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐκοῦν ὁ αὐτὸς γίγνεται δεινὸς περὶ ἀμφοτέρων;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναί.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐκοῦν σὺ φῂς καὶ Ὅμηρον καὶ τοὺς ἄλλους ποιητάς, ἐν οἷς καὶ Ἡσίοδος καὶ Ἀρχίλοχός ἐστιν, περί γε τῶν αὐτῶν λέγειν, ἀλλ᾽ οὐχ ὁμοίως, ἀλλὰ τὸν μὲν εὖ γε, τοὺς δὲ χεῖρον;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Καὶ ἀληθῆ λέγω.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐκοῦν, εἴπερ τὸν εὖ λέγοντα <span class="marker">[532b]</span> γιγνώσκεις, καὶ τοὺς χεῖρον λέγοντας γιγνώσκοις ἂν ὅτι χεῖρον λέγουσιν.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ἔοικέν γε.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐκοῦν, ὦ βέλτιστε, ὁμοίως τὸν Ἴωνα λέγοντες περὶ Ὁμήρου τε δεινὸν εἶναι καὶ περὶ τῶν ἄλλων ποιητῶν οὐχ ἁμαρτησόμεθα, ἐπειδή γε αὐτὸς ὁμολογῇ τὸν αὐτὸν ἔσεσθαι κριτὴν ἱκανὸν πάντων ὅσοι ἂν περὶ τῶν αὐτῶν λέγωσι, τοὺς δὲ ποιητὰς σχεδὸν ἅπαντας τὰ αὐτὰ ποιεῖν.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[531c]</span> ΣΩ. Πώς γίνεται λοιπόν στον Όμηρο να είσαι αυθεντία, στον Ησίοδο όμως όχι — κι ούτε και στους άλλους ποιητές; Ή μήπως ο Όμηρος μιλάει για κάποια άλλα πράγματα, διαφορετικά απ᾽ ό,τι όλοι οι άλλοι ποιητές; Για τον πόλεμο κυρίως δεν έχει μιλήσει κι αυτός, και για σχέσεις ανάμεσα σε ανθρώπους καλούς και κακούς, ανθρώπους που δεν κατέχουν μια τέχνη κι άλλους επιτήδειους σε κάτι, για σχέσεις των θεών μεταξύ τους και με τους ανθρώπους, πώς φέρονται στους ανθρώπους, επίσης για όσα συμβαίνουν στον ουρανό, και για όσα συμβαίνουν στον Άδη, και για τις γενεαλογίες των θεών <span class="marker">[531d]</span> και των ηρώων; Αυτά δεν είναι τα θέματα γύρω από τα οποία στρέφεται ο Όμηρος στην ποίησή του;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Σωστά λες, Σωκράτη.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Αλλά κι οι άλλοι ποιητές; Για τα ίδια πράγματα δεν μιλούν κι αυτοί;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναι, αλλά όχι όμοια με τον Όμηρο.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Τί δηλαδή, χειρότερα;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Πολύ χειρότερα.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Κι ο Όμηρος τα λέει καλύτερα;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ε, μά τον Δία, καλύτερα.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Γλυκέ μου Ίωνα, όταν μιλούν πολλοί για αριθμούς και κάποιος από αυτούς λέει το σωστό, υπάρχει κανείς που θα αναγνωρίσει <span class="marker">[531e]</span> ποιός τα λέει σωστά;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Έτσι λέω.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Άραγε ο ίδιος που θα διακρίνει κι όσους δεν τα λένε σωστά ή κάποιος άλλος;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ο ίδιος, ασφαλώς.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Κι αυτός βέβαια δεν θα είναι εκείνος που κατέχει την επιστήμη των αριθμών;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Αλλά κι όταν μιλούν πολλοί για τις τροφές —ποιές από αυτές είναι οι υγιεινές— και κάποιος από όλους λέει τα σωστά, άραγε άλλος θα διακρίνει αυτόν που λέει τα σωστά, ότι μιλάει σωστά, και άλλος τον χειρότερο, ότι τα λέει άσχημα, ή ο ίδιος και τους δύο;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ο ίδιος βέβαια· είναι ολοφάνερο.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Ποιός είναι αυτός; Πώς τον λέμε;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Γιατρό.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Μπορούμε λοιπόν, συγκεφαλαιώνοντας, να πούμε ότι κατά την άποψή μας, όταν για τα ίδια πράγματα μιλούν πολλοί, <span class="marker">[532a]</span> πάντοτε ένας και ο αυτός θα διακρίνει ποιός λέει τα σωστά και ποιός τα λαθεμένα· με άλλα λόγια, άμα δεν διακρίνει αυτόν που μιλάει λαθεμένα, δεν θα διακρίνει ούτε αυτόν που λέει τα σωστά, σε σχέση φυσικά με το ίδιο πράγμα.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Έτσι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Επομένως, ο ίδιος άνθρωπος θα έχει την ικανότητα να διακρίνει και τους δύο· συμφωνείς;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Εσύ τώρα υποστηρίζεις ότι ο Όμηρος και οι άλλοι ποιητές, ανάμεσά τους ο Ησίοδος και ο Αρχίλοχος, μιλούν βέβαια για τα ίδια πράγματα, όχι όμως κατά τον ίδιο τρόπο, αλλά ότι εκείνος μεν τα λέει με τρόπο πετυχημένο, ενώ οι άλλοι χειρότερα από αυτόν· έτσι;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Έτσι· κι είναι αλήθεια αυτό που λέω.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Επομένως, αφού διακρίνεις αυτόν που τα λέει καλά, <span class="marker">[532b]</span> θα μπορούσες να διακρίνεις κι εκείνους που τα λένε λιγότερο καλά — ότι δεν λένε σωστά πράγματα.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Έτσι τουλάχιστον φαίνεται.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Άρα λοιπόν, φίλε μου, αν πούμε ότι ο Ίων είναι το ίδιο καλός και στον Όμηρο και στους άλλους ποιητές, δεν θα πέσουμε έξω, αφού κι εσύ ο ίδιος παραδέχεσαι ότι ένας και ο αυτός άνθρωπος θα είναι ικανός να κρίνει όλους όσους μιλούν για τα ίδια πράγματα — και οι ποιητές, όλοι τους σχεδόν, καταπιάνονται με τα ίδια πράγματα.</span></p>
+        </div>
+        
+
+        
+        <div class="page-divider" id="page-3" data-hash="book-1-chapter----">
+            Η ποιητική είναι τέχνη ή αποτέλεσμα θεϊκής έμπνευσης; • Κεφάλαιο ΙΩΝ.-ΙΩΝ. (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=106&page=3" target="_blank" class="page-link">Page 3</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text">ΙΩΝ. Τί οὖν ποτε τὸ αἴτιον, ὦ Σώκρατες, ὅτι ἐγώ, ὅταν μέν τις περὶ ἄλλου του ποιητοῦ διαλέγηται, οὔτε προσέχω <span class="marker">[532c]</span> τὸν νοῦν ἀδυνατῶ τε καὶ ὁτιοῦν συμβαλέσθαι λόγου ἄξιον, ἀλλ᾽ ἀτεχνῶς νυστάζω, ἐπειδὰν δέ τις περὶ Ὁμήρου μνησθῇ, εὐθύς τε ἐγρήγορα καὶ προσέχω τὸν νοῦν καὶ εὐπορῶ ὅτι λέγω;</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐ χαλεπὸν τοῦτό γε εἰκάσαι, ὦ ἑταῖρε, ἀλλὰ παντὶ δῆλον ὅτι τέχνῃ καὶ ἐπιστήμῃ περὶ Ὁμήρου λέγειν ἀδύνατος εἶ· εἰ γὰρ τέχνῃ οἷός τε ἦσθα, καὶ περὶ τῶν ἄλλων ποιητῶν ἁπάντων λέγειν οἷός τ᾽ ἂν ἦσθα· ποιητικὴ γάρ πού ἐστιν τὸ ὅλον. ἢ οὔ;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναί.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[532d]</span> ΣΩΚΡΑΤΗΣ. Οὐκοῦν ἐπειδὰν λάβῃ τις καὶ ἄλλην τέχνην ἡντινοῦν ὅλην, ὁ αὐτὸς τρόπος τῆς σκέψεως ἔσται περὶ ἁπασῶν τῶν τεχνῶν; πῶς τοῦτο λέγω, δέῃ τί μου ἀκοῦσαι, ὦ Ἴων;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναὶ μὰ τὸν Δία, ὦ Σώκρατες, ἔγωγε· χαίρω γὰρ ἀκούων ὑμῶν τῶν σοφῶν.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Βουλοίμην ἄν σε ἀληθῆ λέγειν, ὦ Ἴων· ἀλλὰ σοφοὶ μέν πού ἐστε ὑμεῖς οἱ ῥαψῳδοὶ καὶ ὑποκριταὶ καὶ ὧν ὑμεῖς ᾄδετε τὰ ποιήματα, ἐγὼ δὲ οὐδὲν ἄλλο ἢ τἀληθῆ λέγω, <span class="marker">[532e]</span> οἷον εἰκὸς ἰδιώτην ἄνθρωπον. ἐπεὶ καὶ περὶ τούτου οὗ νῦν ἠρόμην σε, θέασαι ὡς φαῦλον καὶ ἰδιωτικόν ἐστι καὶ παντὸς ἀνδρὸς γνῶναι ὃ ἔλεγον, τὴν αὐτὴν εἶναι σκέψιν, ἐπειδάν τις ὅλην τέχνην λάβῃ. λάβωμεν γὰρ τῷ λόγῳ· γραφικὴ γάρ τίς ἐστι τέχνη τὸ ὅλον;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναί.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐκοῦν καὶ γραφῆς πολλοὶ καὶ εἰσὶ καὶ γεγόνασιν ἀγαθοὶ καὶ φαῦλοι;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Πάνυ γε.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ἤδη οὖν τινα εἶδες ὅστις περὶ μὲν Πολυγνώτου τοῦ Ἀγλαοφῶντος δεινός ἐστιν ἀποφαίνειν ἃ εὖ τε γράφει καὶ ἃ μή, περὶ δὲ τῶν ἄλλων γραφέων <span class="marker">[533a]</span> ἀδύνατος; καὶ ἐπειδὰν μέν τις τὰ τῶν ἄλλων ζωγράφων ἔργα ἐπιδεικνύῃ, νυστάζει τε καὶ ἀπορεῖ καὶ οὐκ ἔχει ὅτι συμβάληται, ἐπειδὰν δὲ περὶ Πολυγνώτου ἢ ἄλλου ὅτου βούλει τῶν γραφέων ἑνὸς μόνου δέῃ ἀποφήνασθαι γνώμην, ἐγρήγορέν τε καὶ προσέχει τὸν νοῦν καὶ εὐπορεῖ ὅτι εἴπῃ;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Οὐ μὰ τὸν Δία, οὐ δῆτα.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Τί δέ; ἐν ἀνδριαντοποιίᾳ ἤδη τιν᾽ εἶδες ὅστις περὶ μὲν Δαιδάλου τοῦ Μητίονος <span class="marker">[533b]</span> ἢ Ἐπειοῦ τοῦ Πανοπέως ἢ Θεοδώρου τοῦ Σαμίου ἢ ἄλλου τινὸς ἀνδριαντοποιοῦ ἑνὸς πέρι δεινός ἐστιν ἐξηγεῖσθαι ἃ εὖ πεποίηκεν, ἐν δὲ τοῖς τῶν ἄλλων ἀνδριαντοποιῶν ἔργοις ἀπορεῖ τε καὶ νυστάζει, οὐκ ἔχων ὅτι εἴπῃ;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Οὐ μὰ τὸν Δία, οὐδὲ τοῦτον ἑώρακα.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ἀλλὰ μήν, ὥς γ᾽ ἐγὼ οἶμαι, οὐδ᾽ ἐν αὐλήσει γε οὐδὲ ἐν κιθαρίσει οὐδὲ ἐν κιθαρῳδίᾳ οὐδὲ ἐν ῥαψῳδίᾳ οὐδεπώποτ᾽ εἶδες ἄνδρα ὅστις περὶ μὲν Ὀλύμπου δεινός ἐστιν ἐξηγεῖσθαι ἢ περὶ Θαμύρου ἢ περὶ <span class="marker">[533c]</span> Ὀρφέως ἢ περὶ Φημίου τοῦ Ἰθακησίου ῥαψῳδοῦ, περὶ δὲ Ἴωνος τοῦ Ἐφεσίου [ῥαψῳδοῦ] ἀπορεῖ καὶ οὐκ ἔχει συμβαλέσθαι ἅ τε εὖ ῥαψῳδεῖ καὶ ἃ μή.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Οὐκ ἔχω σοι περὶ τούτου ἀντιλέγειν, ὦ Σώκρατες· ἀλλ᾽ ἐκεῖνο ἐμαυτῷ σύνοιδα, ὅτι περὶ Ὁμήρου κάλλιστ᾽ ἀνθρώπων λέγω καὶ εὐπορῶ καὶ οἱ ἄλλοι πάντες μέ φασιν εὖ λέγειν, περὶ δὲ τῶν ἄλλων οὔ. καίτοι ὅρα τοῦτο τί ἔστιν.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text">ΙΩΝ. Τότε όμως πού τάχα να οφείλεται, Σωκράτη, ότι εγώ, όταν μιλάει κάποιος για έναν άλλο ποιητή, ούτε δίνω <span class="marker">[532c]</span> προσοχή ούτε να προσθέσω κάτι αξιόλογο μπορώ, αλλά κυριολεκτικά με πιάνει νύστα, μόλις όμως αναφερθεί κανείς στον Όμηρο, τότε αμέσως ξυπνώ και τον προσέχω και έχω πολλά να πω;</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Δεν είναι δύσκολο να μαντέψει κανείς, φίλε μου, γιατί σου συμβαίνει αυτό· είναι ολοφάνερο ότι δεν είσαι σε θέση να μιλάς για τον Όμηρο έχοντας ως βάση ειδικές τεχνικές γνώσεις. Διότι, αν μπορούσες να μιλήσεις βάσει τέτοιων γνώσεων, τότε θα μπορούσες να μιλάς και για όλους τους άλλους ποιητές· γιατί το ευρύτερο όλο είναι, υποθέτω, η ποιητική τέχνη. Ή μήπως όχι;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναι.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[532d]</span> ΣΩ. Αλλά αν πάρουμε και οποιαδήποτε άλλη τέχνη ως όλο, ο ίδιος τρόπος σκέψης δεν θα ισχύει για όλες γενικά τις τέχνες; Θα ᾽θελες να ακούσεις, Ίωνα, πώς το εννοώ αυτό;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναι, μά τον Δία, Σωκράτη, το θέλω πολύ· γιατί νιώθω χαρά να σας ακούω εσάς τους σοφούς.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Πολύ θα ᾽θελα να ήταν έτσι, Ίωνα· φαίνεται όμως ότι σοφοί είσαστε εσείς, οι ραψωδοί και συνάμα ηθοποιοί, κι επίσης εκείνοι που εσείς απαγγέλλετε τα ποιήματά τους, ενώ εγώ το μόνο που κάνω είναι να λέω την αλήθεια, <span class="marker">[532e]</span> όπως είναι φυσικό να κάνει ένας κοινός άνθρωπος. Αφού κι αυτό που σε ρώτησα τώρα δα, δες τί εύκολο και απλό είναι και πώς μπορεί να το αντιληφθεί ο καθένας, ότι δηλαδή αν πάρουμε μια τέχνη στην ολότητά της, η μέθοδος της εξέτασης των πραγμάτων είναι σ᾽ αυτήν η ίδια. Ας πάρουμε ένα παράδειγμα: δεν υπάρχει μια τέχνη της ζωγραφικής γενικώς;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Και φυσικά υπάρχουν, κι έχουν υπάρξει και στο παρελθόν, πολλοί ζωγράφοι, άλλοι καλοί, άλλοι κακοί· έτσι;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ασφαλώς.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Έχεις δει λοιπόν ως τώρα κανέναν άνθρωπο ο οποίος για τον Πολύγνωτο του Αγλαοφώντα, ας πούμε, να είναι εξαιρετικά ικανός να εκφέρει μια γνώμη —ποιό έργο του είναι ωραία ζωγραφισμένο και ποιό όχι—, για τους άλλους όμως ζωγράφους <span class="marker">[533a]</span> να μην είναι σε θέση να το κάνει αυτό; Κι όταν του δείχνει κάποιος τα έργα των άλλων ζωγράφων, αυτός να νυστάζει, να έρχεται σε δύσκολη θέση και να μην έχει να συνεισφέρει έστω κάτι στη συζήτηση, ενώ απεναντίας, όταν χρειαστεί να πει τη γνώμη του για τον Πολύγνωτο ή για όποιον άλλο ζωγράφο θέλεις —αλλά για έναν και μόνο—, τότε να ζωντανεύει, να συγκεντρώνεται και να έχει ένα σωρό πράγματα να πει;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Όχι, μά τον Δία, ασφαλώς όχι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Αλλά για δες και στη γλυπτική: Είδες ως τώρα στη γλυπτική κανέναν ο οποίος για μεν τον Δαίδαλο, τον γιο του Μητίονα, <span class="marker">[533b]</span> ή για τον Επειό του Πανοπέα ή τον Θεόδωρο από τη Σάμο ή για κάποιον άλλο γλύπτη —αλλά έναν μόνο— να είναι εξαιρετικά ικανός να μας εξηγήσει σε ποιά έργα του έχει πετύχει, ενώ μπροστά στα έργα των άλλων γλυπτών να έρχεται σε δύσκολη θέση, να νυστάζει και να μην έχει τί να πει;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Όχι, μά τον Δία, ούτε τέτοιον έχω δει κανένα.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Αλλά, όπως πιστεύω εγώ τουλάχιστον, ούτε στο παίξιμο του αυλού, ούτε στης κιθάρας, ούτε στο τραγούδι με συνοδεία κιθάρας, ούτε στην απαγγελία των επικών ποιημάτων είδες ποτέ ως τώρα κανέναν ο οποίος για τον Όλυμπο ή τον Θάμυρη, <span class="marker">[533c]</span> για τον Ορφέα ή τον Φήμιο από την Ιθάκη, να είναι εξαιρετικά ικανός να μιλήσει, αλλά για τον Ίωνα από την Έφεσο να δυσκολεύεται και να μην μπορεί να δώσει μια γνώμη τί είναι καλό στην απαγγελία του και τί όχι.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Δεν μπορώ να σε αντικρούσω σ᾽ αυτό, Σωκράτη· εκείνο όμως που διαπιστώνω στον εαυτό μου είναι ότι για τον Όμηρο μιλώ ωραιότερα από τον καθένα και ότι βρίσκω πολλά να πω κι ότι όλοι οι άλλοι παραδέχονται πως τα λέω καλά, ενώ για τους άλλους ποιητές δεν μου συμβαίνει το ίδιο. Για σκέψου λοιπόν τί τέλος πάντων συμβαίνει με αυτό.</span></p>
+        </div>
+        
+
+        
+        <div class="page-divider" id="page-4" data-hash="book-1-chapter----">
+            Η ποιητική είναι τέχνη ή αποτέλεσμα θεϊκής έμπνευσης; • Κεφάλαιο ΣΩ.-ΙΩΝ. (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=106&page=4" target="_blank" class="page-link">Page 4</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Καὶ ὁρῶ, ὦ Ἴων, καὶ ἔρχομαί γέ σοι <span class="marker">[533d]</span> ἀποφανούμενος ὅ μοι δοκεῖ τοῦτο εἶναι. ἔστι γὰρ τοῦτο τέχνη μὲν οὐκ ὂν παρὰ σοὶ περὶ Ὁμήρου εὖ λέγειν, ὃ νυνδὴ ἔλεγον, θεία δὲ δύναμις ἥ σε κινεῖ, ὥσπερ ἐν τῇ λίθῳ ἣν Εὐριπίδης μὲν Μαγνῆτιν ὠνόμασεν, οἱ δὲ πολλοὶ Ἡρακλείαν. καὶ γὰρ αὕτη ἡ λίθος οὐ μόνον αὐτοὺς τοὺς δακτυλίους ἄγει τοὺς σιδηροῦς, ἀλλὰ καὶ δύναμιν ἐντίθησι τοῖς δακτυλίοις ὥστ᾽ αὖ δύνασθαι ταὐτὸν τοῦτο ποιεῖν ὅπερ ἡ λίθος, ἄλλους <span class="marker">[533e]</span> ἄγειν δακτυλίους, ὥστ᾽ ἐνίοτε ὁρμαθὸς μακρὸς πάνυ σιδηρίων καὶ δακτυλίων ἐξ ἀλλήλων ἤρτηται· πᾶσι δὲ τούτοις ἐξ ἐκείνης τῆς λίθου ἡ δύναμις ἀνήρτηται. οὕτω δὲ καὶ ἡ Μοῦσα ἐνθέους μὲν ποιεῖ αὐτή, διὰ δὲ τῶν ἐνθέων τούτων ἄλλων ἐνθουσιαζόντων ὁρμαθὸς ἐξαρτᾶται. πάντες γὰρ οἵ τε τῶν ἐπῶν ποιηταὶ οἱ ἀγαθοὶ οὐκ ἐκ τέχνης ἀλλ᾽ ἔνθεοι ὄντες καὶ κατεχόμενοι πάντα ταῦτα τὰ καλὰ λέγουσι ποιήματα, καὶ οἱ μελοποιοὶ οἱ ἀγαθοὶ ὡσαύτως, ὥσπερ οἱ <span class="marker">[534a]</span> κορυβαντιῶντες οὐκ ἔμφρονες ὄντες ὀρχοῦνται, οὕτω καὶ οἱ μελοποιοὶ οὐκ ἔμφρονες ὄντες τὰ καλὰ μέλη ταῦτα ποιοῦσιν, ἀλλ᾽ ἐπειδὰν ἐμβῶσιν εἰς τὴν ἁρμονίαν καὶ εἰς τὸν ῥυθμόν, βακχεύουσι καὶ κατεχόμενοι, ὥσπερ αἱ βάκχαι ἀρύονται ἐκ τῶν ποταμῶν μέλι καὶ γάλα κατεχόμεναι, ἔμφρονες δὲ οὖσαι οὔ, καὶ τῶν μελοποιῶν ἡ ψυχὴ τοῦτο ἐργάζεται, ὅπερ αὐτοὶ λέγουσι. λέγουσι γὰρ δήπουθεν πρὸς ἡμᾶς οἱ ποιηταὶ ὅτι <span class="marker">[534b]</span> ἀπὸ κρηνῶν μελιρρύτων ἐκ Μουσῶν κήπων τινῶν καὶ ναπῶν δρεπόμενοι τὰ μέλη ἡμῖν φέρουσιν ὥσπερ αἱ μέλιτται, καὶ αὐτοὶ οὕτω πετόμενοι· καὶ ἀληθῆ λέγουσι. κοῦφον γὰρ χρῆμα ποιητής ἐστιν καὶ πτηνὸν καὶ ἱερόν, καὶ οὐ πρότερον οἷός τε ποιεῖν πρὶν ἂν ἔνθεός τε γένηται καὶ ἔκφρων καὶ ὁ νοῦς μηκέτι ἐν αὐτῷ ἐνῇ· ἕως δ᾽ ἂν τουτὶ ἔχῃ τὸ κτῆμα, ἀδύνατος πᾶς ποιεῖν ἄνθρωπός ἐστιν καὶ χρησμῳδεῖν. ἅτε οὖν οὐ τέχνῃ ποιοῦντες καὶ πολλὰ λέγοντες καὶ καλὰ περὶ <span class="marker">[534c]</span> τῶν πραγμάτων, ὥσπερ σὺ περὶ Ὁμήρου, ἀλλὰ θείᾳ μοίρᾳ, τοῦτο μόνον οἷός τε ἕκαστος ποιεῖν καλῶς ἐφ᾽ ὃ ἡ Μοῦσα αὐτὸν ὥρμησεν, ὁ μὲν διθυράμβους, ὁ δὲ ἐγκώμια, ὁ δὲ ὑπορχήματα, ὁ δ᾽ ἔπη, ὁ δ᾽ ἰάμβους· τὰ δ᾽ ἄλλα φαῦλος αὐτῶν ἕκαστός ἐστιν. οὐ γὰρ τέχνῃ ταῦτα λέγουσιν ἀλλὰ θείᾳ δυνάμει, ἐπεί, εἰ περὶ ἑνὸς τέχνῃ καλῶς ἠπίσταντο λέγειν, κἂν περὶ τῶν ἄλλων ἁπάντων· διὰ ταῦτα δὲ ὁ θεὸς ἐξαιρούμενος τούτων τὸν νοῦν τούτοις χρῆται ὑπηρέταις καὶ <span class="marker">[534d]</span> τοῖς χρησμῳδοῖς καὶ τοῖς μάντεσι τοῖς θείοις, ἵνα ἡμεῖς οἱ ἀκούοντες εἰδῶμεν ὅτι οὐχ οὗτοί εἰσιν οἱ ταῦτα λέγοντες οὕτω πολλοῦ ἄξια, οἷς νοῦς μὴ πάρεστιν, ἀλλ᾽ ὁ θεὸς αὐτός ἐστιν ὁ λέγων, διὰ τούτων δὲ φθέγγεται πρὸς ἡμᾶς. μέγιστον δὲ τεκμήριον τῷ λόγῳ Τύννιχος ὁ Χαλκιδεύς, ὃς ἄλλο μὲν οὐδὲν πώποτε ἐποίησε ποίημα ὅτου τις ἂν ἀξιώσειεν μνησθῆναι, τὸν δὲ παίωνα ὃν πάντες ᾄδουσι, σχεδόν τι πάντων μελῶν κάλλιστον, ἀτεχνῶς, ὅπερ αὐτὸς λέγει, <span class="marker">[534e]</span> «εὕρημά τι Μοισᾶν.» ἐν τούτῳ γὰρ δὴ μάλιστά μοι δοκεῖ ὁ θεὸς ἐνδείξασθαι ἡμῖν, ἵνα μὴ διστάζωμεν, ὅτι οὐκ ἀνθρώπινά ἐστιν τὰ καλὰ ταῦτα ποιήματα οὐδὲ ἀνθρώπων, ἀλλὰ θεῖα καὶ θεῶν, οἱ δὲ ποιηταὶ οὐδὲν ἀλλ᾽ ἢ ἑρμηνῆς εἰσιν τῶν θεῶν, κατεχόμενοι ἐξ ὅτου ἂν ἕκαστος κατέχηται. ταῦτα ἐνδεικνύμενος ὁ θεὸς ἐξεπίτηδες διὰ τοῦ φαυλοτάτου <span class="marker">[535a]</span> ποιητοῦ τὸ κάλλιστον μέλος ᾖσεν· ἢ οὐ δοκῶ σοι ἀληθῆ λέγειν, ὦ Ἴων;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναὶ μὰ τὸν Δία, ἔμοιγε· ἅπτει γάρ πώς μου τοῖς λόγοις τῆς ψυχῆς, ὦ Σώκρατες, καί μοι δοκοῦσι θείᾳ μοίρᾳ ἡμῖν παρὰ τῶν θεῶν ταῦτα οἱ ἀγαθοὶ ποιηταὶ ἑρμηνεύειν.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐκοῦν ὑμεῖς αὖ οἱ ῥαψῳδοὶ τὰ τῶν ποιητῶν ἑρμηνεύετε;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Καὶ τοῦτο ἀληθὲς λέγεις.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐκοῦν ἑρμηνέων ἑρμηνῆς γίγνεσθε;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Παντάπασί γε.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text">ΣΩ. Το σκέπτομαι, Ίωνα, και <span class="marker">[533d]</span> θα σου πω αμέσως τί νομίζω ότι συμβαίνει. Αυτό που σε κάνει να λες ωραία πράγματα για τον Όμηρο δεν είναι κάποια ειδική τεχνική γνώση αλλά, όπως έλεγα τώρα δα, θεϊκή δύναμη που σε δονεί, όπως ακριβώς συμβαίνει και με την πέτρα που ο Ευριπίδης την ονόμασε «μαγνήτη» και ο πολύς κόσμος την λέει «πέτρα του Ηρακλή». Γιατί κι αυτή η πέτρα δεν τραβάει μόνο τα δαχτυλίδια τα σιδερένια, αλλά επιπλέον τους μεταβιβάζει τη δύναμή της ώστε να μπορούν κι αυτά να κάνουν ό,τι η πέτρα, να παρασύρουν <span class="marker">[533e]</span> δηλαδή μαζί τους άλλα δαχτυλίδια, με αποτέλεσμα μερικές φορές να σχηματίζεται ολόκληρη αρμαθιά από σιδεράκια και δαχτυλίδια που κρέμονται το ένα από το άλλο· κι όλα αυτά παίρνουν τη δύναμή τους από εκείνη την πέτρα. Έτσι λοιπόν και η Μούσα χαρίζει σε ορισμένους δύναμη θεϊκή· και από αυτούς τους ένθεους ανθρώπους κρέμεται έπειτα μια αρμαθιά από άλλους, που διατελούν σε κατάσταση ενθουσιασμού. Γιατί όλοι οι επικοί ποιητές, οι μεγάλοι, συνθέτουν αυτά τα ωραία ποιήματα όχι χάρη σε κανόνες τεχνικούς αλλά διατελώντας σε κατάσταση θείας έμπνευσης και διακατεχόμενοι από αυτήν, και το ίδιο όλοι οι μεγάλοι λυρικοί ποιητές· όπως ακριβώς οι <span class="marker">[534a]</span> κορυβαντιώντες που όταν χορεύουν δεν είναι στα λογικά τους, έτσι και οι μουσικοί δημιουργούν αυτές τις όμορφες μελωδίες όχι όταν είναι στα λογικά τους, αλλά μόλις τους αγγίζει η αρμονία και ο ρυθμός κυριεύονται από βακχική μανία και διακατέχονται από αυτήν, σαν τις βάκχες που όταν διατελούν σε αυτή την κατάσταση βγάζουν από τα ποτάμια μέλι και γάλα, ενώ όταν είναι στα λογικά τους όχι, όμοια και η ψυχή των λυρικών ποιητών δημιουργεί, όπως το λένε οι ίδιοι. Γιατί οι ποιητές μάς το λένε, θαρρώ, πως <span class="marker">[534b]</span> τα τραγούδια τους τα μαζεύουν σε κήπους και σε λόγγους Μουσών από βρύσες που στάζουν μέλι, και πως μας τα φέρνουν όπως οι μέλισσες, πετώντας κι αυτοί έτσι· κι είναι αληθινά όσα λένε. Γιατί ο ποιητής είναι κάτι πολύ ανάλαφρο, που πετάει, κάτι ιερό, και δεν μπορεί να δημιουργήσει προτού να τον κυριέψει ο ενθουσιασμός και πέσει σε έκσταση και πάψει πια να έχει μέσα του λογικό· απεναντίας, κάθε άνθρωπος, όσο έχει μέσα του τούτο το πράγμα, το λογικό, αδυνατεί να γράφει ποιήματα ή να δίνει χρησμούς. Αφού λοιπόν αυτά τα πολλά και όμορφα που μας λένε <span class="marker">[534c]</span> για τα διάφορα πράγματα στα ποιήματά τους, όπως λόγου χάρη εσύ για τον Όμηρο, δεν τα δημιουργούν με τη βοήθεια κάποιων τεχνικών κανόνων αλλά τα οφείλουν σε θεϊκό χάρισμα, καθένας τους μπορεί και δημιουργεί όμορφα μόνον αυτό στο οποίο τον έσπρωξε η Μούσα, άλλος διθυράμβους, άλλος εγκώμια, άλλος χορικούς ύμνους, άλλος έπη, άλλος ιάμβους· και καθένας από αυτούς είναι σ᾽ όλα τα άλλα μια μετριότητα. Όσα λοιπόν εκφράζουν δεν τα οφείλουν σε τεχνικούς κανόνες αλλά σε θεϊκό χάρισμα, αφού αν ήξεραν, με βάση την τεχνική, έστω για ένα πράγμα να πουν κάτι όμορφο, τότε θα μπορούσαν να το κάνουν αυτό και για όλα τα άλλα· και γι᾽ αυτό ο θεός τούς αφαιρεί την κρίση και τους χρησιμοποιεί ως υπηρέτες του, όπως <span class="marker">[534d]</span> τους χρησμωδούς και τους θεϊκούς μάντεις, ώστε να ξέρουμε εμείς που τους ακούμε ότι αυτά τα τόσο αξιόλογα δεν τα λένε εκείνοι —που νου δεν έχουν—, αλλά ότι αυτός που μιλάει είναι ο ίδιος ο θεός, ο οποίος απευθύνεται διαμέσου εκείνων σ᾽ εμάς. Περίτρανη απόδειξη για όσα λέω είναι ο Τύννιχος από τη Χαλκίδα, ο οποίος δεν έγραψε ποτέ του κανένα άλλο ποίημα που θα άξιζε να το αναφέρει κανείς εκτός από εκείνο τον παιάνα, τον οποίο όλοι ψάλλουν, το ωραιότερο ίσως απ᾽ όλα τα τραγούδια, κυριολεκτικά, όπως κι ο ίδιος το λέει, <span class="marker">[534e]</span> «εύρημα των Μουσών». Και νομίζω ότι ο θεός μάς το έδειξε αυτό κυρίως με τούτη τη συγκεκριμένη περίπτωση, ώστε να μην αμφιβάλλουμε ότι αυτά τα όμορφα δημιουργήματα δεν είναι έργα ανθρώπων ούτε ανήκουν στους ανθρώπους αλλά έργα θεών και ανήκουν στους θεούς, κι ότι οι ποιητές δεν είναι τίποτε άλλο παρά αγγελιαφόροι των θεών — καθένας του θεού από τον οποίο διακατέχεται. Αυτά θέλοντας να μας φανερώσει ο θεός τραγούδησε το πιο όμορφο τραγούδι εξεπίτηδες μέσα <span class="marker">[535a]</span> από τα χείλη του πιο ασήμαντου ποιητή· ή έχεις την εντύπωση, Ίωνα, ότι δεν τα λέω καλά;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναι, μά τον Δία, σωστά μου φαίνονται· αγγίζεις με τα λόγια σου, δεν ξέρω πώς, Σωκράτη, την ψυχή μου, και μου φαίνεται ότι χάρη σε κάποιο θεϊκό χάρισμα οι μεγάλοι ποιητές μάς τα μεταφέρουν αυτά από τους θεούς.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Κι εσείς πάλι οι ραψωδοί δεν διερμηνεύετε όσα λένε οι ποιητές;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Κι αυτό σωστό είναι, όπως το λες.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Τελικά λοιπόν δεν είσαστε διερμηνείς των διερμηνέων;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Βεβαιότατα.</span></p>
+        </div>
+        
+
+        <div id="book-1-chapter-----2" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-5" data-hash="book-1-chapter-----2">
+            Η ποιητική είναι τέχνη ή αποτέλεσμα θεϊκής έμπνευσης; • Κεφάλαιο ΣΩ.-ΙΩΝ..2 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=106&page=5" target="_blank" class="page-link">Page 5</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[535b]</span> ΣΩΚΡΑΤΗΣ. Ἔχε δή μοι τόδε εἰπέ, ὦ Ἴων, καὶ μὴ ἀποκρύψῃ ὅτι ἄν σε ἔρωμαι· ὅταν εὖ εἴπῃς ἔπη καὶ ἐκπλήξῃς μάλιστα τοὺς θεωμένους, ἢ τὸν Ὀδυσσέα ὅταν ἐπὶ τὸν οὐδὸν ἐφαλλόμενον ᾄδῃς, ἐκφανῆ γιγνόμενον τοῖς μνηστῆρσι καὶ ἐκχέοντα τοὺς ὀιστοὺς πρὸ τῶν ποδῶν, ἢ Ἀχιλλέα ἐπὶ τὸν Ἕκτορα ὁρμῶντα, ἢ καὶ τῶν περὶ Ἀνδρομάχην ἐλεινῶν τι ἢ περὶ Ἑκάβην ἢ περὶ Πρίαμον, τότε πότερον ἔμφρων εἶ ἢ ἔξω <span class="marker">[535c]</span> σαυτοῦ γίγνῃ καὶ παρὰ τοῖς πράγμασιν οἴεταί σου εἶναι ἡ ψυχὴ οἷς λέγεις ἐνθουσιάζουσα, ἢ ἐν Ἰθάκῃ οὖσιν ἢ ἐν Τροίᾳ ἢ ὅπως ἂν καὶ τὰ ἔπη ἔχῃ;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ὡς ἐναργές μοι τοῦτο, ὦ Σώκρατες, τὸ τεκμήριον εἶπες· οὐ γάρ σε ἀποκρυψάμενος ἐρῶ. ἐγὼ γὰρ ὅταν ἐλεινόν τι λέγω, δακρύων ἐμπίμπλανταί μου οἱ ὀφθαλμοί· ὅταν τε φοβερὸν ἢ δεινόν, ὀρθαὶ αἱ τρίχες ἵστανται ὑπὸ φόβου καὶ ἡ καρδία πηδᾷ.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[535d]</span> ΣΩΚΡΑΤΗΣ. Τί οὖν; φῶμεν, ὦ Ἴων, ἔμφρονα εἶναι τότε τοῦτον τὸν ἄνθρωπον, ὃς ἂν κεκοσμημένος ἐσθῆτι ποικίλῃ καὶ χρυσοῖσι στεφάνοις κλάῃ τ᾽ ἐν θυσίαις καὶ ἑορταῖς, μηδὲν ἀπολωλεκὼς τούτων, ἢ φοβῆται πλέον ἢ ἐν δισμυρίοις ἀνθρώποις ἑστηκὼς φιλίοις, μηδενὸς ἀποδύοντος μηδὲ ἀδικοῦντος;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Οὐ μὰ τὸν Δία, οὐ πάνυ, ὦ Σώκρατες, ὥς γε τἀληθὲς εἰρῆσθαι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οἶσθα οὖν ὅτι καὶ τῶν θεατῶν τοὺς πολλοὺς ταὐτὰ ταῦτα ὑμεῖς ἐργάζεσθε;</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[535e]</span> ΙΩΝ. Καὶ μάλα καλῶς οἶδα· καθορῶ γὰρ ἑκάστοτε αὐτοὺς ἄνωθεν ἀπὸ τοῦ βήματος κλάοντάς τε καὶ δεινὸν ἐμβλέποντας καὶ συνθαμβοῦντας τοῖς λεγομένοις. δεῖ γάρ με καὶ σφόδρ᾽ αὐτοῖς τὸν νοῦν προσέχειν· ὡς ἐὰν μὲν κλάοντας αὐτοὺς καθίσω, αὐτὸς γελάσομαι ἀργύριον λαμβάνων, ἐὰν δὲ γελῶντας, αὐτὸς κλαύσομαι ἀργύριον ἀπολλύς.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οἶσθα οὖν ὅτι οὗτός ἐστιν ὁ θεατὴς τῶν δακτυλίων ὁ ἔσχατος, ὧν ἐγὼ ἔλεγον ὑπὸ τῆς Ἡρακλειώτιδος λίθου ἀπ᾽ ἀλλήλων τὴν δύναμιν λαμβάνειν; ὁ δὲ μέσος σὺ ὁ <span class="marker">[536a]</span> ῥαψῳδὸς καὶ ὑποκριτής, ὁ δὲ πρῶτος αὐτὸς ὁ ποιητής· ὁ δὲ θεὸς διὰ πάντων τούτων ἕλκει τὴν ψυχὴν ὅποι ἂν βούληται τῶν ἀνθρώπων, ἀνακρεμαννὺς ἐξ ἀλλήλων τὴν δύναμιν. καὶ ὥσπερ ἐκ τῆς λίθου ἐκείνης ὁρμαθὸς πάμπολυς ἐξήρτηται χορευτῶν τε καὶ διδασκάλων καὶ ὑποδιδασκάλων, ἐκ πλαγίου ἐξηρτημένων τῶν τῆς Μούσης ἐκκρεμαμένων δακτυλίων. καὶ ὁ μὲν τῶν ποιητῶν ἐξ ἄλλης Μούσης, ὁ δὲ ἐξ ἄλλης ἐξήρτηται —ὀνομάζομεν δὲ αὐτὸ κατέχεται, τὸ δέ <span class="marker">[536b]</span> ἐστι παραπλήσιον· ἔχεται γάρ— ἐκ δὲ τούτων τῶν πρώτων δακτυλίων, τῶν ποιητῶν, ἄλλοι ἐξ ἄλλου αὖ ἠρτημένοι εἰσὶ καὶ ἐνθουσιάζουσιν, οἱ μὲν ἐξ Ὀρφέως, οἱ δὲ ἐκ Μουσαίου· οἱ δὲ πολλοὶ ἐξ Ὁμήρου κατέχονταί τε καὶ ἔχονται. ὧν σύ, ὦ Ἴων, εἷς εἶ καὶ κατέχῃ ἐξ Ὁμήρου, καὶ ἐπειδὰν μέν τις ἄλλου του ποιητοῦ ᾄδῃ, καθεύδεις τε καὶ ἀπορεῖς ὅτι λέγῃς, ἐπειδὰν δὲ τούτου τοῦ ποιητοῦ φθέγξηταί τις μέλος, εὐθὺς ἐγρήγορας καὶ ὀρχεῖταί σου ἡ ψυχὴ καὶ εὐπορεῖς ὅτι <span class="marker">[536c]</span> λέγῃς· οὐ γὰρ τέχνῃ οὐδ᾽ ἐπιστήμῃ περὶ Ὁμήρου λέγεις ἃ λέγεις, ἀλλὰ θείᾳ μοίρᾳ καὶ κατοκωχῇ, ὥσπερ οἱ κορυβαντιῶντες ἐκείνου μόνου αἰσθάνονται τοῦ μέλους ὀξέως ὃ ἂν ᾖ τοῦ θεοῦ ἐξ ὅτου ἂν κατέχωνται, καὶ εἰς ἐκεῖνο τὸ μέλος καὶ σχημάτων καὶ ῥημάτων εὐποροῦσι, τῶν δὲ ἄλλων οὐ φροντίζουσιν· οὕτω καὶ σύ, ὦ Ἴων, περὶ μὲν Ὁμήρου ὅταν τις μνησθῇ, εὐπορεῖς, περὶ δὲ τῶν ἄλλων ἀπορεῖς· <span class="marker">[536d]</span> τούτου δ᾽ ἐστὶ τὸ αἴτιον, ὅ μ᾽ ἐρωτᾷς, δι᾽ ὅτι σὺ περὶ μὲν Ὁμήρου εὐπορεῖς, περὶ δὲ τῶν ἄλλων οὔ, ὅτι οὐ τέχνῃ ἀλλὰ θείᾳ μοίρᾳ Ὁμήρου δεινὸς εἶ ἐπαινέτης.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Σὺ μὲν εὖ λέγεις, ὦ Σώκρατες· θαυμάζοιμι μεντἂν εἰ οὕτως εὖ εἴποις, ὥστε με ἀναπεῖσαι ὡς ἐγὼ κατεχόμενος καὶ μαινόμενος Ὅμηρον ἐπαινῶ. οἶμαι δὲ οὐδ᾽ ἂν σοὶ δόξαιμι, εἴ μου ἀκούσαις λέγοντος περὶ Ὁμήρου.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[535b]</span> ΣΩ. Στάσου τώρα, Ίωνα, απάντησέ μου και μη μου κρύψεις την αλήθεια σε ό,τι θα σε ρωτήσω. Όταν απαγγέλλεις ωραία τους επικούς στίχους και εντυπωσιάζεις βαθιά όσους σε παρακολουθούν, λ.χ. όταν τραγουδάς για τον Οδυσσέα παρουσιάζοντας τον να προβάλλει με μια δρασκελιά στο κατώφλι, να φανερώνεται στους μνηστήρες και να ξεχύνει τα βέλη του μπροστά στα πόδια τους, ή τον Αχιλλέα να ορμάει στον Έκτορα, ή όταν τραγουδάς κάτι λυπητερό για την Ανδρομάχη ή την Εκάβη ή τον Πρίαμο, τη στιγμή εκείνη τί από τα δύο συμβαίνει: είσαι στα λογικά σου ή βγαίνεις <span class="marker">[535c]</span> από τον εαυτό σου, κι η ψυχή σου, στον ενθουσιασμό της, φαντάζεται πως είναι κάπου ανάμεσα σε όσα περιγράφεις, είτε στην Ιθάκη συμβαίνουν αυτά είτε στην Τροία είτε όπου αλλού τυχαίνει να διαδραματίζονται στα έπη;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Πόσο παραστατικό, Σωκράτη, είναι το παράδειγμα που μου ανέφερες! Θα σου απαντήσω χωρίς να σου κρύψω τίποτα. Πραγματικά, εγώ όταν λέω κάτι συγκινητικό, τα μάτια μου πλημμυρίζουν δάκρυα, κι όταν πάλι κάτι φοβερό, κάτι τρομακτικό, ανατριχιάζω από τον φόβο μου κι η καρδιά μου χτυπάει δυνατά.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[535d]</span> ΣΩ. Λοιπόν; Μπορούμε, Ίωνα, να πούμε ότι τη στιγμή εκείνη είναι στα λογικά του ο άνθρωπος αυτός που στολισμένος με πολύχρωμο ένδυμα και χρυσά στεφάνια κλαίει στις θυσίες και στα πανηγύρια χωρίς να έχει χάσει τίποτα από τούτα, ή που νιώθει φόβο, παρόλο ότι βρίσκεται ανάμεσα σε είκοσι και πλέον χιλιάδες ανθρώπους με φιλικές διαθέσεις απέναντί του και ενώ κανένας δεν τον κλέβει και κανένας δεν πάει να του κάνει κακό;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Όχι, μά τον Δία, όχι εντελώς, για να είμαι ειλικρινής.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Το ξέρεις άραγε ότι και στους περισσότερους θεατές τις ίδιες ακριβώς καταστάσεις προκαλείτε;</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[535e]</span> ΙΩΝ. Και πολύ καλά μάλιστα· γιατί τους παρακολουθώ κάθε φορά ψηλά από το βήμα πώς κλαίνε, τί τρομαγμένο που είναι το βλέμμα τους και πόσο τους συνεπαίρνουν, όπως κι εμένα, όσα λέγονται. Εξάλλου είμαι αναγκασμένος να έχω στραμμένη την προσοχή μου, τεντωμένη, στις αντιδράσεις τους: άμα τους κάνω να κλάψουν, θα γελάσω εγώ έπειτα με τα λεφτά που θα πάρω, αν όμως βάλουν τα γέλια, τότε θα κλάψω εγώ για τα λεφτά που θα έχω χάσει.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Βλέπεις λοιπόν ότι ο θεατής είναι το τελευταίο από τα δαχτυλίδια για τα οποία έλεγα ότι η πέτρα του Ηρακλή τα κάνει να παίρνουν το ένα από το άλλο εκείνη τη δύναμη που τα τραβάει; Το μεσαίο είσαι εσύ, <span class="marker">[536a]</span> ο ραψωδός και ηθοποιός, ενώ το πρώτο είναι ο ίδιος ο ποιητής. Κι ο θεός διαμέσου όλων αυτών παρασύρει την ψυχή των ανθρώπων όπου αυτός θέλει, κάνοντας ώστε η δύναμη του ενός να κρέμεται από τη δύναμη του άλλου. Κι όπως ακριβώς από την πέτρα εκείνη, έτσι έχει κρεμαστεί κι εδώ ολόκληρη αρμαθιά από χορευτές, δασκάλους, βοηθούς δασκάλων, γαντζωμένους από τα πλάγια στα δαχτυλίδια που κρέμονται από τη Μούσα. Κι ο ένας ποιητής έχει κρεμαστεί από τη μια Μούσα, ο άλλος από την άλλη —και λέμε τότε ότι «διακατέχεται», κάτι <span class="marker">[536b]</span> που είναι παραπλήσιο με αυτό που συμβαίνει, γιατί πραγματικά έχει κυριευθεί— και από τούτα τα πρώτα δαχτυλίδια, από τους ποιητές, κρέμονται πάλι σε κατάσταση έκστασης άλλοι, ο ένας από τον Ορφέα, ο άλλος από τον Μουσαίο· οι περισσότεροι όμως διακατέχονται και έχουν κυριευτεί από τον Όμηρο. Ένας από αυτούς είσαι κι εσύ, Ίωνα, διακατεχόμενος από τον Όμηρο, κι όταν κάποιος απαγγέλλει από έναν άλλο ποιητή, αποκοιμιέσαι και δεν έχεις τί να πεις, μόλις όμως αναφερθεί κανείς σε τούτο τον ποιητή, αμέσως ζωντανεύεις και χοροπηδάει η ψυχή σου κι έχεις <span class="marker">[536c]</span> ένα σωρό πράγματα να πεις· γιατί όσα λες δεν τα λες βασισμένος σε τεχνικούς κανόνες, ούτε σε επιστημονική γνώση, αλλά από χάρισμα θεϊκό κι από την κυριαρχία του θεού μέσα σου, ακριβώς σαν τους κορυβαντιώντες που νιώθουν έντονα τη μελωδία εκείνου μόνον του θεού από τον οποίο διακατέχονται, και που μόνο για εκείνη τη μελωδία βρίσκουν εύκολα χορευτικές κινήσεις και λόγια, ενώ οι άλλες τούς αφήνουν εντελώς αδιάφορους. Έτσι κι εσύ, Ίωνα, μόλις αναφερθεί κάποιος στον Όμηρο, βρίσκεις να πεις πολλά, ενώ για τους άλλους δεν έχεις τί να πεις. <span class="marker">[536d]</span> Κι η αιτία που συμβαίνει αυτό, ότι δηλαδή για τον Όμηρο έχεις να πεις πολλά ενώ για τους άλλους όχι, αυτό δηλαδή που με ρωτάς, είναι ότι δεν οφείλεται σε τεχνικές γνώσεις η μεγάλη σου επιδεξιότητα στο να πλέκεις εγκώμια για τον Όμηρο, αλλά σε χάρισμα δοσμένο από τον θεό.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Εσύ βέβαια, Σωκράτη, ωραία τα λες. Θα παραξενευόμουν όμως αν θα ήσαν τα λόγια σου τόσο ωραία, ώστε να με κάνουν να αλλάξω γνώμη και να παραδεχτώ ότι εγκωμιάζω τον Όμηρο κυριευμένος από τον θεό και σε κατάσταση μανίας. Νομίζω μάλιστα πως ούτε κι εσύ θα σχηματίσεις αυτή τη γνώμη, αν θα με ακούσεις να μιλώ για τον Όμηρο.</span></p>
+        </div>
+        
+
+        <div id="book-2-chapter----" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-6" data-hash="book-2-chapter----">
+            Αν η ποιητική είναι τέχνη ποιό είναι το γνωστικό αντικείμενό της; • Κεφάλαιο ΣΩ.-ΙΩΝ. (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=106&page=6" target="_blank" class="page-link">Page 6</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Καὶ μὴν ἐθέλω γε ἀκοῦσαι, οὐ μέντοι πρότερον <span class="marker">[536e]</span> πρὶν ἄν μοι ἀποκρίνῃ τόδε· ὧν Ὅμηρος λέγει περὶ τίνος εὖ λέγεις; οὐ γὰρ δήπου περὶ ἁπάντων γε.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Εὖ ἴσθι, ὦ Σώκρατες, περὶ οὐδενὸς ὅτου οὔ.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐ δήπου καὶ περὶ τούτων ὧν σὺ μὲν τυγχάνεις οὐκ εἰδώς, Ὅμηρος δὲ λέγει.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Καὶ ταῦτα ποῖά ἐστιν ἃ Ὅμηρος μὲν λέγει, ἐγὼ δὲ οὐκ οἶδα;</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[537a]</span> ΣΩΚΡΑΤΗΣ. Οὐ καὶ περὶ τεχνῶν μέντοι λέγει πολλαχοῦ Ὅμηρος καὶ πολλά; οἷον καὶ περὶ ἡνιοχείας — ἐὰν μνησθῶ τὰ ἔπη, ἐγώ σοι φράσω.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ἀλλ᾽ ἐγὼ ἐρῶ· ἐγὼ γὰρ μέμνημαι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Εἰπὲ δή μοι ἃ λέγει Νέστωρ Ἀντιλόχῳ τῷ ὑεῖ, παραινῶν εὐλαβηθῆναι περὶ τὴν καμπὴν ἐν τῇ ἱπποδρομίᾳ τῇ ἐπὶ Πατρόκλῳ.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Κλινθῆναι δέ, φησί, καὶ αὐτὸς ἐυξέστῳ ἐνὶ δίφρῳ</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[537b]</span> ἦκ᾽ ἐπ᾽ ἀριστερὰ τοῖιν· ἀτὰρ τὸν δεξιὸν ἵππον</span></p>
+<p class="passage indent"><span class="passage-text">κένσαι ὁμοκλήσας, εἶξαί τέ οἱ ἡνία χερσίν.</span></p>
+<p class="passage indent"><span class="passage-text">ἐν νύσσῃ δέ τοι ἵππος ἀριστερὸς ἐγχριμφθήτω,</span></p>
+<p class="passage indent"><span class="passage-text">ὡς ἄν τοι πλήμνη γε δοάσσεται ἄκρον ἱκέσθαι</span></p>
+<p class="passage indent"><span class="passage-text">κύκλου ποιητοῖο· λίθου δ᾽ ἀλέασθαι ἐπαυρεῖν.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[537c]</span> ΣΩΚΡΑΤΗΣ. Ἀρκεῖ. ταῦτα δή, ὦ Ἴων, τὰ ἔπη εἴτε ὀρθῶς λέγει Ὅμηρος εἴτε μή, πότερος ἂν γνοίη ἄμεινον, ἰατρὸς ἢ ἡνίοχος;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ἡνίοχος δήπου.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Πότερον ὅτι τέχνην ταύτην ἔχει ἢ κατ᾽ ἄλλο τι;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Οὔκ, ἀλλ᾽ ὅτι τέχνην.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐκοῦν ἑκάστῃ τῶν τεχνῶν ἀποδέδοταί τι ὑπὸ τοῦ θεοῦ ἔργον οἵᾳ τε εἶναι γιγνώσκειν; οὐ γάρ που ἃ κυβερνητικῇ γιγνώσκομεν, γνωσόμεθα καὶ ἰατρικῇ.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Οὐ δῆτα.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐδέ γε ἃ ἰατρικῇ, ταῦτα καὶ τεκτονικῇ.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[537d]</span> ΙΩΝ. Οὐ δῆτα.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐκοῦν οὕτω καὶ κατὰ πασῶν τῶν τεχνῶν, ἃ τῇ ἑτέρᾳ τέχνῃ γιγνώσκομεν, οὐ γνωσόμεθα τῇ ἑτέρᾳ; τόδε δέ μοι πρότερον τούτου ἀπόκριναι· τὴν μὲν ἑτέραν φῂς εἶναί τινα τέχνην, τὴν δ᾽ ἑτέραν;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναί.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ἆρα ὥσπερ ἐγὼ τεκμαιρόμενος, ὅταν ἡ μὲν ἑτέρων πραγμάτων ᾖ ἐπιστήμη, ἡ δ᾽ ἑτέρων, οὕτω καλῶ τὴν μὲν ἄλλην, τὴν δὲ ἄλλην <span class="marker">[537e]</span> τέχνην, οὕτω καὶ σύ;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναί.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Εἰ γάρ που τῶν αὐτῶν πραγμάτων ἐπιστήμη εἴη τις, τί ἂν τὴν μὲν ἑτέραν φαῖμεν εἶναι, τὴν δ᾽ ἑτέραν, ὁπότε γε ταὐτὰ εἴη εἰδέναι ἀπ᾽ ἀμφοτέρων; ὥσπερ ἐγώ τε γιγνώσκω ὅτι πέντε εἰσὶν οὗτοι οἱ δάκτυλοι, καὶ σύ, ὥσπερ ἐγώ, περὶ τούτων ταὐτὰ γιγνώσκεις· καὶ εἴ σε ἐγὼ ἐροίμην εἰ τῇ αὐτῇ τέχνῃ γιγνώσκομεν τῇ ἀριθμητικῇ τὰ αὐτὰ ἐγώ τε καὶ σὺ ἢ ἄλλῃ, φαίης ἂν δήπου τῇ αὐτῇ.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναί.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text">ΣΩ. Μα ασφαλώς θέλω να σε ακούσω, όχι όμως <span class="marker">[536e]</span> προτού να μου απαντήσεις σε τούτο εδώ. Για ποιό πράγμα από όσα λέει ο Όμηρος μιλάς ωραία; Γιατί βέβαια δεν φαντάζομαι ότι για όλα.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Να το ξέρεις καλά, Σωκράτη, πως δεν υπάρχει ούτε ένα για το οποίο να μη μιλώ ωραία.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Όχι πάντως και για αυτά που συμβαίνει να τα αγνοείς εσύ αλλά που ο Όμηρος τα αναφέρει.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Και ποιά είναι αυτά που ο Όμηρος τα αναφέρει αλλά που εγώ τα αγνοώ;</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[537a]</span> ΣΩ. Μα σε πολλά σημεία δεν λέει ο Όμηρος ένα σωρό πράγματα και για τις διάφορες τέχνες; Λόγου χάρη για την τέχνη του ηνιόχου — άμα θυμηθώ τους στίχους θα σου τους πω.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Θα σου τους πω εγώ· τους θυμάμαι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Για πες μου, τότε, τί λέει ο Νέστωρ στο γιο του τον Αντίλοχο, εκεί που του δίνει συμβουλές για την ιπποδρομία στη μνήμη του Πατρόκλου και του λέει να προσέξει στη στροφή.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Και απ᾽ το καλόπλεκτο θρονί στ᾽ αριστερά των ίππων</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[537b]</span> να χαμηλώνεις το κορμί και το δεξί πουλάρι</span></p>
+<p class="passage indent"><span class="passage-text">με βοήν κέντα και άφησε λυτά τα χαλινάρια·</span></p>
+<p class="passage indent"><span class="passage-text">εις τον καμπτόν ο αριστερός σου ίππος να κολλήσει,</span></p>
+<p class="passage indent"><span class="passage-text">να φαίνεται πού του καλού τροχού το κεφαλάρι</span></p>
+<p class="passage indent"><span class="passage-text">τον ξάκρισε, και πρόσεχε στον λίθον μη σκουντήσεις</span></p>
+<p class="passage indent"><span class="passage-text">μήπως λαβώσεις τ᾽ άλογα και σπάσεις και τ᾽ αμάξι.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[537c]</span> ΣΩ. Αρκεί. Σ᾽ αυτούς τους στίχους ποιός θα καταλάβαινε καλύτερα αν όσα λέει ο Όμηρος είναι σωστά ή όχι: ένας γιατρός ή ένας ηνίοχος;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ένας ηνίοχος, φυσικά.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Επειδή γνωρίζει αυτή την τέχνη ή για κάποιον άλλο λόγο;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Όχι· επειδή την γνωρίζει.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Σε κάθε τέχνη λοιπόν δεν είναι δοσμένο από τον θεό να μπορεί να γνωρίζει ένα ορισμένο έργο; Γιατί, βέβαια, όσα πράγματα τα γνωρίζουμε διαμέσου της τέχνης του κυβερνήτη ενός πλοίου δεν θα μας γίνουν γνωστά και διαμέσου της τέχνης του γιατρού.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ασφαλώς όχι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Ούτε πάλι όσα τα γνωρίζουμε διαμέσου της ιατρικής θα τα γνωρίσουμε, τα ίδια αυτά πράγματα, και διαμέσου της τέχνης του ξυλουργού.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[537d]</span> ΙΩΝ. Ασφαλώς όχι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Δεν συμβαίνει λοιπόν το ίδιο και με όλες τις τέχνες; Όσα πράγματα δηλαδή τα γνωρίζουμε με τη μια τέχνη δεν θα μας γίνουν γνωστά και διαμέσου μιας άλλης τέχνης· έτσι; Πριν από αυτό όμως απάντησέ μου στο εξής: παραδέχεσαι ότι η μια τέχνη είναι διαφορετική από την άλλη;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Άραγε αυτό το στηρίζεις εκεί που το στηρίζω κι εγώ, όταν δηλαδή η μια τέχνη αποτελεί γνώση άλλων πραγμάτων, ενώ η άλλη άλλων, στην περίπτωση αυτή εγώ δίνω άλλο όνομα στη μια και άλλο <span class="marker">[537e]</span> στην άλλη — έτσι κάνεις κι εσύ;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Γιατί αν υποθέσουμε ότι πρόκειται για ένα είδος γνώσης των ίδιων πραγμάτων, τότε γιατί να λέγαμε ότι η μια είναι διαφορετική από την άλλη, αφού τα ίδια πράγματα θα μπορούσαμε να τα γνωρίσουμε και από τη μια και από την άλλη; Όπως ακριβώς ξέρω εγώ ότι αυτά τα δάχτυλα είναι πέντε, έτσι ακριβώς, σαν κι εμένα, το πράγμα αυτό το ξέρεις κι εσύ· κι άμα σε ρωτούσα αν το ξέρουμε αυτό, και εσύ και εγώ, διαμέσου της ίδιας τέχνης, της αριθμητικής, ή διαμέσου κάποιας άλλης τέχνης, θα μου έλεγες, υποθέτω, ότι το ξέρουμε διαμέσου της ίδιας τέχνης.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναι.</span></p>
+        </div>
+        
+
+        <div id="book-2-chapter-----2" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-7" data-hash="book-2-chapter-----2">
+            Αν η ποιητική είναι τέχνη ποιό είναι το γνωστικό αντικείμενό της; • Κεφάλαιο ΣΩ.-ΙΩΝ..2 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=106&page=7" target="_blank" class="page-link">Page 7</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[538a]</span> ΣΩΚΡΑΤΗΣ. Ὃ τοίνυν ἄρτι ἔμελλον ἐρήσεσθαί σε, νυνὶ εἰπέ, εἰ κατὰ πασῶν τῶν τεχνῶν οὕτω σοι δοκεῖ, τῇ μὲν αὐτῇ τέχνῃ τὰ αὐτὰ ἀναγκαῖον εἶναι γιγνώσκειν, τῇ δ᾽ ἑτέρᾳ μὴ τὰ αὐτά, ἀλλ᾽ εἴπερ ἄλλη ἐστίν, ἀναγκαῖον καὶ ἕτερα γιγνώσκειν.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Οὕτω μοι δοκεῖ, ὦ Σώκρατες.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐκοῦν ὅστις ἂν μὴ ἔχῃ τινὰ τέχνην, ταύτης τῆς τέχνης τὰ λεγόμενα ἢ πραττόμενα καλῶς γιγνώσκειν οὐχ οἷός τ᾽ ἔσται;</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[538b]</span> ΙΩΝ. Ἀληθῆ λέγεις.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Πότερον οὖν περὶ τῶν ἐπῶν ὧν εἶπες, εἴτε καλῶς λέγει Ὅμηρος εἴτε μή, σὺ κάλλιον γνώσῃ ἢ ἡνίοχος;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ἡνίοχος.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ῥαψῳδὸς γάρ που εἶ ἀλλ᾽ οὐχ ἡνίοχος.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναί.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ἡ δὲ ῥαψῳδικὴ τέχνη ἑτέρα ἐστὶ τῆς ἡνιοχικῆς;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναί.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Εἰ ἄρα ἑτέρα, περὶ ἑτέρων καὶ ἐπιστήμη πραγμάτων ἐστίν.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναί.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Τί δὲ δὴ ὅταν Ὅμηρος λέγῃ ὡς τετρωμένῳ τῷ Μαχάονι Ἑκαμήδη ἡ Νέστορος παλλακὴ κυκεῶνα πίνειν <span class="marker">[538c]</span> δίδωσι; καὶ λέγει πως οὕτως—</span></p>
+<p class="passage indent"><span class="passage-text">οἴνῳ πραμνείῳ, φησίν, ἐπὶ δ᾽ αἴγειον κνῆ τυρὸν</span></p>
+<p class="passage indent"><span class="passage-text">κνήστι χαλκείῃ· παρὰ δὲ κρόμυον ποτῷ ὄψον·</span></p>
+<p class="passage"><span class="passage-text">ταῦτα εἴτε ὀρθῶς λέγει Ὅμηρος εἴτε μή, πότερον ἰατρικῆς ἐστι διαγνῶναι καλῶς ἢ ῥαψῳδικῆς;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ἰατρικῆς.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Τί δέ, ὅταν λέγῃ Ὅμηρος—</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[538d]</span> ἡ δὲ μολυβδαίνῃ ἰκέλη ἐς βυσσὸν ἵκανεν,</span></p>
+<p class="passage indent"><span class="passage-text">ἥ τε κατ᾽ ἀγραύλοιο βοὸς κέρας ἐμμεμαυῖα</span></p>
+<p class="passage indent"><span class="passage-text">ἔρχεται ὠμηστῇσι μετ᾽ ἰχθύσι πῆμα φέρουσα·</span></p>
+<p class="passage"><span class="passage-text">ταῦτα πότερον φῶμεν ἁλιευτικῆς εἶναι τέχνης μᾶλλον κρῖναι ἢ ῥαψῳδικῆς, ἅττα λέγει καὶ εἴτε καλῶς εἴτε μή;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Δῆλον δή, ὦ Σώκρατες, ὅτι ἁλιευτικῆς.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Σκέψαι δή, σοῦ ἐρομένου, εἰ ἔροιό με· «Ἐπειδὴ <span class="marker">[538e]</span> τοίνυν, ὦ Σώκρατες, τούτων τῶν τεχνῶν ἐν Ὁμήρῳ εὑρίσκεις ἃ προσήκει ἑκάστῃ διακρίνειν, ἴθι μοι ἔξευρε καὶ τὰ τοῦ μάντεώς τε καὶ μαντικῆς, ποῖά ἐστιν ἃ προσήκει αὐτῷ οἵῳ τ᾽ εἶναι διαγιγνώσκειν, εἴτε εὖ εἴτε κακῶς πεποίηται» —σκέψαι ὡς ῥᾳδίως τε καὶ ἀληθῆ ἐγώ σοι ἀποκρινοῦμαι. πολλαχοῦ μὲν γὰρ καὶ ἐν Ὀδυσσείᾳ λέγει, οἷον καὶ ἃ ὁ τῶν Μελαμποδιδῶν λέγει μάντις πρὸς τοὺς μνηστῆρας, Θεοκλύμενος—</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[539a]</span> δαιμόνιοι, τί κακὸν τόδε πάσχετε; νυκτὶ μὲν ὑμέων</span></p>
+<p class="passage indent"><span class="passage-text">εἰλύαται κεφαλαί τε πρόσωπά τε νέρθε τε γυῖα,</span></p>
+<p class="passage indent"><span class="passage-text">οἰμωγὴ δὲ δέδηε, δεδάκρυνται δὲ παρειαί·</span></p>
+<p class="passage indent"><span class="passage-text">εἰδώλων τε πλέον πρόθυρον, πλείη δὲ καὶ αὐλὴ</span></p>
+<p class="passage indent"><span class="passage-text">ἱεμένων ἔρεβόσδε ὑπὸ ζόφον· ἠέλιος δὲ</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[539b]</span> οὐρανοῦ ἐξαπόλωλε, κακὴ δ᾽ ἐπιδέδρομεν ἀχλύς·</span></p>
+<p class="passage"><span class="passage-text">πολλαχοῦ δὲ καὶ ἐν Ἰλιάδι, οἷον καὶ ἐπὶ τειχομαχίᾳ· λέγει γὰρ καὶ ἐνταῦθα—</span></p>
+<p class="passage indent"><span class="passage-text">ὄρνις γάρ σφιν ἐπῆλθε περησέμεναι μεμαῶσιν,</span></p>
+<p class="passage indent"><span class="passage-text">αἰετὸς ὑψιπέτης, ἐπ᾽ ἀριστερὰ λαὸν ἐέργων,</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[539c]</span> φοινήεντα δράκοντα φέρων ὀνύχεσσι πέλωρον,</span></p>
+<p class="passage indent"><span class="passage-text">ζῳόν, ἔτ᾽ ἀσπαίροντα· καὶ οὔπω λήθετο χάρμης.</span></p>
+<p class="passage indent"><span class="passage-text">κόψε γὰρ αὐτὸν ἔχοντα κατὰ στῆθος παρὰ δειρὴν</span></p>
+<p class="passage indent"><span class="passage-text">ἰδνωθεὶς ὀπίσω, ὁ δ᾽ ἀπὸ ἕθεν ἧκε χαμᾶζε</span></p>
+<p class="passage indent"><span class="passage-text">ἀλγήσας ὀδύνῃσι, μέσῳ δ᾽ ἐνὶ κάββαλ᾽ ὁμίλῳ·</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[539d]</span> αὐτὸς δὲ κλάγξας πέτετο πνοιῇς ἀνέμοιο.</span></p>
+<p class="passage"><span class="passage-text">ταῦτα φήσω καὶ τὰ τοιαῦτα τῷ μάντει προσήκειν καὶ σκοπεῖν καὶ κρίνειν.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ἀληθῆ γε σὺ λέγων, ὦ Σώκρατες.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[538a]</span> ΣΩ. Απάντησέ μου λοιπόν τώρα σ᾽ αυτό που λογάριαζα να σε ρωτήσω πριν από λίγο, αν κατά τη γνώμη σου συμβαίνει το ίδιο με όλες τις τέχνες, αν δηλαδή τα αυτά πράγματα τα κατανοούμε υποχρεωτικά διαμέσου μιας και της αυτής τέχνης, ενώ διαμέσου μιας άλλης, διαφορετικής, τέχνης δεν κατανοούμε τα ίδια αυτά πράγματα αλλά, εφόσον πρόκειται για διαφορετική τέχνη, κατανάγκη κατανοούμε με τη βοήθειά της άλλα πράγματα.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναι, αυτή τη γνώμη έχω, Σωκράτη.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Όποιος λοιπόν δεν κατέχει μια ορισμένη τέχνη δεν είναι σε θέση να κατανοεί όσα λέγονται ή πράττονται σ᾽ αυτή την τέχνη· δεν είναι έτσι;</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[538b]</span> ΙΩΝ. Σωστό αυτό που λες.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Ποιός λοιπόν θα ξέρει καλύτερα αν στους επικούς στίχους που ανέφερες ο Όμηρος τα λέει καλά ή όχι: εσύ ή ένας ηνίοχος;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ένας ηνίοχος.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Γιατί εσύ βέβαια είσαι ραψωδός και όχι ηνίοχος.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Και η τέχνη του ραψωδού είναι διαφορετική από την τέχνη του ηνιόχου· έτσι δεν είναι;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Αφού λοιπόν είναι διαφορετική, αποτελεί και γνώση η οποία αναφέρεται σε διαφορετικά πράγματα.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Αλλά κι όταν ο Όμηρος λέει ότι στον πληγωμένο Μαχάονα η Εκαμήδη, η φιλενάδα του Νέστορα, <span class="marker">[538c]</span> του έδωσε να πιει φάρμακο; Και το λέει κάπως έτσι:</span></p>
+<p class="passage indent"><span class="passage-text">κρασί Πράμνειο και τυρί της αίγας που με τρίφτην</span></p>
+<p class="passage indent"><span class="passage-text">χάλκινον έτριψεν αυτή, κι έρραν᾽ επάνω αλεύρι·</span></p>
+<p class="passage"><span class="passage-text">αν είναι σωστά όσα λέει ο Όμηρος ή όχι, ποιά τέχνη είναι αρμόδια να το διακρίνει με ακρίβεια: του γιατρού ή του ραψωδού;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Του γιατρού.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Κι όταν πάλι λέει ο Όμηρος</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[538d]</span> και μες στα βάθη εβύθισεν ωσάν την μολυβήθραν,</span></p>
+<p class="passage indent"><span class="passage-text">όπου με ταύρου κέρατα δεμένη κατεβαίνει</span></p>
+<p class="passage indent"><span class="passage-text">στα ωμοφάγα ψάρια τον θάνατον να φέρει</span></p>
+<p class="passage"><span class="passage-text">ποιά τέχνη θα πούμε ότι είναι αρμοδιότερη να κρίνει τί εννοεί με αυτά και αν το εννοεί σωστά ή όχι: η αλιευτική ή η τέχνη του ραψωδού;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Είναι ολοφάνερο, Σωκράτη, ότι η αλιευτική.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Κοίταξε τώρα, αν αυτός που υπέβαλλε τις ερωτήσεις ήσουν εσύ, και με ρωτούσες: «Ωραία λοιπόν, Σωκράτη, αφού <span class="marker">[538e]</span> ξέρεις και βρίσκεις στον Όμηρο για ποιά πράγματα έχει αρμοδιότητα να τα διακρίνει καθεμιά από τούτες τις τέχνες, έλα τώρα και βρες μου και τα σχετικά με τον μάντη και τη μαντική τέχνη, ποιά είναι αυτά που εμπίπτουν στην αρμοδιότητά του και που ο μάντης είναι σε θέση να διακρίνει αν ο ποιητής τα έχει συνθέσει καλά ή άσχημα» — κοίταξε πόσο εύκολα και σωστά θα σου απαντήσω. Γιατί και στην Οδύσσεια σε πολλά σημεία ο Όμηρος μιλάει γι᾽ αυτά, όπως για παράδειγμα εκεί που ο μάντης των Μελαμποδιδών, ο Θεοκλύμενος, μιλάει στους μνηστήρες,</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[539a]</span> α! δύστυχοι! ποιά συμφορά σάς ηύρε; μαύρη νύκτα</span></p>
+<p class="passage indent"><span class="passage-text">τες κεφαλές, τα πρόσωπα, τα γόνατα, σας ζώνει</span></p>
+<p class="passage indent"><span class="passage-text">άναψε ο θρήνος, δάκρυα στα μάγουλά σας ρέουν,</span></p>
+<p class="passage indent"><span class="passage-text">και τα λαμπρά μεσόστυλα και οι τοίχοι στάζουν αίμα·</span></p>
+<p class="passage indent"><span class="passage-text">πρόθυρο, αυλή, σκιές νεκρών γεμίσαν κινημένες</span></p>
+<p class="passage indent"><span class="passage-text">κατά το ανήλιον Έρεβος· ο ήλιος εσβύσθη</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[539b]</span> στον ουρανό, και απλώθη αυτού γύρω κακή μαυρίλα.</span></p>
+<p class="passage"><span class="passage-text">αλλά και σε πολλά σημεία της Ιλιάδας, όπως για παράδειγμα και στην Τειχομαχία· λέει λοιπόν και εδώ</span></p>
+<p class="passage indent"><span class="passage-text">ότι ενώ ήσαν πρόθυμοι τον λάκκον να περάσουν,</span></p>
+<p class="passage indent"><span class="passage-text">υψηλοπέτης αετός εφάνη δεξιά τους,</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[539c]</span> και ζωντανός στα νύχια του και κοκκινοβαμμένος</span></p>
+<p class="passage indent"><span class="passage-text">μέγας σπαρνούσε δράκοντας και πολεμούσε ακόμη·</span></p>
+<p class="passage indent"><span class="passage-text">όσο που οπίσω γέρνοντας τον αετόν στο στήθος</span></p>
+<p class="passage indent"><span class="passage-text">έκοψε κάτω απ᾽ τον λαιμόν· κι εκείνος απ᾽ τον πόνον</span></p>
+<p class="passage indent"><span class="passage-text">απόλυσε τον δράκοντα να πέσει μες στο πλήθος</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[539d]</span> και κρώζοντας επέταξε με τες πνοές του ανέμου.</span></p>
+<p class="passage"><span class="passage-text">Αυτά τα σημεία, θα υποστηρίξω, και τα παρόμοια είναι στην αρμοδιότητα του μάντη να τα εξετάζει και να τα κρίνει.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Και θα ᾽ναι σωστή απάντηση, Σωκράτη.</span></p>
+        </div>
+        
+
+        <div id="book-2-chapter-----3" class="chapter-anchor"></div>
+        <div class="page-divider" id="page-8" data-hash="book-2-chapter-----3">
+            Αν η ποιητική είναι τέχνη ποιό είναι το γνωστικό αντικείμενό της; • Κεφάλαιο ΣΩ.-ΙΩΝ..3 (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=106&page=8" target="_blank" class="page-link">Page 8</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Καὶ σύ γε, ὦ Ἴων, ἀληθῆ ταῦτα λέγεις. ἴθι δὴ καὶ σὺ ἐμοί, ὥσπερ ἐγὼ σοὶ ἐξέλεξα καὶ ἐξ Ὀδυσσείας καὶ ἐξ Ἰλιάδος ὁποῖα τοῦ μάντεώς ἐστι καὶ ὁποῖα τοῦ ἰατροῦ καὶ <span class="marker">[539e]</span> ὁποῖα τοῦ ἁλιέως, οὕτω καὶ σὺ ἐμοὶ ἔκλεξον, ἐπειδὴ καὶ ἐμπειρότερος εἶ ἐμοῦ τῶν Ὁμήρου, ὁποῖα τοῦ ῥαψῳδοῦ ἐστιν, ὦ Ἴων, καὶ τῆς τέχνης τῆς ῥαψῳδικῆς, ἃ τῷ ῥαψῳδῷ προσήκει καὶ σκοπεῖσθαι καὶ διακρίνειν παρὰ τοὺς ἄλλους ἀνθρώπους.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ἐγὼ μέν φημι, ὦ Σώκρατες, ἅπαντα.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐ σύ γε φῄς, ὦ Ἴων, ἅπαντα· ἢ οὕτως ἐπιλήσμων εἶ; καίτοι οὐκ ἂν πρέποι γε ἐπιλήσμονα εἶναι ῥαψῳδὸν ἄνδρα.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[540a]</span> ΙΩΝ. Τί δὲ δὴ ἐπιλανθάνομαι;</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐ μέμνησαι ὅτι ἔφησθα τὴν ῥαψῳδικὴν τέχνην ἑτέραν εἶναι τῆς ἡνιοχικῆς;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Μέμνημαι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐκοῦν καὶ ἑτέραν οὖσαν ἕτερα γνώσεσθαι ὡμολόγεις;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναί.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐκ ἄρα πάντα γε γνώσεται ἡ ῥαψῳδικὴ κατὰ τὸν σὸν λόγον οὐδὲ ὁ ῥαψῳδός.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Πλήν γε ἴσως τὰ τοιαῦτα, ὦ Σώκρατες.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[540b]</span> ΣΩΚΡΑΤΗΣ. Τὰ τοιαῦτα δὲ λέγεις πλὴν τὰ τῶν ἄλλων τεχνῶν σχεδόν τι· ἀλλὰ ποῖα δὴ γνώσεται, ἐπειδὴ οὐχ ἅπαντα;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ἃ πρέπει, οἶμαι ἔγωγε, ἀνδρὶ εἰπεῖν καὶ ὁποῖα γυναικί, καὶ ὁποῖα δούλῳ καὶ ὁποῖα ἐλευθέρῳ, καὶ ὁποῖα ἀρχομένῳ καὶ ὁποῖα ἄρχοντι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ἆρα ὁποῖα ἄρχοντι, λέγεις, ἐν θαλάττῃ χειμαζομένου πλοίου πρέπει εἰπεῖν, ὁ ῥαψῳδὸς γνώσεται κάλλιον ἢ ὁ κυβερνήτης;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Οὔκ, ἀλλὰ ὁ κυβερνήτης τοῦτό γε.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[540c]</span> ΣΩΚΡΑΤΗΣ. Ἀλλ᾽ ὁποῖα ἄρχοντι κάμνοντος πρέπει εἰπεῖν, ὁ ῥαψῳδὸς γνώσεται κάλλιον ἢ ὁ ἰατρός;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Οὐδὲ τοῦτο.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ἀλλ᾽ οἷα δούλῳ πρέπει, λέγεις;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναί.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οἷον βουκόλῳ λέγεις δούλῳ ἃ πρέπει εἰπεῖν ἀγριαινουσῶν βοῶν παραμυθουμένῳ, ὁ ῥαψῳδὸς γνώσεται ἀλλ᾽ οὐχ ὁ βουκόλος;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Οὐ δῆτα.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ἀλλ᾽ οἷα γυναικὶ πρέποντά ἐστιν εἰπεῖν ταλασιουργῷ περὶ ἐρίων <span class="marker">[540d]</span> ἐργασίας;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Οὔ.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ἀλλ᾽ οἷα ἀνδρὶ πρέπει εἰπεῖν γνώσεται στρατηγῷ στρατιώταις παραινοῦντι;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναί, τὰ τοιαῦτα γνώσεται ὁ ῥαψῳδός.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Τί δέ; ἡ ῥαψῳδικὴ τέχνη στρατηγική ἐστιν;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Γνοίην γοῦν ἂν ἔγωγε οἷα στρατηγὸν πρέπει εἰπεῖν.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ἴσως γὰρ εἶ καὶ στρατηγικός, ὦ Ἴων. καὶ γὰρ εἰ ἐτύγχανες ἱππικὸς ὢν ἅμα καὶ κιθαριστικός, ἔγνως ἂν ἵππους <span class="marker">[540e]</span> εὖ καὶ κακῶς ἱππαζομένους· ἀλλ᾽ εἴ σ᾽ ἐγὼ ἠρόμην· «Ποτέρᾳ δὴ τέχνῃ, ὦ Ἴων, γιγνώσκεις τοὺς εὖ ἱππαζομένους ἵππους; ᾗ ἱππεὺς εἶ ἢ ᾗ κιθαριστής;» τί ἄν μοι ἀπεκρίνω;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ἧι ἱππεύς, ἔγωγ᾽ ἄν.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐκοῦν εἰ καὶ τοὺς εὖ κιθαρίζοντας διεγίγνωσκες, ὡμολόγεις ἄν, ᾗ κιθαριστὴς εἶ, ταύτῃ διαγιγνώσκειν, ἀλλ᾽ οὐχ ᾗ ἱππεύς.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναί.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ἐπειδὴ δὲ τὰ στρατιωτικὰ γιγνώσκεις, πότερον ᾗ στρατηγικὸς εἶ γιγνώσκεις ἢ ᾗ ῥαψῳδὸς ἀγαθός;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Οὐδὲν ἔμοιγε δοκεῖ διαφέρειν.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text">ΣΩ. Κι εσύ, Ίωνα, σωστά τα λες αυτά. Έλα λοιπόν τώρα κι εσύ, και όπως έψαξα εγώ και σου βρήκα από την Οδύσσεια και την Ιλιάδα τί ανήκει στην αρμοδιότητα του μάντη και τί στου γιατρού και <span class="marker">[539e]</span> τί στου ψαρά, έτσι κι εσύ ξεχώρισέ μου —μια που είσαι και πιο εξοικειωμένος απ᾽ ό,τι εγώ με τα ποιήματα του Ομήρου— τί ανήκει στην αρμοδιότητα του ραψωδού, Ίωνα, και της ραψωδικής τέχνης, για τα οποία ο ραψωδός είναι αρμοδιότερος από τους άλλους ανθρώπους να τα εξετάζει και να τα κρίνει.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Εγώ, πάντως, Σωκράτη, υποστηρίζω ότι όλα ανεξαιρέτως.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Όχι, Ίωνα, εσύ δεν ισχυρίζεσαι κάτι τέτοιο· ή μήπως ξεχνάς τόσο εύκολα; Κι όμως δεν θα ᾽πρεπε ποτέ ένας ραψωδός να ξεχνάει τόσο εύκολα.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[540a]</span> ΙΩΝ. Τί έχω ξεχάσει δηλαδή;</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Δεν θυμάσαι ότι υποστήριζες πως η τέχνη του ραψωδού είναι διαφορετική από την τέχνη του ηνιόχου;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Το θυμάμαι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Και δεν παραδέχτηκες ότι αφού είναι διαφορετική, θα είναι διαφορετικά και τα πράγματα που θα γνωρίζει;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Άρα, σύμφωνα με τα λεγόμενά σου, δεν θα τα κρίνει όλα η ραψωδική τέχνη ούτε και ο ραψωδός.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Εκτός ίσως από κάτι τέτοιας λογής, Σωκράτη.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[540b]</span> ΣΩ. Λέγοντας «τέτοιας λογής» εννοείς, υποθέτω, όσα ανήκουν στις άλλες τέχνες· ποιά όμως είναι αυτά που θα τα γνωρίζει ο ραψωδός, μια που δεν θα τα γνωρίζει όλα;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Κατά τη γνώμη μου, θα γνωρίζει ποιά πράγματα ταιριάζει να πει ένας άνδρας και ποιά μια γυναίκα, ποιά ένας δούλος και ποιά ένας ελεύθερος, ποιά ένας άρχοντας και ποιά ένας αρχόμενος.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Άραγε εννοείς ότι ποιά πράγματα πρέπει να πει ο κυβερνήτης ενός πλοίου που θαλασσοδέρνεται στο πέλαγος θα τα ξέρει ο ραψωδός καλύτερα από τον κυβερνήτη;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Όχι· αυτό θα το ξέρει ο κυβερνήτης, οπωσδήποτε.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[540c]</span> ΣΩ. Τί όμως πρέπει να πει κάποιος που κατευθύνει τη θεραπεία ενός αρρώστου, ποιός θα το γνωρίζει καλύτερα: ο ραψωδός ή ο γιατρός;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ούτε αυτό.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Μήπως όμως εννοείς όσα ταιριάζουν σ᾽ ένα δούλο;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Δηλαδή εννοείς ότι όσα πρέπει να πει ένας δούλος αγελαδάρης προσπαθώντας να καθησυχάσει μια αγέλη εξαγριωμένα βόδια τα ξέρει ο ραψωδός κι όχι ο αγελαδάρης;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Όχι βέβαια.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Αλλά μήπως όσα πρέπει να πει για την κατεργασία των μαλλιών μια γυναίκα <span class="marker">[540d]</span> που υφαίνει;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Όχι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Αλλά μήπως θα ξέρει τί πρέπει να πει ένας στρατηγός για να δώσει θάρρος στους στρατιώτες;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναι, τέτοια πράγματα ο ραψωδός θα τα ξέρει.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Μα πώς; Η τέχνη του ραψωδού είναι στρατηγική;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Εν πάση περιπτώσει, εγώ ξέρω τί πρέπει να πει ένας στρατηγός.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Επειδή είναι πιθανό να είσαι γνώστης και της στρατηγικής τέχνης, Ίωνα. Γιατί αν συνέβαινε να ξέρεις από άλογα και συνάμα να ξέρεις και κιθάρα, θα μπορούσες να διακρίνεις <span class="marker">[540e]</span> ποιά άλογα ιππεύονται καλά και ποιά όχι· αν όμως σε ρωτούσα «Με τη βοήθεια ποιάς από τις δύο τέχνες, Ίωνα, διακρίνεις τα άλογα που ιππεύονται καλά: αυτής με την οποία είσαι ιππέας ή αυτής με την οποία είσαι κιθαριστής;», τί θα μου απαντούσες;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Αυτής με την οποία είμαι ιππέας· έτσι θα απαντούσα, εγώ τουλάχιστον.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Κι αν επίσης διέκρινες ποιοί παίζουν καλά κιθάρα, θα παραδεχόσουν ότι τους διακρίνεις με τη βοήθεια της τέχνης διαμέσου της οποίας είσαι κιθαριστής, κι όχι με τη βοήθεια εκείνης διαμέσου της οποίας είσαι ιππέας.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ναι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Κι επειδή συμβαίνει να ξέρεις τα στρατιωτικά πράγματα, διαμέσου ποιάς τέχνης τα ξέρεις: αυτής με την οποία είσαι γνώστης των στρατιωτικών ή αυτής με την οποία είσαι καλός ραψωδός;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Δεν νομίζω ότι υπάρχει καμία διαφορά.</span></p>
+        </div>
+        
+
+        
+        <div class="page-divider" id="page-9" data-hash="book-2-chapter----">
+            Αν η ποιητική είναι τέχνη ποιό είναι το γνωστικό αντικείμενό της; • Κεφάλαιο ΣΩ.-ΣΩ. (<a href="https://www.greek-language.gr/digitalResources/ancient_greek/library/browse.html?text_id=106&page=9" target="_blank" class="page-link">Page 9</a>)
+        </div>
+        <div class="column original-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[541a]</span> ΣΩΚΡΑΤΗΣ. Πῶς; οὐδὲν λέγεις διαφέρειν; μίαν λέγεις τέχνην εἶναι τὴν ῥαψῳδικὴν καὶ τὴν στρατηγικὴν ἢ δύο;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Μία ἔμοιγε δοκεῖ.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ὅστις ἄρα ἀγαθὸς ῥαψῳδός ἐστιν, οὗτος καὶ ἀγαθὸς στρατηγὸς τυγχάνει ὤν;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Μάλιστα, ὦ Σώκρατες.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐκοῦν καὶ ὅστις ἀγαθὸς στρατηγὸς τυγχάνει ὤν, ἀγαθὸς καὶ ῥαψῳδός ἐστιν.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Οὐκ αὖ μοι δοκεῖ τοῦτο.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ἀλλ᾽ ἐκεῖνο μὴν δοκεῖ σοι, ὅστις γε ἀγαθὸς <span class="marker">[541b]</span> ῥαψῳδός, καὶ στρατηγὸς ἀγαθὸς εἶναι;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Πάνυ γε.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Οὐκοῦν σὺ τῶν Ἑλλήνων ἄριστος ῥαψῳδὸς εἶ;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Πολύ γε, ὦ Σώκρατες.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ἦ καὶ στρατηγός, ὦ Ἴων, τῶν Ἑλλήνων ἄριστος εἶ;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Εὖ ἴσθι, ὦ Σώκρατες· καὶ ταῦτά γε ἐκ τῶν Ὁμήρου μαθών.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Τί δή ποτ᾽ οὖν πρὸς τῶν θεῶν, ὦ Ἴων, ἀμφότερα ἄριστος ὢν τῶν Ἑλλήνων, καὶ στρατηγὸς καὶ ῥαψῳδός, ῥαψῳδεῖς μὲν περιιὼν τοῖς Ἕλλησι, στρατηγεῖς δ᾽ οὔ; ἢ <span class="marker">[541c]</span> ῥαψῳδοῦ μὲν δοκεῖ σοι χρυσῷ στεφάνῳ ἐστεφανωμένου πολλὴ χρεία εἶναι τοῖς Ἕλλησι, στρατηγοῦ δὲ οὐδεμία;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ἡ μὲν γὰρ ἡμετέρα, ὦ Σώκρατες, πόλις ἄρχεται ὑπὸ ὑμῶν καὶ στρατηγεῖται καὶ οὐδὲν δεῖται στρατηγοῦ, ἡ δὲ ὑμετέρα καὶ ἡ Λακεδαιμονίων οὐκ ἄν με ἕλοιτο στρατηγόν· αὐτοὶ γὰρ οἴεσθε ἱκανοὶ εἶναι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ὦ βέλτιστε Ἴων, Ἀπολλόδωρον οὐ γιγνώσκεις τὸν Κυζικηνόν;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ποῖον τοῦτον;</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Ὃν Ἀθηναῖοι πολλάκις ἑαυτῶν στρατηγὸν ᾕρηνται <span class="marker">[541d]</span> ξένον ὄντα· καὶ Φανοσθένη τὸν Ἄνδριον καὶ Ἡρακλείδην τὸν Κλαζομένιον, οὓς ἥδε ἡ πόλις ξένους ὄντας, ἐνδειξαμένους ὅτι ἄξιοι λόγου εἰσί, καὶ εἰς στρατηγίας καὶ εἰς τὰς ἄλλας ἀρχὰς ἄγει· Ἴωνα δ᾽ ἄρα τὸν Ἐφέσιον οὐχ αἱρήσεται στρατηγὸν καὶ τιμήσει, ἐὰν δοκῇ ἄξιος λόγου εἶναι; τί δέ; οὐκ Ἀθηναῖοι μέν ἐστε οἱ Ἐφέσιοι τὸ ἀρχαῖον, καὶ ἡ Ἔφεσος <span class="marker">[541e]</span> οὐδεμιᾶς ἐλάττων πόλεως; ἀλλὰ γὰρ σύ, ὦ Ἴων, εἰ μὲν ἀληθῆ λέγεις ὡς τέχνῃ καὶ ἐπιστήμῃ οἷός τε εἶ Ὅμηρον ἐπαινεῖν, ἀδικεῖς, ὅστις ἐμοὶ ὑποσχόμενος ὡς πολλὰ καὶ καλὰ περὶ Ὁμήρου ἐπίστασαι καὶ φάσκων ἐπιδείξειν, ἐξαπατᾷς με καὶ πολλοῦ δεῖς ἐπιδεῖξαι, ὅς γε οὐδὲ ἅττα ἐστὶ ταῦτα περὶ ὧν δεινὸς εἶ ἐθέλεις εἰπεῖν, πάλαι ἐμοῦ λιπαροῦντος, ἀλλὰ ἀτεχνῶς ὥσπερ ὁ Πρωτεὺς παντοδαπὸς γίγνῃ στρεφόμενος ἄνω καὶ κάτω, ἕως τελευτῶν διαφυγών με στρατηγὸς <span class="marker">[542a]</span> ἀνεφάνης, ἵνα μὴ ἐπιδείξῃς ὡς δεινὸς εἶ τὴν περὶ Ὁμήρου σοφίαν. εἰ μὲν οὖν τεχνικὸς ὤν, ὅπερ νυνδὴ ἔλεγον, περὶ Ὁμήρου ὑποσχόμενος ἐπιδείξειν ἐξαπατᾷς με, ἄδικος εἶ· εἰ δὲ μὴ τεχνικὸς εἶ, ἀλλὰ θείᾳ μοίρᾳ κατεχόμενος ἐξ Ὁμήρου μηδὲν εἰδὼς πολλὰ καὶ καλὰ λέγεις περὶ τοῦ ποιητοῦ, ὥσπερ ἐγὼ εἶπον περὶ σοῦ, οὐδὲν ἀδικεῖς. ἑλοῦ οὖν πότερα βούλει νομίζεσθαι ὑπὸ ἡμῶν ἄδικος ἀνὴρ εἶναι ἢ θεῖος.</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[542b]</span> ΙΩΝ. Πολὺ διαφέρει, ὦ Σώκρατες· πολὺ γὰρ κάλλιον τὸ θεῖον νομίζεσθαι.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩΚΡΑΤΗΣ. Τοῦτο τοίνυν τὸ κάλλιον ὑπάρχει σοι παρ᾽ ἡμῖν, ὦ Ἴων, θεῖον εἶναι καὶ μὴ τεχνικὸν περὶ Ὁμήρου ἐπαινέτην.</span></p>
+        </div>
+        <div class="column translation-col">
+            <p class="passage indent"><span class="passage-text"><span class="marker">[541a]</span> ΣΩ. Πώς; Δεν υπάρχει, λες, καμία διαφορά; Μία τέχνη υποστηρίζεις ότι είναι η ραψωδική και η στρατηγική ή δύο;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Εγώ τουλάχιστον έχω τη γνώμη ότι είναι μία.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Όποιος λοιπόν είναι καλός ραψωδός θα είναι, ο ίδιος, και καλός στρατηγός;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Μάλιστα, Σωκράτη.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Και όποιος, επομένως, συμβαίνει να είναι καλός στρατηγός, αυτός είναι και καλός ραψωδός.</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Α, όχι· αυτό δεν το πιστεύω.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Εκείνο όμως το πιστεύεις στ᾽ αλήθεια, ότι όποιος είναι καλός <span class="marker">[541b]</span> ραψωδός είναι και καλός στρατηγός· έτσι;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Βεβαιότατα.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Εσύ δεν είσαι ο καλύτερος έλληνας ραψωδός;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ο κατά πολύ καλύτερος, Σωκράτη.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Τότε, λοιπόν, Ίωνα, δεν είσαι κι ο καλύτερος ανάμεσα στους έλληνες στρατηγούς;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Να είσαι βέβαιος γι᾽ αυτό, Σωκράτη· και μάλιστα έχοντας μάθει αυτά τα πράγματα από τον Όμηρο.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Μα τότε, για το όνομα του θεού, Ίωνα, αφού είσαι και στα δύο ο πρώτος ανάμεσα στους Έλληνες, και στρατηγός και ραψωδός, γιατί περιφέρεσαι εδώ κι εκεί στην Ελλάδα απαγγέλλοντας επικούς στίχους και δεν αναλαμβάνεις και στρατηγός; Ή μήπως <span class="marker">[541c]</span> νομίζεις ότι υπάρχει μεγάλη ανάγκη στους Έλληνες για ραψωδό στεφανωμένο με χρυσό στεφάνι, ενώ για στρατηγό καμία;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Μα, Σωκράτη, η δική μας πόλη εξουσιάζεται και στρατηγεύεται από εσάς και δεν χρειάζεται πια στρατηγό, ενώ η δική σας και των Λακεδαιμονίων, δεν θα διάλεγε ποτέ εμένα για στρατηγό της· γιατί φαντάζεστε ότι είσαστε ικανοί εσείς.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Καλέ μου Ίωνα, τον Απολλόδωρο τον Κυζικηνό δεν τον ξέρεις;</span></p>
+<p class="passage indent"><span class="passage-text">ΙΩΝ. Ποιός είναι αυτός;</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Αυτός που οι Αθηναίοι τον έχουν πολλές φορές εκλέξει στρατηγό τους, <span class="marker">[541d]</span> παρόλο ότι είναι ξένος· και τον Φανοσθένη από την Άνδρο και τον Ηρακλείδη από τις Κλαζομενές, ξένους κι αυτούς, στους οποίους τούτη εδώ η πόλη, όταν έδωσαν δείγματα της αξίας τους, και στρατηγούς τούς έκανε και άλλα αξιώματα τους ανάθεσε· δεν θα εκλέξει λοιπόν στρατηγό και τον Ίωνα, τον Εφέσιο, και δεν θα τον τιμήσει, αν τον θεωρήσει ότι αξίζει; Γιατί όχι; Άλλωστε δεν είσαστε εσείς οι Εφέσιοι από παλιά Αθηναίοι, κι η Έφεσος <span class="marker">[541e]</span> μια πόλη που δεν υστερεί σε τίποτα από καμιά άλλη; Εσύ όμως, Ίωνα, αν αληθεύουν αυτά που λες, ότι δηλαδή με την τέχνη και τη γνώση σου μπορείς κι εγκωμιάζεις τον Όμηρο, με αδικείς: από τη μια με διαβεβαιώνεις ότι ξέρεις πολλά και όμορφα πράγματα για τον Όμηρο και μου υπόσχεσαι πως τάχα θα μου τα δείξεις, κι από την άλλη με εξαπατάς και κάθε άλλο παρά μου τα δείχνεις, αφού δεν έχεις τη διάθεση ούτε καν να αναφέρεις ποιά είναι αυτά στα οποία είσαι τόσο φοβερός, παρόλο ότι εγώ τόση ώρα σε εκλιπαρώ, αλλά εσύ κυριολεκτικά σαν τον Πρωτέα αλλάζεις συνεχώς μορφές στριφογυρίζοντας πάνω κάτω, ώσπου στο τέλος μού ξέφυγες και εμφανίστηκες <span class="marker">[542a]</span> ως στρατηγός, ακριβώς για να μη φανερώσεις πόσο φοβερή είναι η σοφία σου γύρω από τον Όμηρο. Αν λοιπόν στ᾽ αλήθεια έχεις αυτές τις τεχνικές γνώσεις γύρω από τον Όμηρο και, όπως έλεγα τώρα δα, με κοροϊδεύεις και δεν μου τις δείχνεις, ενώ μου υποσχέθηκες πως θα τις φανερώσεις, τότε είσαι άδικος άνθρωπος· αν όμως πάλι δεν έχεις αυτές τις γνώσεις, αλλά λες πολλά και όμορφα πράγματα για τον ποιητή, επειδή χάρη σε κάποιο θεϊκό δώρημα έχεις κυριευτεί από τον Όμηρο, όπως εγώ είπα για σένα, τότε διόλου δεν αδικείς. Διάλεξε λοιπόν τί από τα δύο θέλεις να πιστεύουμε για σένα: ότι είσαι άδικος άνθρωπος ή θεϊκός;</span></p>
+<p class="passage indent"><span class="passage-text"><span class="marker">[542b]</span> ΙΩΝ. Είναι πολύ μεγάλη η διαφορά, Σωκράτη· είναι πολύ ωραιότερο να θεωρείται κάποιος θεϊκός.</span></p>
+<p class="passage indent"><span class="passage-text">ΣΩ. Ε λοιπόν, αυτό το ωραιότερο, Ίωνα, εμείς σου το αναγνωρίζουμε, πως είσαι θεϊκός υμνητής του Ομήρου κι όχι κάτοχος μιας ορισμένης γνώσης.</span></p>
+        </div>
+        
+        </section>
+    </main>
+
+    <script>
+        // Layout and Theme controls
+        function toggleLayout() {
+            const body = document.body;
+            const btn = document.getElementById('toggle-layout-btn');
+            
+            if (body.classList.contains('hide-original')) {
+                body.classList.remove('hide-original');
+                btn.innerText = 'Hide Original';
+                localStorage.setItem('ebook-hide-original', 'false');
+            } else {
+                body.classList.add('hide-original');
+                btn.innerText = 'Show Original';
+                localStorage.setItem('ebook-hide-original', 'true');
+            }
+        }
+
+        function setTheme(theme, buttonElement) {
+            if (theme === 'light') {
+                document.documentElement.removeAttribute('data-theme');
+            } else {
+                document.documentElement.setAttribute('data-theme', theme);
+            }
+            
+            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+            buttonElement.classList.add('active');
+            
+            localStorage.setItem('ebook-theme', theme);
+        }
+
+        function toggleSidebar() {
+            const body = document.body;
+            const overlay = document.getElementById('mobile-overlay');
+            const isMobile = window.innerWidth <= 900;
+            
+            if (isMobile) {
+                if (body.classList.contains('sidebar-open')) {
+                    body.classList.remove('sidebar-open');
+                    overlay.classList.remove('open');
+                } else {
+                    body.classList.add('sidebar-open');
+                    overlay.classList.add('open');
+                    // Close right sidebar if open
+                    body.classList.remove('chat-sidebar-open');
+                }
+            } else {
+                if (body.classList.contains('sidebar-closed')) {
+                    body.classList.remove('sidebar-closed');
+                    localStorage.setItem('ebook-sidebar-closed', 'false');
+                } else {
+                    body.classList.add('sidebar-closed');
+                    localStorage.setItem('ebook-sidebar-closed', 'true');
+                }
+            }
+        }
+        
+        function closeSidebarOnMobile() {
+            if (window.innerWidth <= 900) {
+                document.body.classList.remove('sidebar-open');
+                document.getElementById('mobile-overlay').classList.remove('open');
+            }
+        }
+        
+        function toggleMobileOptions() {
+            const header = document.querySelector('header');
+            const btn = document.querySelector('.options-toggle');
+            
+            if (header.classList.contains('options-open')) {
+                header.classList.remove('options-open');
+                document.body.classList.remove('mobile-options-open');
+                btn.classList.remove('active');
+            } else {
+                header.classList.add('options-open');
+                document.body.classList.add('mobile-options-open');
+                btn.classList.add('active');
+            }
+        }
+
+        // Adjusts sidebar height dynamically to match mobile visual viewport when virtual keyboard is launched
+        function adjustSidebarHeightForKeyboard() {
+            if (window.visualViewport) {
+                const chatSidebar = document.getElementById('chat-sidebar');
+                const isMobile = window.innerWidth <= 900;
+                if (isMobile && document.body.classList.contains('chat-sidebar-open')) {
+                    chatSidebar.style.height = window.visualViewport.height + 'px';
+                } else {
+                    chatSidebar.style.height = ''; // Fallback to CSS rules
+                }
+            }
+        }
+
+        // Right AI Sidebar Toggles
+        function toggleChatSidebar() {
+            const body = document.body;
+            if (body.classList.contains('chat-sidebar-open')) {
+                body.classList.remove('chat-sidebar-open');
+                adjustSidebarHeightForKeyboard();
+            } else {
+                body.classList.add('chat-sidebar-open');
+                // Close Left Sidebar on Mobile
+                if (window.innerWidth <= 900) {
+                    body.classList.remove('sidebar-open');
+                    document.getElementById('mobile-overlay').classList.remove('open');
+                }
+                // Focus text area
+                setTimeout(() => {
+                    document.getElementById('chat-input').focus();
+                    adjustSidebarHeightForKeyboard();
+                }, 100);
+            }
+        }
+
+        // AI Configuration Modal controls
+        function openAiSettings() {
+            document.getElementById('ai-config-modal').classList.add('open');
+            loadSavedAiSettings();
+        }
+
+        function closeAiSettings() {
+            document.getElementById('ai-config-modal').classList.remove('open');
+        }
+
+        function handleProviderChange() {
+            const p = document.getElementById('ai-provider').value;
+            const customUrlGroup = document.getElementById('group-custom-url');
+            const modelInput = document.getElementById('ai-model');
+
+            if (p === 'custom') {
+                customUrlGroup.style.display = 'flex';
+            } else {
+                customUrlGroup.style.display = 'none';
+            }
+
+            // Suggest model placeholders and default values based on provider selection
+            if (p === 'openai') {
+                modelInput.placeholder = 'gpt-4o-mini';
+                if (modelInput.value === 'gemini-flash-latest' || modelInput.value === '' || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gemini')) {
+                    modelInput.value = 'gpt-4o-mini';
+                }
+            } else if (p === 'anthropic') {
+                modelInput.placeholder = 'claude-3-5-sonnet-20241022';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('gemini') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'claude-3-5-sonnet-20241022';
+                }
+            } else if (p === 'gemini') {
+                modelInput.placeholder = 'gemini-flash-latest';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'gemini-flash-latest';
+                }
+            } else if (p === 'openrouter') {
+                modelInput.placeholder = 'meta-llama/llama-3-8b-instruct:free';
+                if (modelInput.value === 'gpt-4o-mini' || modelInput.value === '' || modelInput.value.startsWith('gemini') || modelInput.value.startsWith('claude') || modelInput.value.startsWith('gpt')) {
+                    modelInput.value = 'meta-llama/llama-3-8b-instruct:free';
+                }
+            } else if (p === 'custom') {
+                modelInput.placeholder = 'model-name';
+            }
+        }
+
+        function loadSavedAiSettings() {
+            const provider = localStorage.getItem('ai-prov') || 'openai';
+            const apiKey = localStorage.getItem('ai-key') || '';
+            const model = localStorage.getItem('ai-mod') || '';
+            const customUrl = localStorage.getItem('ai-url') || '';
+
+            document.getElementById('ai-provider').value = provider;
+            document.getElementById('ai-key').value = apiKey;
+            document.getElementById('ai-model').value = model;
+            document.getElementById('ai-custom-url').value = customUrl;
+
+            handleProviderChange();
+        }
+
+        function saveAiSettings() {
+            const provider = document.getElementById('ai-provider').value;
+            const apiKey = document.getElementById('ai-key').value;
+            const model = document.getElementById('ai-model').value;
+            const customUrl = document.getElementById('ai-custom-url').value;
+
+            localStorage.setItem('ai-prov', provider);
+            localStorage.setItem('ai-key', apiKey);
+            localStorage.setItem('ai-mod', model);
+            localStorage.setItem('ai-url', customUrl);
+
+            closeAiSettings();
+        }
+
+        // Text Selection & Chat logic
+        let currentSelection = "";
+        let currentContext = null;
+        let chatHistory = [];
+
+        function getPageContext(node) {
+            let current = node.nodeType === Node.TEXT_NODE ? node.parentElement : node;
+            let col = current.closest('.column');
+            if (!col) return null;
+
+            // Find the preceding page-divider element
+            let sibling = col.previousElementSibling;
+            while (sibling && !sibling.classList.contains('page-divider')) {
+                sibling = sibling.previousElementSibling;
+            }
+            if (!sibling) return null;
+
+            const pageNum = sibling.id.replace('page-', '');
+
+            // Identify parallel original and translation sibling columns
+            let origCol = sibling.nextElementSibling;
+            while (origCol && !origCol.classList.contains('original-col')) {
+                origCol = origCol.nextElementSibling;
+            }
+            let transCol = sibling.nextElementSibling;
+            while (transCol && !transCol.classList.contains('translation-col')) {
+                transCol = transCol.nextElementSibling;
+            }
+
+            const isOriginal = col.classList.contains('original-col');
+
+            return {
+                pageNum: pageNum,
+                dividerText: sibling.textContent.trim(),
+                originalText: origCol ? origCol.innerText : "",
+                translationText: transCol ? transCol.innerText : "",
+                selectedColType: isOriginal ? "original" : "translation"
+            };
+        }
+
+        function handleTextSelection(e) {
+            setTimeout(() => {
+                const selection = window.getSelection();
+                const text = selection.toString().trim();
+                const popup = document.getElementById('ai-selection-popup');
+
+                if (!text) {
+                    if (e.target && e.target.id !== 'ai-selection-popup') {
+                        popup.style.display = 'none';
+                    }
+                    return;
+                }
+
+                const anchorNode = selection.anchorNode;
+                if (!anchorNode) return;
+
+                const context = getPageContext(anchorNode);
+                if (!context) {
+                    popup.style.display = 'none';
+                    return;
+                }
+
+                currentSelection = text;
+                currentContext = context;
+
+                const isMobile = window.innerWidth <= 900;
+                
+                if (isMobile) {
+                    // Position fixed at the bottom on mobile to avoid native Android contextual menu overlap
+                    popup.style.display = 'flex';
+                    popup.style.position = 'fixed';
+                    popup.style.bottom = '24px';
+                    popup.style.left = '50%';
+                    popup.style.transform = 'translateX(-50%)';
+                    popup.style.top = 'auto';
+                    popup.style.width = 'calc(100% - 40px)';
+                    popup.style.maxWidth = '340px';
+                    popup.style.justifyContent = 'center';
+                    popup.style.boxShadow = '0 8px 24px rgba(0,0,0,0.3)';
+                } else {
+                    // Position relative to selection on desktop
+                    const range = selection.getRangeAt(0);
+                    const rect = range.getBoundingClientRect();
+
+                    popup.style.display = 'flex';
+                    popup.style.position = 'fixed';
+                    popup.style.bottom = 'auto';
+                    popup.style.transform = 'none';
+                    popup.style.width = 'auto';
+                    popup.style.maxWidth = 'none';
+                    popup.style.left = Math.max(10, Math.min(window.innerWidth - popup.offsetWidth - 10, rect.left + (rect.width / 2) - 50)) + "px";
+                    popup.style.top = (rect.top - 45) + "px";
+                    popup.style.justifyContent = 'flex-start';
+                    popup.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+                }
+            }, 10);
+        }
+
+        function openChatWithSelection() {
+            document.getElementById('ai-selection-popup').style.display = 'none';
+            
+            // Populate context card
+            const contextTextNode = document.getElementById('chat-context-text');
+            const colLabel = currentContext.selectedColType === 'original' ? 'Αρχαία' : 'Μετάφραση';
+            contextTextNode.textContent = '"' + currentSelection + '" (' + colLabel + ' • Σελίδα ' + currentContext.pageNum + ')';
+            
+            // Clear prior conversation when selecting new text
+            clearChat();
+
+            // Open sidebar
+            document.body.classList.add('chat-sidebar-open');
+            setTimeout(() => {
+                document.getElementById('chat-input').focus();
+                adjustSidebarHeightForKeyboard();
+            }, 100);
+        }
+
+        function clearChat() {
+            chatHistory = [];
+            const msgsContainer = document.getElementById('chat-messages');
+            
+            // Keep the context card, wipe standard bubble divs
+            const contextCard = document.getElementById('chat-context-card');
+            msgsContainer.innerHTML = '';
+            msgsContainer.appendChild(contextCard);
+        }
+
+        function handleChatKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendChatMessage();
+            }
+        }
+
+        function appendMessage(sender, text, isError = false, historyIndex = null) {
+            const msgsContainer = document.getElementById('chat-messages');
+            const msgDiv = document.createElement('div');
+            
+            if (isError) {
+                msgDiv.className = 'chat-message system-error';
+            } else {
+                msgDiv.className = 'chat-message ' + sender;
+            }
+
+            // If it is a user message and linked to history, attach interactive attributes
+            if (sender === 'user' && historyIndex !== null) {
+                msgDiv.setAttribute('data-history-index', historyIndex);
+                msgDiv.setAttribute('title', 'Κλικ για εκ νέου εκτέλεση από αυτό το σημείο');
+                msgDiv.addEventListener('click', () => handleHistoryClick(historyIndex));
+            }
+            
+            msgDiv.innerHTML = formatMarkdown(text);
+            msgsContainer.appendChild(msgDiv);
+            msgsContainer.scrollTop = msgsContainer.scrollHeight;
+        }
+
+        // Truncate history and re-run on user dialog click
+        async function handleHistoryClick(historyIndex) {
+            // Prevent duplicate triggers if query is running
+            const inputEl = document.getElementById('chat-input');
+            if (inputEl.disabled) return;
+
+            // Slice history array up to and including the selected user query
+            chatHistory = chatHistory.slice(0, historyIndex + 1);
+
+            // Redraw UI container to match truncated array
+            rebuildChatUI();
+
+            // Re-fire query
+            await runQuery();
+        }
+
+        // Clean redraw of current stack
+        function rebuildChatUI() {
+            const msgsContainer = document.getElementById('chat-messages');
+            const contextCard = document.getElementById('chat-context-card');
+            
+            msgsContainer.innerHTML = '';
+            msgsContainer.appendChild(contextCard);
+            
+            chatHistory.forEach((msg, idx) => {
+                if (msg.role === 'user') {
+                    let displayContent = msg.content;
+                    // Extract original question portion from first structured input turn for a clean UI
+                    if (idx === 0 && msg.content.includes("Ερώτηση:\n")) {
+                        displayContent = msg.content.split("Ερώτηση:\n").slice(1).join("Ερώτηση:\n");
+                    }
+                    appendMessage('user', displayContent, false, idx);
+                } else if (msg.role === 'assistant') {
+                    appendMessage('assistant', msg.content);
+                }
+            });
+        }
+
+        // Native Markdown parser leveraging standard Marked.js library
+        function formatMarkdown(text) {
+            if (!text) return "";
+            try {
+                // Parse standard markdown strings to structural HTML
+                return marked.parse(text);
+            } catch (err) {
+                // Fallback to basic text escaping on parse failure
+                return text
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/\n/g, "<br>");
+            }
+        }
+
+        // Modular core query runner
+        async function runQuery() {
+            const inputEl = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('chat-send-btn');
+            
+            // Disable inputs during network transaction
+            inputEl.disabled = true;
+            sendBtn.disabled = true;
+            
+            // Append loading container
+            appendMessage('assistant', 'Thinking...');
+            const lastMsgDiv = document.getElementById('chat-messages').lastChild;
+
+            // Load credentials
+            const provider = localStorage.getItem('ai-prov') || 'openai';
+            const apiKey = localStorage.getItem('ai-key') || '';
+            const savedMod = localStorage.getItem('ai-mod') || '';
+            const customUrl = localStorage.getItem('ai-url') || '';
+
+            if (!apiKey && provider !== 'custom') {
+                lastMsgDiv.className = 'chat-message system-error';
+                lastMsgDiv.innerText = '⚠️ Παρακαλούμε ρυθμίστε το API Key στις ρυθμίσεις AI Config πρώτα.';
+                openAiSettings();
+                inputEl.disabled = false;
+                sendBtn.disabled = false;
+                return;
+            }
+
+            // Build the System Prompt Context dynamically on EVERY call
+            const isOriginal = currentContext.selectedColType === 'original';
+            const contextText = isOriginal ? currentContext.originalText : currentContext.translationText;
+            const contextLabel = isOriginal ? "Αρχαίο Κείμενο" : "Σύγχρονη Μετάφραση";
+			const pageTitle = document.title;
+
+            let systemInstruction = "Είσαι διακεκριμένος φιλόσοφος και γνώστης της φιλοσοφίας του Αριστοτέλη και Πλάτωνα και άλλων αρχαίων ελλήνων συγγραφέων.\n" +
+                "Ο χρήστης διαβάζει το βιβλίου του " + pageTitle + " και βάσει αυτού θα σου κάνει μερικές ερωτήσεις, περιλαμβάνοντας κάποιες φορές αποσπάσματα απο το βιβλίο αυτό πάνω στα οποία σχετίζονται οι ερωτήσεις. Ακολουθεί το ευρύτειο πλαίσιο της σελίδας/κεφαλαίου (Σελίδα " + currentContext.pageNum + ", " + currentContext.dividerText + ") για αναφορά:\n" +
+                "--- " + contextLabel + ":\n" + contextText + "\n\n" +
+                "Απάντησε στις ερωτήσεις του χρήστη σε σχέση με το πλαίσιο του κειμένου που παρέχεται. " +
+                "Δώσε τις απαντήσεις σου στα νέα ελληνικά χρησιμοποιώντας markdown μορφοποίηση.";
+
+            // Construct Payload Messages (Always prepending system prompt at index 0)
+            let payloadMessages = [{ role: "system", content: systemInstruction }];
+            payloadMessages = payloadMessages.concat(chatHistory);
+
+            try {
+                const answer = await requestAPI(provider, apiKey, savedMod, payloadMessages, customUrl);
+                lastMsgDiv.innerHTML = formatMarkdown(answer);
+                chatHistory.push({ role: "assistant", content: answer });
+            } catch (error) {
+                lastMsgDiv.className = 'chat-message system-error';
+                lastMsgDiv.innerText = "Error: " + error.message;
+                // If API failed, keep the user question on screen so they can click to retry it,
+                // do not silently clear the UI anymore.
+            } finally {
+                inputEl.disabled = false;
+                sendBtn.disabled = false;
+                document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+                inputEl.focus();
+                adjustSidebarHeightForKeyboard();
+            }
+        }
+
+        async function sendChatMessage() {
+            const inputEl = document.getElementById('chat-input');
+            const prompt = inputEl.value.trim();
+            if (!prompt) return;
+
+            // If the last message in history is a 'user' query (due to a previous failed turn),
+            // pop it before sending so that our conversational stack maintains alternating roles.
+            if (chatHistory.length > 0 && chatHistory[chatHistory.length - 1].role === 'user') {
+                chatHistory.pop();
+            }
+
+            // 1. Manage Chat History & Highlight Context
+            let histIdx;
+            if (chatHistory.length === 0) {
+                // Incorporate highlighted text directly into the first user turn, NOT the system prompt
+                const firstUserContent = "Επισημασμένο κείμενο:\n\"" + currentSelection + "\"\n\nΕρώτηση:\n" + prompt;
+                chatHistory.push({ role: "user", content: firstUserContent });
+                histIdx = 0;
+            } else {
+                // Subsequent turns: push the raw user follow-up prompt
+                chatHistory.push({ role: "user", content: prompt });
+                histIdx = chatHistory.length - 1;
+            }
+
+            // 2. Display user message in UI with history index
+            appendMessage('user', prompt, false, histIdx);
+            inputEl.value = '';
+
+            // 3. Trigger query execution
+            await runQuery();
+        }
+
+        async function requestAPI(provider, apiKey, model, messages, customUrl) {
+            let url = "";
+            let headers = { "Content-Type": "application/json" };
+            let body = {};
+
+            // Normalize models to defaults if unspecified
+            let activeModel = model;
+            if (!activeModel) {
+                if (provider === 'openai') activeModel = 'gpt-4o-mini';
+                else if (provider === 'anthropic') activeModel = 'claude-3-5-sonnet-20241022';
+                else if (provider === 'gemini') activeModel = 'gemini-flash-latest';
+                else if (provider === 'openrouter') activeModel = 'meta-llama/llama-3-8b-instruct:free';
+                else activeModel = 'local-model';
+            }
+
+            if (provider === 'openai') {
+                url = "https://api.openai.com/v1/chat/completions";
+                headers["Authorization"] = "Bearer " + apiKey;
+                body = { model: activeModel, messages: messages };
+            } else if (provider === 'openrouter') {
+                url = "https://openrouter.ai/api/v1/chat/completions";
+                headers["Authorization"] = "Bearer " + apiKey;
+                headers["HTTP-Referer"] = window.location.href;
+                headers["X-Title"] = "Ancient Greek Bilingual Reader";
+                body = { model: activeModel, messages: messages };
+            } else if (provider === 'gemini') {
+                url = "https://generativelanguage.googleapis.com/v1beta/models/" + activeModel + ":generateContent?key=" + apiKey;
+                
+                // Restructure typical OpenAI formats to Gemini's native API structure
+                const systemItem = messages.find(m => m.role === 'system');
+                const userItems = messages.filter(m => m.role !== 'system');
+                
+                const contents = userItems.map(m => ({
+                    role: m.role === 'assistant' ? 'model' : 'user',
+                    parts: [{ text: m.content }]
+                }));
+
+                body = { contents: contents };
+                if (systemItem) {
+                    body.systemInstruction = { parts: [{ text: systemItem.content }] };
+                }
+            } else if (provider === 'anthropic') {
+                url = "https://api.anthropic.com/v1/messages";
+                headers["x-api-key"] = apiKey;
+                headers["anthropic-version"] = "2023-06-01";
+                headers["dangerously-allow-browser"] = "true";
+
+                const systemItem = messages.find(m => m.role === 'system');
+                const userItems = messages.filter(m => m.role !== 'system');
+
+                body = {
+                    model: activeModel,
+                    messages: userItems.map(m => ({ role: m.role, content: m.content })),
+                    max_tokens: 1500
+                };
+                if (systemItem) {
+                    body.system = systemItem.content;
+                }
+            } else if (provider === 'custom') {
+                url = customUrl || "http://localhost:11434/v1/chat/completions";
+                if (apiKey) {
+                    headers["Authorization"] = "Bearer " + apiKey;
+                }
+                body = { model: activeModel, messages: messages };
+            }
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(body)
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error("API Error (" + response.status + "): " + (errText || response.statusText));
+            }
+
+            const responseData = await response.json();
+
+            // Extract content responses safely depending on the selected engine
+            if (provider === 'gemini') {
+                return responseData.candidates[0].content.parts[0].text;
+            } else if (provider === 'anthropic') {
+                return responseData.content[0].text;
+            } else {
+                // OpenAI / OpenRouter / Ollama
+                return responseData.choices[0].message.content;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('ebook-theme');
+            if (savedTheme) {
+                const targetBtn = document.getElementById('theme-' + savedTheme);
+                if (targetBtn) setTheme(savedTheme, targetBtn);
+            }
+
+            const hideOriginal = localStorage.getItem('ebook-hide-original');
+            if (hideOriginal === 'true') {
+                document.body.classList.add('hide-original');
+                document.getElementById('toggle-layout-btn').innerText = 'Show Original';
+            }
+            
+            if (window.innerWidth > 900) {
+                const sidebarClosed = localStorage.getItem('ebook-sidebar-closed');
+                if (sidebarClosed === 'true') {
+                    document.body.classList.add('sidebar-closed');
+                }
+            }
+
+            // Restore saved chat width on desktop
+            const chatSidebar = document.getElementById('chat-sidebar');
+            const savedChatWidth = localStorage.getItem('ebook-chat-width');
+            if (savedChatWidth && window.innerWidth > 900) {
+                chatSidebar.style.width = savedChatWidth;
+            }
+
+            // Setup Resizing for AI Chat Sidebar
+            const resizeHandle = document.getElementById('chat-resize-handle');
+            let isResizing = false;
+
+            resizeHandle.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                chatSidebar.classList.add('resizing');
+                document.body.style.userSelect = 'none';
+                document.body.style.cursor = 'ew-resize';
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isResizing) return;
+                const newWidth = window.innerWidth - e.clientX;
+                // Limit range between 280px and 85% of total screen width
+                if (newWidth > 280 && newWidth < window.innerWidth * 0.85) {
+                    chatSidebar.style.width = newWidth + 'px';
+                    localStorage.setItem('ebook-chat-width', newWidth + 'px');
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (isResizing) {
+                    isResizing = false;
+                    chatSidebar.classList.remove('resizing');
+                    document.body.style.userSelect = '';
+                    document.body.style.cursor = '';
+                }
+            });
+            
+            // Listen for selection events on layout columns (supports mouse and touch handles)
+            document.addEventListener('mouseup', handleTextSelection);
+            document.addEventListener('keyup', handleTextSelection);
+            document.addEventListener('selectionchange', handleTextSelection);
+
+            // Bind selection popup using both mousedown and touchstart with preventDefault.
+            // This guarantees instant tap execution on touch devices before selection focus is lost.
+            const popup = document.getElementById('ai-selection-popup');
+            const handleTriggerTap = (e) => {
+                e.preventDefault();
+                openChatWithSelection();
+            };
+            popup.addEventListener('mousedown', handleTriggerTap);
+            popup.addEventListener('touchstart', handleTriggerTap);
+
+            // Hide the popup trigger during scroll shifts (desktop only to prevent mobile touch glitches)
+            window.addEventListener('scroll', () => {
+                if (window.innerWidth > 900) {
+                    document.getElementById('ai-selection-popup').style.display = 'none';
+                }
+            }, { passive: true });
+
+            // VisualViewport resizing adjustments (Handles Android virtual keyboard overlap natively)
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', adjustSidebarHeightForKeyboard);
+                window.visualViewport.addEventListener('scroll', adjustSidebarHeightForKeyboard);
+            }
+
+            const chatInput = document.getElementById('chat-input');
+            if (chatInput) {
+                chatInput.addEventListener('focus', () => {
+                    setTimeout(adjustSidebarHeightForKeyboard, 150);
+                });
+                chatInput.addEventListener('blur', () => {
+                    setTimeout(adjustSidebarHeightForKeyboard, 150);
+                });
+            }
+            
+            let lastScrollTop = 0;
+            const header = document.querySelector('header');
+            const optBtn = document.querySelector('.options-toggle');
+            
+            window.addEventListener('scroll', () => {
+                let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                
+                if (scrollTop < 0) scrollTop = 0;
+                
+                if (scrollTop > 10) {
+                    document.body.classList.add('scrolled');
+                } else {
+                    document.body.classList.remove('scrolled');
+                }
+                
+                if (scrollTop > lastScrollTop && scrollTop > 120) {
+                    header.classList.add('header-hidden');
+                    header.classList.remove('options-open');
+                    document.body.classList.remove('mobile-options-open');
+                    optBtn.classList.remove('active');
+                } else {
+                    header.classList.remove('header-hidden');
+                }
+                
+                lastScrollTop = scrollTop;
+            }, { passive: true });
+            
+            const observerOptions = {
+                root: null,
+                rootMargin: "-100px 0px -60% 0px", 
+                threshold: 0
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const hash = entry.target.getAttribute('data-hash');
+                        if (hash && window.location.hash !== '#' + hash) {
+                            history.replaceState(null, null, '#' + hash);
+                        }
+                    }
+                });
+            }, observerOptions);
+            
+            document.querySelectorAll('.page-divider').forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>
