@@ -2,46 +2,420 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>Κλασικά Κείμενα</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greek Classical Library</title>
     <style>
+        :root {
+            --primary-color: #2c3e50;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --border-color: #dce1e3;
+            --pinned-bg: #fffdf5;
+            --pinned-border: #f1c40f;
+        }
+
         body {
-            font-family: system-ui, sans-serif;
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 0 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
             line-height: 1.6;
         }
+
         h1 {
-            border-bottom: 2px solid #ccc;
-            padding-bottom: 0.3em;
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--primary-color);
         }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        @media (max-width: 600px) {
+            .controls {
+                flex-direction: column;
+            }
+        }
+
+        select, input {
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            outline: none;
+        }
+
+        select {
+            flex: 1;
+            cursor: pointer;
+        }
+
+        input {
+            flex: 2;
+        }
+
+        select:focus, input:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
         ul {
-            list-style: none;
+            list-style-type: none;
             padding: 0;
+            margin: 0;
         }
+
         li {
-            margin: 0.75em 0;
+            background: var(--card-bg);
+            margin-bottom: 12px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border-left: 4px solid transparent;
         }
+
+        li:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Pinned item styling */
+        li.pinned {
+            background-color: var(--pinned-bg);
+            border-left-color: var(--pinned-border);
+        }
+
         a {
+            display: flex;
+            flex-direction: column;
+            padding: 15px 20px;
             text-decoration: none;
-            color: #0066cc;
-            font-size: 1.1em;
+            color: inherit;
         }
-        a:hover {
-            text-decoration: underline;
+
+        .book-author {
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #7f8c8d;
+            margin-bottom: 4px;
+        }
+
+        .book-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #2980b9;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filename-hint {
+            font-size: 0.75em;
+            color: #bdc3c7;
+            margin-top: 8px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+            font-size: 1.1em;
+            background: var(--card-bg);
+            border-radius: 8px;
+            border-left: none;
         }
     </style>
 </head>
 <body>
-    <h1>Κλασικά Ελληνικά Κείμενα</h1>
 
-    <ul>
-        <li><a href="ΑΡΙΣΤΟΤΕΛΗΣ_Ποιητική.html">Αριστοτέλης — Ποιητική</a></li>
-        <li><a href="ΑΡΙΣΤΟΤΕΛΗΣ_Ἠθικὰ_Νικομάχεια.html">Αριστοτέλης — Ἠθικὰ Νικομάχεια</a></li>
-        <li><a href="ΠΛΑΤΩΝ_Συμπόσιον.html">Πλάτων — Συμπόσιον</a></li>
-        <li><a href="ΠΛΑΤΩΝ_Ἀπολογία_Σωκράτους.html">Πλάτων — Ἀπολογία Σωκράτους</a></li>
-        <li><a href="ΠΛΑΤΩΝ_Πολιτεία.html">Πλάτων — Πολιτεία</a></li>
-    </ul>
+    <h1>Greek Classical Library</h1>
 
+    <div class="controls">
+        <select id="authorFilter">
+            <option value="all">All Authors</option>
+        </select>
+        <input type="text" id="searchInput" placeholder="Search by filename or title (e.g. Πολιτεια)...">
+    </div>
+
+    <ul id="bookList"></ul>
+
+    <script>
+        // List of books to be pinned at the top
+        const pinnedFiles = [
+            "ΑΡΙΣΤΟΤΕΛΗΣ_Ποιητική.html",
+            "ΑΡΙΣΤΟΤΕΛΗΣ_Ἠθικὰ_Νικομάχεια.html",
+            "ΠΛΑΤΩΝ_Πολιτεία.html",
+            "ΠΛΑΤΩΝ_Συμπόσιον.html",
+            "ΠΛΑΤΩΝ_Ἀπολογία_Σωκράτους.html"
+        ];
+
+        const rawFiles = [
+            "[ΔΗΜΟΣΘΕΝΗΣ]_[Φιλίππου]_ἐπιστολή.html",
+            "[ΔΗΜΟΣΘΕΝΗΣ]_Περὶ_συντάξεως.html",
+            "[ΔΗΜΟΣΘΕΝΗΣ]_Περὶ_τῶν_πρὸς_Ἀλέξανδρον_συνθηκῶν.html",
+            "[ΔΗΜΟΣΘΕΝΗΣ]_Περὶ_Ἁλοννήσου.html",
+            "[ΔΗΜΟΣΘΕΝΗΣ]_Πρὸς_τὴν_ἐπστολήν.html",
+            "[ΨΕΥΔΟ-ΟΜΗΡΟΣ]_Βατραχομυομαχία.html",
+            "ΑΙΣΧΙΝΗΣ_Κατὰ_Κτησιφῶντος.html",
+            "ΑΙΣΧΥΛΟΣ_Εὐμενίδες.html",
+            "ΑΙΣΧΥΛΟΣ_Πέρσαι.html",
+            "ΑΙΣΧΥΛΟΣ_Προμηθεὺς_δεσμώτης.html",
+            "ΑΙΣΧΥΛΟΣ_Χοηφόροι.html",
+            "ΑΙΣΧΥΛΟΣ_Ἀγαμέμνων.html",
+            "ΑΙΣΧΥΛΟΣ_Ἑπτὰ_ἐπὶ_Θήβας.html",
+            "ΑΙΣΧΥΛΟΣ_Ἱκέτιδες.html",
+            "ΑΙΣΩΠΟΣ_Μῦθοι.html",
+            "ΑΝΤΙΦΩΝ_ΡΗΤΩΡ_Φαρμακείας_κατὰ_τῆς_μητρυιᾶς.html",
+            "ΑΡΙΣΤΟΤΕΛΗΣ_Ποιητική.html",
+            "ΑΡΙΣΤΟΤΕΛΗΣ_Ρητορική.html",
+            "ΑΡΙΣΤΟΤΕΛΗΣ_Ἠθικὰ_Νικομάχεια.html",
+            "ΑΡΙΣΤΟΦΑΝΗΣ_Βάτραχοι.html",
+            "ΑΡΙΣΤΟΦΑΝΗΣ_Εἰρήνη.html",
+            "ΑΡΙΣΤΟΦΑΝΗΣ_Λυσιστράτη.html",
+            "ΑΡΙΣΤΟΦΑΝΗΣ_Νεφέλαι.html",
+            "ΑΡΙΣΤΟΦΑΝΗΣ_Πλοῦτος.html",
+            "ΑΡΙΣΤΟΦΑΝΗΣ_Σφῆκες.html",
+            "ΑΡΙΣΤΟΦΑΝΗΣ_Ἐκκλησιάζουσαι.html",
+            "ΑΡΙΣΤΟΦΑΝΗΣ_Ἱππῆς.html",
+            "ΑΡΙΣΤΟΦΑΝΗΣ_Ὄρνιθες.html",
+            "ΑΡΡΙΑΝΟΣ_Ἀλεξάνδρου_Ἀνάβασις.html",
+            "ΒΑΚΧΥΛΙΔΗΣ_Διθύραμβοι.html",
+            "ΒΑΚΧΥΛΙΔΗΣ_Επίνικοι.html",
+            "ΒΙΩΝ_Αποσπάσματα.html",
+            "ΒΙΩΝ_Ἐπιτάφιος_Ἀδώνιδος.html",
+            "ΓΟΡΓΙΑΣ_Ἑλένης_ἐγκώμιον.html",
+            "ΓΟΡΓΙΑΣ_Ὑπὲρ_Παλαμήδους_ἀπολογία.html",
+            "ΔΗΜΟΣΘΕΝΗΣ_Κατὰ_Μειδίου.html",
+            "ΔΗΜΟΣΘΕΝΗΣ_Κατὰ_Φιλίππου_α΄.html",
+            "ΔΗΜΟΣΘΕΝΗΣ_Κατὰ_Φιλίππου_β΄.html",
+            "ΔΗΜΟΣΘΕΝΗΣ_Κατὰ_Φιλίππου_γ΄.html",
+            "ΔΗΜΟΣΘΕΝΗΣ_Κατὰ_Φιλίππου_δ΄.html",
+            "ΔΗΜΟΣΘΕΝΗΣ_Περὶ_τοῦ_στεφάνου.html",
+            "ΔΗΜΟΣΘΕΝΗΣ_Περὶ_τῆς_εἰρήνης.html",
+            "ΔΗΜΟΣΘΕΝΗΣ_Περὶ_τῶν_συμμοριῶν.html",
+            "ΔΗΜΟΣΘΕΝΗΣ_Περὶ_τῶν_ἐν_Χερρονήσῳ.html",
+            "ΔΗΜΟΣΘΕΝΗΣ_Ὀλυνθιακὸς_α΄.html",
+            "ΔΗΜΟΣΘΕΝΗΣ_Ὀλυνθιακὸς_β΄.html",
+            "ΔΗΜΟΣΘΕΝΗΣ_Ὀλυνθιακὸς_γ΄.html",
+            "ΔΗΜΟΣΘΕΝΗΣ_Ὑπὲρ_Μεγαλοπολιτών.html",
+            "ΔΗΜΟΣΘΕΝΗΣ_Ὑπὲρ_τῆς_Ῥοδίων_ἐλευθερίας.html",
+            "ΕΠΤΑ_ΣΟΦΟΙ_ΔΙΟΓΕΝΗΣ_ΛΑΕΡΤΙΟΣ_Βίοι_Φιλοσόφων_1.22-122.html",
+            "ΕΠΤΑ_ΣΟΦΟΙ_ΠΛΟΥΤΑΡΧΟΣ_Τῶν_ἑπτὰ_σοφῶν_συμπόσιον.html",
+            "ΕΠΤΑ_ΣΟΦΟΙ_ΣΤΟΒΑΙΟΣ_Ἀνθολόγιον_3.1.172-172.html",
+            "ΕΥΡΙΠΙΔΗΣ_Βάκχαι.html",
+            "ΕΥΡΙΠΙΔΗΣ_Κύκλωψ.html",
+            "ΕΥΡΙΠΙΔΗΣ_Μήδεια.html",
+            "ΕΥΡΙΠΙΔΗΣ_Τρῳάδες.html",
+            "ΕΥΡΙΠΙΔΗΣ_Ἀνδρομάχη.html",
+            "ΕΥΡΙΠΙΔΗΣ_Ἄλκηστις.html",
+            "ΕΥΡΙΠΙΔΗΣ_Ἑκάβη.html",
+            "ΕΥΡΙΠΙΔΗΣ_Ἑλένη.html",
+            "ΕΥΡΙΠΙΔΗΣ_Ἡλέκτρα.html",
+            "ΕΥΡΙΠΙΔΗΣ_Ἡρακλεῖδαι.html",
+            "ΕΥΡΙΠΙΔΗΣ_Ἡρακλῆς_Μαινόμενος.html",
+            "ΕΥΡΙΠΙΔΗΣ_Ἰφιγένεια_ἡ_ἐν_Αὐλίδι.html",
+            "ΕΥΡΙΠΙΔΗΣ_Ἰφιγένεια_ἡ_ἐν_Ταύροις.html",
+            "ΕΥΡΙΠΙΔΗΣ_Ἱππόλυτος.html",
+            "ΗΡΟΔΟΤΟΣ_Ἱστορίαι.html",
+            "ΗΡΩΔΑΣ_Μιμίαμβοι.html",
+            "ΗΣΙΟΔΟΣ_Θεογονία.html",
+            "ΗΣΙΟΔΟΣ_Ἀσπὶς_Ἡρακλέους.html",
+            "ΗΣΙΟΔΟΣ_Ἔργα_καὶ_Ἡμέραι.html",
+            "ΘΕΟΚΡΙΤΟΣ_Εἰδύλλια.html",
+            "ΘΕΟΦΡΑΣΤΟΣ_Χαρακτῆρες.html",
+            "ΘΟΥΚΥΔΙΔΗΣ_Ἱστορίαι.html",
+            "ΙΣΟΚΡΑΤΗΣ_Παναθηναϊκός.html",
+            "ΙΣΟΚΡΑΤΗΣ_Πανηγυρικός.html",
+            "ΙΣΟΚΡΑΤΗΣ_Φίλιππος.html",
+            "ΙΣΟΚΡΑΤΗΣ_Ἀρεοπαγιτικός.html",
+            "ΙΣΟΚΡΑΤΗΣ_Ἐπιστολὴ_πρὸς_Φίλιππον.html",
+            "ΙΣΟΚΡΑΤΗΣ_Ἑλένης_ἐγκώμιον.html",
+            "ΚΑΛΛΙΜΑΧΟΣ_Ὕμνοι.html",
+            "ΛΟΓΓΟΣ_Τὰ_κατὰ_Δάφνιν_καὶ_Χλόην.html",
+            "ΛΟΥΚΙΑΝΟΣ_Βίων_πρᾶσις.html",
+            "ΛΟΥΚΙΑΝΟΣ_Δραπέται.html",
+            "ΛΟΥΚΙΑΝΟΣ_Δὶς_κατηγορούμενος.html",
+            "ΛΟΥΚΙΑΝΟΣ_Κατάπλους_ἢ_Τύραννος.html",
+            "ΛΟΥΚΙΑΝΟΣ_Μένιππος_ἢ_Νεκυομαντεία.html",
+            "ΛΟΥΚΙΑΝΟΣ_Νεκρικοὶ_Διάλογοι.html",
+            "ΛΟΥΚΙΑΝΟΣ_Περὶ_πένθους.html",
+            "ΛΟΥΚΙΑΝΟΣ_Συμπόσιον_ἢ_Λαπίθαι.html",
+            "ΛΟΥΚΙΑΝΟΣ_Τίμων_ἢ_Μισάνθρωπος.html",
+            "ΛΟΥΚΙΑΝΟΣ_Χάρων_ἢ_Ἐπισκοποῦντες.html",
+            "ΛΟΥΚΙΑΝΟΣ_Ἁλιεὺς_ἢ_Ἀναβιοῦντες.html",
+            "ΛΥΣΙΑΣ_Κατὰ_Διογείτονος.html",
+            "ΛΥΣΙΑΣ_Κατὰ_Θεομνήστου.html",
+            "ΛΥΣΙΑΣ_Κατὰ_Νικομάχου.html",
+            "ΛΥΣΙΑΣ_Κατὰ_τῶν_σιτοπωλῶν.html",
+            "ΛΥΣΙΑΣ_Κατὰ_Ἐρατοσθένους.html",
+            "ΛΥΣΙΑΣ_Περὶ_τοῦ_σηκοῦ_ἀπολογία.html",
+            "ΛΥΣΙΑΣ_Ὑπὲρ_Μαντιθέου.html",
+            "ΛΥΣΙΑΣ_Ὑπὲρ_τοῦ_ἀδυνάτου.html",
+            "ΛΥΣΙΑΣ_Ὑπὲρ_τοῦ_Ἐρατοσθένους_φόνου.html",
+            "ΜΕΝΑΝΔΡΟΣ_Δύσκολος.html",
+            "ΜΕΝΑΝΔΡΟΣ_Σαμία.html",
+            "ΜΟΣΧΟΣ_Αποσπάσματα.html",
+            "ΜΟΣΧΟΣ_Εὐρώπη.html",
+            "ΜΟΥΣΑΙΟΣ_Τὰ_καθ'_Ἡρὼ_καὶ_Λέναδρον.html",
+            "ΞΕΝΟΦΩΝ_Κύρου_Ἀνάβασις.html",
+            "ΞΕΝΟΦΩΝ_Οἰκονομικός.html",
+            "ΞΕΝΟΦΩΝ_Ἑλληνικά.html",
+            "ΟΜΗΡΟΣ_Ἰλιάς.html",
+            "ΟΜΗΡΟΣ_Ὀδύσσεια.html",
+            "ΠΙΝΔΑΡΟΣ_Νεμεονίκαις.html",
+            "ΠΙΝΔΑΡΟΣ_Πυθιονίκαις.html",
+            "ΠΙΝΔΑΡΟΣ_Ἰσθμιονίκαις.html",
+            "ΠΙΝΔΑΡΟΣ_Ὀλυμπιονίκαις.html",
+            "ΠΛΑΤΩΝ_Κρίτων.html",
+            "ΠΛΑΤΩΝ_Λύσις.html",
+            "ΠΛΑΤΩΝ_Μενέξενος.html",
+            "ΠΛΑΤΩΝ_Πολιτεία.html",
+            "ΠΛΑΤΩΝ_Πρωταγόρας.html",
+            "ΠΛΑΤΩΝ_Συμπόσιον.html",
+            "ΠΛΑΤΩΝ_Ἀπολογία_Σωκράτους.html",
+            "ΠΛΑΤΩΝ_Ἴων.html",
+            "ΠΛΑΤΩΝ_Ἵππίας_μείζων.html",
+            "ΠΛΟΥΤΑΡΧΟΣ_Θεμιστοκλῆς.html",
+            "ΠΛΟΥΤΑΡΧΟΣ_Νικίας.html",
+            "ΠΛΟΥΤΑΡΧΟΣ_Περικλῆς.html",
+            "ΠΛΟΥΤΑΡΧΟΣ_Σόλων.html",
+            "ΠΛΟΥΤΑΡΧΟΣ_Τῶν_ἑπτὰ_σοφῶν_συμπόσιον.html",
+            "ΠΛΟΥΤΑΡΧΟΣ_Ἀλέξανδρος.html",
+            "ΣΟΦΟΚΛΗΣ_Αἴας.html",
+            "ΣΟΦΟΚΛΗΣ_Οἰδίπους_Τύραννος.html",
+            "ΣΟΦΟΚΛΗΣ_Οἰδίπους_ἐπὶ_Κολωνῷ.html",
+            "ΣΟΦΟΚΛΗΣ_Τραχίνιαι.html",
+            "ΣΟΦΟΚΛΗΣ_Φιλοκτήτης.html",
+            "ΣΟΦΟΚΛΗΣ_Ἀντιγόνη.html",
+            "ΣΟΦΟΚΛΗΣ_Ἠλέκτρα.html"
+        ];
+
+        // Parse filenames to extract Author, Title, and check if pinned
+        const books = rawFiles.map(filename => {
+            let nameWithoutExt = filename.replace('.html', '');
+            let author = "";
+            let title = "";
+
+            // Handle multi-word or special bracketed authors
+            if (nameWithoutExt.startsWith("ΕΠΤΑ_ΣΟΦΟΙ_ΔΙΟΓΕΝΗΣ_ΛΑΕΡΤΙΟΣ")) {
+                author = "ΕΠΤΑ_ΣΟΦΟΙ_ΔΙΟΓΕΝΗΣ_ΛΑΕΡΤΙΟΣ";
+            } else if (nameWithoutExt.startsWith("ΕΠΤΑ_ΣΟΦΟΙ_ΠΛΟΥΤΑΡΧΟΣ")) {
+                author = "ΕΠΤΑ_ΣΟΦΟΙ_ΠΛΟΥΤΑΡΧΟΣ";
+            } else if (nameWithoutExt.startsWith("ΕΠΤΑ_ΣΟΦΟΙ_ΣΤΟΒΑΙΟΣ")) {
+                author = "ΕΠΤΑ_ΣΟΦΟΙ_ΣΤΟΒΑΙΟΣ";
+            } else if (nameWithoutExt.startsWith("ΑΝΤΙΦΩΝ_ΡΗΤΩΡ")) {
+                author = "ΑΝΤΙΦΩΝ_ΡΗΤΩΡ";
+            } else if (nameWithoutExt.startsWith("[ΔΗΜΟΣΘΕΝΗΣ]")) {
+                author = "[ΔΗΜΟΣΘΕΝΗΣ]";
+            } else if (nameWithoutExt.startsWith("[ΨΕΥΔΟ-ΟΜΗΡΟΣ]")) {
+                author = "[ΨΕΥΔΟ-ΟΜΗΡΟΣ]";
+            } else {
+                let firstUnderscore = nameWithoutExt.indexOf('_');
+                if (firstUnderscore !== -1) {
+                    author = nameWithoutExt.substring(0, firstUnderscore);
+                } else {
+                    author = "Unknown";
+                }
+            }
+
+            if (author !== "Unknown") {
+                title = nameWithoutExt.substring(author.length + 1).replace(/_/g, ' ');
+            } else {
+                title = nameWithoutExt;
+            }
+
+            const isPinned = pinnedFiles.includes(filename);
+
+            return { filename, author, title, isPinned };
+        });
+
+        // Populate the dropdown with unique authors
+        const authorFilter = document.getElementById('authorFilter');
+        const uniqueAuthors = [...new Set(books.map(b => b.author))].sort();
+        
+        uniqueAuthors.forEach(author => {
+            const option = document.createElement('option');
+            option.value = author;
+            option.textContent = author.replace(/_/g, ' '); 
+            authorFilter.appendChild(option);
+        });
+
+        // Normalization function to ignore Greek accents and casing during search
+        function normalizeText(text) {
+            return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+        }
+
+        const bookList = document.getElementById('bookList');
+        const searchInput = document.getElementById('searchInput');
+
+        // Function to render the list based on current filters
+        function renderList() {
+            const selectedAuthor = authorFilter.value;
+            const searchString = normalizeText(searchInput.value);
+
+            // Filter logic
+            const filteredBooks = books.filter(book => {
+                const matchesAuthor = (selectedAuthor === 'all' || book.author === selectedAuthor);
+                const matchesSearch = normalizeText(book.filename).includes(searchString) || 
+                                      normalizeText(book.title).includes(searchString);
+                return matchesAuthor && matchesSearch;
+            });
+
+            // Clear current list
+            bookList.innerHTML = '';
+
+            // Handle empty results
+            if (filteredBooks.length === 0) {
+                bookList.innerHTML = '<li class="no-results">No books found matching your criteria.</li>';
+                return;
+            }
+
+            // Separate pinned books from regular books to display them at the top
+            const pinnedList = filteredBooks.filter(b => b.isPinned);
+            const regularList = filteredBooks.filter(b => !b.isPinned);
+            const sortedBooks = [...pinnedList, ...regularList];
+
+            // Render list items
+            sortedBooks.forEach(book => {
+                const li = document.createElement('li');
+                if (book.isPinned) {
+                    li.classList.add('pinned');
+                }
+
+                const a = document.createElement('a');
+                // Prefix the folder path here
+                a.href = `books/${book.filename}`;
+                
+                a.innerHTML = `
+                    <span class="book-author">${book.author.replace(/_/g, ' ')}</span>
+                    <span class="book-title">
+                        ${book.isPinned ? '📌 ' : ''}${book.title}
+                    </span>
+                    <span class="filename-hint">${book.filename}</span>
+                `;
+                
+                li.appendChild(a);
+                bookList.appendChild(li);
+            });
+        }
+
+        // Event listeners
+        authorFilter.addEventListener('change', renderList);
+        searchInput.addEventListener('input', renderList);
+
+        // Initial render
+        renderList();
+
+    </script>
 </body>
 </html>
